@@ -1,0 +1,336 @@
+{
+  "closeout": null,
+  "created_at": "2026-07-28T16:10:40+00:00",
+  "current_focus": {
+    "cadence": "frontier-batch",
+    "confirmed": true,
+    "confirmed_at": "2026-07-28T16:34:59+00:00",
+    "domain": "product identity and bootstrap contract",
+    "started_at": "2026-07-28T16:10:40+00:00",
+    "status": "implementing",
+    "summary": "RepoGlance named; private saari-co/RepoGlance bootstrapped contract-only; access model corrected at the shared-understanding gate to RepoBar-faithful account-first discovery (sign-in saariuslystoned, owner switcher across saariuslystoned/saari-co/dinkuskit, all repos per owner, pin/hide curation with pins as the widget and background-refresh set); navigator scope model account|org|repo x issues|PRs|both; GitHub App on all three owners; private with no license; small-widget content deferred to a five-variant fixture grill."
+  },
+  "decisions": [
+    {
+      "baseline_ref": "plan:x-api/plans/repobar-pixel-companion-plan-20260728.md",
+      "candidate_refs": [],
+      "choice": "The product and repository are named RepoGlance: repo saari-co/RepoGlance, checkout ~/Developer/side-quests/RepoGlance, GitHub App named RepoGlance.",
+      "context_ref": "github:saari-co/x-api#522",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "The product and repository are named RepoGlance: repo saari-co/RepoGlance, checkout ~/Developer/side-quests/RepoGlance, GitHub App named RepoGlance.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted in frontier batch 1; presented alternatives were PixelRepoBar and SwarmGlance",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "The product and repository are named RepoGlance: repo saari-co/RepoGlance, checkout ~/Developer/side-quests/RepoGlance, GitHub App named RepoGlance.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "repository created under the chosen name",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "product-name-001",
+      "implementation_ref": "github:saari-co/RepoGlance",
+      "question": "What is the product/repository name?",
+      "rationale": "Matches the glance discipline and the Jetpack Glance widget stack; no collision in saari-co or ~/Developer; deliberately not Swarm-prefixed because the app has no swarm dependency.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "plan:x-api/plans/swarmbar-macos-companion-plan-20260717.md#slice-05",
+      "candidate_refs": [],
+      "choice": "Create private saari-co/RepoGlance now with a contract-only seed (README, AGENTS, VISION, REPO_HYGIENE, PRODUCT_DECISIONS, GrillTrack ledger, proof packet) per the SwarmBar Slice 0.5 bootstrap precedent; no Android project until the build lane is routed.",
+      "context_ref": "github:saari-co/x-api#522",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "product-name-001"
+      ],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Create private saari-co/RepoGlance now with a contract-only seed per the SwarmBar Slice 0.5 bootstrap precedent; no Android project until the build lane is routed.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user answered 'Yes - saari-co, now'; this is the explicit repo-creation instruction the x-api plan requires",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Create private saari-co/RepoGlance now with a contract-only seed per the SwarmBar Slice 0.5 bootstrap precedent; no Android project until the build lane is routed.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "repository created and seeded; subject commit SHA recorded in proof/bootstrap-20260728/PROOF.md",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "repo-bootstrap-002",
+      "implementation_ref": "github:saari-co/RepoGlance",
+      "question": "Create the app repository now (Slice 0.5 bootstrap), and under which owner?",
+      "rationale": "Explicit authorization given in-grill; saari-co is the house product org. Bootstrap commits go directly to main as the one authorized contract-only seed sequence; all later changes use branch/PR review.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "github:saari-co (repo inventory 2026-07-28)",
+      "candidate_refs": [],
+      "choice": "Watch a curated roster as the access boundary: Swarm core (x-api, swarmpocket, SwarmBar, SwarmDash, smokyworker_setup, pixel-fold, spark-dgx) plus website/product family (smokyworks, smokyproductco, smokyclub, aicommerce, dinkuskit/blocks).",
+      "context_ref": "github:saari-co/x-api#522",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Watch a curated roster as the access boundary: Swarm core plus website/product family.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user selected the two groups in frontier batch 1",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Watch a curated roster as the access boundary: Swarm core plus website/product family.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "at the shared-understanding gate Bobby corrected the model: RepoBar shows all repos for the connected account; curated roster demoted from access boundary to default pinned set; see access-model-004",
+          "to": "superseded",
+          "verification_ref": null
+        }
+      ],
+      "id": "watch-roster-003",
+      "implementation_ref": null,
+      "question": "What is the initial watched-repo roster for v0.1?",
+      "rationale": "Superseded before implementation; preserved per GrillTrack reopening rules.",
+      "review_ref": null,
+      "status": "superseded",
+      "superseded_by": "access-model-004",
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "decision:watch-roster-003",
+      "candidate_refs": [],
+      "choice": "Account-first discovery: sign in as saariuslystoned; owner switcher saariuslystoned / saari-co / dinkuskit; all repos with PR/issue pressure per owner; pin/hide curation. Default pins: x-api, swarmpocket, SwarmBar, SwarmDash, smokyworker_setup, pixel-fold, spark-dgx, smokyworks, smokyproductco, smokyclub, aicommerce, dinkuskit/blocks. Pinned repos are the widget and background-refresh set; discovery lists fetch on demand.",
+      "context_ref": "upstream:steipete/RepoBar repository browser",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Account-first discovery with owner switcher, all repos per owner, and pin/hide curation; pins are the widget and background-refresh set.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked at the revised shared-understanding confirmation",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Account-first discovery with owner switcher, all repos per owner, and pin/hide curation; pins are the widget and background-refresh set.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/x-api#522",
+          "note": "x-api plan amended (access model section) and this repo's contracts record it",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "access-model-004",
+      "implementation_ref": "github:saari-co/x-api#522",
+      "question": "What is the access/visibility model for repositories?",
+      "rationale": "Bobby: RepoBar shows all repos for the connected account; RepoGlance should connect as saariuslystoned, show the orgs, navigate between saariuslystoned, saari-co, and dinkuskit, and show all repos' PRs/issues. Pins keep widgets and battery bounded without becoming an access wall.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "plan:x-api/plans/repobar-pixel-companion-plan-20260728.md#issue-navigator-v01",
+      "candidate_refs": [],
+      "choice": "The issue navigator scopes account-wide, org-wide, or single-repo via a dropdown, each showing issues only, PRs only, or PRs+issues, composing with the Open/Mine/Mentions/Recently-updated/Awaiting-my-review filters.",
+      "context_ref": "upstream:steipete/RepoBar issue navigation",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "access-model-004"
+      ],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Navigator scope model: account | org | repo, each x issues | PRs | both, composing with the existing filters.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked at the revised shared-understanding confirmation",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Navigator scope model: account | org | repo, each x issues | PRs | both, composing with the existing filters.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/x-api#522",
+          "note": "x-api plan navigator section amended",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "navigator-scope-005",
+      "implementation_ref": "github:saari-co/x-api#522",
+      "question": "How does the issue navigator scope and mode selection work?",
+      "rationale": "Bobby: the navigator's repo dropdown narrowing to a single repo with issues-only / PRs-only / both, available account-wide, org-wide, and per-repo, is core to why the tool is useful.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "upstream:steipete/RepoBar auth (GitHub App user tokens; README pass 2026-07-28)",
+      "candidate_refs": [],
+      "choice": "The RepoGlance GitHub App is owned by saari-co and installed on all three owners (saariuslystoned, saari-co, dinkuskit); the sign-in identity is saariuslystoned via Chrome Custom Tab; short-lived user tokens rotate silently, Keystore-backed; fine-grained read-only PAT remains the fallback. Registration and installations are Bobby-manual before Slice 3.",
+      "context_ref": "decision:access-model-004",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "product-name-001",
+        "access-model-004"
+      ],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "RepoGlance GitHub App owned by saari-co, installed on saariuslystoned, saari-co, and dinkuskit; sign-in as saariuslystoned; Bobby-manual registration before Slice 3.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked at the revised shared-understanding confirmation; user tokens see the intersection of user permissions and app installations, hence three installations; not implementable in this cycle",
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "github-app-topology-006",
+      "implementation_ref": null,
+      "question": "Who owns the GitHub App, where is it installed, and what identity signs in?",
+      "rationale": "Bobby signs in once as saariuslystoned and reaches everything the switcher offers; no browser-cookie reuse ever. dinkuskit/blocks is additionally readable via public access even before the dinkuskit installation.",
+      "review_ref": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "plan:x-api/plans/swarmbar-macos-companion-plan-20260717.md (no-license precedent)",
+      "candidate_refs": [],
+      "choice": "Private repository with no license file until Bobby makes a distribution decision.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Private repository with no license file until Bobby makes a distribution decision.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted in frontier batch 1; alternatives were MIT-staged and public-from-birth",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": "Private repository with no license file until Bobby makes a distribution decision.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "repository created private with no LICENSE file",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "license-posture-007",
+      "implementation_ref": "github:saari-co/RepoGlance",
+      "question": "What license and visibility posture does the app repository take?",
+      "rationale": "SwarmBar precedent keeps every distribution option open; nothing public exists yet to license.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "plan:x-api/plans/repobar-pixel-companion-plan-20260728.md#pixel-optimization-contract",
+      "candidate_refs": [],
+      "choice": null,
+      "context_ref": "plan:grill-skills-family-20260719.md#grill-frontend",
+      "created_at": "2026-07-28T16:34:59+00:00",
+      "deferred_reason": "Best decided with the grill-frontend five-variant picker against real Slice 2 widget fixtures; an abstract preference now would be low-fidelity.",
+      "delivery_ref": null,
+      "dependencies": [
+        "access-model-004"
+      ],
+      "domain": "product identity and bootstrap contract",
+      "history": [
+        {
+          "at": "2026-07-28T16:34:59+00:00",
+          "choice": null,
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "deferred by agent recommendation, accepted in the shared-understanding summary",
+          "to": "deferred",
+          "verification_ref": null
+        }
+      ],
+      "id": "widget-content-priority-008",
+      "implementation_ref": null,
+      "question": "Which two-three numbers earn the small-widget slot?",
+      "rationale": null,
+      "review_ref": null,
+      "status": "deferred",
+      "superseded_by": null,
+      "updated_at": "2026-07-28T16:34:59+00:00",
+      "verification_ref": null
+    }
+  ],
+  "last_activation": {
+    "at": "2026-07-28T16:10:40+00:00",
+    "mechanism": "explicit"
+  },
+  "recommendation": null,
+  "schema_version": "grilltrack/v0.1",
+  "status": "active",
+  "title": "RepoGlance product identity and bootstrap contract",
+  "track_id": "gt-20260728163459-227573",
+  "updated_at": "2026-07-28T16:34:59+00:00"
+}

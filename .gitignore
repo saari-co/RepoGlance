@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# Repo shape
+/runs/
+/worktrees/
+.grilltrack/work/
+
+# Android (pre-seeded for the future build lane)
+build/
+.gradle/
+.kotlin/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml

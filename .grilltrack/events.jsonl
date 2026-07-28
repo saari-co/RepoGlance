@@ -1,0 +1,13 @@
+{"action": "track_initialized", "at": "2026-07-28T16:10:40+00:00", "data": {"track_id": "gt-20260728163459-227573", "note": "explicit activation: Bobby requested 'a grilltrack on repoglance' in the x-api session that authored plan PR #522"}, "event_id": "cd754d1f-a6f2-4558-9711-f8745a10611a"}
+{"action": "focus_started", "at": "2026-07-28T16:10:40+00:00", "data": {"cadence": "frontier-batch", "domain": "product identity and bootstrap contract"}, "event_id": "9f74a45b-d8cb-4d57-94fd-3f72172a224f"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "product-name-001"}, "event_id": "9db95670-415c-4d7f-a09f-6029ee6a1f9a"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "repo-bootstrap-002"}, "event_id": "59d864c8-04cf-4cbe-9c06-8c3b77cc22e5"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "watch-roster-003"}, "event_id": "187b80cf-e162-42cf-9748-5c786be421dd"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "license-posture-007"}, "event_id": "703b64b3-c1cd-4548-94de-2091bc7c996c"}
+{"action": "decision_superseded", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "watch-roster-003", "superseded_by": "access-model-004", "note": "user corrected the access model at the shared-understanding gate"}, "event_id": "430607f3-943c-4efb-a81c-2b5f6b41eb0a"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "access-model-004"}, "event_id": "5d67d52e-521f-4e25-9d6d-cf19b366f393"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "navigator-scope-005"}, "event_id": "bc1505f6-ee1c-4f7a-bcc0-861de9ebe53a"}
+{"action": "decision_locked", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "github-app-topology-006"}, "event_id": "f2c2b8c0-9a61-452d-aa33-2b788277cb9e"}
+{"action": "decision_deferred", "at": "2026-07-28T16:34:59+00:00", "data": {"decision_id": "widget-content-priority-008", "reason": "five-variant fixture grill later"}, "event_id": "6576f787-bbba-4cf6-875e-a84280b6cdb9"}
+{"action": "focus_confirmed", "at": "2026-07-28T16:34:59+00:00", "data": {"note": "revised shared understanding confirmed after access-model correction"}, "event_id": "10bcdf6e-3ccb-4446-bcf2-ba44c44bf844"}
+{"action": "implementation_recorded", "at": "2026-07-28T16:34:59+00:00", "data": {"refs": ["github:saari-co/RepoGlance", "github:saari-co/x-api#522"], "note": "contract-only bootstrap seed plus x-api plan amendment"}, "event_id": "4b329b13-508d-423e-95b7-2ec7c4343ef6"}
