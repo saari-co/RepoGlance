@@ -8,7 +8,7 @@
     "domain": "public release posture",
     "started_at": "2026-07-29T12:02:53+00:00",
     "status": "implementing",
-    "summary": "Repo public under MIT with full history published as-is; honest-main discipline; no preset pins (in-place pin toggle, pins = widget + background-refresh set); GitHub App publicly installable with maintainer installs as personal config. Public docs rework + LICENSE land via PR #1 (maintainer merge gate)."
+    "summary": "Repo public under MIT with full history published as-is; honest-main discipline; no preset pins (in-place pin toggle, pins = widget + background-refresh set); GitHub App publicly installable with maintainer installs as personal config. Public docs rework + LICENSE land via PR #1 (maintainer merge gate). Delivery rail locked: rolling-release APKs pulled by cp-1 with one-tap banner installs, public sideload channel for everyone else."
   },
   "decisions": [
     {
@@ -535,6 +535,40 @@
       "superseded_by": null,
       "updated_at": "2026-07-29T12:08:47+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": "pattern:swarmpocket rolling-release update rail",
+      "candidate_refs": [],
+      "choice": "Maintainer delivery rides the proven SwarmPocket rail, generalized: merge an app change -> CI builds and publishes the APK to a rolling GitHub release -> cp-1 pulls it within 30 minutes -> the update banner appears on the phone over WireGuard -> one-tap install. The public rolling release doubles as the public sideload channel; the cp-1 puller and banner configuration stay swarm-side so the product keeps zero swarm dependency. First device install is one manual sideload (REQUEST_INSTALL_PACKAGES for self-update); release signing keystore and CI secrets are maintainer-gated.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-29T12:10:13+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "repo-bootstrap-002",
+        "public-mit-009"
+      ],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-07-29T12:10:13+00:00",
+          "choice": "Maintainer delivery rides the proven SwarmPocket rail, generalized: merge an app change -> CI builds and publishes the APK to a rolling GitHub release -> cp-1 pulls it within 30 minutes -> the update banner appears on the phone over WireGuard -> one-tap install. The public rolling release doubles as the public sideload channel; the cp-1 puller and banner configuration stay swarm-side so the product keeps zero swarm dependency. First device install is one manual sideload (REQUEST_INSTALL_PACKAGES for self-update); release signing keystore and CI secrets are maintainer-gated.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "maintainer, mid-cycle 2026-07-29: sync to phone over cp-1/WireGuard once scaffolded, 'same way we are syncing updates to the swarmpocket'; quoted pipeline recorded verbatim in rationale",
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "delivery-rail-012",
+      "implementation_ref": null,
+      "question": "How do merged app changes reach the maintainer's phone (and the public)?",
+      "rationale": "Maintainer's stated pipeline: 'merge an app change -> CI builds and publishes to a rolling release -> cp-1 pulls it within 30 minutes -> the pink banner appears on your phone -> one tap'. Implementable only once the build lane produces an APK and CI exists.",
+      "review_ref": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-07-29T12:10:13+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -554,5 +588,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-07-29T12:08:47+00:00"
+  "updated_at": "2026-07-29T12:10:13+00:00"
 }
