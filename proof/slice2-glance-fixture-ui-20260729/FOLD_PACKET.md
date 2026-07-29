@@ -59,6 +59,12 @@ review each frame, upload to `swarm-pr-assets` release
 Personal-launcher content in Fold home-screen frames gets per-frame human
 review before publication per house media policy.
 
+Signature caveat: until the DEBUG_KEYSTORE_B64 continuity step is armed
+(swarmpocket `proof/companion-rail-20260729/DEPLOY_PACKET.md`, step 0), the
+canary APK is throwaway-signed — a first install works, but the first
+continuity-signed update over it will need one uninstall/reinstall. Arming
+the keystore first avoids that churn.
+
 ## Not in this packet
 
 The rail one-tap proof (merge → canary → cp-1 pull → banner → install) is a
