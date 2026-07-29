@@ -11,11 +11,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import co.saari.repoglance.fixtures.FixtureScenario
+import co.saari.repoglance.fixtures.Fixtures
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
+import java.time.Instant
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +39,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun SliceOneScreen() {
+    // Proves the model links into the app target: a real Fixtures call,
+    // not a placeholder. Slice 2 replaces this with the actual navigator UI.
+    val mixedRepoCount = remember { Fixtures.snapshots(FixtureScenario.MIXED, Instant.now()).size }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,6 +57,10 @@ private fun SliceOneScreen() {
         Text(
             text = "Slice 1: model + fixtures (no UI yet)",
             style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = "MIXED fixture repos: $mixedRepoCount",
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
