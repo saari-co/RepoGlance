@@ -12,12 +12,10 @@ Peter Steinberger (macOS menu bar). RepoGlance is the Pixel-native analog,
 not a port: no local git, no menu bar — Glance widgets, an owner switcher,
 and deep links into the GitHub mobile app.
 
-## Status: contracts only — no code yet
+## Status
 
-This repository is in its bootstrap phase. What exists today is the product
-contract, the decision ledger, and proof of how decisions were made. The
-Android project has not started. This README distinguishes **planned** from
-**available**; right now, everything below is planned.
+Slice 1 available: typed snapshot model, fixture corpus, and truth-rule
+tests — no network, no UI yet. Everything else remains planned.
 
 ## Planned
 
