@@ -8,10 +8,7 @@ name: canary
 
 on:
   push:
-    # TEMPORARY: codex/canary-rail-20260729 added only to fire this workflow
-    # for real pre-merge proof of the built_at-epoch fix. Removed in a
-    # follow-up commit once the canary run is green.
-    branches: [main, codex/canary-rail-20260729]
+    branches: [main]
     paths-ignore:
       - "proof/**"
       - "docs/**"
