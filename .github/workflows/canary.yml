@@ -8,7 +8,10 @@ name: canary
 
 on:
   push:
-    branches: [main]
+    # TEMPORARY: codex/canary-rail-20260729 added only to fire this workflow
+    # for real pre-merge proof of the built_at-epoch fix. Removed in a
+    # follow-up commit once the canary run is green.
+    branches: [main, codex/canary-rail-20260729]
     paths-ignore:
       - "proof/**"
       - "docs/**"
@@ -50,8 +53,8 @@ jobs:
           cp app/build/outputs/apk/debug/app-debug.apk "$APK"
           SIZE=$(stat -c%s "$APK")
           SHA256=$(sha256sum "$APK" | cut -d' ' -f1)
-          BUILT_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          printf '{"sha":"%s","apk":"%s","size":%s,"apk_sha256":"%s","built_at":"%s","package":"%s","version_code":%s,"version_name":"%s"}\n' \
+          BUILT_AT=$(date -u +%s)
+          printf '{"sha":"%s","apk":"%s","size":%s,"apk_sha256":"%s","built_at":%s,"package":"%s","version_code":%s,"version_name":"%s"}\n' \
             "$GITHUB_SHA" "$APK" "$SIZE" "$SHA256" "$BUILT_AT" \
             "co.saari.repoglance" "$REPOGLANCE_VERSION_CODE" "$REPOGLANCE_VERSION_NAME" \
             > version.json
