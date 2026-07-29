@@ -1,0 +1,77 @@
+# Build the RepoGlance debug APK on every main push and publish it to a
+# stable rolling prerelease tag `canary`. Assets are replaced on every run;
+# the release itself is never deleted. A cp-1 puller consumes version.json
+# (sha, apk name, size, apk_sha256 — plus built_at/package/version_code/
+# version_name for the phone-side banner) to fetch and verify the APK over
+# its own authed channel. Debug-signed only; no keystore, no secrets.
+name: canary
+
+on:
+  push:
+    # TEMPORARY: codex/canary-rail-20260729 added only to fire this workflow
+    # for real pre-merge proof (workflow_dispatch can't target a non-default
+    # branch). Removed in a follow-up commit once the canary run is green.
+    branches: [main, codex/canary-rail-20260729]
+    paths-ignore:
+      - "proof/**"
+      - "docs/**"
+      - ".grilltrack/**"
+      - "**.md"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: canary
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REPOGLANCE_VERSION_CODE: ${{ github.run_number }}
+      REPOGLANCE_VERSION_NAME: "0.2.0-canary.${{ github.run_number }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build debug APK
+        run: |
+          echo "REPOGLANCE_VERSION_CODE=$REPOGLANCE_VERSION_CODE"
+          echo "REPOGLANCE_VERSION_NAME=$REPOGLANCE_VERSION_NAME"
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Package release payload
+        run: |
+          SHORT=${GITHUB_SHA:0:12}
+          APK="repoglance-${SHORT}.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$APK"
+          SIZE=$(stat -c%s "$APK")
+          SHA256=$(sha256sum "$APK" | cut -d' ' -f1)
+          BUILT_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          printf '{"sha":"%s","apk":"%s","size":%s,"apk_sha256":"%s","built_at":"%s","package":"%s","version_code":%s,"version_name":"%s"}\n' \
+            "$GITHUB_SHA" "$APK" "$SIZE" "$SHA256" "$BUILT_AT" \
+            "co.saari.repoglance" "$REPOGLANCE_VERSION_CODE" "$REPOGLANCE_VERSION_NAME" \
+            > version.json
+          cat version.json
+
+      - name: Publish rolling canary release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT=${GITHUB_SHA:0:12}
+          APK="repoglance-${SHORT}.apk"
+          gh release view canary >/dev/null 2>&1 || \
+            gh release create canary --prerelease \
+              --title "RepoGlance canary" \
+              --notes "Rolling debug preview channel. Assets are replaced on every main push; this release is never deleted."
+          gh release upload canary "$APK" --clobber
+          gh release upload canary version.json --clobber
+          for a in $(gh release view canary --json assets --jq '.assets[].name' | grep '^repoglance-.*\.apk$'); do
+            [ "$a" = "$APK" ] || gh release delete-asset canary "$a" -y
+          done
