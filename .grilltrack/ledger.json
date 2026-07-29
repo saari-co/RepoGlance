@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-07-28T16:34:59+00:00",
-    "domain": "product identity and bootstrap contract",
-    "started_at": "2026-07-28T16:10:40+00:00",
-    "status": "inspected",
-    "summary": "RepoGlance named; private saari-co/RepoGlance bootstrapped contract-only; access model corrected at the shared-understanding gate to RepoBar-faithful account-first discovery (sign-in saariuslystoned, owner switcher across saariuslystoned/saari-co/dinkuskit, all repos per owner, pin/hide curation with pins as the widget and background-refresh set); navigator scope model account|org|repo x issues|PRs|both; GitHub App on all three owners; private with no license; small-widget content deferred to a five-variant fixture grill."
+    "confirmed_at": "2026-07-29T12:08:47+00:00",
+    "domain": "public release posture",
+    "started_at": "2026-07-29T12:02:53+00:00",
+    "status": "implementing",
+    "summary": "Repo public under MIT with full history published as-is; honest-main discipline; no preset pins (in-place pin toggle, pins = widget + background-refresh set); GitHub App publicly installable with maintainer installs as personal config. Public docs rework + LICENSE land via PR #1 (maintainer merge gate). Delivery rail locked: rolling-release APKs pulled by cp-1 with one-tap banner installs, public sideload channel for everyone else."
   },
   "decisions": [
     {
@@ -188,6 +188,24 @@
           "note": "verification recorded: repo private on main, seed pushed at 7251d024ef27fd54c6ef84666b7d5201e563a83f, x-api plan amended at 3d6054b58, ledger/events valid JSON",
           "to": "verified",
           "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
+        },
+        {
+          "at": "2026-07-29T12:02:53+00:00",
+          "choice": "Account-first discovery: sign in as saariuslystoned; owner switcher saariuslystoned / saari-co / dinkuskit; all repos with PR/issue pressure per owner; pin/hide curation. Default pins: x-api, swarmpocket, SwarmBar, SwarmDash, smokyworker_setup, pixel-fold, spark-dgx, smokyworks, smokyproductco, smokyclub, aicommerce, dinkuskit/blocks. Pinned repos are the widget and background-refresh set; discovery lists fetch on demand.",
+          "from": "verified",
+          "implementation_ref": "github:saari-co/x-api#522",
+          "note": "public product cannot ship Bobby's private repos as default pins; default-pin aspect must be re-verified for a public audience",
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
+        },
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "Account-first discovery: sign in as saariuslystoned; owner switcher saariuslystoned / saari-co / dinkuskit; all repos with PR/issue pressure per owner; pin/hide curation. Default pins: x-api, swarmpocket, SwarmBar, SwarmDash, smokyworker_setup, pixel-fold, spark-dgx, smokyworks, smokyproductco, smokyclub, aicommerce, dinkuskit/blocks. Pinned repos are the widget and background-refresh set; discovery lists fetch on demand.",
+          "from": "needs_reverification",
+          "implementation_ref": "github:saari-co/x-api#522",
+          "note": "re-verified in cumulative context under the public model: discovery/switcher/pin-as-refresh-set unchanged; default-pin aspect refined by pin-model-010 (no preset pins)",
+          "to": "verified",
+          "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
         }
       ],
       "id": "access-model-004",
@@ -197,7 +215,7 @@
       "review_ref": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-07-28T16:40:28+00:00",
+      "updated_at": "2026-07-29T12:08:47+00:00",
       "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
     },
     {
@@ -273,6 +291,24 @@
           "note": "locked at the revised shared-understanding confirmation; user tokens see the intersection of user permissions and app installations, hence three installations; not implementable in this cycle",
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-07-29T12:02:53+00:00",
+          "choice": "The RepoGlance GitHub App is owned by saari-co and installed on all three owners (saariuslystoned, saari-co, dinkuskit); the sign-in identity is saariuslystoned via Chrome Custom Tab; short-lived user tokens rotate silently, Keystore-backed; fine-grained read-only PAT remains the fallback. Registration and installations are Bobby-manual before Slice 3.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "public product needs a public GitHub App any user can install; Bobby's three installations become personal config, not product topology",
+          "to": "needs_reverification",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "The RepoGlance GitHub App is owned by saari-co and installed on all three owners (saariuslystoned, saari-co, dinkuskit); the sign-in identity is saariuslystoned via Chrome Custom Tab; short-lived user tokens rotate silently, Keystore-backed; fine-grained read-only PAT remains the fallback. Registration and installations are Bobby-manual before Slice 3.",
+          "from": "needs_reverification",
+          "implementation_ref": null,
+          "note": "public product requires a publicly installable app; maintainer installations become personal config; see app-public-011",
+          "to": "superseded",
+          "verification_ref": null
         }
       ],
       "id": "github-app-topology-006",
@@ -280,9 +316,9 @@
       "question": "Who owns the GitHub App, where is it installed, and what identity signs in?",
       "rationale": "Bobby signs in once as saariuslystoned and reaches everything the switcher offers; no browser-cookie reuse ever. dinkuskit/blocks is additionally readable via public access even before the dinkuskit installation.",
       "review_ref": null,
-      "status": "locked",
-      "superseded_by": null,
-      "updated_at": "2026-07-28T16:34:59+00:00",
+      "status": "superseded",
+      "superseded_by": "app-public-011",
+      "updated_at": "2026-07-29T12:08:47+00:00",
       "verification_ref": null
     },
     {
@@ -322,6 +358,24 @@
           "note": "verification recorded: repo private on main, seed pushed at 7251d024ef27fd54c6ef84666b7d5201e563a83f, x-api plan amended at 3d6054b58, ledger/events valid JSON",
           "to": "verified",
           "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
+        },
+        {
+          "at": "2026-07-29T12:02:53+00:00",
+          "choice": "Private repository with no license file until Bobby makes a distribution decision.",
+          "from": "verified",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "Bobby reopened 2026-07-28: expects a quick build and wants the repo public because others will want to use it; replacement decided in the public-release grill",
+          "to": "reopened",
+          "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
+        },
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "Private repository with no license file until Bobby makes a distribution decision.",
+          "from": "reopened",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "public-release grill: maintainer chose public + MIT; see public-mit-009",
+          "to": "superseded",
+          "verification_ref": null
         }
       ],
       "id": "license-posture-007",
@@ -329,9 +383,9 @@
       "question": "What license and visibility posture does the app repository take?",
       "rationale": "SwarmBar precedent keeps every distribution option open; nothing public exists yet to license.",
       "review_ref": null,
-      "status": "verified",
-      "superseded_by": null,
-      "updated_at": "2026-07-28T16:40:28+00:00",
+      "status": "superseded",
+      "superseded_by": "public-mit-009",
+      "updated_at": "2026-07-29T12:08:47+00:00",
       "verification_ref": "file:proof/bootstrap-20260728/PROOF.md"
     },
     {
@@ -366,6 +420,155 @@
       "superseded_by": null,
       "updated_at": "2026-07-28T16:34:59+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": "decision:license-posture-007",
+      "candidate_refs": [],
+      "choice": "Public repository under the MIT license (copyright saari-co), published as-is with full history; honest-main discipline: README distinguishes planned, available, and proven behavior.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-29T12:08:47+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "Public repository under the MIT license (copyright saari-co), published as-is with full history; honest-main discipline: README distinguishes planned, available, and proven behavior.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked in the public-release frontier batch; alternatives were Apache-2.0 and public-unlicensed",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "Public repository under the MIT license (copyright saari-co), published as-is with full history; honest-main discipline: README distinguishes planned, available, and proven behavior.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "visibility flipped to PUBLIC and verified via gh repo view; LICENSE and public front-door docs land via PR #1; verification completes at merge",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "public-mit-009",
+      "implementation_ref": "github:saari-co/RepoGlance",
+      "question": "What visibility and license does the repository take for public adoption?",
+      "rationale": "Maintainer reopened license-posture-007 on 2026-07-29 expecting a quick build and public interest; MIT matches upstream RepoBar and maximizes adoption; full-history publication was accepted knowingly (no secrets in history).",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-29T12:08:47+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "decision:access-model-004",
+      "candidate_refs": [],
+      "choice": "No preset pins. Any repo visible in the connected account/orgs is pinnable via an in-place row toggle (Claude Code session-pinning interaction); pinned repos sort first and form the widget and background-refresh set. The maintainer's twelve pins are personal on-device config, not product defaults.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-29T12:08:47+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "access-model-004"
+      ],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "No preset pins. Any repo visible in the connected account/orgs is pinnable via an in-place row toggle (Claude Code session-pinning interaction); pinned repos sort first and form the widget and background-refresh set. The maintainer's twelve pins are personal on-device config, not product defaults.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked in the public-release frontier batch",
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "No preset pins. Any repo visible in the connected account/orgs is pinnable via an in-place row toggle (Claude Code session-pinning interaction); pinned repos sort first and form the widget and background-refresh set. The maintainer's twelve pins are personal on-device config, not product defaults.",
+          "from": "locked",
+          "implementation_ref": "github:saari-co/RepoGlance",
+          "note": "recorded in public docs and the x-api plan amendment; verification completes at PR #1 merge",
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "pin-model-010",
+      "implementation_ref": "github:saari-co/RepoGlance",
+      "question": "How do pins and defaults work for a public product?",
+      "rationale": "Maintainer: users should be able to pin repos as needed, any repo in their account or orgs, similar to the session pin feature in the Claude Code app.",
+      "review_ref": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-07-29T12:08:47+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "decision:github-app-topology-006",
+      "candidate_refs": [],
+      "choice": "The RepoGlance GitHub App is public and installable by any user on their own accounts/orgs; the maintainer's saariuslystoned/saari-co/dinkuskit installations are personal configuration. Registration remains maintainer-manual before Slice 3.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-29T12:08:47+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "access-model-004"
+      ],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-07-29T12:08:47+00:00",
+          "choice": "The RepoGlance GitHub App is public and installable by any user on their own accounts/orgs; the maintainer's saariuslystoned/saari-co/dinkuskit installations are personal configuration. Registration remains maintainer-manual before Slice 3.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "locked in the public-release shared-understanding confirmation; not implementable until GitHub App registration",
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "app-public-011",
+      "implementation_ref": null,
+      "question": "Who can install the GitHub App once the product is public?",
+      "rationale": "A public product cannot hardcode the maintainer's installation topology; supersedes github-app-topology-006 while preserving its sign-in and no-cookie rules.",
+      "review_ref": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-07-29T12:08:47+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "pattern:swarmpocket rolling-release update rail",
+      "candidate_refs": [],
+      "choice": "Maintainer delivery rides the proven SwarmPocket rail, generalized: merge an app change -> CI builds and publishes the APK to a rolling GitHub release -> cp-1 pulls it within 30 minutes -> the update banner appears on the phone over WireGuard -> one-tap install. The public rolling release doubles as the public sideload channel; the cp-1 puller and banner configuration stay swarm-side so the product keeps zero swarm dependency. First device install is one manual sideload (REQUEST_INSTALL_PACKAGES for self-update); release signing keystore and CI secrets are maintainer-gated.",
+      "context_ref": "github:saari-co/RepoGlance",
+      "created_at": "2026-07-29T12:10:13+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "repo-bootstrap-002",
+        "public-mit-009"
+      ],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-07-29T12:10:13+00:00",
+          "choice": "Maintainer delivery rides the proven SwarmPocket rail, generalized: merge an app change -> CI builds and publishes the APK to a rolling GitHub release -> cp-1 pulls it within 30 minutes -> the update banner appears on the phone over WireGuard -> one-tap install. The public rolling release doubles as the public sideload channel; the cp-1 puller and banner configuration stay swarm-side so the product keeps zero swarm dependency. First device install is one manual sideload (REQUEST_INSTALL_PACKAGES for self-update); release signing keystore and CI secrets are maintainer-gated.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "maintainer, mid-cycle 2026-07-29: sync to phone over cp-1/WireGuard once scaffolded, 'same way we are syncing updates to the swarmpocket'; quoted pipeline recorded verbatim in rationale",
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "delivery-rail-012",
+      "implementation_ref": null,
+      "question": "How do merged app changes reach the maintainer's phone (and the public)?",
+      "rationale": "Maintainer's stated pipeline: 'merge an app change -> CI builds and publishes to a rolling release -> cp-1 pulls it within 30 minutes -> the pink banner appears on your phone -> one tap'. Implementable only once the build lane produces an APK and CI exists.",
+      "review_ref": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-07-29T12:10:13+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -385,5 +588,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-07-28T16:40:28+00:00"
+  "updated_at": "2026-07-29T12:10:13+00:00"
 }
