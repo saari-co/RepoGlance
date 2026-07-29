@@ -14,12 +14,14 @@ list.
 
 1. On the Fold, open:
    `https://github.com/saari-co/RepoGlance/releases/tag/canary`
-2. Download `repoglance-87bc859b2c53.apk`
-   (sha256 `c3a053dd5071b7b570bb5452be1c725730f33233b4b1856379310f57c849b316`,
+2. Download `repoglance-23ab59276ff2.apk`
+   (sha256 `98440ecd1b86cea5a00ad7739698d19a452d8bbbfdea382b6ee89bfbc8262f43`,
    28,667,110 bytes — built from the Slice 2 tree; debug-signed preview,
-   zero permissions, fixtures only).
+   zero permissions, fixtures only). The canary release replaces its APK
+   asset on every firing — if the exact name differs, use the single
+   `repoglance-*.apk` asset named in the release's `version.json`.
 3. Install (allow install from browser when prompted). Expected app:
-   "RepoGlance", version `0.2.0-canary.1`.
+   "RepoGlance", version `0.2.0-canary.2`.
 4. Long-press home screen → Widgets → RepoGlance → place **both** widgets
    (per-repo + stack). Or use the in-app "Pin repo widget" / "Pin stack
    widget" buttons.
