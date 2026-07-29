@@ -12,8 +12,8 @@ android {
         applicationId = "co.saari.repoglance"
         minSdk = 31
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-slice2"
+        versionCode = System.getenv("REPOGLANCE_VERSION_CODE")?.toIntOrNull() ?: 2
+        versionName = System.getenv("REPOGLANCE_VERSION_NAME") ?: "0.2.0-slice2"
     }
 
     buildTypes {
