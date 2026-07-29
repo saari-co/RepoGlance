@@ -15,7 +15,13 @@ and deep links into the GitHub mobile app.
 ## Status
 
 Slice 1 available: typed snapshot model, fixture corpus, and truth-rule
-tests — no network, no UI yet. Everything else remains planned.
+tests — no network, no UI yet.
+
+Slice 2 available: fixture-first Glance widgets (per-repo + stack) and an
+in-app fixture mode (pinning, navigator, cached search) — still no network,
+no auth.
+
+Everything else remains planned.
 
 ## Planned
 
