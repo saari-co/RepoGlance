@@ -1,11 +1,12 @@
 package co.saari.repoglance.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.action.actionParametersOf
+import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionStartActivity
@@ -20,7 +21,6 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.material3.GlanceTheme
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -69,7 +69,7 @@ class StackWidget : GlanceAppWidget() {
                                 )
                             }
                         } else {
-                            items(repos.size) { index -> StackRow(repos[index], now) }
+                            items(repos.size) { index -> StackRow(context, repos[index], now) }
                         }
                     }
                 }
@@ -98,15 +98,14 @@ private fun HeaderRow(scenario: FixtureScenario, repos: List<RepoSnapshot>, now:
 }
 
 @Composable
-private fun StackRow(snapshot: RepoSnapshot, now: Instant) {
+private fun StackRow(context: Context, snapshot: RepoSnapshot, now: Instant) {
+    val tapIntent = Intent(context, MainActivity::class.java).apply {
+        putExtra(EXTRA_REPO_FULL, snapshot.repo.full)
+    }
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .clickable(
-                actionStartActivity<MainActivity>(
-                    parameters = actionParametersOf(ActionKeyRepoFull to snapshot.repo.full),
-                ),
-            )
+            .clickable(actionStartActivity(tapIntent))
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

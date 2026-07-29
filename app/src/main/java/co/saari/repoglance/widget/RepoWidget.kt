@@ -1,13 +1,14 @@
 package co.saari.repoglance.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.LocalSize
-import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -25,7 +26,6 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
-import androidx.glance.material3.GlanceTheme
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -69,13 +69,14 @@ class RepoWidget : GlanceAppWidget() {
         val pins = AppPrefs.pinnedRepos(context)
         val snapshot = placeholderRepo(scenario, pins, now)
 
+        val tapIntent = Intent(context, MainActivity::class.java).apply {
+            snapshot?.let { putExtra(EXTRA_REPO_FULL, it.repo.full) }
+        }
+
         provideContent {
             GlanceTheme {
                 val size = LocalSize.current
-                val tapAction = actionStartActivity<MainActivity>(
-                    parameters = snapshot?.let { actionParametersOf(ActionKeyRepoFull to it.repo.full) }
-                        ?: actionParametersOf(),
-                )
+                val tapAction = actionStartActivity(tapIntent)
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
