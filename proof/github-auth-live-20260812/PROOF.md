@@ -45,9 +45,10 @@ This repair did not sign in, rotate a live token, use a device, deploy, push,
 comment, or merge. Therefore the Fold evidence below remains valid only for its
 exact historical source; it is not device proof for the current device-flow
 source.
-After the source repair began, the maintainer enabled **Device Flow** for the
-RepoGlance GitHub App and reported GitHub's successful-update confirmation and
-checked state. No agent changed the setting or inspected account/auth logs. A
+After the source repair began, an operator-approved Codex browser action
+changed only **Device Flow** for the RepoGlance GitHub App and verified GitHub's
+successful-update confirmation and checked state. There was no credential/auth
+log inspection and no sign-in/device action. A
 release-signing App Link fingerprint is no longer required for authentication
 because the current source has no App Link callback. The remaining proof gate
 is an authorized live-device install/sign-in run bound to the repaired commit.

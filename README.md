@@ -64,8 +64,8 @@ GitHub issues expiring user tokens.
 Current authentication has no callback-host dependency, embedded confidential
 client credential, browser-cookie reuse, or auth broker. Read-only permissions
 are the ceiling and the app performs no GitHub writes. The GitHub App must have
-Device Flow enabled before sign-in can succeed; the maintainer enabled it on
-2026-08-12. See
+Device Flow enabled before sign-in can succeed; an operator-approved Codex
+browser action enabled it on 2026-08-12. See
 [docs/AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md).
 
 ## How this is being built

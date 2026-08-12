@@ -48,10 +48,11 @@ implement GitHub writes.
 
 ## Human gate and proof status
 
-The maintainer enabled **Device Flow** in the RepoGlance GitHub App settings on
-2026-08-12 and reported GitHub's successful-update confirmation and checked
-state. This source repair did not perform that configuration change, sign in,
-rotate a live token, use a device, deploy, or release.
+An operator-approved Codex browser action changed only **Device Flow** in the
+RepoGlance GitHub App settings on 2026-08-12 and verified GitHub's
+successful-update confirmation and checked state. It did not inspect a
+credential or auth log, sign in, or use a device. The source repair did not
+rotate a live token, deploy, or release.
 No release-signing App Link fingerprint is needed because device flow has no
 Android App Link callback.
 
