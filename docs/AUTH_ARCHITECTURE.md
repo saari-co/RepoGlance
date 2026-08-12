@@ -1,60 +1,61 @@
 # Authentication architecture
 
-RepoGlance's personal prototype uses a GitHub App user access token. The app
-starts a user-present authorization in an Android Custom Tab, binds the return
-with a random state and PKCE S256 challenge, accepts the verified
-`https://repoglance.ztoned.com/oauth/callback` App Link, and stores the
-resulting rotating user and refresh tokens with an
-Android Keystore-backed key. RepoGlance then reads GitHub directly. CP-1 and
-SwarmPocket are not in the authentication or data path.
+RepoGlance is a public Android client of a GitHub App. It uses GitHub's OAuth
+device authorization flow, which needs only the app's public client ID:
 
-The live catalog/navigator slice needs only Metadata, Issues, and Pull requests
-at read access. The registered prototype also preauthorizes read-only Checks,
-Commit statuses, and Contents for the existing widget pressure fields, which
-remain fixture-backed in this checkpoint. Its installation controls which
+1. RepoGlance posts the client ID to GitHub's device-code endpoint.
+2. The app keeps the returned user code visible and opens the exact GitHub
+   verification page in an Android Custom Tab.
+3. A ViewModel-scoped coroutine waits for GitHub's minimum interval before
+   each token request, adds GitHub's slowdown interval, and stops on success,
+   expiry, local cancellation, or a terminal GitHub response.
+4. The resulting GitHub App user token is encrypted with a non-exportable
+   Android Keystore key and stored in the app's no-backup directory.
+
+GitHub issues expiring user tokens by default. A device-flow token can be
+refreshed using the public client ID and refresh token without a confidential
+client credential. RepoGlance rotates both encrypted values before access-token
+expiry. A missing, expired, revoked, or rejected session is cleared locally and
+the UI returns to an explicit **Reconnect GitHub** state. A GitHub API 401 on
+either repository-content section is promoted to that same session-level
+invalidation instead of being left as a partial row error.
+
+The implementation follows GitHub's current primary documentation for
+[GitHub App user tokens](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app)
+and
+[refresh token rotation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens).
+
+## Network and credential boundary
+
+Authentication and data reads go directly from the APK to fixed HTTPS hosts at
+`github.com` and `api.github.com`. Current source has no authentication
+callback, Android App Link, static callback-site source, relay, token broker,
+storage service, or analytics dependency. The previously deployed historical
+callback may still exist externally, but the current app neither references nor
+requires it. The repository accepts no secret-bearing build environment input
+and generates no confidential auth field in `BuildConfig`.
+
+The encrypted token payload format is bumped for this transition. An installed
+prototype clears any legacy web-flow session locally and asks the user to
+connect through device flow, ensuring later refreshes never depend on the
+removed confidential flow.
+
+The live catalog/navigator needs only Metadata, Issues, and Pull requests at
+read access. Checks, Commit statuses, and Contents remain future read-only
+inputs for widget pressure fields. The GitHub App installation controls which
 accounts and repositories are visible. RepoGlance does not request or
 implement GitHub writes.
 
-## Prototype client credential boundary
+## Human gate and proof status
 
-GitHub currently requires a GitHub App client secret for web-flow code
-exchange and refresh, even when PKCE is used. An Android APK cannot keep an
-embedded client credential confidential. For this prototype, the credential
-is therefore treated as public, replaceable configuration and never as proof
-that a request came from an authentic RepoGlance binary.
+The maintainer enabled **Device Flow** in the RepoGlance GitHub App settings on
+2026-08-12 and reported GitHub's successful-update confirmation and checked
+state. This source repair did not perform that configuration change, sign in,
+rotate a live token, use a device, deploy, or release.
+No release-signing App Link fingerprint is needed because device flow has no
+Android App Link callback.
 
-The credential is injected only through the transient
-`REPOGLANCE_GITHUB_CLIENT_SECRET` process environment of an explicitly
-approved local prototype build. It is not accepted from a Gradle property,
-committed, logged, stored in a file, included in CI, or published as a release
-artifact. Builds without it remain safely signed out. A credential-bearing APK
-must not be described or distributed as having a confidential client secret.
-
-Before general distribution, choose one of these explicit follow-ups:
-
-1. Enable and implement GitHub's device flow so the public client does not
-   carry a client secret, accepting the less seamless sign-in UX.
-2. Revise the no-server boundary and put code exchange and refresh behind a
-   narrowly scoped confidential authentication broker.
-
-If a credential-bearing APK has ever been distributed outside the approved
-prototype devices, rotate that client secret before further use.
-
-## Static callback
-
-`callback-site/` is a secret-free static return surface. It performs no token
-exchange and stores no data. Android App Links should deliver the HTTPS return
-directly to RepoGlance; the static page provides a narrow custom-URI fallback
-for devices where association is not yet verified. The page forwards exactly
-one state and exactly one code-or-error outcome and loads no third-party code.
-
-The source is deployed by direct upload to the Cloudflare Pages project
-`repoglance-callback` (`https://repoglance-callback.pages.dev`) and served at
-`https://repoglance.ztoned.com`. The custom domain is active with SSL, and
-Android reported the domain as verified for the prototype debug signing
-certificate on the maintainer's Pixel 10 Pro Fold on 2026-08-12. Release/Play
-signing requires adding its public certificate fingerprint before distribution.
-
-Future production deploys, DNS changes, signing-fingerprint changes, GitHub App
-configuration, sign-in, token rotation, and distribution remain
-maintainer-gated.
+The earlier web-flow checkpoint has source-bound Fold proof. That proof does
+not transfer to the current device-flow source. The current repair is supported
+by local unit/build/lint and static public-client checks only until a separate,
+authorized live-device sign-in/install proof lane runs.

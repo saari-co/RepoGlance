@@ -144,7 +144,9 @@ class SecureTokenStore(context: Context) : TokenStore {
         const val KEYSTORE_PROVIDER = "AndroidKeyStore"
         const val KEY_ALIAS = "co.saari.repoglance.github-user-token.v1"
         const val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
-        const val FORMAT_VERSION = 1
+        // v2 deliberately invalidates v1 web-flow sessions: only tokens minted
+        // by device flow are eligible for secret-free refresh.
+        const val FORMAT_VERSION = 2
         const val MAX_TOKEN_PAYLOAD_BYTES = 128 * 1024
     }
 }

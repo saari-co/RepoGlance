@@ -119,15 +119,17 @@ internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): St
             " · PRS " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis)
 }
 
+internal const val WIDGET_PREVIEW_LABEL = "FIXTURE PREVIEW"
+
 @Composable
 private fun UnconfiguredContent() {
     Column(modifier = GlanceModifier.fillMaxSize().padding(10.dp)) {
         Text(
-            "Choose a repository",
+            WIDGET_PREVIEW_LABEL,
             style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
         )
         Text(
-            "Long-press · Reconfigure",
+            "Choose a repository",
             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
         )
     }
@@ -157,7 +159,7 @@ private fun CompactContent(
             style = TextStyle(color = GlanceTheme.colors.onBackground),
         )
         Text(
-            Ages.updatedLabel(snapshot.observedAt, now),
+            "$WIDGET_PREVIEW_LABEL · ${Ages.updatedLabel(snapshot.observedAt, now)}",
             maxLines = 1,
             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
         )
@@ -186,7 +188,8 @@ private fun TallContent(
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
             )
             Text(
-                widgetCountSummary(snapshot, config.mode) + " · " + Ages.updatedLabel(snapshot.observedAt, now),
+                "$WIDGET_PREVIEW_LABEL · " + widgetCountSummary(snapshot, config.mode) +
+                    " · " + Ages.updatedLabel(snapshot.observedAt, now),
                 maxLines = 1,
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
             )

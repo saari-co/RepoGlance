@@ -71,4 +71,9 @@ class RepoWidgetConfigurationTest {
         assertEquals("ISSUES 5", widgetCountSummary(snapshot, NavigatorMode.ISSUES))
         assertEquals("PRS 2", widgetCountSummary(snapshot, NavigatorMode.PRS))
     }
+
+    @Test
+    fun persistentFixtureWidgetsCarryAnUnambiguousPreviewLabel() {
+        assertEquals("FIXTURE PREVIEW", WIDGET_PREVIEW_LABEL)
+    }
 }

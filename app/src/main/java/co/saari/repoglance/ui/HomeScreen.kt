@@ -73,8 +73,11 @@ fun HomeScreen(
     onOpenNavigator: () -> Unit,
     onOpenRepo: (RepoRef) -> Unit,
 ) {
-    val now = remember(scenario, pinnedRepos) { Instant.now() }
-    val repos = remember(scenario, pinnedRepos) { SnapshotStore.repoList(scenario, pinnedRepos, now) }
+    val fixtureAnchor = remember(scenario) { Instant.now() }
+    val now = rememberFreshnessNow()
+    val repos = remember(scenario, pinnedRepos, fixtureAnchor) {
+        SnapshotStore.repoList(scenario, pinnedRepos, fixtureAnchor)
+    }
 
     Column(
         modifier = Modifier

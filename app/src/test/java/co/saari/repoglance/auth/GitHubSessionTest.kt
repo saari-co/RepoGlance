@@ -18,50 +18,53 @@ class GitHubSessionTest {
 
     @Test
     fun currentTokenIsReturnedWithoutNetworkRefresh() {
-        val store = FakeTokenStore(
-            GitHubUserToken("current", "refresh", now.plusSeconds(3600), now.plusSeconds(7200), "bearer"),
-        )
+        val store = FakeTokenStore(token("current", "refresh", now.plusSeconds(3600), now.plusSeconds(7200)))
         val transport = HttpTransport { error("network should not be called") }
-        val oauth = GitHubOAuthClient(config(), transport, clock)
 
-        assertEquals("current", GitHubSession(store, oauth, clock).accessToken())
+        assertEquals("current", session(store, transport).accessToken())
     }
 
     @Test
-    fun expiringTokenIsRefreshedAndReplaced() {
-        val store = FakeTokenStore(
-            GitHubUserToken("old", "refresh", now.plusSeconds(30), now.plusSeconds(7200), "bearer"),
-        )
+    fun expiringDeviceFlowTokenIsRefreshedAndReplaced() {
+        val store = FakeTokenStore(token("old", "refresh", now.plusSeconds(30), now.plusSeconds(7200)))
         val transport = HttpTransport {
             HttpResponse(
                 statusCode = 200,
                 headers = emptyMap(),
-                body = """{"access_token":"new","refresh_token":"new-refresh","expires_in":28800,"refresh_token_expires_in":15811200,"token_type":"bearer"}""",
+                body = """{
+                  "access_token":"new",
+                  "refresh_token":"new-refresh",
+                  "expires_in":28800,
+                  "refresh_token_expires_in":15811200,
+                  "token_type":"bearer"
+                }""",
             )
         }
-        val session = GitHubSession(store, GitHubOAuthClient(config(), transport, clock), clock)
 
-        assertEquals("new", session.accessToken())
+        assertEquals("new", session(store, transport).accessToken())
         assertEquals("new", store.value?.accessToken)
+        assertEquals("new-refresh", store.value?.refreshToken)
+    }
+
+    @Test
+    fun nonExpiringDeviceFlowTokenDoesNotNeedRefreshMaterial() {
+        val store = FakeTokenStore(token("current", null, null, null))
+
+        assertEquals("current", session(store, HttpTransport { error("unused") }).accessToken())
     }
 
     @Test
     fun signOutClearsOnlyLocalTokenStore() {
-        val store = FakeTokenStore(
-            GitHubUserToken("current", null, null, null, "bearer"),
-        )
-        val session = GitHubSession(store, GitHubOAuthClient(config(), HttpTransport { error("unused") }, clock), clock)
+        val store = FakeTokenStore(token("current", null, null, null))
 
-        session.signOut()
+        session(store, HttpTransport { error("unused") }).signOut()
 
         assertNull(store.value)
     }
 
     @Test
     fun invalidRefreshRequiresNewSignInWithoutReflectingServerDescription() {
-        val store = FakeTokenStore(
-            GitHubUserToken("old", "refresh", now.minusSeconds(1), now.plusSeconds(7200), "bearer"),
-        )
+        val store = FakeTokenStore(token("old", "refresh", now.minusSeconds(1), now.plusSeconds(7200)))
         val transport = HttpTransport {
             HttpResponse(
                 statusCode = 400,
@@ -69,19 +72,25 @@ class GitHubSessionTest {
                 body = """{"error":"bad_refresh_token","error_description":"untrusted detail"}""",
             )
         }
-        val session = GitHubSession(store, GitHubOAuthClient(config(), transport, clock), clock)
 
-        val failure = assertThrows(GitHubAuthException::class.java) { session.accessToken() }
+        val failure = assertThrows(GitHubAuthException::class.java) { session(store, transport).accessToken() }
 
         assertTrue(failure.needsNewSignIn)
         assertFalse(failure.message.orEmpty().contains("untrusted"))
     }
 
-    private fun config() = GitHubAuthConfig(
-        clientId = "client",
-        clientSecret = "public-client-credential",
-        callbackUrl = "https://repoglance.ztoned.com/oauth/callback",
+    private fun session(store: TokenStore, transport: HttpTransport) = GitHubSession(
+        tokenStore = store,
+        deviceFlowClient = GitHubDeviceFlowClient(GitHubAuthConfig("public-client-id"), transport, clock),
+        clock = clock,
     )
+
+    private fun token(
+        access: String,
+        refresh: String?,
+        accessExpiry: Instant?,
+        refreshExpiry: Instant?,
+    ) = GitHubUserToken(access, refresh, accessExpiry, refreshExpiry, "bearer")
 
     private class FakeTokenStore(var value: GitHubUserToken?) : TokenStore {
         override fun read(): GitHubUserToken? = value

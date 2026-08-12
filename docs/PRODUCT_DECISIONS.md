@@ -37,6 +37,9 @@ default-pin aspect refined by `pin-model-010`.
 
 Implementation note (2026-08-12): the maintainer registered the public
 RepoGlance GitHub App, installed it for all repositories on `saariuslystoned`,
-`saari-co`, and `dinkuskit`, and completed the first live read-only Fold sign-in.
+`saari-co`, and `dinkuskit`, and completed the first live read-only Fold sign-in
+on the earlier web-flow checkpoint. The current branch replaces that flow with
+a public-client device flow; the maintainer enabled Device Flow on 2026-08-12,
+and no new live-device sign-in/install proof is claimed.
 The canonical ledger status remains unchanged until the next GrillTrack
 reconciliation.

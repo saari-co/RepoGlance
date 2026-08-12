@@ -1,7 +1,7 @@
 package co.saari.repoglance.data
 
 import co.saari.repoglance.auth.GitHubAuthConfig
-import co.saari.repoglance.auth.GitHubOAuthClient
+import co.saari.repoglance.auth.GitHubDeviceFlowClient
 import co.saari.repoglance.auth.GitHubSession
 import co.saari.repoglance.auth.GitHubUserToken
 import co.saari.repoglance.auth.TokenStore
@@ -181,6 +181,32 @@ class GitHubApiClientTest {
         assertEquals(1, pulls.rows.size)
         assertFalse(pulls.rows.first().isDraft)
         assertTrue(pulls.rows.first().reviewRequestedFromViewer)
+    }
+
+    @Test
+    fun repositoryContent401CarriesSessionInvalidationSignalForReconnect() {
+        val repository = LiveRepository(
+            id = 99L,
+            ref = RepoRef("octocat", "api"),
+            isPrivate = true,
+            isArchived = false,
+            pushedAt = null,
+        )
+        val transport = FakeTransport().apply {
+            enqueue(
+                "/repos/octocat/api/issues?state=open&sort=updated&direction=desc&per_page=30",
+                HttpResponse(401, emptyMap(), """{"message":"Bad credentials"}"""),
+            )
+        }
+
+        val content = GitHubApiClient(testSession(), transport, clock)
+            .loadRepositoryContent(repository, viewerLogin = "viewer")
+        val invalidSession = content.sessionInvalidationFailure()
+
+        assertEquals(401, invalidSession?.statusCode)
+        assertTrue(invalidSession?.needsNewSignIn == true)
+        assertEquals("Your GitHub session needs to be renewed", invalidSession?.message)
+        assertEquals(1, transport.requests.size)
     }
 
     @Test
@@ -364,12 +390,8 @@ class GitHubApiClientTest {
                 tokenType = "bearer",
             ),
         ),
-        oauthClient = GitHubOAuthClient(
-            config = GitHubAuthConfig(
-                clientId = "id",
-                clientSecret = "secret",
-                callbackUrl = "https://example.com/callback",
-            ),
+        deviceFlowClient = GitHubDeviceFlowClient(
+            config = GitHubAuthConfig(clientId = "id"),
             transport = HttpTransport { error("OAuth not expected") },
             clock = clock,
         ),

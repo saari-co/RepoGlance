@@ -4,21 +4,23 @@ import java.time.Instant
 
 class GitHubAuthConfig(
     val clientId: String,
-    val clientSecret: String,
-    val callbackUrl: String,
 ) {
     val isReady: Boolean
-        get() = clientId.isNotBlank() && clientSecret.isNotBlank() && callbackUrl.isNotBlank()
+        get() = clientId.isNotBlank()
 
-    override fun toString(): String = "GitHubAuthConfig(clientId=$clientId, clientSecret=<redacted>, callbackUrl=$callbackUrl)"
+    override fun toString(): String = "GitHubAuthConfig(clientId=$clientId)"
 }
 
-class PendingAuthorization(
-    val state: String,
-    val codeVerifier: String,
-    val authorizationUrl: String,
+class GitHubDeviceAuthorization(
+    val deviceCode: String,
+    val userCode: String,
+    val verificationUri: String,
+    val expiresAt: Instant,
+    val intervalSeconds: Long,
 ) {
-    override fun toString(): String = "PendingAuthorization(<redacted>)"
+    override fun toString(): String =
+        "GitHubDeviceAuthorization(userCode=<redacted>, deviceCode=<redacted>, " +
+            "verificationUri=$verificationUri, expiresAt=$expiresAt, intervalSeconds=$intervalSeconds)"
 }
 
 class GitHubUserToken(

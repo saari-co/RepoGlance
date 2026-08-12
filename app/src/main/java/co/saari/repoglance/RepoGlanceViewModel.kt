@@ -1,16 +1,15 @@
 package co.saari.repoglance
 
 import android.app.Application
-import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import co.saari.repoglance.auth.AuthorizationCommitGate
 import co.saari.repoglance.auth.GitHubAuthConfig
 import co.saari.repoglance.auth.GitHubAuthException
-import co.saari.repoglance.auth.GitHubAuthorization
-import co.saari.repoglance.auth.GitHubOAuthClient
+import co.saari.repoglance.auth.GitHubDeviceFlowClient
+import co.saari.repoglance.auth.GitHubDeviceFlowPoller
 import co.saari.repoglance.auth.GitHubSession
-import co.saari.repoglance.auth.PendingAuthorizationStore
 import co.saari.repoglance.auth.SecureTokenStore
 import co.saari.repoglance.data.GitHubApiClient
 import co.saari.repoglance.data.GitHubApiResult
@@ -18,10 +17,14 @@ import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.RateLimitSnapshot
-import java.util.concurrent.atomic.AtomicBoolean
+import co.saari.repoglance.data.sessionInvalidationFailure
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,103 +35,80 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     private val authConfig = GitHubAuthConfig(
         clientId = BuildConfig.GITHUB_APP_CLIENT_ID,
-        clientSecret = BuildConfig.GITHUB_APP_CLIENT_SECRET,
-        callbackUrl = BuildConfig.GITHUB_CALLBACK_URL,
     )
-    private val pendingAuthorizationStore = PendingAuthorizationStore(application)
+    private val deviceFlowClient = GitHubDeviceFlowClient(authConfig)
     private val session = GitHubSession(
         tokenStore = SecureTokenStore(application),
-        oauthClient = GitHubOAuthClient(authConfig),
+        deviceFlowClient = deviceFlowClient,
     )
+    private val deviceFlowPoller = GitHubDeviceFlowPoller(deviceFlowClient)
+    private val authorizationCommitGate = AuthorizationCommitGate()
     private val apiClient = GitHubApiClient(session)
-    private val authBusy = AtomicBoolean(false)
     private val catalogGeneration = AtomicInteger(0)
     private val repositoryContentGeneration = AtomicInteger(0)
+    private var authorizationJob: Job? = null
     private var catalogLoadJob: Job? = null
     private var repositoryContentLoadJob: Job? = null
 
-    val credentialReady: Boolean
+    val deviceFlowReady: Boolean
         get() = authConfig.isReady
 
     init {
         bootstrapSessionState()
     }
 
-    fun beginGitHubAuthorization(): String? {
+    fun beginGitHubAuthorization() {
         if (!authConfig.isReady) {
             liveState.value = LiveUiState.Failure(
-                "This local build still needs its GitHub App credential before sign-in can start.",
-            )
-            return null
-        }
-        val pending = GitHubAuthorization.create(authConfig)
-        pendingAuthorizationStore.save(pending)
-        liveState.value = LiveUiState.AwaitingBrowser
-        return pending.authorizationUrl
-    }
-
-    fun handleAuthorizationCallback(uri: Uri): Boolean {
-        if (!uri.isRepoGlanceCallback()) return false
-
-        val states = uri.getQueryParameters("state")
-        val codes = uri.getQueryParameters("code")
-        val errors = uri.getQueryParameters("error")
-        if (states.size != 1 || states.single().isBlank()) {
-            return true
-        }
-        val verifier = pendingAuthorizationStore.verifierFor(states.single())
-        if (verifier == null) {
-            return true
-        }
-        val hasOneCode = codes.size == 1 && codes.single().isNotBlank()
-        val hasOneError = errors.size == 1 && errors.single().isNotBlank()
-        if (hasOneCode == hasOneError) {
-            pendingAuthorizationStore.clear()
-            liveState.value = LiveUiState.Failure(
-                message = "The GitHub return link was incomplete. Please try again.",
+                message = "This build is missing its public GitHub App client ID.",
                 needsNewSignIn = true,
             )
-            return true
+            return
         }
-        if (hasOneError) {
-            pendingAuthorizationStore.clear()
-            liveState.value = LiveUiState.Failure(
-                message = when (errors.single()) {
-                    "access_denied" -> "GitHub sign-in was cancelled"
-                    "redirect_uri_mismatch" -> "GitHub rejected the app return address"
-                    else -> "GitHub did not complete sign-in"
-                },
-                needsNewSignIn = true,
-            )
-            return true
-        }
-        if (!authBusy.compareAndSet(false, true)) return true
-
-        liveState.value = LiveUiState.Connecting
-        viewModelScope.launch {
+        authorizationJob?.cancel()
+        val requestGeneration = authorizationCommitGate.nextGeneration()
+        liveState.value = LiveUiState.RequestingDeviceCode
+        authorizationJob = viewModelScope.launch {
             try {
-                withContext(Dispatchers.IO) {
-                    session.acceptAuthorizationCode(codes.single(), verifier)
+                val authorization = withContext(Dispatchers.IO) { deviceFlowClient.begin() }
+                currentCoroutineContext().ensureActive()
+                liveState.value = LiveUiState.AwaitingDeviceAuthorization(
+                    userCode = authorization.userCode,
+                    verificationUri = authorization.verificationUri,
+                    expiresAt = authorization.expiresAt,
+                )
+                val token = withContext(Dispatchers.IO) {
+                    deviceFlowPoller.awaitToken(authorization)
                 }
-                pendingAuthorizationStore.clear()
+                currentCoroutineContext().ensureActive()
+                if (!authorizationCommitGate.commit(requestGeneration) { session.acceptDeviceToken(token) }) {
+                    return@launch
+                }
+                liveState.value = LiveUiState.Connecting
                 refreshCatalog()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (failure: GitHubAuthException) {
-                pendingAuthorizationStore.clear()
+                if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
                 liveState.value = LiveUiState.Failure(
                     message = failure.message ?: "GitHub sign-in failed",
                     needsNewSignIn = failure.needsNewSignIn || !session.hasSavedSession(),
                 )
             } catch (_: Exception) {
-                pendingAuthorizationStore.clear()
+                if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
                 liveState.value = LiveUiState.Failure(
-                    message = "Could not finish GitHub sign-in right now",
-                    needsNewSignIn = true,
+                    message = "Could not start GitHub sign-in right now",
+                    needsNewSignIn = !session.hasSavedSession(),
                 )
-            } finally {
-                authBusy.set(false)
             }
         }
-        return true
+    }
+
+    fun cancelGitHubAuthorization() {
+        authorizationJob?.cancel()
+        authorizationJob = null
+        authorizationCommitGate.invalidate(session::signOut)
+        liveState.value = LiveUiState.SignedOut
     }
 
     fun refreshCatalog() {
@@ -145,7 +125,10 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                     rateLimit = result.rateLimit,
                 )
                 is GitHubApiResult.Failure -> {
-                    if (result.needsNewSignIn) session.signOut()
+                    if (result.needsNewSignIn) {
+                        session.signOut()
+                        backToRepositories()
+                    }
                     liveState.value = LiveUiState.Failure(
                         message = result.message,
                         needsNewSignIn = result.needsNewSignIn,
@@ -177,7 +160,19 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             ) {
                 return@launch
             }
-            repositoryContent.value = ContentUiState.Ready(content)
+            val invalidSession = content.sessionInvalidationFailure()
+            if (invalidSession != null) {
+                session.signOut()
+                selectedRepository.value = null
+                repositoryContent.value = ContentUiState.Idle
+                liveState.value = LiveUiState.Failure(
+                    message = invalidSession.message,
+                    needsNewSignIn = true,
+                    rateLimit = invalidSession.rateLimit,
+                )
+            } else {
+                repositoryContent.value = ContentUiState.Ready(content)
+            }
         }
     }
 
@@ -189,8 +184,9 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun signOut() {
-        session.signOut()
-        pendingAuthorizationStore.clear()
+        authorizationJob?.cancel()
+        authorizationJob = null
+        authorizationCommitGate.invalidate(session::signOut)
         catalogLoadJob?.cancel()
         catalogGeneration.incrementAndGet()
         backToRepositories()
@@ -205,17 +201,17 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun Uri.isRepoGlanceCallback(): Boolean {
-        val verifiedHttps = scheme == "https" && host == "repoglance.ztoned.com" && path == "/oauth/callback"
-        val localFallback = scheme == "repoglance" && host == "oauth" && path == "/callback"
-        return verifiedHttps || localFallback
-    }
 }
 
 sealed interface LiveUiState {
     data object Checking : LiveUiState
     data object SignedOut : LiveUiState
-    data object AwaitingBrowser : LiveUiState
+    data object RequestingDeviceCode : LiveUiState
+    data class AwaitingDeviceAuthorization(
+        val userCode: String,
+        val verificationUri: String,
+        val expiresAt: Instant,
+    ) : LiveUiState
     data object Connecting : LiveUiState
     data object LoadingRepositories : LiveUiState
     data class Ready(

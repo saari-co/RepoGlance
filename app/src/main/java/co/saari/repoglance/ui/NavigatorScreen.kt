@@ -125,9 +125,10 @@ fun NavigatorScreen(
     var issuesExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableStateOf(0) }
     var prsExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableStateOf(0) }
 
-    val now = remember(scope, mode, filter, fixtureListState) { Instant.now() }
-    val section = remember(scope, mode, filter, fixtureListState, now) {
-        SnapshotStore.navigatorRows(scope, mode, filter, fixtureListState, now)
+    val fixtureAnchor = remember(scenario) { Instant.now() }
+    val now = rememberFreshnessNow()
+    val section = remember(scope, mode, filter, fixtureListState, fixtureAnchor) {
+        SnapshotStore.navigatorRows(scope, mode, filter, fixtureListState, fixtureAnchor)
     }
     fun changeMode(newMode: NavigatorMode) {
         if (newMode == mode) return

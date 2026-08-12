@@ -44,6 +44,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,8 +76,10 @@ fun LiveRepoGlanceScreen(
     state: LiveUiState,
     selectedRepository: LiveRepository?,
     contentState: ContentUiState,
-    credentialReady: Boolean,
+    connectionReady: Boolean,
     onConnectGitHub: () -> Unit,
+    onOpenGitHubVerification: (String) -> Unit,
+    onCancelGitHubAuthorization: () -> Unit,
     onRetry: () -> Unit,
     onSelectRepository: (LiveRepository) -> Unit,
     onBackToRepositories: () -> Unit,
@@ -86,13 +89,20 @@ fun LiveRepoGlanceScreen(
 ) {
     when (state) {
         LiveUiState.Checking -> CenteredStatus("Checking your GitHub session…")
-        LiveUiState.SignedOut -> ConnectGitHubScreen(credentialReady, onConnectGitHub)
-        LiveUiState.AwaitingBrowser -> AwaitingGitHubScreen(onConnectGitHub)
+        LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub)
+        LiveUiState.RequestingDeviceCode -> CenteredStatus("Starting GitHub sign-in…", showProgress = true)
+        is LiveUiState.AwaitingDeviceAuthorization -> AwaitingGitHubScreen(
+            userCode = state.userCode,
+            verificationUri = state.verificationUri,
+            expiresAt = state.expiresAt,
+            onOpenGitHub = onOpenGitHubVerification,
+            onCancel = onCancelGitHubAuthorization,
+        )
         LiveUiState.Connecting -> CenteredStatus("Securing your GitHub session…", showProgress = true)
         LiveUiState.LoadingRepositories -> CenteredStatus("Loading your repositories…", showProgress = true)
         is LiveUiState.Failure -> FailureScreen(
             message = state.message,
-            credentialReady = credentialReady,
+            connectionReady = connectionReady,
             needsNewSignIn = state.needsNewSignIn,
             rateLimit = state.rateLimit,
             onRetry = onRetry,
@@ -122,21 +132,45 @@ fun LiveRepoGlanceScreen(
 }
 
 @Composable
-private fun AwaitingGitHubScreen(onStartAgain: () -> Unit) {
+private fun AwaitingGitHubScreen(
+    userCode: String,
+    verificationUri: String,
+    expiresAt: Instant,
+    onOpenGitHub: (String) -> Unit,
+    onCancel: () -> Unit,
+) {
+    val now = rememberFreshnessNow()
+    val minutesRemaining = ((Duration.between(now, expiresAt).seconds.coerceAtLeast(0L) + 59L) / 60L)
+    LaunchedEffect(verificationUri) {
+        onOpenGitHub(verificationUri)
+    }
     Box(
         modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Finish signing in with GitHub in the browser", style = MaterialTheme.typography.bodyLarge)
+            Text("Enter this code on GitHub", style = MaterialTheme.typography.headlineSmall)
+            Spacer(Modifier.height(12.dp))
+            Text(userCode, style = MaterialTheme.typography.displaySmall)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                if (minutesRemaining > 0L) "Code expires in about $minutesRemaining min" else "Code expired",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Spacer(Modifier.height(16.dp))
-            TextButton(onClick = onStartAgain) { Text("Start sign-in again") }
+            Button(onClick = { onOpenGitHub(verificationUri) }, enabled = minutesRemaining > 0L) {
+                Text("Open GitHub")
+            }
+            Spacer(Modifier.height(8.dp))
+            Text("RepoGlance is waiting safely in this screen.", style = MaterialTheme.typography.bodySmall)
+            TextButton(onClick = onCancel) { Text("Cancel sign-in") }
         }
     }
 }
 
 @Composable
-private fun ConnectGitHubScreen(credentialReady: Boolean, onConnectGitHub: () -> Unit) {
+private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -159,13 +193,13 @@ private fun ConnectGitHubScreen(credentialReady: Boolean, onConnectGitHub: () ->
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
-            Button(onClick = onConnectGitHub, enabled = credentialReady) {
+            Button(onClick = onConnectGitHub, enabled = connectionReady) {
                 Text("Connect GitHub")
             }
-            if (!credentialReady) {
+            if (!connectionReady) {
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "This local prototype is ready for its GitHub App credential.",
+                    "This build is missing its public GitHub App client ID.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.tertiary,
                 )
@@ -193,12 +227,13 @@ private fun CenteredStatus(message: String, showProgress: Boolean = false) {
 @Composable
 private fun FailureScreen(
     message: String,
-    credentialReady: Boolean,
+    connectionReady: Boolean,
     needsNewSignIn: Boolean,
     rateLimit: RateLimitSnapshot?,
     onRetry: () -> Unit,
     onConnectGitHub: () -> Unit,
 ) {
+    val now = rememberFreshnessNow()
     Box(
         modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
@@ -207,7 +242,7 @@ private fun FailureScreen(
             Text("RepoGlance could not refresh", style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(8.dp))
             Text(message, style = MaterialTheme.typography.bodyLarge)
-            rateLimit?.waitLabel(Instant.now())?.let { waitLabel ->
+            rateLimit?.waitLabel(now)?.let { waitLabel ->
                 Spacer(Modifier.height(6.dp))
                 Text(
                     waitLabel,
@@ -220,7 +255,7 @@ private fun FailureScreen(
                 Button(onClick = onRetry) { Text("Try again") }
                 Spacer(Modifier.height(8.dp))
             }
-            OutlinedButton(onClick = onConnectGitHub, enabled = credentialReady) {
+            OutlinedButton(onClick = onConnectGitHub, enabled = connectionReady) {
                 Text(if (needsNewSignIn) "Reconnect GitHub" else "Start a new sign-in")
             }
         }
@@ -242,7 +277,7 @@ private fun LiveRepositoryHome(
     val matchingRepositories = remember(catalog.repositories, query) {
         catalog.repositories.filter { it.ref.full.contains(query.trim(), ignoreCase = true) }
     }
-    val now = remember(catalog) { Instant.now() }
+    val now = rememberFreshnessNow()
 
     if (confirmSignOut) {
         AlertDialog(
@@ -393,7 +428,7 @@ private fun LiveNavigator(
     var query by rememberSaveable(repository.id) { mutableStateOf("") }
     val mode = NavigatorMode.valueOf(modeName)
     val context = LocalContext.current
-    val now = remember(contentState) { Instant.now() }
+    val now = rememberFreshnessNow()
 
     fun open(url: String) {
         if (!GitHubAppLauncher.open(context, url, adjacent = true)) {

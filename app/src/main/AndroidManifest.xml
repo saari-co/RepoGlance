@@ -22,26 +22,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="repoglance.ztoned.com"
-                    android:pathPrefix="/oauth/callback" />
-            </intent-filter>
-            <!-- PKCE-protected fallback used by the static callback page when
-                 Android has not yet verified the HTTPS App Link. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="repoglance"
-                    android:host="oauth"
-                    android:path="/callback" />
-            </intent-filter>
         </activity>
 
         <activity

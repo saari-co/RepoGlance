@@ -65,8 +65,10 @@ class MainActivity : ComponentActivity() {
                             state = liveModel.liveState.value,
                             selectedRepository = liveModel.selectedRepository.value,
                             contentState = liveModel.repositoryContent.value,
-                            credentialReady = liveModel.credentialReady,
-                            onConnectGitHub = ::beginGitHubAuthorization,
+                            connectionReady = liveModel.deviceFlowReady,
+                            onConnectGitHub = liveModel::beginGitHubAuthorization,
+                            onOpenGitHubVerification = ::openGitHubVerification,
+                            onCancelGitHubAuthorization = liveModel::cancelGitHubAuthorization,
                             onRetry = liveModel::refreshCatalog,
                             onSelectRepository = liveModel::selectRepository,
                             onBackToRepositories = liveModel::backToRepositories,
@@ -79,27 +81,17 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        intent?.data?.let { callback ->
-            if (liveModel.handleAuthorizationCallback(callback)) intent?.setData(null)
-        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val callback = intent.data
-        if (callback != null && liveModel.handleAuthorizationCallback(callback)) {
-            intent.setData(null)
-            return
-        }
         handleFixtureIntent(intent)
     }
 
-    private fun beginGitHubAuthorization() {
-        liveModel.beginGitHubAuthorization()?.let { authorizationUrl ->
-            CustomTabsIntent.Builder().setShowTitle(true).build()
-                .launchUrl(this, Uri.parse(authorizationUrl))
-        }
+    private fun openGitHubVerification(verificationUri: String) {
+        CustomTabsIntent.Builder().setShowTitle(true).build()
+            .launchUrl(this, Uri.parse(verificationUri))
     }
 
     private fun openInstallationSettings() {

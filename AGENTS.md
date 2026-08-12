@@ -30,19 +30,19 @@ about what has actually merged and been proven.
    claims to be current.
 4. Rate limit is first-class state; back off visibly, never silently serve
    old numbers as fresh.
-5. Auth is a GitHub App user token via Custom Tab sign-in. Never read or
-   reuse browser cookies. Never expose, print, log, or commit token values;
-   sign-in is user-present, tokens are handled only on-device, and persistent
-   custody is Keystore-backed.
+5. Auth is a GitHub App user token obtained through GitHub's device flow: the
+   user code stays visible in RepoGlance and verification opens in a Custom
+   Tab. Never read or reuse browser cookies. Never expose, print, log, or
+   commit token values; sign-in is user-present, tokens are handled only
+   on-device, and persistent custody is Keystore-backed.
 6. Pinned repos are the only background-refresh set; discovery lists fetch
    on demand. No wakelocks, no foreground polling service. Pinning is an
    in-place row toggle with no preset pins.
 
 ## Boundaries
 
-- No server-side component. The only non-GitHub network surface is the
-  secret-free static HTTPS callback/App-Link host; it performs no exchange,
-  relay, storage, analytics, or data access.
+- No server-side component and no authentication callback. Authentication and
+  live reads go directly from the Android app to fixed GitHub HTTPS endpoints.
 - Not a session dashboard, not a chat client, and never a full GitHub
   client: full threads and all actions deep-link to the installed GitHub
   app.

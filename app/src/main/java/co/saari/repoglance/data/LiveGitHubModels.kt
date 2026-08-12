@@ -79,6 +79,11 @@ data class LiveRepositoryContent(
     val pullRequests: GitHubApiResult<LivePage<LivePullRequest>>,
 )
 
+fun LiveRepositoryContent.sessionInvalidationFailure(): GitHubApiResult.Failure? =
+    sequenceOf(issues, pullRequests)
+        .filterIsInstance<GitHubApiResult.Failure>()
+        .firstOrNull { it.needsNewSignIn }
+
 data class LivePage<T>(
     val rows: List<T>,
     val hasMorePages: Boolean,

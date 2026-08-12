@@ -101,20 +101,25 @@ class GitHubApiClient(
                 rateLimit = response.rateLimit(),
             )
         }
-        val pullRequests: GitHubApiResult<LivePage<LivePullRequest>> = authenticated {
-            val response = get(
-                withPageSize(
-                    "/repos/$owner/$name/pulls?state=open&sort=updated&direction=desc",
-                    ISSUES_PAGE_SIZE,
-                ),
-            )
-            val rows = response.requireArray().objects()
-                .map { parsePullRequest(it, viewerLogin) }
-            SuccessPayload(
-                value = LivePage(rows = rows, hasMorePages = response.hasNextPage()),
-                rateLimit = response.rateLimit(),
-            )
-        }
+        val pullRequests: GitHubApiResult<LivePage<LivePullRequest>> =
+            if (issues is GitHubApiResult.Failure && issues.needsNewSignIn) {
+                issues
+            } else {
+                authenticated {
+                    val response = get(
+                        withPageSize(
+                            "/repos/$owner/$name/pulls?state=open&sort=updated&direction=desc",
+                            ISSUES_PAGE_SIZE,
+                        ),
+                    )
+                    val rows = response.requireArray().objects()
+                        .map { parsePullRequest(it, viewerLogin) }
+                    SuccessPayload(
+                        value = LivePage(rows = rows, hasMorePages = response.hasNextPage()),
+                        rateLimit = response.rateLimit(),
+                    )
+                }
+            }
         return LiveRepositoryContent(repository, issues, pullRequests)
     }
 

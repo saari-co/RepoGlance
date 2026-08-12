@@ -21,11 +21,13 @@ in-app fixture mode (pinning, navigator, cached search), plus per-widget
 repository/mode configuration and a Fold-first navigator shell.
 
 The prototype live-data slice on this branch adds user-present GitHub App
-sign-in, a verified `repoglance.ztoned.com` Android App Link, Keystore-backed
-rotating tokens, live repository discovery, and repo-scoped open issue/PR
-lists. It has been exercised on the maintainer's Pixel 10 Pro Fold. Widgets
-remain fixture-backed in this checkpoint; background refresh, live widget
-content, CI/release pressure, and general distribution remain planned.
+device-flow sign-in, Keystore-backed rotating tokens, live repository
+discovery, and repo-scoped open issue/PR lists. The earlier confidential-flow
+checkpoint was exercised on the maintainer's Pixel 10 Pro Fold; the current
+public-client device-flow repair is source- and JVM-verified only and does not
+claim new device proof. Widgets remain fixture-backed and visibly say
+`FIXTURE PREVIEW`; background refresh, live widget content, CI/release
+pressure, and general distribution remain planned.
 
 ## Planned
 
@@ -51,18 +53,19 @@ content, CI/release pressure, and general distribution remain planned.
 
 ## Auth (prototype)
 
-RepoGlance signs in through its public GitHub App in an Android Custom Tab.
-State and PKCE bind the verified HTTPS return; short-lived user tokens refresh
-and remain encrypted behind Android Keystore. RepoGlance never reads or reuses
-browser cookies, and read-only permissions are the ceiling — the app performs
-no GitHub writes.
+RepoGlance requests a short user code from its public GitHub App, keeps that
+code visible, and opens GitHub's verification page in an Android Custom Tab.
+The ViewModel polls no faster than GitHub's interval, honors slowdown and
+expiry responses, and stops immediately when sign-in is cancelled. The APK
+contains only the public client ID. Device-flow access and refresh tokens stay
+encrypted behind Android Keystore, including silent refresh rotation when
+GitHub issues expiring user tokens.
 
-GitHub's current GitHub App web flow still requires a client secret during code
-exchange. A native APK cannot keep that value confidential, so the personal
-prototype treats it as public, revocable build configuration. Default and CI
-builds contain no credential and remain signed out; credential-bearing APKs
-must never be published. General distribution requires either GitHub device
-flow or a narrowly scoped confidential auth broker. See
+Current authentication has no callback-host dependency, embedded confidential
+client credential, browser-cookie reuse, or auth broker. Read-only permissions
+are the ceiling and the app performs no GitHub writes. The GitHub App must have
+Device Flow enabled before sign-in can succeed; the maintainer enabled it on
+2026-08-12. See
 [docs/AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md).
 
 ## How this is being built
