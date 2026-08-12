@@ -16,17 +16,25 @@ class RepoSnapshotInvariantsTest {
         prsAwaitingMyReview: Int?,
         openIssues: Int?,
         observedAt: Instant?,
+        defaultBranchCi: CiState = CiState.UNKNOWN,
+        latestRelease: ReleaseInfo? = null,
+        pushedAt: Instant? = null,
+        rateLimit: RateLimitBucket = RateLimitBucket.UNKNOWN,
+        issueLists: Map<NavigatorFilter, NavigatorList> = emptyMap(),
+        prLists: Map<NavigatorFilter, NavigatorList> = emptyMap(),
     ) = RepoSnapshot(
         repo = repo,
         openPrs = openPrs,
         prsAwaitingMyReview = prsAwaitingMyReview,
         openIssues = openIssues,
-        defaultBranchCi = CiState.UNKNOWN,
-        latestRelease = null,
-        pushedAt = null,
+        defaultBranchCi = defaultBranchCi,
+        latestRelease = latestRelease,
+        pushedAt = pushedAt,
         valueBasis = valueBasis,
         observedAt = observedAt,
-        rateLimit = RateLimitBucket.UNKNOWN,
+        rateLimit = rateLimit,
+        issueLists = issueLists,
+        prLists = prLists,
     )
 
     @Test
@@ -41,6 +49,151 @@ class RepoSnapshotInvariantsTest {
     fun unknownBasisRejectsNonNullCount() {
         assertThrows(IllegalArgumentException::class.java) {
             snapshot(ValueBasis.UNKNOWN, 1, null, null, null)
+        }
+    }
+
+    @Test
+    fun unknownBasisRejectsKnownObservationMetadata() {
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, now)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, null, pushedAt = now)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, null, defaultBranchCi = CiState.PASSING)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.UNKNOWN,
+                null,
+                null,
+                null,
+                null,
+                latestRelease = ReleaseInfo("v1.0.0", now),
+            )
+        }
+    }
+
+    @Test
+    fun unknownBasisAllowsKnownRateLimitState() {
+        val result = snapshot(
+            ValueBasis.UNKNOWN,
+            null,
+            null,
+            null,
+            null,
+            rateLimit = RateLimitBucket.EXHAUSTED,
+        )
+        assertEquals(RateLimitBucket.EXHAUSTED, result.rateLimit)
+    }
+
+    @Test
+    fun snapshotListMapsRequireMatchingKeysAndRowTypes() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+        val prList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Prs(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                issueLists = mapOf(NavigatorFilter.MINE to issueList),
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                issueLists = mapOf(NavigatorFilter.OPEN to prList),
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                prLists = mapOf(NavigatorFilter.OPEN to issueList),
+            )
+        }
+    }
+
+    @Test
+    fun snapshotListMapsAcceptMatchingKeysAndRowTypes() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+        val prList = NavigatorList(
+            filter = NavigatorFilter.MINE,
+            rows = NavigatorRows.Prs(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+
+        val result = snapshot(
+            ValueBasis.EXACT,
+            1,
+            0,
+            2,
+            now,
+            issueLists = mapOf(NavigatorFilter.OPEN to issueList),
+            prLists = mapOf(NavigatorFilter.MINE to prList),
+        )
+
+        assertEquals(issueList, result.issueLists[NavigatorFilter.OPEN])
+        assertEquals(prList, result.prLists[NavigatorFilter.MINE])
+    }
+
+    @Test
+    fun snapshotDefensivelySnapshotsMutableListMaps() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+        val mutableIssueLists = mutableMapOf(NavigatorFilter.OPEN to issueList)
+        val result = snapshot(
+            ValueBasis.EXACT,
+            1,
+            0,
+            2,
+            now,
+            issueLists = mutableIssueLists,
+        )
+
+        mutableIssueLists.clear()
+
+        assertEquals(issueList, result.issueLists[NavigatorFilter.OPEN])
+        assertEquals(1, result.issueLists.size)
+        assertThrows(UnsupportedOperationException::class.java) {
+            @Suppress("UNCHECKED_CAST")
+            (result.issueLists as MutableMap<NavigatorFilter, NavigatorList>).clear()
         }
     }
 
@@ -88,6 +241,13 @@ class RepoSnapshotInvariantsTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             snapshot(ValueBasis.EXACT, 1, 0, -2, now)
+        }
+    }
+
+    @Test
+    fun awaitingReviewCountCannotExceedOpenPrCount() {
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.EXACT, 1, 2, 3, now)
         }
     }
 }

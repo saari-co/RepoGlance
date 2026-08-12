@@ -1,5 +1,6 @@
 package co.saari.repoglance.fixtures
 
+import co.saari.repoglance.link.GitHubLinks
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.NavigatorFilter
@@ -8,6 +9,7 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorRows
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.ReviewState
 import co.saari.repoglance.model.ValueBasis
 import org.junit.Assert.assertEquals
@@ -68,6 +70,7 @@ class FixtureIntegrityTest {
         val snapshots = Fixtures.snapshots(FixtureScenario.MIXED, now)
         val combos = snapshots.map { Triple(it.valueBasis, it.defaultBranchCi, it.rateLimit) }.toSet()
         assertTrue("expected >= 4 distinct combos, got ${combos.size}", combos.size >= 4)
+        assertEquals(snapshots.size, snapshots.map { it.repo }.toSet().size)
         assertTrue(snapshots.any { it.valueBasis == ValueBasis.LAST_GOOD })
         assertTrue(snapshots.any { it.valueBasis == ValueBasis.UNKNOWN })
         assertTrue(snapshots.any { it.rateLimit == RateLimitBucket.EXHAUSTED })
@@ -111,6 +114,83 @@ class FixtureIntegrityTest {
         val rows = (list.rows as NavigatorRows.Prs).rows
         assertTrue(rows.isNotEmpty())
         assertTrue(rows.all { it.reviewState == ReviewState.REVIEW_REQUIRED })
+        assertTrue(rows.all { it.state == "open" })
+        assertTrue(rows.none { it.isDraft })
+    }
+
+    @Test
+    fun openFilterProducesOnlyOpenRows() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Account,
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.state == "open" })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.state == "open" })
+            }
+        }
+    }
+
+    @Test
+    fun accountNavigatorRowsCarryRepositoryIdentityForDeepLinks() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Account,
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.LOADED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> {
+                    assertTrue(rows.rows.map { it.repo }.toSet().size > 1)
+                    rows.rows.forEach { assertTrue(GitHubLinks.issue(it.repo, it.number).contains(it.repo.full)) }
+                }
+                is NavigatorRows.Prs -> {
+                    assertTrue(rows.rows.map { it.repo }.toSet().size > 1)
+                    rows.rows.forEach { assertTrue(GitHubLinks.pull(it.repo, it.number).contains(it.repo.full)) }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun repoScopedNavigatorRowsUseOnlyTheRequestedRepo() {
+        val requested = RepoRef("acme", "api-server")
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Repo(requested),
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.repo == requested })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.repo == requested })
+            }
+        }
+    }
+
+    @Test
+    fun orgScopedNavigatorRowsUseOnlyTheRequestedOwner() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Org("acme"),
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.repo.owner == "acme" })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.repo.owner == "acme" })
+            }
+        }
     }
 
     @Test
@@ -152,6 +232,38 @@ class FixtureIntegrityTest {
         )
         assertEquals(ValueBasis.LAST_GOOD, list.valueBasis)
         assertTrue(list.observedAt!!.isBefore(now))
+    }
+
+    @Test
+    fun rateLimitedNavigatorListCarriesExhaustedStateAndLastGoodData() {
+        val list = Fixtures.navigatorList(
+            scope = NavigatorScope.Account,
+            mode = NavigatorMode.ISSUES,
+            filter = NavigatorFilter.OPEN,
+            state = ListState.RATE_LIMITED,
+            now = now,
+        )
+
+        assertEquals(ValueBasis.LAST_GOOD, list.valueBasis)
+        assertEquals(RateLimitBucket.EXHAUSTED, list.rateLimit)
+        assertTrue(list.rows.size > 0)
+        assertTrue(list.observedAt!!.isBefore(now))
+    }
+
+    @Test
+    fun unknownNavigatorListCarriesUnknownRateLimitAndNoRows() {
+        val list = Fixtures.navigatorList(
+            scope = NavigatorScope.Account,
+            mode = NavigatorMode.PRS,
+            filter = NavigatorFilter.OPEN,
+            state = ListState.UNKNOWN,
+            now = now,
+        )
+
+        assertEquals(ValueBasis.UNKNOWN, list.valueBasis)
+        assertEquals(RateLimitBucket.UNKNOWN, list.rateLimit)
+        assertEquals(0, list.rows.size)
+        assertEquals(null, list.observedAt)
     }
 
     @Test

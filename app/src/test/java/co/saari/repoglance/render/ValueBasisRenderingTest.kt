@@ -2,13 +2,17 @@ package co.saari.repoglance.render
 
 import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.model.ReleaseInfo
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Duration
 import java.time.Instant
 
 class ValueBasisRenderingTest {
@@ -65,5 +69,49 @@ class ValueBasisRenderingTest {
         for (count in 0..100) {
             assertEquals("—", SnapshotRendering.countText(count, ValueBasis.UNKNOWN))
         }
+    }
+
+    @Test
+    fun pushedLabelDoesNotAppendAgoToJustNow() {
+        assertEquals("Pushed just now", SnapshotRendering.pushedLabel(now.minusSeconds(5), now))
+        assertEquals(
+            "Pushed 2m ago",
+            SnapshotRendering.pushedLabel(now.minus(Duration.ofMinutes(2)), now),
+        )
+    }
+
+    @Test
+    fun releaseLabelPreservesUnknownVersusKnownEmpty() {
+        assertEquals(
+            "Latest release: unknown",
+            SnapshotRendering.releaseLabel(null, ValueBasis.UNKNOWN, now),
+        )
+        assertEquals(
+            "No releases",
+            SnapshotRendering.releaseLabel(null, ValueBasis.EXACT, now),
+        )
+    }
+
+    @Test
+    fun releaseLabelSanitizesDisplayTagWithoutChangingSourceTag() {
+        val rtlOverride = 0x202e.toChar().toString()
+        val sourceTag = "v1" + rtlOverride + "stable"
+        val release = ReleaseInfo(sourceTag, now)
+
+        assertEquals(
+            "v1stable · just now",
+            SnapshotRendering.releaseLabel(release, ValueBasis.EXACT, now),
+        )
+        assertEquals(sourceTag, release.tag)
+
+        val tail = "x".repeat(30)
+        val credentialShapedTag = "gh" + "p_" + tail
+        val redacted = SnapshotRendering.releaseLabel(
+            ReleaseInfo(credentialShapedTag, now),
+            ValueBasis.EXACT,
+            now,
+        )
+        assertTrue(redacted.contains("•••"))
+        assertFalse(redacted.contains(tail))
     }
 }

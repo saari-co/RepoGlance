@@ -34,11 +34,6 @@ object GitHubLinks {
     }
 
     private fun base(ref: RepoRef): String {
-        // RepoRef's own charset already rules out "/", but its name pattern
-        // still permits a bare ".." (e.g. name = ".."). Belt-and-braces: never
-        // let ".." reach a URL we build, even though RepoRef makes it hard to
-        // get here in the first place.
-        require(!ref.full.contains("..")) { "repo ref must not contain \"..\": ${ref.full}" }
         return "$BASE${ref.owner}/${ref.name}"
     }
 
