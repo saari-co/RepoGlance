@@ -1,7 +1,9 @@
 package co.saari.repoglance.ui
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -50,6 +54,7 @@ import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
 import co.saari.repoglance.widget.RepoWidgetReceiver
+import co.saari.repoglance.widget.RepoWidgetConfigActivity
 import co.saari.repoglance.widget.StackWidgetReceiver
 import java.time.Instant
 
@@ -71,7 +76,13 @@ fun HomeScreen(
     val now = remember(scenario, pinnedRepos) { Instant.now() }
     val repos = remember(scenario, pinnedRepos) { SnapshotStore.repoList(scenario, pinnedRepos, now) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(16.dp),
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -124,10 +135,16 @@ private fun PinWidgetsRow() {
             modifier = Modifier.weight(1f),
             onClick = {
                 if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                    val configureCallback = PendingIntent.getActivity(
+                        context,
+                        REPO_WIDGET_CONFIG_REQUEST_CODE,
+                        Intent(context, RepoWidgetConfigActivity::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+                    )
                     appWidgetManager.requestPinAppWidget(
                         ComponentName(context, RepoWidgetReceiver::class.java),
                         null,
-                        null,
+                        configureCallback,
                     )
                 }
             },
@@ -150,6 +167,8 @@ private fun PinWidgetsRow() {
         }
     }
 }
+
+private const val REPO_WIDGET_CONFIG_REQUEST_CODE = 1101
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

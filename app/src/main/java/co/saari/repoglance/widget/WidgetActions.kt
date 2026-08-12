@@ -1,5 +1,7 @@
 package co.saari.repoglance.widget
 
+import co.saari.repoglance.model.NavigatorMode
+
 /**
  * Shared repo Intent-extra contract between the widgets' tap actions and
  * [co.saari.repoglance.MainActivity], which reads this extra to pre-scope
@@ -11,3 +13,11 @@ package co.saari.repoglance.widget
  * widget/StackWidget.kt KDoc).
  */
 const val EXTRA_REPO_FULL: String = "repo_full"
+
+/** Optional companion to [EXTRA_REPO_FULL] for opening the navigator in the
+ * mode selected for one widget instance. Missing or malformed values stay
+ * safe and predictable by falling back to [NavigatorMode.BOTH]. */
+const val EXTRA_NAVIGATOR_MODE: String = "navigator_mode"
+
+internal fun navigatorModeFromExtra(value: String?): NavigatorMode =
+    NavigatorMode.entries.firstOrNull { it.name == value } ?: NavigatorMode.BOTH

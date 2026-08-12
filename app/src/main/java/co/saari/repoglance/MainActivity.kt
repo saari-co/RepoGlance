@@ -3,6 +3,7 @@ package co.saari.repoglance
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.NavigatorScopeCodec
@@ -22,12 +24,15 @@ import co.saari.repoglance.ui.HomeScreen
 import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
+import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.WidgetRefresh
+import co.saari.repoglance.widget.navigatorModeFromExtra
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         // A widget row tap launches MainActivity with this extra set (see
         // widget/WidgetActions.kt) instead of a raw ACTION_VIEW Intent from
@@ -39,6 +44,7 @@ class MainActivity : ComponentActivity() {
         val initialScope = widgetRepoFull
             ?.let { NavigatorScopeCodec.decode("REPO", it) }
             ?.takeIf { it is NavigatorScope.Repo }
+        val initialMode = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
 
         setContent {
             RepoGlanceTheme {
@@ -46,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    AppRoot(initialNavigatorScope = initialScope)
+                    AppRoot(initialNavigatorScope = initialScope, initialNavigatorMode = initialMode)
                 }
             }
         }
@@ -54,7 +60,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AppRoot(initialNavigatorScope: NavigatorScope?) {
+private fun AppRoot(initialNavigatorScope: NavigatorScope?, initialNavigatorMode: NavigatorMode) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -65,6 +71,9 @@ private fun AppRoot(initialNavigatorScope: NavigatorScope?) {
     var scopeValue by rememberSaveable {
         mutableStateOf(initialNavigatorScope?.let(NavigatorScopeCodec::valueOf) ?: "")
     }
+    var modeName by rememberSaveable {
+        mutableStateOf(if (initialNavigatorScope == null) NavigatorMode.BOTH.name else initialNavigatorMode.name)
+    }
 
     val scenarioState = AppPrefs.rememberScenario(context)
     val pinnedState = AppPrefs.rememberPinnedRepos(context)
@@ -73,9 +82,10 @@ private fun AppRoot(initialNavigatorScope: NavigatorScope?) {
         coroutineScope.launch { WidgetRefresh.updateAll(context) }
     }
 
-    fun openNavigator(scope: NavigatorScope) {
+    fun openNavigator(scope: NavigatorScope, mode: NavigatorMode = NavigatorMode.BOTH) {
         scopeKind = NavigatorScopeCodec.kindOf(scope)
         scopeValue = NavigatorScopeCodec.valueOf(scope)
+        modeName = mode.name
         isHome = false
     }
 
@@ -99,6 +109,7 @@ private fun AppRoot(initialNavigatorScope: NavigatorScope?) {
         NavigatorScreen(
             scenario = scenarioState.value,
             initialScope = scope,
+            initialMode = navigatorModeFromExtra(modeName),
             onBackToHome = { isHome = true },
         )
     }
