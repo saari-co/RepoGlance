@@ -44,6 +44,7 @@ data class NavigatorList(
             ValueBasis.UNKNOWN -> {
                 require(rows.size == 0) { "UNKNOWN basis requires an empty navigator list" }
                 require(observedAt == null) { "UNKNOWN basis requires a null observedAt" }
+                require(!hasMorePages) { "UNKNOWN basis cannot claim more pages" }
             }
             ValueBasis.EXACT, ValueBasis.LAST_GOOD -> {
                 require(observedAt != null) {

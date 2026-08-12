@@ -20,6 +20,8 @@ class RepoSnapshotInvariantsTest {
         latestRelease: ReleaseInfo? = null,
         pushedAt: Instant? = null,
         rateLimit: RateLimitBucket = RateLimitBucket.UNKNOWN,
+        issueLists: Map<NavigatorFilter, NavigatorList> = emptyMap(),
+        prLists: Map<NavigatorFilter, NavigatorList> = emptyMap(),
     ) = RepoSnapshot(
         repo = repo,
         openPrs = openPrs,
@@ -31,6 +33,8 @@ class RepoSnapshotInvariantsTest {
         valueBasis = valueBasis,
         observedAt = observedAt,
         rateLimit = rateLimit,
+        issueLists = issueLists,
+        prLists = prLists,
     )
 
     @Test
@@ -82,6 +86,82 @@ class RepoSnapshotInvariantsTest {
             rateLimit = RateLimitBucket.EXHAUSTED,
         )
         assertEquals(RateLimitBucket.EXHAUSTED, result.rateLimit)
+    }
+
+    @Test
+    fun snapshotListMapsRequireMatchingKeysAndRowTypes() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+        )
+        val prList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Prs(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                issueLists = mapOf(NavigatorFilter.MINE to issueList),
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                issueLists = mapOf(NavigatorFilter.OPEN to prList),
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.EXACT,
+                1,
+                0,
+                2,
+                now,
+                prLists = mapOf(NavigatorFilter.OPEN to issueList),
+            )
+        }
+    }
+
+    @Test
+    fun snapshotListMapsAcceptMatchingKeysAndRowTypes() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+        )
+        val prList = NavigatorList(
+            filter = NavigatorFilter.MINE,
+            rows = NavigatorRows.Prs(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+        )
+
+        val result = snapshot(
+            ValueBasis.EXACT,
+            1,
+            0,
+            2,
+            now,
+            issueLists = mapOf(NavigatorFilter.OPEN to issueList),
+            prLists = mapOf(NavigatorFilter.MINE to prList),
+        )
+
+        assertEquals(issueList, result.issueLists[NavigatorFilter.OPEN])
+        assertEquals(prList, result.prLists[NavigatorFilter.MINE])
     }
 
     @Test

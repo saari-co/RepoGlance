@@ -28,6 +28,16 @@ data class RepoSnapshot(
     val prLists: Map<NavigatorFilter, NavigatorList> = emptyMap(),
 ) {
     init {
+        require(issueLists.all { (filter, list) ->
+            filter == list.filter && list.rows is NavigatorRows.Issues
+        }) {
+            "issueLists keys must match their list filters and contain only issue rows"
+        }
+        require(prLists.all { (filter, list) ->
+            filter == list.filter && list.rows is NavigatorRows.Prs
+        }) {
+            "prLists keys must match their list filters and contain only PR rows"
+        }
         when (valueBasis) {
             ValueBasis.UNKNOWN -> {
                 require(openPrs == null && prsAwaitingMyReview == null && openIssues == null) {

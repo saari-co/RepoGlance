@@ -29,11 +29,13 @@ class NavigatorListInvariantsTest {
         valueBasis: ValueBasis,
         rows: NavigatorRows,
         observedAt: Instant?,
+        hasMorePages: Boolean = false,
     ) = NavigatorList(
         filter = NavigatorFilter.OPEN,
         rows = rows,
         valueBasis = valueBasis,
         observedAt = observedAt,
+        hasMorePages = hasMorePages,
     )
 
     @Test
@@ -47,6 +49,13 @@ class NavigatorListInvariantsTest {
     fun unknownBasisRequiresNullObservedAt() {
         assertThrows(IllegalArgumentException::class.java) {
             list(ValueBasis.UNKNOWN, emptyRows, now)
+        }
+    }
+
+    @Test
+    fun unknownBasisRejectsPaginationClaim() {
+        assertThrows(IllegalArgumentException::class.java) {
+            list(ValueBasis.UNKNOWN, emptyRows, null, hasMorePages = true)
         }
     }
 
