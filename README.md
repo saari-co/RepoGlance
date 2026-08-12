@@ -14,14 +14,22 @@ and deep links into the GitHub mobile app.
 
 ## Status
 
-Slice 1 available: typed snapshot model, fixture corpus, and truth-rule
-tests — no network, no UI yet.
+Slice 1 available: typed snapshot model, fixture corpus, and truth-rule tests.
 
 Slice 2 available: fixture-first Glance widgets (per-repo + stack) and an
-in-app fixture mode (pinning, navigator, cached search) — still no network,
-no auth.
+in-app fixture mode (pinning, navigator, cached search), plus per-widget
+repository/mode configuration and a Fold-first navigator shell.
 
-Everything else remains planned.
+The prototype live-data slice on this branch adds user-present GitHub App
+device-flow sign-in, Keystore-backed rotating tokens, live repository
+discovery, and repo-scoped open issue/PR lists. The repaired public-client
+device flow is source-, JVM-, and physical-Fold verified: the exact installed
+APK completed GitHub authorization, loaded the public live RepoGlance
+navigator, and retained its encrypted session across a force-stop/cold launch.
+Widgets remain fixture-backed and visibly say
+`FIXTURE PREVIEW`; background refresh, live widget content, CI/release
+pressure, signing, release, general distribution, and revocation of the earlier
+prototype client secret remain maintainer-gated or planned.
 
 ## Planned
 
@@ -45,12 +53,35 @@ Everything else remains planned.
   labelled with its age; rate-limited is a visible state, never silently
   masked with old numbers.
 
-## Auth (planned)
+## Auth (prototype)
 
-A RepoGlance GitHub App: sign in via the browser's authorization flow in a
-Custom Tab, short-lived user tokens refresh silently, stored behind Android
-Keystore. RepoGlance never reads or reuses browser cookies, and read-only
-scopes are the ceiling — the app performs no GitHub writes.
+RepoGlance requests a short user code from its public GitHub App, keeps that
+code visible, and waits for an explicit **Copy code & open GitHub** tap. That
+action copies the code and opens GitHub's exact verification page in an Android
+Custom Tab; returning to RepoGlance leaves the code visible. GitHub currently
+uses segmented one-character fields on Android, so normal clipboard paste may
+not fill the complete code and manual entry can still be required.
+Returning also wakes a paused pending check, which still rechecks GitHub's
+minimum interval before any request. The ViewModel honors slowdown and expiry
+responses, retries transient poll I/O only until code expiry, and stops
+immediately when sign-in is cancelled. Authorized tokens are committed with
+Android's atomic-file sync and encrypted behind Android Keystore; a save failure
+is cleared and reported without exposing its exception or token. The APK
+contains only the public client ID, including for silent refresh rotation when
+GitHub issues expiring user tokens.
+
+Current authentication has no callback-host dependency, embedded confidential
+client credential, browser-cookie reuse, or auth broker. Read-only permissions
+are the ceiling and the app performs no GitHub writes. The GitHub App must have
+Device Flow enabled before sign-in can succeed; an operator-approved Codex
+browser action enabled it on 2026-08-12. See
+[docs/AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md).
+
+Exact repaired-source proof on the registered Pixel 10 Pro Fold completed the
+device authorization, loaded the public live RepoGlance navigator, and retained
+the encrypted session across a force-stop/cold launch. Selected sanitized
+evidence is linked from
+[proof/github-auth-live-20260812/PROOF.md](proof/github-auth-live-20260812/PROOF.md).
 
 ## How this is being built
 

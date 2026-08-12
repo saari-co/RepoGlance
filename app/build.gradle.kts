@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
 android {
     namespace = "co.saari.repoglance"
     compileSdk = 35
@@ -12,8 +15,10 @@ android {
         applicationId = "co.saari.repoglance"
         minSdk = 31
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-slice2"
+        versionCode = 3
+        versionName = "0.3.0-auth-live"
+
+        buildConfigField("String", "GITHUB_APP_CLIENT_ID", "Iv23livzEuAb2HMCbcUq".asBuildConfigString())
     }
 
     buildTypes {
@@ -29,6 +34,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -42,10 +48,14 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
     debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    testImplementation(libs.json.jvm)
 }

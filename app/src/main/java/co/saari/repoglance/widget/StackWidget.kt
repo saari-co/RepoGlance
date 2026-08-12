@@ -89,7 +89,7 @@ private fun HeaderRow(scenario: FixtureScenario, repos: List<RepoSnapshot>, now:
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            scenario.name,
+            "$WIDGET_PREVIEW_LABEL · ${scenario.name}",
             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
         )
         Spacer(modifier = GlanceModifier.width(8.dp))

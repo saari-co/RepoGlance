@@ -2,6 +2,7 @@ package co.saari.repoglance.widget
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -11,8 +12,10 @@ import androidx.glance.GlanceTheme
 import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -22,179 +25,215 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import co.saari.repoglance.MainActivity
-import co.saari.repoglance.fixtures.FixtureScenario
-import co.saari.repoglance.fixtures.Fixtures
-import co.saari.repoglance.model.CiState
+import co.saari.repoglance.link.Sanitize
+import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.render.Ages
-import co.saari.repoglance.render.CiColorRole
-import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
 import java.time.Instant
 
 /**
- * Per-repo Glance widget.
+ * Independently configured per-repository widget.
  *
- * Fixture-mode placeholder behavior (v0.1-honest simplification — a real
- * per-widget repo picker is future work): renders the first pinned repo,
- * matched against the currently selected fixture scenario so the widget
- * follows the in-app scenario switcher when pins exist there; when there
- * are no pins at all (or none match the selected scenario, e.g. EMPTY is
- * selected), it falls back to the first repo of the MIXED scenario
- * specifically — not the selected scenario — so a fresh install's widget
- * always shows something.
- *
- * [SizeMode.Responsive] with two breakpoints: SMALL (width < 180dp, fits
- * the Fold cover display) shows name/CI/PRs/data-age only; WIDE (>= 180dp)
- * adds the full count trio, release, pushed age, stale chip, and rate-limit
- * banner. Tapping opens [MainActivity] pre-scoped to the shown repo.
+ * A compact 2x1 placement is a count summary. Any placement tall enough for
+ * rows becomes a single recently-updated feed whose entries are individually
+ * labeled ISSUE or PR. Header/summary taps open RepoGlance at this widget's
+ * repository and mode; row taps open the exact GitHub URL through Android's
+ * verified-link routing.
  */
 class RepoWidget : GlanceAppWidget() {
 
-    override val sizeMode: SizeMode = SizeMode.Responsive(setOf(SMALL_SIZE, WIDE_SIZE))
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(COMPACT_SIZE, NARROW_TALL_SIZE, WIDE_TALL_SIZE),
+    )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val now = Instant.now()
-        val scenario = AppPrefs.selectedScenario(context)
-        val pins = AppPrefs.pinnedRepos(context)
-        val snapshot = placeholderRepo(scenario, pins, now)
-
-        val tapIntent = Intent(context, MainActivity::class.java).apply {
-            snapshot?.let { putExtra(EXTRA_REPO_FULL, it.repo.full) }
-        }
+        val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
         provideContent {
+            // Glance keeps a composition alive briefly after the first render.
+            // Read storage inside the composition so an explicit update after
+            // configuration/reconfiguration sees the newly persisted values.
+            val config = RepoWidgetConfigStore.load(context, appWidgetId)
+            val now = Instant.now()
+            val scenario = AppPrefs.selectedScenario(context)
+            val snapshot = config?.let { WidgetFixtureData.snapshotFor(it.repo, scenario, now) }
+            val rows = config?.let { WidgetFixtureData.recentRows(it.repo, it.mode, now) }.orEmpty()
+            val appIntent = config?.let { navigatorIntent(context, it) }
+
             GlanceTheme {
-                val size = LocalSize.current
-                val tapAction = actionStartActivity(tapIntent)
+                val isTall = LocalSize.current.height >= TALL_BREAKPOINT
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .background(GlanceTheme.colors.background)
-                        .clickable(tapAction),
+                        .background(GlanceTheme.colors.background),
                 ) {
-                    if (size.width < WIDE_BREAKPOINT) {
-                        SmallContent(snapshot, now)
-                    } else {
-                        WideContent(snapshot, now)
+                    when {
+                        config == null || snapshot == null || appIntent == null -> UnconfiguredContent()
+                        isTall -> TallContent(config, snapshot, rows, now, appIntent)
+                        else -> CompactContent(config, snapshot, now, appIntent)
                     }
                 }
             }
         }
     }
 
-    private fun placeholderRepo(scenario: FixtureScenario, pins: Set<String>, now: Instant): RepoSnapshot? {
-        if (pins.isNotEmpty()) {
-            Fixtures.snapshots(scenario, now).firstOrNull { it.repo.full in pins }?.let { return it }
-        }
-        return Fixtures.snapshots(FixtureScenario.MIXED, now).firstOrNull()
-    }
-
     companion object {
-        private val SMALL_SIZE = DpSize(120.dp, 64.dp)
-        private val WIDE_SIZE = DpSize(250.dp, 140.dp)
-        private val WIDE_BREAKPOINT = 180.dp
+        private val COMPACT_SIZE = DpSize(120.dp, 64.dp)
+        private val NARROW_TALL_SIZE = DpSize(120.dp, 120.dp)
+        private val WIDE_TALL_SIZE = DpSize(250.dp, 140.dp)
+        private val TALL_BREAKPOINT = 100.dp
     }
 }
 
-@Composable
-private fun ciColorProvider(ci: CiState): ColorProvider = when (CiSemanticRole.of(ci)) {
-    CiColorRole.POSITIVE -> GlanceTheme.colors.primary
-    CiColorRole.NEGATIVE -> GlanceTheme.colors.error
-    CiColorRole.IN_PROGRESS -> GlanceTheme.colors.tertiary
-    CiColorRole.NEUTRAL -> GlanceTheme.colors.outline
-}
-
-@Composable
-private fun CiDot(ci: CiState) {
-    Box(modifier = GlanceModifier.size(8.dp).background(ciColorProvider(ci))) {}
-}
-
-@Composable
-private fun SmallContent(snapshot: RepoSnapshot?, now: Instant) {
-    Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp)) {
-        if (snapshot == null) {
-            Text("No repo pinned", style = TextStyle(color = GlanceTheme.colors.onBackground))
-            Text(Ages.updatedLabel(null, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-            return@Column
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CiDot(snapshot.defaultBranchCi)
-            Spacer(modifier = GlanceModifier.width(4.dp))
-            Text(
-                snapshot.repo.name,
-                maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
-            )
-        }
-        Text(SnapshotRendering.ciLabel(snapshot.defaultBranchCi), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-        Text(
-            "PRs " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis),
-            style = TextStyle(color = GlanceTheme.colors.onBackground),
-        )
-        Text(Ages.updatedLabel(snapshot.observedAt, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent =
+    Intent(context, MainActivity::class.java).apply {
+        data = Uri.Builder()
+            .scheme("repoglance")
+            .authority("navigator")
+            .appendPath(config.repo.full)
+            .appendQueryParameter("mode", config.mode.name)
+            .build()
+        putExtra(EXTRA_REPO_FULL, config.repo.full)
+        putExtra(EXTRA_NAVIGATOR_MODE, config.mode.name)
     }
+
+private fun githubIntent(row: WidgetRow): Intent =
+    Intent(Intent.ACTION_VIEW, Uri.parse(row.url)).apply {
+        addCategory(Intent.CATEGORY_BROWSABLE)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): String = when (mode) {
+    NavigatorMode.ISSUES -> "ISSUES " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis)
+    NavigatorMode.PRS -> "PRS " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis)
+    NavigatorMode.BOTH ->
+        "ISSUES " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis) +
+            " · PRS " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis)
 }
 
+internal const val WIDGET_PREVIEW_LABEL = "FIXTURE PREVIEW"
+
 @Composable
-private fun WideContent(snapshot: RepoSnapshot?, now: Instant) {
-    Column(modifier = GlanceModifier.fillMaxSize().padding(12.dp)) {
-        if (snapshot == null) {
-            Text(
-                "No repo pinned",
-                style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
-            )
-            Text(Ages.updatedLabel(null, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-            return@Column
-        }
-        SnapshotRendering.rateLimitBanner(snapshot.rateLimit)?.let { banner ->
-            Text(
-                banner,
-                style = TextStyle(color = GlanceTheme.colors.onErrorContainer, fontWeight = FontWeight.Bold),
-                modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .background(GlanceTheme.colors.errorContainer)
-                    .padding(4.dp),
-            )
-            Spacer(modifier = GlanceModifier.height(4.dp))
-        }
+private fun UnconfiguredContent() {
+    Column(modifier = GlanceModifier.fillMaxSize().padding(10.dp)) {
         Text(
-            snapshot.repo.full,
+            WIDGET_PREVIEW_LABEL,
             style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
         )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CiDot(snapshot.defaultBranchCi)
-            Spacer(modifier = GlanceModifier.width(4.dp))
-            Text(SnapshotRendering.ciLabel(snapshot.defaultBranchCi), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-            SnapshotRendering.ageChip(snapshot, now)?.let { chip ->
-                Spacer(modifier = GlanceModifier.width(6.dp))
-                Text(
-                    "Cached · $chip",
-                    style = TextStyle(color = GlanceTheme.colors.tertiary, fontWeight = FontWeight.Bold),
-                )
-            }
-        }
         Text(
-            "PRs " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis) +
-                "  Review " + SnapshotRendering.countText(snapshot.prsAwaitingMyReview, snapshot.valueBasis) +
-                "  Issues " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis),
+            "Choose a repository",
+            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+        )
+    }
+}
+
+@Composable
+private fun CompactContent(
+    config: RepoWidgetConfig,
+    snapshot: RepoSnapshot,
+    now: Instant,
+    appIntent: Intent,
+) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .clickable(actionStartActivity(appIntent))
+            .padding(8.dp),
+    ) {
+        Text(
+            config.repo.full,
+            maxLines = 1,
+            style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
+        )
+        Text(
+            widgetCountSummary(snapshot, config.mode),
+            maxLines = 1,
             style = TextStyle(color = GlanceTheme.colors.onBackground),
         )
         Text(
-            SnapshotRendering.releaseLabel(snapshot.latestRelease, snapshot.valueBasis, now),
+            "$WIDGET_PREVIEW_LABEL · ${Ages.updatedLabel(snapshot.observedAt, now)}",
+            maxLines = 1,
             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
         )
-        Text(SnapshotRendering.pushedLabel(snapshot.pushedAt, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-        Text(Ages.updatedLabel(snapshot.observedAt, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+    }
+}
+
+@Composable
+private fun TallContent(
+    config: RepoWidgetConfig,
+    snapshot: RepoSnapshot,
+    rows: List<WidgetRow>,
+    now: Instant,
+    appIntent: Intent,
+) {
+    Column(modifier = GlanceModifier.fillMaxSize()) {
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .background(GlanceTheme.colors.surfaceVariant)
+                .clickable(actionStartActivity(appIntent))
+                .padding(horizontal = 10.dp, vertical = 7.dp),
+        ) {
+            Text(
+                config.repo.full,
+                maxLines = 1,
+                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
+            )
+            Text(
+                "$WIDGET_PREVIEW_LABEL · " + widgetCountSummary(snapshot, config.mode) +
+                    " · " + Ages.updatedLabel(snapshot.observedAt, now),
+                maxLines = 1,
+                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+            )
+        }
+        LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+            if (rows.isEmpty()) {
+                item {
+                    Text(
+                        "No recent rows",
+                        modifier = GlanceModifier.padding(10.dp),
+                        style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+                    )
+                }
+            } else {
+                items(rows.take(MAX_WIDGET_ROWS).size) { index ->
+                    WidgetFeedRow(rows[index])
+                }
+            }
+        }
+    }
+}
+
+private const val MAX_WIDGET_ROWS = 10
+
+@Composable
+private fun WidgetFeedRow(row: WidgetRow) {
+    val tapAction = actionStartActivity(githubIntent(row))
+    Row(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .clickable(tapAction)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            "${row.kind.name} #${row.number}",
+            maxLines = 1,
+            style = TextStyle(color = GlanceTheme.colors.primary, fontWeight = FontWeight.Bold),
+        )
+        Spacer(modifier = GlanceModifier.width(8.dp))
+        Text(
+            Sanitize.displayText(row.title),
+            maxLines = 1,
+            style = TextStyle(color = GlanceTheme.colors.onBackground),
+        )
     }
 }

@@ -10,6 +10,7 @@
 build/
 .gradle/
 .kotlin/
+.wrangler/
 local.properties
 captures/
 .externalNativeBuild/
@@ -18,6 +19,9 @@ captures/
 *.aab
 *.keystore
 *.jks
+.env
+.env.*
+!.env.example
 
 # IDE
 .idea/

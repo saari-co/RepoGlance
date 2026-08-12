@@ -34,3 +34,26 @@ default-pin aspect refined by `pin-model-010`.
 | `pin-model-010` | No preset pins. Any repo visible in the connected account/orgs is pinnable via an in-place row toggle (Claude Code session-pinning interaction); pinned repos sort first and form the widget and background-refresh set. The maintainer's twelve pins are personal config, not product defaults. | implemented (in code at PR #4: in-place toggle, pins-first sort, pinned set drives the stack widget; device-proven on the XL) |
 | `app-public-011` | The RepoGlance GitHub App is public and installable by any user on their own accounts/orgs; the maintainer's `saariuslystoned`/`saari-co`/`dinkuskit` installations are personal configuration. Registration remains maintainer-manual before Slice 3. Supersedes `github-app-topology-006`. | locked |
 | `delivery-rail-012` | Merge → CI builds the APK → rolling GitHub release → cp-1 pulls within 30 minutes → update banner on the maintainer's phone over WireGuard → one-tap install (the SwarmPocket rail, generalized). The public rolling release doubles as the public sideload channel; puller/banner config stays swarm-side. First install is one manual sideload; signing keystore and CI secrets are maintainer-gated. | locked |
+
+Implementation note (2026-08-12): the maintainer registered the public
+RepoGlance GitHub App, installed it for all repositories on `saariuslystoned`,
+`saari-co`, and `dinkuskit`, and completed the first live read-only Fold sign-in
+on the earlier web-flow checkpoint. The current branch replaces that flow with
+a public-client device flow; an operator-approved Codex browser action enabled
+only Device Flow on 2026-08-12. A Fold attempt on the pre-UX-repair device-flow
+head was rejected before authorization because the verification page opened
+automatically and the code had no copy action. On the corrected UX head, GitHub
+accepted the copied code and displayed its connected confirmation, but
+RepoGlance remained on the waiting screen after return. That proves the handoff,
+not token receipt, session persistence, or live data. The resume-wake head left
+the waiting state but then displayed a generic pre-session failure with no saved
+session. The current repair handles transient poll I/O and session persistence
+as separate sanitized phases. The final repaired source completed the
+authorized Fold rerun: GitHub reached success, RepoGlance loaded the public
+live `saari-co/RepoGlance` navigator, and the encrypted session survived a
+force-stop/cold launch. GitHub's segmented Android code fields still do not
+reliably accept whole-code clipboard paste; manual entry remains a documented
+provider-UI limitation rather than something RepoGlance bypasses with browser
+scripting.
+The canonical ledger status remains unchanged until the next GrillTrack
+reconciliation.

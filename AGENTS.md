@@ -13,11 +13,12 @@ and agents; keep it durable and contract-only.
    originating product plan)
 4. Current source, tests, fixtures, and committed proof
 
-## Implementation Hold
+## Implementation State
 
-No Android project, source, CI, icon, or dependency work exists or may
-begin until the maintainer explicitly routes the build lane. Until then
-this repository holds contracts, decisions, and proof only.
+The Android project, fixture-first widgets/navigator, and prototype live GitHub
+read path exist on stacked development branches. Source-changing work requires
+an explicitly routed, isolated worktree and proof trail. `main` remains honest
+about what has actually merged and been proven.
 
 ## Truth Rules
 
@@ -29,16 +30,19 @@ this repository holds contracts, decisions, and proof only.
    claims to be current.
 4. Rate limit is first-class state; back off visibly, never silently serve
    old numbers as fresh.
-5. Auth is a GitHub App user token via Custom Tab sign-in. Never read or
-   reuse browser cookies. Never handle, print, store, or commit token
-   values; sign-in is user-present, on-device, Keystore-backed.
+5. Auth is a GitHub App user token obtained through GitHub's device flow: the
+   user code stays visible in RepoGlance and verification opens in a Custom
+   Tab. Never read or reuse browser cookies. Never expose, print, log, or
+   commit token values; sign-in is user-present, tokens are handled only
+   on-device, and persistent custody is Keystore-backed.
 6. Pinned repos are the only background-refresh set; discovery lists fetch
    on demand. No wakelocks, no foreground polling service. Pinning is an
    in-place row toggle with no preset pins.
 
 ## Boundaries
 
-- No server-side component and no non-GitHub network dependency.
+- No server-side component and no authentication callback. Authentication and
+  live reads go directly from the Android app to fixed GitHub HTTPS endpoints.
 - Not a session dashboard, not a chat client, and never a full GitHub
   client: full threads and all actions deep-link to the installed GitHub
   app.
