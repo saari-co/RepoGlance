@@ -43,7 +43,7 @@ class CanaryWorkflowContractTest(unittest.TestCase):
         self.assertIn("SIGNING_CERT_SHA256", self.text)
         self.assertNotRegex(self.text, r"echo\s+[^\n]*(KEYSTORE_B64|KEY_PASSWORD|STORE_PASSWORD)")
 
-    def test_only_exact_current_main_can_publish(self) -> None:
+    def test__only_exact_current_main_can_publish(self) -> None:
         self.assertIn("branches: [main]", self.text)
         self.assertGreaterEqual(self.text.count("github.ref == 'refs/heads/main'"), 3)
         self.assertGreaterEqual(self.text.count("assert_current_main"), 4)
