@@ -48,6 +48,12 @@ RepoGlance remained on the waiting screen after return. That proves the handoff,
 not token receipt, session persistence, or live data. The resume-wake head left
 the waiting state but then displayed a generic pre-session failure with no saved
 session. The current repair handles transient poll I/O and session persistence
-as separate sanitized phases; an exact-head Fold rerun remains required.
+as separate sanitized phases. The final repaired source completed the
+authorized Fold rerun: GitHub reached success, RepoGlance loaded the public
+live `saari-co/RepoGlance` navigator, and the encrypted session survived a
+force-stop/cold launch. GitHub's segmented Android code fields still do not
+reliably accept whole-code clipboard paste; manual entry remains a documented
+provider-UI limitation rather than something RepoGlance bypasses with browser
+scripting.
 The canonical ledger status remains unchanged until the next GrillTrack
 reconciliation.

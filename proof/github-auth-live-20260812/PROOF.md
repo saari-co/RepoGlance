@@ -41,6 +41,8 @@ resume, and marks every persistent fixture widget surface `FIXTURE PREVIEW`.
   `2a385e9cfc783c8d3215ad29c66a3aa04e6325df`
 - Poll-I/O/session-persistence repair starting head:
   `b3d8b2f8aa903c1f0574ffb206f0f397b2a72502`
+- Proven device-flow source head:
+  `f9ee4edd07fb7775b5f814cd51469d0141d06e2d`
 - Repair starting head: `fbb78927d3579294c0652f41e6f39b02825fa2a5`
 - Stacked review base: `5c0a0d660b5332f40b3ccb1fbf21dd63e755f3ef`
 - Secret-free clean command:
@@ -55,6 +57,47 @@ resume, and marks every persistent fixture widget surface `FIXTURE PREVIEW`.
   before commit
 - Post-commit proof-asset placement: pass, with 0 candidate media files, 0
   required fixes, and 0 explicit exceptions
+
+### Exact-source-head Pixel 10 Pro Fold proof
+
+The registered Pixel 10 Pro Fold completed a source-blind run against source
+head `f9ee4edd07fb7775b5f814cd51469d0141d06e2d`. A fresh debug APK and the APK
+pulled back from the installed package both had SHA-256
+`8e20f59718d2a45aaa13aafe58f5bea624b84f50b7bbe382580605acd46e9473`.
+The packaged sensitive-name and token/private-key signature scans returned zero
+hits.
+
+The user-approved device authorization reached GitHub's success state. On
+return, RepoGlance visibly reached `LIVE`, with `Connect GitHub` and failure
+states absent. Before any catalog evidence was captured, a source-blind guard
+entered the exact public filter `saari-co/RepoGlance` and proved that every
+repository-shaped label on screen was that public repository. No unfiltered
+catalog capture was retained.
+
+The public RepoGlance navigator then showed freshly updated Issues and PRs,
+`No open issues match`, and current draft PR #5. After a force-stop and cold
+launch, RepoGlance again reached `LIVE` without reconnecting. The public filter
+was safely reapplied before capture, and the public navigator again showed PR
+#5. Android reported the physical Fold in `OPENED` posture at 180 degrees on
+the 2076x2152 inner display. This closes token receipt, Keystore-backed session
+persistence, public live-data, and Fold-posture proof for the repaired source.
+
+Selected sanitized evidence is published as the immutable private release
+[`repoglance-pr-5-f9ee4edd07fb`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-pr-5-f9ee4edd07fb):
+
+| Asset | Bytes | SHA-256 | Directly supports |
+| --- | ---: | --- | --- |
+| [`live-badge.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-pr-5-f9ee4edd07fb/live-badge.png) | 6,679 | `3e74609273e053d97eafd8c373f3ffd1c97863ebffef21110005269ce91767b8` | Initial authorized `LIVE` state |
+| [`filtered-public-card.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-pr-5-f9ee4edd07fb/filtered-public-card.png) | 60,628 | `ec38dd474fb3bc88ccff8426df6a53332da1ed2be53a95e30ba0e603078d8df3` | Exact public filter and public RepoGlance card |
+| [`public-repo-navigator.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-pr-5-f9ee4edd07fb/public-repo-navigator.png) | 258,643 | `09de3ccd3630630456e7992d03e70cd83496e72d5c2cf99af23b0c6d7dd4eaf3` | Fresh public issue/PR truth and draft PR #5 |
+| [`relaunch-public-repo-navigator.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-pr-5-f9ee4edd07fb/relaunch-public-repo-navigator.png) | 256,733 | `f74e1e9f7851adaabe0cfd584944490f63273472f962935794dfae986ea720ec` | Repeated public truth after cold-launch session persistence |
+
+These images were visually inspected before publication and contain only
+public RepoGlance data. No device/user code, token, clipboard content, auth
+page or URL, cookie, private repository inventory, or credential log was
+captured in or published with the selected evidence. The complete local
+behavior packet passed its machine-readable contract and checksum verification;
+raw/unselected artifacts remain outside Git history and the release shelf.
 
 The unit lane includes a static guard over current source and build
 configuration for obsolete confidential/callback auth paths. A dedicated UI
@@ -99,7 +142,8 @@ Activity-resume wake-up for the ViewModel poll wait after background execution.
 The current source repair adds that wake-up without creating another poll loop
 or relaxing GitHub's interval. This source lane did not perform a device action,
 sign in, rotate a token, deploy, push, comment, or merge. An authorized
-exact-head Fold install/sign-in proof run must be performed again.
+exact-source-head Fold install/sign-in proof was required and is closed by the
+successful run documented above.
 
 The maintainer next exercised the resume-wake build at
 `b3d8b2f8aa903c1f0574ffb206f0f397b2a72502` on the Fold. In a source-blind
@@ -122,15 +166,16 @@ which already performs sync/close/commit. The current repair removes that
 extra failure point, retries only poll `IOException` at the existing bounded
 schedule, and converts any token-store exception into a fixed sanitized
 persistence failure after clearing partial state. It does not claim which
-unobserved exception occurred on the Fold. An authorized exact-head rerun must
-still prove token receipt, encrypted persistence, and live catalog loading.
+unobserved exception occurred on the Fold. The successful exact-source-head
+rerun above proves token receipt, encrypted persistence, and live catalog
+loading without claiming that hidden predecessor exception.
 After the source repair began, an operator-approved Codex browser action
 changed only **Device Flow** for the RepoGlance GitHub App and verified GitHub's
 successful-update confirmation and checked state. There was no credential/auth
 log inspection and no sign-in/device action. A
 release-signing App Link fingerprint is no longer required for authentication
 because the current source has no App Link callback. The remaining proof gate
-is an authorized live-device install/sign-in run bound to the repaired commit.
+was the authorized live-device install/sign-in run now documented above.
 
 Before any public APK distribution, the maintainer should revoke or rotate the
 GitHub App client secret that was injected into the earlier prototype APK. The

@@ -61,8 +61,10 @@ pressure, and general distribution remain planned.
 
 RepoGlance requests a short user code from its public GitHub App, keeps that
 code visible, and waits for an explicit **Copy code & open GitHub** tap. That
-action copies the code for pasting and opens GitHub's exact verification page
-in an Android Custom Tab; returning to RepoGlance leaves the code visible.
+action copies the code and opens GitHub's exact verification page in an Android
+Custom Tab; returning to RepoGlance leaves the code visible. GitHub currently
+uses segmented one-character fields on Android, so normal clipboard paste may
+not fill the complete code and manual entry can still be required.
 Returning also wakes a paused pending check, which still rechecks GitHub's
 minimum interval before any request. The ViewModel honors slowdown and expiry
 responses, retries transient poll I/O only until code expiry, and stops
@@ -78,6 +80,12 @@ are the ceiling and the app performs no GitHub writes. The GitHub App must have
 Device Flow enabled before sign-in can succeed; an operator-approved Codex
 browser action enabled it on 2026-08-12. See
 [docs/AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md).
+
+Exact repaired-source proof on the registered Pixel 10 Pro Fold completed the
+device authorization, loaded the public live RepoGlance navigator, and retained
+the encrypted session across a force-stop/cold launch. Selected sanitized
+evidence is linked from
+[proof/github-auth-live-20260812/PROOF.md](proof/github-auth-live-20260812/PROOF.md).
 
 ## How this is being built
 

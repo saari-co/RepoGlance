@@ -6,9 +6,12 @@ device authorization flow, which needs only the app's public client ID:
 1. RepoGlance posts the client ID to GitHub's device-code endpoint.
 2. The app keeps the returned user code visible and does not open a browser
    automatically. An explicit **Copy code & open GitHub** tap copies the code
-   for pasting, marks it sensitive on supported Android versions, and opens the
+   to a sensitive clipboard entry on supported Android versions and opens the
    exact GitHub verification page in an Android Custom Tab. Returning from the
-   tab leaves the code visible in RepoGlance.
+   tab leaves the code visible in RepoGlance. GitHub's segmented Android input
+   does not reliably accept a whole-code clipboard paste, so manual entry may
+   still be required; RepoGlance does not inject script or inspect browser
+   content to bypass GitHub's authorization UI.
 3. A ViewModel-scoped coroutine waits for GitHub's minimum interval before
    each token request. Activity resume wakes a pending wait after the Custom
    Tab may have paused or frozen background execution, but the poller rechecks
@@ -82,6 +85,9 @@ unsafe diagnostic detail. It did find one concrete redundant failure point:
 `FileDescriptor.sync()` immediately before `AtomicFile.finishWrite()`, even
 though the Android API already syncs, closes, and commits. The current repair
 removes that redundant raw sync, retries only transient polling I/O until local
-expiry, and maps token-store failures to a sanitized persistence phase. It is
-supported by local unit/build/lint and static public-client checks only until an
-authorized exact-head Fold install/sign-in proof lane reruns.
+expiry, and maps token-store failures to a sanitized persistence phase. The
+final repaired source then completed an authorized Fold run: GitHub reached
+success, RepoGlance loaded the public live `saari-co/RepoGlance` navigator, and
+the encrypted session survived a force-stop/cold launch. See
+`proof/github-auth-live-20260812/PROOF.md` for exact source identity, immutable
+sanitized assets, hashes, and proof boundaries.
