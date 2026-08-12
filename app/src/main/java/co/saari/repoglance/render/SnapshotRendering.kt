@@ -1,5 +1,6 @@
 package co.saari.repoglance.render
 
+import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.ReleaseInfo
@@ -43,13 +44,15 @@ object SnapshotRendering {
         RateLimitBucket.OK, RateLimitBucket.UNKNOWN -> null
     }
 
-    fun releaseLabel(release: ReleaseInfo?, now: Instant): String {
+    fun releaseLabel(release: ReleaseInfo?, basis: ValueBasis, now: Instant): String {
+        if (basis == ValueBasis.UNKNOWN) return "Latest release: unknown"
         if (release == null) return "No releases"
-        return "${release.tag} · ${Ages.format(release.publishedAt, now)}"
+        return "${Sanitize.displayText(release.tag)} · ${Ages.format(release.publishedAt, now)}"
     }
 
     fun pushedLabel(pushedAt: Instant?, now: Instant): String {
         if (pushedAt == null) return "Last push: unknown"
-        return "Pushed ${Ages.format(pushedAt, now)} ago"
+        val age = Ages.format(pushedAt, now)
+        return if (age == "just now") "Pushed just now" else "Pushed $age ago"
     }
 }
