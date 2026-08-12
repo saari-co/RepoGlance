@@ -1,0 +1,218 @@
+# PR #2 OpenClaw Review-Fix Proof
+
+Date: 2026-08-12
+
+Repo: `saari-co/RepoGlance`
+PR: https://github.com/saari-co/RepoGlance/pull/2
+Base: `main` at `7c9789e8f4996f40912dc94fc516baf92ab41306`
+Reviewed head: `47a7b6452318112aa5a85c834136a17af7d268a9`
+Repair branch: `codex/repoglance-pr2-review-fixes-20260812`
+Worktree: `/Users/bobbybones/Developer/worktrees/RepoGlance-pr2-review-fixes-20260812`
+
+## Review Input
+
+The official OpenClaw autoreview first ran on Spark-2 through the x-api queue.
+Its credential scanner failed before code review, so the result was classified
+as a degraded review-host blocker rather than a product finding. The contract's
+cockpit fallback then reviewed a clean detached worktree at the same immutable
+base/head tuple and reported five actionable findings.
+
+## Accepted Findings And Repairs
+
+1. `required_fix` — standard `Authorization: Bearer <credential>` input could
+   leave the credential behind after the generic authorization matcher consumed
+   only the scheme. A full bearer-header matcher now redacts the scheme and
+   credential together; a dynamically constructed regression input proves the
+   credential is absent.
+2. `required_fix` — `NavigatorList` did not enforce the value-basis truth
+   contract. `UNKNOWN` now requires empty rows and no observation time;
+   `EXACT` and `LAST_GOOD` require `observedAt`. Model-level construction tests
+   cover the rejected and accepted shapes.
+3. `required_fix` — fixture rows could contradict `OPEN` and
+   `AWAITING_MY_REVIEW`. Open fixtures now contain only open rows; awaiting-
+   review PRs are open, non-draft, and `REVIEW_REQUIRED`. Fixture-integrity
+   tests cover both modes.
+4. `required_fix` — the mixed snapshot corpus reused two repo identities for
+   five scenarios. It now selects five distinct repositories, and the corpus
+   test asserts one unique `RepoRef` per snapshot.
+5. `required_fix` — the freshest push label rendered `Pushed just now ago`.
+   It now mirrors the existing updated-label special case and renders
+   `Pushed just now`; rendering tests cover fresh and older timestamps.
+
+No finding was rejected, deferred, or routed to a human gate. This is repair
+cycle 1 for the PR #2 source slice.
+
+## Repair Cycle 2
+
+The exact-head cycle-1 rerun reported four additional actionable findings.
+All four were accepted as `required_fix`:
+
+1. Navigator issue and PR rows now carry `RepoRef`, so account- and org-wide
+   rows with identical issue numbers retain repository identity and can build
+   correct GitHub deep links. Fixtures span multiple repos and tests exercise
+   row-derived links.
+2. Release rendering now receives `ValueBasis`; a null release under UNKNOWN
+   renders `Latest release: unknown`, while a null release under an exact basis
+   remains the known-empty `No releases` state.
+3. Authorization redaction now consumes both scheme and credential for generic
+   two-token headers, covering Basic, Token, Bearer, and equivalent shapes.
+4. `RepoRef` rejects only exact `.` and `..` repo-name segments. Valid names
+   containing consecutive dots, such as `foo..bar`, remain navigable.
+
+This is repair cycle 2, the automatic repair limit for this source slice. The
+next exact-head autoreview may close clean; if it reports another finding, the
+route stops for adjudication instead of applying a third automatic patch.
+
+## Owner-Authorized Bounded Repair Slice
+
+On 2026-08-12, Bobby explicitly authorized a new bounded repair slice for the
+three findings preserved by the cycle-2 stop. This is not an automatic third
+cycle. The accepted `required_fix` findings and repairs are:
+
+1. Navigator fixture row construction now receives `NavigatorScope`. Repo
+   scope produces only the requested `RepoRef`; org scope produces only rows
+   owned by the requested login; account scope retains the cross-repo corpus.
+2. `RepoSnapshot` now rejects observation timestamps, push timestamps,
+   release metadata, and non-UNKNOWN CI state when `valueBasis` is UNKNOWN.
+   Rate-limit state remains intentionally independent and may be known.
+3. Display sanitization now replaces Unicode control characters, strips
+   Unicode format controls (including bidi overrides and isolates), and
+   normalizes all Unicode separator categories before secret-shape redaction.
+
+Implementation commit: `e1011ee867c16b7bcbdca479df5784a7fc122a81`
+
+Bounded-slice verification:
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 78 unit tests, debug APK assembled
+```
+
+The next review must bind the immutable base to the exact PR head after this
+proof update. ClawSweeper remains gated on a terminal-clean OpenClaw result,
+green GitHub checks, and an unchanged PR head.
+
+### Authorized Slice — Review/Repair Cycle 1
+
+Official OpenClaw reviewed exact PR head
+`80be65c8982be71418747481bfc5767a339c87b2` against immutable base
+`7c9789e8f4996f40912dc94fc516baf92ab41306`. Spark-2 remained on the
+previously recorded pre-review scanner blocker, so the verified local official
+helper ran from a clean detached checkout. Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_182345_19750_2a09a4c7/PROOF.md`
+in the x-api cockpit.
+
+The review reported three findings. Each was accepted as `required_fix`:
+
+1. UNKNOWN navigator lists now reject `hasMorePages = true`.
+2. Snapshot issue/PR list maps now require map keys to match each list's
+   filter and require the corresponding issue or PR row type.
+3. Release-label display now sanitizes the GitHub-sourced tag while leaving
+   the original `ReleaseInfo.tag` available to link construction.
+
+Implementation commit: `6ce64ff164f2b703c92a75ce79779e4eb54c520f`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 82 unit tests, debug APK assembled
+```
+
+This is review/repair cycle 1 of the explicitly authorized bounded slice.
+
+### Authorized Slice — Review/Repair Cycle 2
+
+Official OpenClaw reviewed exact PR head
+`039a0586dd4466c0cb46b34babef085b19655713` against immutable base
+`7c9789e8f4996f40912dc94fc516baf92ab41306` from a clean detached checkout.
+Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_182753_20720_00655f12/PROOF.md`
+in the x-api cockpit.
+
+The review reported three findings. Each was accepted as `required_fix`:
+
+1. `NavigatorList` now carries first-class `RateLimitBucket` state. Fixtures
+   cover exact, unknown, and exhausted/last-good navigator results.
+2. Navigator row lists and snapshot list maps now defensively snapshot their
+   inputs and expose unmodifiable collections, preventing caller-owned mutable
+   aliases from invalidating constructor checks.
+3. Known snapshots now reject an awaiting-my-review PR count larger than the
+   total open-PR count.
+
+Implementation commit: `8dd10bb9b93a7ea46820807165755b555639866c`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 87 unit tests, debug APK assembled
+```
+
+This is review/repair cycle 2 and reaches the automatic repair limit for the
+explicitly authorized slice. The next exact-head review is terminal for this
+route: a clean verdict may admit ClawSweeper; any accepted finding requires a
+new owner decision and no further automatic patch.
+
+## Owner-Authorized Nested-Label Repair Slice
+
+The terminal exact-head review on
+`2fbf381f8c1036e8596007af6c33ded2a5f20b9b` reported one accepted
+`required_fix`: `IssueRow` and `PrRow` retained caller-owned mutable `labels`
+aliases after the outer navigator collections had been snapshotted. Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_183611_23060_be5a4920/PROOF.md`
+in the x-api cockpit.
+
+Bobby explicitly authorized a new bounded repair slice for this one finding.
+Both row types now defensively snapshot label inputs, expose unmodifiable label
+views, and retain structural equality/hash behavior. Regression tests mutate
+the original label collections, attempt mutation through the exposed views,
+and verify the row data and hash remain unchanged.
+
+Implementation commit: `d1e3e16c3fe8654527cbcfdda4e8b265057afb9f`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 89 unit tests, debug APK assembled
+```
+
+The next exact-head OpenClaw review starts cycle 1 of this explicitly
+authorized one-finding slice. ClawSweeper remains gated on a terminal-clean
+result, green GitHub checks, passing proof-asset placement, and an unchanged
+PR head.
+
+## Verification
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 73 unit tests, debug APK assembled
+```
+
+The SDK path was supplied only as a process environment value. No
+`local.properties`, credential, token, auth log, keystore, or secret was read,
+created, copied, or committed.
+
+## Gates And Next Step
+
+- No merge, release, deploy, signing, distribution, GitHub App/auth change,
+  device mutation, customer send, destructive cleanup, or secret handling.
+- Push the repair commit as a fast-forward to PR #2's existing head branch.
+- Re-materialize and rerun official OpenClaw against the new exact head.
+- Request ClawSweeper only after that terminal result is clean and the PR head
+  still matches.

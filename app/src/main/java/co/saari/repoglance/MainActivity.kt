@@ -1,0 +1,66 @@
+package co.saari.repoglance
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import co.saari.repoglance.fixtures.FixtureScenario
+import co.saari.repoglance.fixtures.Fixtures
+import co.saari.repoglance.ui.theme.RepoGlanceTheme
+import java.time.Instant
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            RepoGlanceTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    SliceOneScreen()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SliceOneScreen() {
+    // Proves the model links into the app target: a real Fixtures call,
+    // not a placeholder. Slice 2 replaces this with the actual navigator UI.
+    val mixedRepoCount = remember { Fixtures.snapshots(FixtureScenario.MIXED, Instant.now()).size }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.headlineMedium,
+        )
+        Text(
+            text = "Slice 1: model + fixtures (no UI yet)",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = "MIXED fixture repos: $mixedRepoCount",
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
