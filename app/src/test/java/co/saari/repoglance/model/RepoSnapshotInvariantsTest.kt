@@ -16,17 +16,21 @@ class RepoSnapshotInvariantsTest {
         prsAwaitingMyReview: Int?,
         openIssues: Int?,
         observedAt: Instant?,
+        defaultBranchCi: CiState = CiState.UNKNOWN,
+        latestRelease: ReleaseInfo? = null,
+        pushedAt: Instant? = null,
+        rateLimit: RateLimitBucket = RateLimitBucket.UNKNOWN,
     ) = RepoSnapshot(
         repo = repo,
         openPrs = openPrs,
         prsAwaitingMyReview = prsAwaitingMyReview,
         openIssues = openIssues,
-        defaultBranchCi = CiState.UNKNOWN,
-        latestRelease = null,
-        pushedAt = null,
+        defaultBranchCi = defaultBranchCi,
+        latestRelease = latestRelease,
+        pushedAt = pushedAt,
         valueBasis = valueBasis,
         observedAt = observedAt,
-        rateLimit = RateLimitBucket.UNKNOWN,
+        rateLimit = rateLimit,
     )
 
     @Test
@@ -42,6 +46,42 @@ class RepoSnapshotInvariantsTest {
         assertThrows(IllegalArgumentException::class.java) {
             snapshot(ValueBasis.UNKNOWN, 1, null, null, null)
         }
+    }
+
+    @Test
+    fun unknownBasisRejectsKnownObservationMetadata() {
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, now)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, null, pushedAt = now)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.UNKNOWN, null, null, null, null, defaultBranchCi = CiState.PASSING)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(
+                ValueBasis.UNKNOWN,
+                null,
+                null,
+                null,
+                null,
+                latestRelease = ReleaseInfo("v1.0.0", now),
+            )
+        }
+    }
+
+    @Test
+    fun unknownBasisAllowsKnownRateLimitState() {
+        val result = snapshot(
+            ValueBasis.UNKNOWN,
+            null,
+            null,
+            null,
+            null,
+            rateLimit = RateLimitBucket.EXHAUSTED,
+        )
+        assertEquals(RateLimitBucket.EXHAUSTED, result.rateLimit)
     }
 
     @Test

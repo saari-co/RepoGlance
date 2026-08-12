@@ -9,6 +9,7 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorRows
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.ReviewState
 import co.saari.repoglance.model.ValueBasis
 import org.junit.Assert.assertEquals
@@ -153,6 +154,41 @@ class FixtureIntegrityTest {
                     assertTrue(rows.rows.map { it.repo }.toSet().size > 1)
                     rows.rows.forEach { assertTrue(GitHubLinks.pull(it.repo, it.number).contains(it.repo.full)) }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun repoScopedNavigatorRowsUseOnlyTheRequestedRepo() {
+        val requested = RepoRef("acme", "api-server")
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Repo(requested),
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.repo == requested })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.repo == requested })
+            }
+        }
+    }
+
+    @Test
+    fun orgScopedNavigatorRowsUseOnlyTheRequestedOwner() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Org("acme"),
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.repo.owner == "acme" })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.repo.owner == "acme" })
             }
         }
     }

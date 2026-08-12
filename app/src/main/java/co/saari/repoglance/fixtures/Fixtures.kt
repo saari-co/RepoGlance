@@ -272,9 +272,6 @@ object Fixtures {
         require(mode != NavigatorMode.BOTH) {
             "navigatorList builds one typed list per call; BOTH composes an ISSUES list and a PRS list at the call site"
         }
-        // scope only affects which repo/org the rows are notionally drawn
-        // from in a wired-up app; the fixture corpus's row content does not
-        // vary by scope in Slice 1.
         return when (state) {
             ListState.EMPTY -> NavigatorList(
                 filter = filter,
@@ -285,14 +282,14 @@ object Fixtures {
             )
             ListState.LOADED -> NavigatorList(
                 filter = filter,
-                rows = buildRows(mode, filter, count = 8, now = now),
+                rows = buildRows(scope, mode, filter, count = 8, now = now),
                 valueBasis = ValueBasis.EXACT,
                 observedAt = now,
                 hasMorePages = false,
             )
             ListState.PAGED -> NavigatorList(
                 filter = filter,
-                rows = buildRows(mode, filter, count = NavigatorList.PAGE_SIZE, now = now),
+                rows = buildRows(scope, mode, filter, count = NavigatorList.PAGE_SIZE, now = now),
                 valueBasis = ValueBasis.EXACT,
                 observedAt = now,
                 hasMorePages = true,
@@ -301,7 +298,7 @@ object Fixtures {
                 val observedAt = now.minus(Duration.ofHours(1))
                 NavigatorList(
                     filter = filter,
-                    rows = buildRows(mode, filter, count = 8, now = observedAt),
+                    rows = buildRows(scope, mode, filter, count = 8, now = observedAt),
                     valueBasis = ValueBasis.LAST_GOOD,
                     observedAt = observedAt,
                     hasMorePages = false,
@@ -316,22 +313,45 @@ object Fixtures {
         NavigatorMode.BOTH -> error("unreachable: BOTH is rejected before this point")
     }
 
-    private fun buildRows(mode: NavigatorMode, filter: NavigatorFilter, count: Int, now: Instant): NavigatorRows =
-        when (mode) {
-            NavigatorMode.ISSUES -> NavigatorRows.Issues(buildIssueRows(filter, count, now))
-            NavigatorMode.PRS -> NavigatorRows.Prs(buildPrRows(filter, count, now))
+    private fun buildRows(
+        scope: NavigatorScope,
+        mode: NavigatorMode,
+        filter: NavigatorFilter,
+        count: Int,
+        now: Instant,
+    ): NavigatorRows {
+        val repos = reposForScope(scope)
+        return when (mode) {
+            NavigatorMode.ISSUES -> NavigatorRows.Issues(buildIssueRows(repos, filter, count, now))
+            NavigatorMode.PRS -> NavigatorRows.Prs(buildPrRows(repos, filter, count, now))
             NavigatorMode.BOTH -> error("unreachable: BOTH is rejected before this point")
         }
+    }
+
+    private fun reposForScope(scope: NavigatorScope): List<RepoRef> = when (scope) {
+        NavigatorScope.Account -> ROW_REPOS
+        is NavigatorScope.Org -> ROW_REPOS.filter { it.owner == scope.login }.ifEmpty {
+            listOf(RepoRef(scope.login, "fixture-repo"))
+        }
+        is NavigatorScope.Repo -> listOf(scope.ref)
+    }
+
+    private fun rowRepo(repos: List<RepoRef>, index: Int): RepoRef = repos[index % repos.size]
 
     private fun rowTitle(filter: NavigatorFilter, index: Int): String {
         val base = TITLE_POOL[index % TITLE_POOL.size]
         return if (filter == NavigatorFilter.MENTIONS) "$base (cc @$YOU)" else base
     }
 
-    private fun buildIssueRows(filter: NavigatorFilter, count: Int, now: Instant): List<IssueRow> =
+    private fun buildIssueRows(
+        repos: List<RepoRef>,
+        filter: NavigatorFilter,
+        count: Int,
+        now: Instant,
+    ): List<IssueRow> =
         (0 until count).map { i ->
             IssueRow(
-                repo = ROW_REPOS[i % ROW_REPOS.size],
+                repo = rowRepo(repos, i),
                 number = 100 + i,
                 title = rowTitle(filter, i),
                 state = if (filter == NavigatorFilter.OPEN) "open"
@@ -344,10 +364,15 @@ object Fixtures {
             )
         }
 
-    private fun buildPrRows(filter: NavigatorFilter, count: Int, now: Instant): List<PrRow> =
+    private fun buildPrRows(
+        repos: List<RepoRef>,
+        filter: NavigatorFilter,
+        count: Int,
+        now: Instant,
+    ): List<PrRow> =
         (0 until count).map { i ->
             PrRow(
-                repo = ROW_REPOS[i % ROW_REPOS.size],
+                repo = rowRepo(repos, i),
                 number = 200 + i,
                 title = rowTitle(filter, i),
                 state = if (

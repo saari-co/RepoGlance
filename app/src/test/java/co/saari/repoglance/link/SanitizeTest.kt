@@ -80,6 +80,21 @@ class SanitizeTest {
     }
 
     @Test
+    fun stripsUnicodeBidiControlsAndNormalizesUnicodeSeparators() {
+        val rtlOverride = 0x202e.toChar().toString()
+        val leftToRightIsolate = 0x2066.toChar().toString()
+        val lineSeparator = 0x2028.toChar().toString()
+        val hostile = "alpha" + rtlOverride + "beta" + leftToRightIsolate + lineSeparator + "gamma"
+
+        val result = Sanitize.displayText(hostile)
+
+        assertEquals("alphabeta gamma", result)
+        assertFalse(result.contains(rtlOverride))
+        assertFalse(result.contains(leftToRightIsolate))
+        assertFalse(result.contains(lineSeparator))
+    }
+
+    @Test
     fun cleanProsePassesThroughUnchanged() {
         val clean = "Fix flaky retry in sync worker"
         assertEquals(clean, Sanitize.displayText(clean))

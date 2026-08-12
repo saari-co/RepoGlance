@@ -4,17 +4,19 @@ package co.saari.repoglance.link
  * Text-safety layer for anything sourced from GitHub (titles, labels, repo
  * names, tags, ...) before it is ever shown on screen.
  *
- * Pipeline: strip ASCII/ISO control characters -> collapse whitespace runs
- * to a single space (and trim) -> redact any token-shaped or bearer-shaped
- * substring with "•••". The redaction patterns below are regex *shapes*,
- * not secret literals — no token-shaped string literal appears anywhere in
- * this file or its tests; hostile inputs are built at test time by runtime
+ * Pipeline: replace Unicode control characters with spaces, strip Unicode
+ * format controls, collapse ASCII and Unicode separator whitespace runs to a
+ * single space (and trim), then redact any token-shaped or bearer-shaped
+ * substring with "•••". The redaction patterns below are regex *shapes*, not
+ * secret literals — no token-shaped string literal appears anywhere in this
+ * file or its tests; hostile inputs are built at test time by runtime
  * concatenation only.
  */
 object Sanitize {
 
-    private val CONTROL_CHARS = Regex("\\p{Cntrl}")
-    private val WHITESPACE_RUN = Regex("\\s+")
+    private val CONTROL_CHARS = Regex("\\p{Cc}")
+    private val FORMAT_CONTROLS = Regex("\\p{Cf}")
+    private val WHITESPACE_RUN = Regex("[\\s\\p{Z}]+")
 
     private val REDACTION_PATTERNS = listOf(
         // Classic GitHub PAT prefixes: ghp_/gho_/ghu_/ghs_/ghr_ + 20+ alnum.
@@ -31,6 +33,7 @@ object Sanitize {
 
     fun displayText(raw: String): String {
         var text = CONTROL_CHARS.replace(raw, " ")
+        text = FORMAT_CONTROLS.replace(text, "")
         text = WHITESPACE_RUN.replace(text, " ").trim()
         for (pattern in REDACTION_PATTERNS) {
             text = pattern.replace(text, "•••")

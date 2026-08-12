@@ -6,8 +6,9 @@ import java.time.Instant
  * A single repo's at-a-glance state.
  *
  * Truth-rule invariants (enforced here, not left to the UI layer):
- * - `valueBasis == UNKNOWN` forces all three counts null — we know nothing,
- *   so nothing renders as a number (never as zero).
+ * - `valueBasis == UNKNOWN` forces counts and repo observation metadata to
+ *   unknown values — we know nothing, so nothing renders as current or as
+ *   zero. Rate-limit state remains independent and may still be known.
  * - `valueBasis` in {EXACT, LAST_GOOD} requires all three counts non-null,
  *   non-negative, AND `observedAt` non-null — a value with a basis always
  *   carries the moment it was observed.
@@ -31,6 +32,12 @@ data class RepoSnapshot(
             ValueBasis.UNKNOWN -> {
                 require(openPrs == null && prsAwaitingMyReview == null && openIssues == null) {
                     "UNKNOWN basis forces null counts"
+                }
+                require(observedAt == null && pushedAt == null && latestRelease == null) {
+                    "UNKNOWN basis forces null observation metadata"
+                }
+                require(defaultBranchCi == CiState.UNKNOWN) {
+                    "UNKNOWN basis requires UNKNOWN default-branch CI"
                 }
             }
             ValueBasis.EXACT, ValueBasis.LAST_GOOD -> {
