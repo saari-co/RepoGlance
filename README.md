@@ -22,18 +22,14 @@ repository/mode configuration and a Fold-first navigator shell.
 
 The prototype live-data slice on this branch adds user-present GitHub App
 device-flow sign-in, Keystore-backed rotating tokens, live repository
-discovery, and repo-scoped open issue/PR lists. The earlier confidential-flow
-checkpoint was exercised on the maintainer's Pixel 10 Pro Fold; the current
-public-client device-flow repair is source- and JVM-verified only. Fold attempts
-found and rejected an automatic browser launch, then proved the corrected
-copy/open handoff and GitHub's connected confirmation but exposed a missing
-resume wake-up when RepoGlance stayed on its waiting screen. The resume repair
-woke the check, but the Fold then surfaced a generic pre-session failure. The
-current repair handles bounded polling I/O and session persistence explicitly;
-it still needs an exact-head Fold rerun. Widgets remain fixture-backed and
-visibly say
+discovery, and repo-scoped open issue/PR lists. The repaired public-client
+device flow is source-, JVM-, and physical-Fold verified: the exact installed
+APK completed GitHub authorization, loaded the public live RepoGlance
+navigator, and retained its encrypted session across a force-stop/cold launch.
+Widgets remain fixture-backed and visibly say
 `FIXTURE PREVIEW`; background refresh, live widget content, CI/release
-pressure, and general distribution remain planned.
+pressure, signing, release, general distribution, and revocation of the earlier
+prototype client secret remain maintainer-gated or planned.
 
 ## Planned
 
