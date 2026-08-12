@@ -35,6 +35,11 @@ class NavigatorListInvariantsTest {
         rows = rows,
         valueBasis = valueBasis,
         observedAt = observedAt,
+        rateLimit = if (valueBasis == ValueBasis.UNKNOWN) {
+            RateLimitBucket.UNKNOWN
+        } else {
+            RateLimitBucket.OK
+        },
         hasMorePages = hasMorePages,
     )
 
@@ -73,5 +78,21 @@ class NavigatorListInvariantsTest {
         assertEquals(0, list(ValueBasis.UNKNOWN, emptyRows, null).rows.size)
         assertEquals(1, list(ValueBasis.EXACT, populatedRows, now).rows.size)
         assertEquals(1, list(ValueBasis.LAST_GOOD, populatedRows, now).rows.size)
+    }
+
+    @Test
+    fun navigatorRowsDefensivelySnapshotMutableInputs() {
+        val mutableRows = mutableListOf<IssueRow>()
+        val rows = NavigatorRows.Issues(mutableRows)
+        val unknown = list(ValueBasis.UNKNOWN, rows, null)
+
+        mutableRows += populatedRows.rows.single()
+
+        assertEquals(0, unknown.rows.size)
+        assertEquals(0, rows.rows.size)
+        assertThrows(UnsupportedOperationException::class.java) {
+            @Suppress("UNCHECKED_CAST")
+            (rows.rows as MutableList<IssueRow>).add(populatedRows.rows.single())
+        }
     }
 }

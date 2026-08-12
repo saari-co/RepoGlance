@@ -235,6 +235,38 @@ class FixtureIntegrityTest {
     }
 
     @Test
+    fun rateLimitedNavigatorListCarriesExhaustedStateAndLastGoodData() {
+        val list = Fixtures.navigatorList(
+            scope = NavigatorScope.Account,
+            mode = NavigatorMode.ISSUES,
+            filter = NavigatorFilter.OPEN,
+            state = ListState.RATE_LIMITED,
+            now = now,
+        )
+
+        assertEquals(ValueBasis.LAST_GOOD, list.valueBasis)
+        assertEquals(RateLimitBucket.EXHAUSTED, list.rateLimit)
+        assertTrue(list.rows.size > 0)
+        assertTrue(list.observedAt!!.isBefore(now))
+    }
+
+    @Test
+    fun unknownNavigatorListCarriesUnknownRateLimitAndNoRows() {
+        val list = Fixtures.navigatorList(
+            scope = NavigatorScope.Account,
+            mode = NavigatorMode.PRS,
+            filter = NavigatorFilter.OPEN,
+            state = ListState.UNKNOWN,
+            now = now,
+        )
+
+        assertEquals(ValueBasis.UNKNOWN, list.valueBasis)
+        assertEquals(RateLimitBucket.UNKNOWN, list.rateLimit)
+        assertEquals(0, list.rows.size)
+        assertEquals(null, list.observedAt)
+    }
+
+    @Test
     fun emptyStateListHasNoRowsAndExactBasis() {
         val list = Fixtures.navigatorList(
             scope = NavigatorScope.Account,

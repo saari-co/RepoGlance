@@ -278,6 +278,7 @@ object Fixtures {
                 rows = emptyRows(mode),
                 valueBasis = ValueBasis.EXACT,
                 observedAt = now,
+                rateLimit = RateLimitBucket.OK,
                 hasMorePages = false,
             )
             ListState.LOADED -> NavigatorList(
@@ -285,6 +286,7 @@ object Fixtures {
                 rows = buildRows(scope, mode, filter, count = 8, now = now),
                 valueBasis = ValueBasis.EXACT,
                 observedAt = now,
+                rateLimit = RateLimitBucket.OK,
                 hasMorePages = false,
             )
             ListState.PAGED -> NavigatorList(
@@ -292,6 +294,7 @@ object Fixtures {
                 rows = buildRows(scope, mode, filter, count = NavigatorList.PAGE_SIZE, now = now),
                 valueBasis = ValueBasis.EXACT,
                 observedAt = now,
+                rateLimit = RateLimitBucket.OK,
                 hasMorePages = true,
             )
             ListState.LAST_GOOD -> {
@@ -301,6 +304,26 @@ object Fixtures {
                     rows = buildRows(scope, mode, filter, count = 8, now = observedAt),
                     valueBasis = ValueBasis.LAST_GOOD,
                     observedAt = observedAt,
+                    rateLimit = RateLimitBucket.OK,
+                    hasMorePages = false,
+                )
+            }
+            ListState.UNKNOWN -> NavigatorList(
+                filter = filter,
+                rows = emptyRows(mode),
+                valueBasis = ValueBasis.UNKNOWN,
+                observedAt = null,
+                rateLimit = RateLimitBucket.UNKNOWN,
+                hasMorePages = false,
+            )
+            ListState.RATE_LIMITED -> {
+                val observedAt = now.minus(Duration.ofHours(1))
+                NavigatorList(
+                    filter = filter,
+                    rows = buildRows(scope, mode, filter, count = 8, now = observedAt),
+                    valueBasis = ValueBasis.LAST_GOOD,
+                    observedAt = observedAt,
+                    rateLimit = RateLimitBucket.EXHAUSTED,
                     hasMorePages = false,
                 )
             }

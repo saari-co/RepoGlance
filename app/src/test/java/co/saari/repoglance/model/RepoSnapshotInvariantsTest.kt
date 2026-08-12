@@ -95,12 +95,14 @@ class RepoSnapshotInvariantsTest {
             rows = NavigatorRows.Issues(emptyList()),
             valueBasis = ValueBasis.EXACT,
             observedAt = now,
+            rateLimit = RateLimitBucket.OK,
         )
         val prList = NavigatorList(
             filter = NavigatorFilter.OPEN,
             rows = NavigatorRows.Prs(emptyList()),
             valueBasis = ValueBasis.EXACT,
             observedAt = now,
+            rateLimit = RateLimitBucket.OK,
         )
 
         assertThrows(IllegalArgumentException::class.java) {
@@ -142,12 +144,14 @@ class RepoSnapshotInvariantsTest {
             rows = NavigatorRows.Issues(emptyList()),
             valueBasis = ValueBasis.EXACT,
             observedAt = now,
+            rateLimit = RateLimitBucket.OK,
         )
         val prList = NavigatorList(
             filter = NavigatorFilter.MINE,
             rows = NavigatorRows.Prs(emptyList()),
             valueBasis = ValueBasis.EXACT,
             observedAt = now,
+            rateLimit = RateLimitBucket.OK,
         )
 
         val result = snapshot(
@@ -162,6 +166,35 @@ class RepoSnapshotInvariantsTest {
 
         assertEquals(issueList, result.issueLists[NavigatorFilter.OPEN])
         assertEquals(prList, result.prLists[NavigatorFilter.MINE])
+    }
+
+    @Test
+    fun snapshotDefensivelySnapshotsMutableListMaps() {
+        val issueList = NavigatorList(
+            filter = NavigatorFilter.OPEN,
+            rows = NavigatorRows.Issues(emptyList()),
+            valueBasis = ValueBasis.EXACT,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+        val mutableIssueLists = mutableMapOf(NavigatorFilter.OPEN to issueList)
+        val result = snapshot(
+            ValueBasis.EXACT,
+            1,
+            0,
+            2,
+            now,
+            issueLists = mutableIssueLists,
+        )
+
+        mutableIssueLists.clear()
+
+        assertEquals(issueList, result.issueLists[NavigatorFilter.OPEN])
+        assertEquals(1, result.issueLists.size)
+        assertThrows(UnsupportedOperationException::class.java) {
+            @Suppress("UNCHECKED_CAST")
+            (result.issueLists as MutableMap<NavigatorFilter, NavigatorList>).clear()
+        }
     }
 
     @Test
@@ -208,6 +241,13 @@ class RepoSnapshotInvariantsTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             snapshot(ValueBasis.EXACT, 1, 0, -2, now)
+        }
+    }
+
+    @Test
+    fun awaitingReviewCountCannotExceedOpenPrCount() {
+        assertThrows(IllegalArgumentException::class.java) {
+            snapshot(ValueBasis.EXACT, 1, 2, 3, now)
         }
     }
 }
