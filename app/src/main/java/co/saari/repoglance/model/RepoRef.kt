@@ -11,6 +11,7 @@ data class RepoRef(val owner: String, val name: String) {
     init {
         require(isValidOwner(owner)) { "invalid GitHub owner: \"$owner\"" }
         require(NAME_PATTERN.matches(name)) { "invalid GitHub repo name: \"$name\"" }
+        require(name != "." && name != "..") { "repo name must not be a dot segment" }
     }
 
     val full: String get() = "$owner/$name"

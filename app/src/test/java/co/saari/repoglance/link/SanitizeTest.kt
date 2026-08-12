@@ -43,6 +43,26 @@ class SanitizeTest {
     }
 
     @Test
+    fun redactsFullAuthorizationBearerHeaderShape() {
+        val tail = "x".repeat(24)
+        val hostile = "Autho" + "rization: Bear" + "er " + tail
+        val result = Sanitize.displayText(hostile)
+        assertEquals(BULLET3, result)
+        assertFalse(result.contains(tail))
+    }
+
+    @Test
+    fun redactsCredentialsAfterNonBearerAuthorizationSchemes() {
+        for (scheme in listOf("Basic", "Token")) {
+            val tail = "z".repeat(24)
+            val hostile = "Autho" + "rization: " + scheme + " " + tail
+            val result = Sanitize.displayText(hostile)
+            assertEquals(BULLET3, result)
+            assertFalse(result.contains(tail))
+        }
+    }
+
+    @Test
     fun redactsBearerShape() {
         val tail = "x".repeat(20)
         val hostile = "Bear" + "er " + tail
@@ -57,6 +77,21 @@ class SanitizeTest {
         val hostile = "hello" + bell + "world"
         val result = Sanitize.displayText(hostile)
         assertFalse(result.contains(bell))
+    }
+
+    @Test
+    fun stripsUnicodeBidiControlsAndNormalizesUnicodeSeparators() {
+        val rtlOverride = 0x202e.toChar().toString()
+        val leftToRightIsolate = 0x2066.toChar().toString()
+        val lineSeparator = 0x2028.toChar().toString()
+        val hostile = "alpha" + rtlOverride + "beta" + leftToRightIsolate + lineSeparator + "gamma"
+
+        val result = Sanitize.displayText(hostile)
+
+        assertEquals("alphabeta gamma", result)
+        assertFalse(result.contains(rtlOverride))
+        assertFalse(result.contains(leftToRightIsolate))
+        assertFalse(result.contains(lineSeparator))
     }
 
     @Test

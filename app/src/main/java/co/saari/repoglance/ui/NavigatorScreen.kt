@@ -129,8 +129,6 @@ fun NavigatorScreen(
     val section = remember(scope, mode, filter, fixtureListState, now) {
         SnapshotStore.navigatorRows(scope, mode, filter, fixtureListState, now)
     }
-    val repoRef = remember(scenario, scope, now) { representativeRepoRef(scenario, scope, now) }
-
     fun changeMode(newMode: NavigatorMode) {
         if (newMode == mode) return
         mode = newMode
@@ -142,8 +140,11 @@ fun NavigatorScreen(
     }
 
     fun openOnGitHub(item: RowItem, adjacent: Boolean) {
-        val ref = repoRef ?: return
-        val url = if (item.pr != null) GitHubLinks.pull(ref, item.number) else GitHubLinks.issue(ref, item.number)
+        val url = if (item.pr != null) {
+            GitHubLinks.pull(item.repo, item.number)
+        } else {
+            GitHubLinks.issue(item.repo, item.number)
+        }
         if (GitHubAppLauncher.open(context, url, adjacent)) {
             if (adjacent) externalGitHubMode = true
         } else {
@@ -217,7 +218,6 @@ fun NavigatorScreen(
                     Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                         DetailPane(
                             item = selectedItem,
-                            repoRef = repoRef,
                             now = now,
                             onOpenGitHub = { item -> openOnGitHub(item, adjacent = true) },
                         )
@@ -277,7 +277,6 @@ fun NavigatorScreen(
                     }
                     DetailPane(
                         item = selectedItem,
-                        repoRef = repoRef,
                         now = now,
                         onOpenGitHub = { item -> openOnGitHub(item, adjacent = false) },
                     )
@@ -291,6 +290,7 @@ fun NavigatorScreen(
  *  [pr] is non-null exactly when the row came from a PR list, carrying the
  *  draft/review/CI-rollup fields issues don't have. */
 private data class RowItem(
+    val repo: RepoRef,
     val number: Int,
     val title: String,
     val state: String,
@@ -302,8 +302,8 @@ private data class RowItem(
     val pr: PrRow?,
 )
 
-private fun IssueRow.toItem() = RowItem(number, title, state, labels, author, assignee, commentCount, updatedAt, null)
-private fun PrRow.toItem() = RowItem(number, title, state, labels, author, assignee, commentCount, updatedAt, this)
+private fun IssueRow.toItem() = RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, null)
+private fun PrRow.toItem() = RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, this)
 
 /** Fixture-mode "Load more" paging: appends another copy of the same fixture
  *  rows with numbers offset so they never collide with an earlier page or
@@ -313,16 +313,43 @@ private fun PrRow.toItem() = RowItem(number, title, state, labels, author, assig
 private fun pagedIssueRows(list: NavigatorList, extraPages: Int): List<IssueRow> {
     val base = (list.rows as NavigatorRows.Issues).rows
     return (0..extraPages).flatMap { pageIndex ->
-        base.map { it.copy(number = it.number + pageIndex * PAGE_OFFSET) }
+        base.map { it.withNumber(it.number + pageIndex * PAGE_OFFSET) }
     }
 }
 
 private fun pagedPrRows(list: NavigatorList, extraPages: Int): List<PrRow> {
     val base = (list.rows as NavigatorRows.Prs).rows
     return (0..extraPages).flatMap { pageIndex ->
-        base.map { it.copy(number = it.number + pageIndex * PAGE_OFFSET) }
+        base.map { it.withNumber(it.number + pageIndex * PAGE_OFFSET) }
     }
 }
+
+private fun IssueRow.withNumber(newNumber: Int): IssueRow = IssueRow(
+    repo = repo,
+    number = newNumber,
+    title = title,
+    state = state,
+    labels = labels,
+    author = author,
+    assignee = assignee,
+    commentCount = commentCount,
+    updatedAt = updatedAt,
+)
+
+private fun PrRow.withNumber(newNumber: Int): PrRow = PrRow(
+    repo = repo,
+    number = newNumber,
+    title = title,
+    state = state,
+    labels = labels,
+    author = author,
+    assignee = assignee,
+    commentCount = commentCount,
+    updatedAt = updatedAt,
+    isDraft = isDraft,
+    reviewState = reviewState,
+    ciRollup = ciRollup,
+)
 
 private const val PAGE_OFFSET = 10_000
 
@@ -336,22 +363,6 @@ private fun findItem(section: NavigatorSection, issuesExtraPages: Int, prsExtraP
     }
     return null
 }
-
-/**
- * Slice 1's [IssueRow]/[PrRow] carry no repo field, so Account/Org scope has
- * no single backing repo for "Open on GitHub". This picks a representative
- * one (the scope's own repo for [NavigatorScope.Repo]; the first fixture
- * repo owned by the org for [NavigatorScope.Org]; the first fixture repo
- * overall for [NavigatorScope.Account]) so the button has somewhere honest
- * to point — a later slice that tags rows with their originating repo
- * removes the need for this.
- */
-private fun representativeRepoRef(scenario: FixtureScenario, scope: NavigatorScope, now: Instant): RepoRef? =
-    when (scope) {
-        is NavigatorScope.Repo -> scope.ref
-        is NavigatorScope.Org -> Fixtures.snapshots(scenario, now).firstOrNull { it.repo.owner == scope.login }?.repo
-        is NavigatorScope.Account -> Fixtures.snapshots(scenario, now).firstOrNull()?.repo
-    }
 
 @Composable
 private fun ScopeSwitcher(scenario: FixtureScenario, scope: NavigatorScope, onScopeChange: (NavigatorScope) -> Unit) {
@@ -493,7 +504,14 @@ private fun FiltersMenu(
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             )
-            listOf(ListState.LOADED, ListState.EMPTY, ListState.PAGED, ListState.LAST_GOOD).forEach { option ->
+            listOf(
+                ListState.LOADED,
+                ListState.EMPTY,
+                ListState.PAGED,
+                ListState.LAST_GOOD,
+                ListState.UNKNOWN,
+                ListState.RATE_LIMITED,
+            ).forEach { option ->
                 DropdownMenuItem(
                     text = {
                         Text((if (fixtureListState == option) "✓ " else "") + option.displayLabel())
@@ -521,6 +539,8 @@ private fun ListState.displayLabel(): String = when (this) {
     ListState.LOADED -> "Loaded"
     ListState.PAGED -> "Paged"
     ListState.LAST_GOOD -> "Last-good"
+    ListState.UNKNOWN -> "Unknown"
+    ListState.RATE_LIMITED -> "Rate-limited"
 }
 
 @Composable
@@ -594,7 +614,7 @@ private fun ListPane(
                 val rows = pagedIssueRows(list, issuesExtraPages)
                 val filtered = (SnapshotStore.search(NavigatorRows.Issues(rows), query) as NavigatorRows.Issues).rows
                 if (filtered.isEmpty()) {
-                    item { EmptyRowsText() }
+                    item { EmptyRowsText(list.valueBasis) }
                 } else {
                     items(filtered, key = { "issue-${it.number}" }) { row ->
                         NavigatorRowView(
@@ -618,7 +638,7 @@ private fun ListPane(
                 val rows = pagedPrRows(list, prsExtraPages)
                 val filtered = (SnapshotStore.search(NavigatorRows.Prs(rows), query) as NavigatorRows.Prs).rows
                 if (filtered.isEmpty()) {
-                    item { EmptyRowsText() }
+                    item { EmptyRowsText(list.valueBasis) }
                 } else {
                     items(filtered, key = { "pr-${it.number}" }) { row ->
                         NavigatorRowView(
@@ -638,7 +658,6 @@ private fun ListPane(
                 }
             }
         }
-
         // Compose's experimental sticky header can be dropped after a long
         // cover-display scroll on the API 36 Fold emulator. Keep an animated,
         // opaque copy over the list once the controls item has left the viewport
@@ -659,22 +678,38 @@ private fun ListPane(
 
 @Composable
 private fun SectionHeader(title: String, list: NavigatorList, now: Instant) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-        if (list.valueBasis == ValueBasis.LAST_GOOD) {
-            val chipAge = list.observedAt?.let { Ages.format(it, now) } ?: "unknown"
-            AssistChip(onClick = {}, label = { Text("Cached · $chipAge") })
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+            when (list.valueBasis) {
+                ValueBasis.EXACT -> Unit
+                ValueBasis.LAST_GOOD -> {
+                    val chipAge = list.observedAt?.let { Ages.format(it, now) } ?: "unknown"
+                    AssistChip(onClick = {}, label = { Text("Cached · $chipAge") })
+                }
+                ValueBasis.UNKNOWN -> AssistChip(onClick = {}, label = { Text("Unknown") })
+            }
+        }
+        SnapshotRendering.rateLimitBanner(list.rateLimit)?.let { banner ->
+            Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    banner,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(6.dp),
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun EmptyRowsText() {
+private fun EmptyRowsText(valueBasis: ValueBasis) {
     Text(
-        "No rows match",
+        if (valueBasis == ValueBasis.UNKNOWN) "Data unavailable" else "No rows match",
         modifier = Modifier.padding(12.dp),
         style = MaterialTheme.typography.bodyMedium,
     )
@@ -741,7 +776,7 @@ private fun NavigatorRowView(
 }
 
 @Composable
-private fun DetailPane(item: RowItem?, repoRef: RepoRef?, now: Instant, onOpenGitHub: (RowItem) -> Unit) {
+private fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) -> Unit) {
     if (item == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Select a row to see details", style = MaterialTheme.typography.bodyMedium)
@@ -765,7 +800,7 @@ private fun DetailPane(item: RowItem?, repoRef: RepoRef?, now: Instant, onOpenGi
             Text("CI: " + SnapshotRendering.ciLabel(pr.ciRollup))
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = { onOpenGitHub(item) }, enabled = repoRef != null) {
+        Button(onClick = { onOpenGitHub(item) }) {
             Text("Open on GitHub")
         }
     }
