@@ -491,17 +491,26 @@
           "note": "recorded in public docs and the x-api plan amendment; verification completes at PR #1 merge",
           "to": "implemented",
           "verification_ref": null
+        },
+        {
+          "at": "2026-07-29T17:25:00+00:00",
+          "choice": "No preset pins. Any repo visible in the connected account/orgs is pinnable via an in-place row toggle (Claude Code session-pinning interaction); pinned repos sort first and form the widget and background-refresh set. The maintainer's twelve pins are personal on-device config, not product defaults.",
+          "from": "implemented",
+          "implementation_ref": "github:saari-co/RepoGlance#4 @ c9294825fefbb6d914b85624d951d9c77bca63dd (state/AppPrefs.kt pinned set, state/SnapshotStore.kt pins-first sort + stack-widget source, ui/HomeScreen.kt in-place star toggle)",
+          "note": "Slice 2 lands the pin model in code: in-place row toggle, pins float first, persisted set drives the stack widget; no preset pins anywhere. Unit tests (SnapshotStoreTest) lock pins-first + stack fallback; device proof frames 02/03 show the toggle live on the XL.",
+          "to": "implemented",
+          "verification_ref": "ci:run/30457064602 + assets:swarm-pr-assets/RepoGlance-pr-4-c9294825fefb + proof/slice2-glance-fixture-ui-20260729/PROOF.md"
         }
       ],
       "id": "pin-model-010",
-      "implementation_ref": "github:saari-co/RepoGlance",
+      "implementation_ref": "github:saari-co/RepoGlance#4 @ c9294825fefbb6d914b85624d951d9c77bca63dd",
       "question": "How do pins and defaults work for a public product?",
       "rationale": "Maintainer: users should be able to pin repos as needed, any repo in their account or orgs, similar to the session pin feature in the Claude Code app.",
       "review_ref": null,
       "status": "implemented",
       "superseded_by": null,
-      "updated_at": "2026-07-29T12:08:47+00:00",
-      "verification_ref": null
+      "updated_at": "2026-07-29T17:25:00+00:00",
+      "verification_ref": "ci:run/30457064602 + assets:swarm-pr-assets/RepoGlance-pr-4-c9294825fefb"
     },
     {
       "baseline_ref": "decision:github-app-topology-006",

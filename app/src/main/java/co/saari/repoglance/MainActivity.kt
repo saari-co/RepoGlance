@@ -3,34 +3,50 @@ package co.saari.repoglance
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import co.saari.repoglance.fixtures.FixtureScenario
-import co.saari.repoglance.fixtures.Fixtures
+import androidx.compose.ui.platform.LocalContext
+import co.saari.repoglance.model.NavigatorScope
+import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.NavigatorScopeCodec
+import co.saari.repoglance.ui.HomeScreen
+import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
-import java.time.Instant
+import co.saari.repoglance.widget.EXTRA_REPO_FULL
+import co.saari.repoglance.widget.WidgetRefresh
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // A widget row tap launches MainActivity with this extra set (see
+        // widget/WidgetActions.kt) instead of a raw ACTION_VIEW Intent from
+        // Glance — pre-scoping the navigator to that repo. Only read on a
+        // fresh launch (no onNewIntent handling in v0.1); a widget tap while
+        // the app is already running opens another activity instance, which
+        // is standard-launch-mode default behavior, not specially handled.
+        val widgetRepoFull = intent?.getStringExtra(EXTRA_REPO_FULL)
+        val initialScope = widgetRepoFull
+            ?.let { NavigatorScopeCodec.decode("REPO", it) }
+            ?.takeIf { it is NavigatorScope.Repo }
+
         setContent {
             RepoGlanceTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    SliceOneScreen()
+                    AppRoot(initialNavigatorScope = initialScope)
                 }
             }
         }
@@ -38,29 +54,52 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun SliceOneScreen() {
-    // Proves the model links into the app target: a real Fixtures call,
-    // not a placeholder. Slice 2 replaces this with the actual navigator UI.
-    val mixedRepoCount = remember { Fixtures.snapshots(FixtureScenario.MIXED, Instant.now()).size }
+private fun AppRoot(initialNavigatorScope: NavigatorScope?) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(id = R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
+    var isHome by rememberSaveable { mutableStateOf(initialNavigatorScope == null) }
+    var scopeKind by rememberSaveable {
+        mutableStateOf(initialNavigatorScope?.let(NavigatorScopeCodec::kindOf) ?: "ACCOUNT")
+    }
+    var scopeValue by rememberSaveable {
+        mutableStateOf(initialNavigatorScope?.let(NavigatorScopeCodec::valueOf) ?: "")
+    }
+
+    val scenarioState = AppPrefs.rememberScenario(context)
+    val pinnedState = AppPrefs.rememberPinnedRepos(context)
+
+    fun refreshWidgets() {
+        coroutineScope.launch { WidgetRefresh.updateAll(context) }
+    }
+
+    fun openNavigator(scope: NavigatorScope) {
+        scopeKind = NavigatorScopeCodec.kindOf(scope)
+        scopeValue = NavigatorScopeCodec.valueOf(scope)
+        isHome = false
+    }
+
+    if (isHome) {
+        HomeScreen(
+            scenario = scenarioState.value,
+            onScenarioChange = { newScenario ->
+                AppPrefs.setSelectedScenario(context, newScenario)
+                refreshWidgets()
+            },
+            pinnedRepos = pinnedState.value,
+            onTogglePin = { repoFull ->
+                AppPrefs.togglePin(context, repoFull)
+                refreshWidgets()
+            },
+            onOpenNavigator = { openNavigator(NavigatorScope.Account) },
+            onOpenRepo = { ref -> openNavigator(NavigatorScope.Repo(ref)) },
         )
-        Text(
-            text = "Slice 1: model + fixtures (no UI yet)",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            text = "MIXED fixture repos: $mixedRepoCount",
-            style = MaterialTheme.typography.bodySmall,
+    } else {
+        val scope = remember(scopeKind, scopeValue) { NavigatorScopeCodec.decode(scopeKind, scopeValue) }
+        NavigatorScreen(
+            scenario = scenarioState.value,
+            initialScope = scope,
+            onBackToHome = { isHome = true },
         )
     }
 }

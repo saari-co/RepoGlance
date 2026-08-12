@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixture-mode widget: updatePeriodMillis is 0 because fixtures never
+     refresh on their own — the app calls WidgetRefresh.updateAll after a
+     scenario or pin change instead. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:initialLayout="@layout/widget_loading"
+    android:description="@string/widget_repo_description"
+    android:updatePeriodMillis="0" />

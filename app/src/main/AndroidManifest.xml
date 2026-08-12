@@ -19,6 +19,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Both receivers must be exported: APPWIDGET_UPDATE is broadcast
+             by the system widget host, an external caller. Neither accepts
+             any other intent, and both are fixture-mode-only (no network,
+             no write). -->
+        <receiver
+            android:name=".widget.RepoWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/repo_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.StackWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/stack_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
