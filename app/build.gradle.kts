@@ -4,6 +4,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+val githubClientSecret = providers
+    .environmentVariable("REPOGLANCE_GITHUB_CLIENT_SECRET")
+    .orElse("")
+
 android {
     namespace = "co.saari.repoglance"
     compileSdk = 35
@@ -12,8 +19,16 @@ android {
         applicationId = "co.saari.repoglance"
         minSdk = 31
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-slice2"
+        versionCode = 3
+        versionName = "0.3.0-auth-live"
+
+        buildConfigField("String", "GITHUB_APP_CLIENT_ID", "Iv23livzEuAb2HMCbcUq".asBuildConfigString())
+        buildConfigField("String", "GITHUB_APP_CLIENT_SECRET", githubClientSecret.get().asBuildConfigString())
+        buildConfigField(
+            "String",
+            "GITHUB_CALLBACK_URL",
+            "https://repoglance.ztoned.com/oauth/callback".asBuildConfigString(),
+        )
     }
 
     buildTypes {
@@ -29,6 +44,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -44,9 +60,11 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.browser)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
     debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    testImplementation(libs.json.jvm)
 }

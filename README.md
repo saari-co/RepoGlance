@@ -14,14 +14,18 @@ and deep links into the GitHub mobile app.
 
 ## Status
 
-Slice 1 available: typed snapshot model, fixture corpus, and truth-rule
-tests — no network, no UI yet.
+Slice 1 available: typed snapshot model, fixture corpus, and truth-rule tests.
 
 Slice 2 available: fixture-first Glance widgets (per-repo + stack) and an
-in-app fixture mode (pinning, navigator, cached search) — still no network,
-no auth.
+in-app fixture mode (pinning, navigator, cached search), plus per-widget
+repository/mode configuration and a Fold-first navigator shell.
 
-Everything else remains planned.
+The prototype live-data slice on this branch adds user-present GitHub App
+sign-in, a verified `repoglance.ztoned.com` Android App Link, Keystore-backed
+rotating tokens, live repository discovery, and repo-scoped open issue/PR
+lists. It has been exercised on the maintainer's Pixel 10 Pro Fold. Widgets
+remain fixture-backed in this checkpoint; background refresh, live widget
+content, CI/release pressure, and general distribution remain planned.
 
 ## Planned
 
@@ -45,12 +49,21 @@ Everything else remains planned.
   labelled with its age; rate-limited is a visible state, never silently
   masked with old numbers.
 
-## Auth (planned)
+## Auth (prototype)
 
-A RepoGlance GitHub App: sign in via the browser's authorization flow in a
-Custom Tab, short-lived user tokens refresh silently, stored behind Android
-Keystore. RepoGlance never reads or reuses browser cookies, and read-only
-scopes are the ceiling — the app performs no GitHub writes.
+RepoGlance signs in through its public GitHub App in an Android Custom Tab.
+State and PKCE bind the verified HTTPS return; short-lived user tokens refresh
+and remain encrypted behind Android Keystore. RepoGlance never reads or reuses
+browser cookies, and read-only permissions are the ceiling — the app performs
+no GitHub writes.
+
+GitHub's current GitHub App web flow still requires a client secret during code
+exchange. A native APK cannot keep that value confidential, so the personal
+prototype treats it as public, revocable build configuration. Default and CI
+builds contain no credential and remain signed out; credential-bearing APKs
+must never be published. General distribution requires either GitHub device
+flow or a narrowly scoped confidential auth broker. See
+[docs/AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md).
 
 ## How this is being built
 

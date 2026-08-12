@@ -1,0 +1,13 @@
+/*
+  Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-Robots-Tag: noindex
+
+/oauth/callback*
+  Cache-Control: no-store
+
+/.well-known/assetlinks.json
+  Cache-Control: public, max-age=300
+  Content-Type: application/json

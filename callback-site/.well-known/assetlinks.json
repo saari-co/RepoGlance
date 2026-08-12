@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "co.saari.repoglance",
+      "sha256_cert_fingerprints": [
+        "41:63:D6:71:DF:89:2F:EE:1C:92:79:59:60:EC:2A:9B:C6:01:04:3B:92:77:F0:82:44:22:E1:FF:42:57:D0:AA"
+      ]
+    }
+  }
+]
