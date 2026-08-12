@@ -17,9 +17,9 @@ list.
 2. Download `repoglance-23ab59276ff2.apk`
    (sha256 `98440ecd1b86cea5a00ad7739698d19a452d8bbbfdea382b6ee89bfbc8262f43`,
    28,667,110 bytes — built from the Slice 2 tree; debug-signed preview,
-   zero permissions, fixtures only). The canary release replaces its APK
-   asset on every firing — if the exact name differs, use the single
-   `repoglance-*.apk` asset named in the release's `version.json`.
+   zero permissions, fixtures only). Always use the exact APK name and digest
+   in the release's `version.json`; the repaired delivery rail retains older
+   uniquely named APKs so the manifest remains the channel pointer.
 3. Install (allow install from browser when prompted). Expected app:
    "RepoGlance", version `0.2.0-canary.2`.
 4. Long-press home screen → Widgets → RepoGlance → place **both** widgets
@@ -59,11 +59,12 @@ review each frame, upload to `swarm-pr-assets` release
 Personal-launcher content in Fold home-screen frames gets per-frame human
 review before publication per house media policy.
 
-Signature caveat: until the DEBUG_KEYSTORE_B64 continuity step is armed
-(swarmpocket `proof/companion-rail-20260729/DEPLOY_PACKET.md`, step 0), the
-canary APK is throwaway-signed — a first install works, but the first
-continuity-signed update over it will need one uninstall/reinstall. Arming
-the keystore first avoids that churn.
+Signature caveat: the current canary APK is throwaway-signed. Draft PR #3's
+repaired rail fails closed until its `canary` Actions environment has the four
+signing secrets and expected certificate fingerprint described in
+`proof/canary-rail-review-fixes-20260812/PROOF.md`. The first
+continuity-signed install over the old canary will need one
+uninstall/reinstall; later updates must retain that signing key.
 
 ## Not in this packet
 

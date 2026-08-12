@@ -1,9 +1,6 @@
-# Build the RepoGlance debug APK on every main push and publish it to a
-# stable rolling prerelease tag `canary`. Assets are replaced on every run;
-# the release itself is never deleted. A cp-1 puller consumes version.json
-# (sha, apk name, size, apk_sha256 — plus built_at/package/version_code/
-# version_name for the phone-side banner) to fetch and verify the APK over
-# its own authed channel. Debug-signed only; no keystore, no secrets.
+# Build, sign, and publish a stable-signature canary only for the exact current
+# main commit. The unprivileged build, secret-bearing sign, and contents-write
+# publish capabilities intentionally live in separate jobs.
 name: canary
 
 on:
@@ -16,59 +13,400 @@ on:
       - "**.md"
   workflow_dispatch: {}
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
-  group: canary
+  group: canary-main
+  # A queued newer push changes refs/heads/main. The guards below then fail an
+  # older run closed without risking cancellation during a release mutation.
   cancel-in-progress: false
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact_digest: ${{ steps.upload_unsigned.outputs.artifact-digest }}
     env:
       REPOGLANCE_VERSION_CODE: ${{ github.run_number }}
       REPOGLANCE_VERSION_NAME: "0.2.0-canary.${{ github.run_number }}"
     steps:
-      - uses: actions/checkout@v4
+      - name: Require the main branch ref
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
 
-      - uses: actions/setup-java@v4
+      - name: Check out the exact source commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Build debug APK
-        run: |
-          echo "REPOGLANCE_VERSION_CODE=$REPOGLANCE_VERSION_CODE"
-          echo "REPOGLANCE_VERSION_NAME=$REPOGLANCE_VERSION_NAME"
-          ./gradlew --no-daemon assembleDebug
+      - name: Test, lint, and build the unsigned release APK
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleRelease
 
-      - name: Package release payload
+      - name: Package unsigned build provenance
         run: |
-          SHORT=${GITHUB_SHA:0:12}
-          APK="repoglance-${SHORT}.apk"
-          cp app/build/outputs/apk/debug/app-debug.apk "$APK"
-          SIZE=$(stat -c%s "$APK")
-          SHA256=$(sha256sum "$APK" | cut -d' ' -f1)
+          set -euo pipefail
+          SOURCE_APK=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*-unsigned.apk' -print -quit)
+          test -n "$SOURCE_APK"
+
+          mkdir -p unsigned
+          UNSIGNED_APK="repoglance-unsigned-${GITHUB_SHA}.apk"
+          cp "$SOURCE_APK" "unsigned/$UNSIGNED_APK"
+          UNSIGNED_SIZE=$(stat -c%s "unsigned/$UNSIGNED_APK")
+          UNSIGNED_SHA256=$(sha256sum "unsigned/$UNSIGNED_APK" | cut -d' ' -f1)
           BUILT_AT=$(date -u +%s)
-          printf '{"sha":"%s","apk":"%s","size":%s,"apk_sha256":"%s","built_at":%s,"package":"%s","version_code":%s,"version_name":"%s"}\n' \
-            "$GITHUB_SHA" "$APK" "$SIZE" "$SHA256" "$BUILT_AT" \
-            "co.saari.repoglance" "$REPOGLANCE_VERSION_CODE" "$REPOGLANCE_VERSION_NAME" \
-            > version.json
-          cat version.json
 
-      - name: Publish rolling canary release
+          jq -n \
+            --arg sha "$GITHUB_SHA" \
+            --arg source_repository "$GITHUB_REPOSITORY" \
+            --arg source_ref "$GITHUB_REF" \
+            --arg source_url "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" \
+            --arg workflow_run_url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            --arg unsigned_apk "$UNSIGNED_APK" \
+            --arg unsigned_apk_sha256 "$UNSIGNED_SHA256" \
+            --arg package "co.saari.repoglance" \
+            --arg version_name "$REPOGLANCE_VERSION_NAME" \
+            --argjson unsigned_size "$UNSIGNED_SIZE" \
+            --argjson built_at "$BUILT_AT" \
+            --argjson version_code "$REPOGLANCE_VERSION_CODE" \
+            '{
+              schema: 2,
+              sha: $sha,
+              source_repository: $source_repository,
+              source_ref: $source_ref,
+              source_url: $source_url,
+              workflow_run_url: $workflow_run_url,
+              unsigned_apk: $unsigned_apk,
+              unsigned_size: $unsigned_size,
+              unsigned_apk_sha256: $unsigned_apk_sha256,
+              built_at: $built_at,
+              package: $package,
+              version_code: $version_code,
+              version_name: $version_name
+            }' > unsigned/build-metadata.json
+
+      - name: Transfer unsigned payload
+        id: upload_unsigned
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: repoglance-canary-unsigned-${{ github.sha }}
+          path: unsigned/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  sign:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Configure protection and all signing inputs on this environment. An
+    # unconfigured or partially configured environment fails before signing.
+    environment: canary
+    permissions:
+      contents: none
+    outputs:
+      artifact_digest: ${{ steps.upload_signed.outputs.artifact-digest }}
+    steps:
+      - name: Receive unsigned payload
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: repoglance-canary-unsigned-${{ github.sha }}
+          path: unsigned
+
+      - name: Validate, sign, and package immutable provenance
+        env:
+          BUILD_ARTIFACT_DIGEST: ${{ needs.build.outputs.artifact_digest }}
+          EXPECTED_SIGNING_CERT_SHA256: ${{ vars.REPOGLANCE_CANARY_SIGNING_CERT_SHA256 }}
+          KEYSTORE_B64: ${{ secrets.REPOGLANCE_CANARY_KEYSTORE_B64 }}
+          KEY_ALIAS: ${{ secrets.REPOGLANCE_CANARY_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.REPOGLANCE_CANARY_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.REPOGLANCE_CANARY_STORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          for name in BUILD_ARTIFACT_DIGEST EXPECTED_SIGNING_CERT_SHA256 KEYSTORE_B64 KEY_ALIAS KEY_PASSWORD STORE_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Required canary signing input $name is not configured"
+              exit 1
+            fi
+          done
+          [[ "$BUILD_ARTIFACT_DIGEST" =~ ^[0-9a-f]{64}$ ]]
+
+          UNSIGNED_APK="repoglance-unsigned-${GITHUB_SHA}.apk"
+          test -f "unsigned/$UNSIGNED_APK"
+          test "$(jq -er '.sha' unsigned/build-metadata.json)" = "$GITHUB_SHA"
+          test "$(jq -er '.source_repository' unsigned/build-metadata.json)" = "$GITHUB_REPOSITORY"
+          test "$(jq -er '.source_ref' unsigned/build-metadata.json)" = "refs/heads/main"
+          test "$(jq -er '.unsigned_apk' unsigned/build-metadata.json)" = "$UNSIGNED_APK"
+          test "$(stat -c%s "unsigned/$UNSIGNED_APK")" = "$(jq -er '.unsigned_size' unsigned/build-metadata.json)"
+          test "$(sha256sum "unsigned/$UNSIGNED_APK" | cut -d' ' -f1)" = "$(jq -er '.unsigned_apk_sha256' unsigned/build-metadata.json)"
+
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$SDK_ROOT"
+          BUILD_TOOLS_DIR=$(find "$SDK_ROOT/build-tools" -mindepth 1 -maxdepth 1 -type d -print | sort -V | tail -n 1)
+          test -x "$BUILD_TOOLS_DIR/zipalign"
+          test -x "$BUILD_TOOLS_DIR/apksigner"
+
+          umask 077
+          KEYSTORE_FILE="$RUNNER_TEMP/repoglance-canary.jks"
+          ALIGNED_APK="$RUNNER_TEMP/repoglance-aligned.apk"
+          cleanup() {
+            rm -f "$KEYSTORE_FILE" "$ALIGNED_APK"
+          }
+          trap cleanup EXIT
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$KEYSTORE_FILE"
+          test -s "$KEYSTORE_FILE"
+
+          mkdir -p signed
+          APK="repoglance-${GITHUB_SHA}.apk"
+          "$BUILD_TOOLS_DIR/zipalign" -f -p 4 "unsigned/$UNSIGNED_APK" "$ALIGNED_APK"
+          "$BUILD_TOOLS_DIR/apksigner" sign \
+            --ks "$KEYSTORE_FILE" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:STORE_PASSWORD \
+            --key-pass env:KEY_PASSWORD \
+            --v4-signing-enabled false \
+            --out "signed/$APK" \
+            "$ALIGNED_APK"
+          "$BUILD_TOOLS_DIR/apksigner" verify --verbose "signed/$APK" >/dev/null
+
+          SIGNING_CERT_SHA256=$(
+            "$BUILD_TOOLS_DIR/apksigner" verify --print-certs "signed/$APK" |
+              sed -n 's/^Signer #1 certificate SHA-256 digest: //p' |
+              head -n 1 |
+              tr '[:upper:]' '[:lower:]' |
+              tr -d ':[:space:]'
+          )
+          EXPECTED_CERT=$(printf '%s' "$EXPECTED_SIGNING_CERT_SHA256" |
+            tr '[:upper:]' '[:lower:]' |
+            tr -d ':[:space:]')
+          [[ "$SIGNING_CERT_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          if [ "$SIGNING_CERT_SHA256" != "$EXPECTED_CERT" ]; then
+            echo "::error::Canary signing certificate does not match the configured continuity fingerprint"
+            exit 1
+          fi
+
+          APK_SIZE=$(stat -c%s "signed/$APK")
+          APK_SHA256=$(sha256sum "signed/$APK" | cut -d' ' -f1)
+          IMMUTABLE_TAG="canary-${GITHUB_SHA}"
+          jq -n \
+            --arg sha "$GITHUB_SHA" \
+            --arg source_repository "$GITHUB_REPOSITORY" \
+            --arg source_ref "refs/heads/main" \
+            --arg source_url "$(jq -er '.source_url' unsigned/build-metadata.json)" \
+            --arg workflow_run_url "$(jq -er '.workflow_run_url' unsigned/build-metadata.json)" \
+            --arg immutable_release_tag "$IMMUTABLE_TAG" \
+            --arg apk "$APK" \
+            --arg apk_sha256 "$APK_SHA256" \
+            --arg signing_cert_sha256 "$SIGNING_CERT_SHA256" \
+            --arg build_artifact_digest "$BUILD_ARTIFACT_DIGEST" \
+            --arg package "$(jq -er '.package' unsigned/build-metadata.json)" \
+            --arg version_name "$(jq -er '.version_name' unsigned/build-metadata.json)" \
+            --argjson size "$APK_SIZE" \
+            --argjson built_at "$(jq -er '.built_at' unsigned/build-metadata.json)" \
+            --argjson version_code "$(jq -er '.version_code' unsigned/build-metadata.json)" \
+            '{
+              schema: 2,
+              channel: "canary",
+              sha: $sha,
+              source_repository: $source_repository,
+              source_ref: $source_ref,
+              source_url: $source_url,
+              workflow_run_url: $workflow_run_url,
+              immutable_release_tag: $immutable_release_tag,
+              apk: $apk,
+              size: $size,
+              apk_sha256: $apk_sha256,
+              signing_cert_sha256: $signing_cert_sha256,
+              build_artifact_digest: $build_artifact_digest,
+              built_at: $built_at,
+              package: $package,
+              version_code: $version_code,
+              version_name: $version_name
+            }' > signed/version.json
+          cp signed/version.json "signed/version-${GITHUB_SHA}.json"
+          (
+            cd signed
+            sha256sum "$APK" version.json > SHA256SUMS
+            sha256sum "$APK" "version-${GITHUB_SHA}.json" > "SHA256SUMS-${GITHUB_SHA}"
+          )
+
+      - name: Transfer signed publication payload
+        id: upload_signed
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: repoglance-canary-signed-${{ github.sha }}
+          path: signed/
+          if-no-files-found: error
+          retention-days: 3
+          compression-level: 0
+
+  publish:
+    needs: sign
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Receive signed publication payload
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: repoglance-canary-signed-${{ github.sha }}
+          path: signed
+
+      - name: Verify publication payload
+        env:
+          SIGNED_ARTIFACT_DIGEST: ${{ needs.sign.outputs.artifact_digest }}
+        run: |
+          set -euo pipefail
+          [[ "$SIGNED_ARTIFACT_DIGEST" =~ ^[0-9a-f]{64}$ ]]
+          APK="repoglance-${GITHUB_SHA}.apk"
+          IMMUTABLE_TAG="canary-${GITHUB_SHA}"
+          test -f "signed/$APK"
+          test "$(jq -er '.sha' signed/version.json)" = "$GITHUB_SHA"
+          test "$(jq -er '.source_repository' signed/version.json)" = "$GITHUB_REPOSITORY"
+          test "$(jq -er '.source_ref' signed/version.json)" = "refs/heads/main"
+          test "$(jq -er '.immutable_release_tag' signed/version.json)" = "$IMMUTABLE_TAG"
+          test "$(jq -er '.apk' signed/version.json)" = "$APK"
+          test "$(stat -c%s "signed/$APK")" = "$(jq -er '.size' signed/version.json)"
+          test "$(sha256sum "signed/$APK" | cut -d' ' -f1)" = "$(jq -er '.apk_sha256' signed/version.json)"
+          [[ "$(jq -er '.signing_cert_sha256' signed/version.json)" =~ ^[0-9a-f]{64}$ ]]
+          cmp -s signed/version.json "signed/version-${GITHUB_SHA}.json"
+          (
+            cd signed
+            sha256sum -c SHA256SUMS
+            sha256sum -c "SHA256SUMS-${GITHUB_SHA}"
+          )
+
+      - name: Publish immutable payload, then promote rolling manifest
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          SHORT=${GITHUB_SHA:0:12}
-          APK="repoglance-${SHORT}.apk"
-          gh release view canary >/dev/null 2>&1 || \
-            gh release create canary --prerelease \
+          set -euo pipefail
+          APK="repoglance-${GITHUB_SHA}.apk"
+          IMMUTABLE_TAG="canary-${GITHUB_SHA}"
+          UNIQUE_MANIFEST="version-${GITHUB_SHA}.json"
+          UNIQUE_SUMS="SHA256SUMS-${GITHUB_SHA}"
+
+          assert_current_main() {
+            local current_main
+            current_main=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')
+            if [ "$current_main" != "$GITHUB_SHA" ]; then
+              echo "::error::Refusing to publish: this run is not the exact current main commit"
+              exit 1
+            fi
+          }
+
+          release_asset_exists() {
+            local tag="$1"
+            local name="$2"
+            gh release view "$tag" --json assets --jq '.assets[].name' | grep -Fqx -- "$name"
+          }
+
+          verify_asset() {
+            local tag="$1"
+            local path="$2"
+            local name
+            local temp_dir
+            name=$(basename "$path")
+            temp_dir=$(mktemp -d)
+            gh release download "$tag" --pattern "$name" --dir "$temp_dir"
+            if ! cmp -s "$path" "$temp_dir/$name"; then
+              rm -rf "$temp_dir"
+              echo "::error::Existing release asset $name differs from the exact payload"
+              exit 1
+            fi
+            rm -rf "$temp_dir"
+          }
+
+          ensure_asset() {
+            local tag="$1"
+            local path="$2"
+            local allow_upload="$3"
+            local name
+            name=$(basename "$path")
+            if release_asset_exists "$tag" "$name"; then
+              verify_asset "$tag" "$path"
+            elif [ "$allow_upload" = "yes" ]; then
+              gh release upload "$tag" "$path"
+            else
+              echo "::error::Published immutable release is missing $name"
+              exit 1
+            fi
+          }
+
+          assert_current_main
+
+          RELEASE_STATE="$RUNNER_TEMP/immutable-release.json"
+          if ! gh release view "$IMMUTABLE_TAG" \
+            --json isDraft,isPrerelease,targetCommitish > "$RELEASE_STATE" 2>/dev/null; then
+            cat > "$RUNNER_TEMP/immutable-notes.md" <<EOF
+          Stable-signature RepoGlance canary built from exact main commit \`$GITHUB_SHA\`.
+
+          The APK, manifest, and checksums are immutable provenance for this source SHA. The rolling \`canary\` release is only a convenience pointer.
+          EOF
+            gh release create "$IMMUTABLE_TAG" \
+              --draft \
+              --prerelease \
+              --latest=false \
+              --target "$GITHUB_SHA" \
+              --title "RepoGlance canary ${GITHUB_SHA}" \
+              --notes-file "$RUNNER_TEMP/immutable-notes.md"
+            gh release view "$IMMUTABLE_TAG" \
+              --json isDraft,isPrerelease,targetCommitish > "$RELEASE_STATE"
+          fi
+          test "$(jq -er '.targetCommitish' "$RELEASE_STATE")" = "$GITHUB_SHA"
+
+          IS_DRAFT=$(jq -er '.isDraft' "$RELEASE_STATE")
+          if [ "$IS_DRAFT" = "true" ]; then
+            ensure_asset "$IMMUTABLE_TAG" "signed/$APK" yes
+            ensure_asset "$IMMUTABLE_TAG" signed/version.json yes
+            ensure_asset "$IMMUTABLE_TAG" signed/SHA256SUMS yes
+            assert_current_main
+            gh release edit "$IMMUTABLE_TAG" --draft=false --prerelease --latest=false
+          else
+            test "$(jq -er '.isPrerelease' "$RELEASE_STATE")" = "true"
+            ensure_asset "$IMMUTABLE_TAG" "signed/$APK" no
+            ensure_asset "$IMMUTABLE_TAG" signed/version.json no
+            ensure_asset "$IMMUTABLE_TAG" signed/SHA256SUMS no
+          fi
+
+          assert_current_main
+          ROLLING_STATE="$RUNNER_TEMP/rolling-release.json"
+          if ! gh release view canary \
+            --json isDraft,isPrerelease > "$ROLLING_STATE" 2>/dev/null; then
+            gh release create canary \
+              --prerelease \
+              --latest=false \
+              --target "$GITHUB_SHA" \
               --title "RepoGlance canary" \
-              --notes "Rolling debug preview channel. Assets are replaced on every main push; this release is never deleted."
-          gh release upload canary "$APK" --clobber
-          gh release upload canary version.json --clobber
-          for a in $(gh release view canary --json assets --jq '.assets[].name' | grep '^repoglance-.*\.apk$'); do
-            [ "$a" = "$APK" ] || gh release delete-asset canary "$a" -y
-          done
+              --notes "Rolling canary pointer. Exact payloads remain available under per-SHA canary releases."
+            gh release view canary \
+              --json isDraft,isPrerelease > "$ROLLING_STATE"
+          fi
+          test "$(jq -er '.isDraft' "$ROLLING_STATE")" = "false"
+          test "$(jq -er '.isPrerelease' "$ROLLING_STATE")" = "true"
+
+          # These names are unique and never clobbered or deleted. Therefore an
+          # old version.json continues to name a complete old APK until the new
+          # pointer is promoted.
+          ensure_asset canary "signed/$APK" yes
+          ensure_asset canary "signed/$UNIQUE_MANIFEST" yes
+          ensure_asset canary "signed/$UNIQUE_SUMS" yes
+
+          # GitHub Release assets have no atomic replace primitive. Promote the
+          # small compatibility pointer last; the per-SHA manifest above is the
+          # recoverable source if this one clobber is interrupted.
+          assert_current_main
+          gh release upload canary signed/version.json --clobber
+          verify_asset canary signed/version.json
