@@ -50,6 +50,7 @@ object SnapshotRendering {
 
     fun pushedLabel(pushedAt: Instant?, now: Instant): String {
         if (pushedAt == null) return "Last push: unknown"
-        return "Pushed ${Ages.format(pushedAt, now)} ago"
+        val age = Ages.format(pushedAt, now)
+        return if (age == "just now") "Pushed just now" else "Pushed $age ago"
     }
 }

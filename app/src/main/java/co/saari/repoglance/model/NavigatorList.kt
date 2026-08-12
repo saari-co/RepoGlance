@@ -40,6 +40,17 @@ data class NavigatorList(
 ) {
     init {
         require(pageSize == PAGE_SIZE) { "pageSize must be $PAGE_SIZE, got $pageSize" }
+        when (valueBasis) {
+            ValueBasis.UNKNOWN -> {
+                require(rows.size == 0) { "UNKNOWN basis requires an empty navigator list" }
+                require(observedAt == null) { "UNKNOWN basis requires a null observedAt" }
+            }
+            ValueBasis.EXACT, ValueBasis.LAST_GOOD -> {
+                require(observedAt != null) {
+                    "EXACT/LAST_GOOD basis requires a non-null observedAt"
+                }
+            }
+        }
         if (filter == NavigatorFilter.AWAITING_MY_REVIEW) {
             require(rows is NavigatorRows.Prs) {
                 "AWAITING_MY_REVIEW is only valid for PR lists"

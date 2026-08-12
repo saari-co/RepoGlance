@@ -68,6 +68,7 @@ class FixtureIntegrityTest {
         val snapshots = Fixtures.snapshots(FixtureScenario.MIXED, now)
         val combos = snapshots.map { Triple(it.valueBasis, it.defaultBranchCi, it.rateLimit) }.toSet()
         assertTrue("expected >= 4 distinct combos, got ${combos.size}", combos.size >= 4)
+        assertEquals(snapshots.size, snapshots.map { it.repo }.toSet().size)
         assertTrue(snapshots.any { it.valueBasis == ValueBasis.LAST_GOOD })
         assertTrue(snapshots.any { it.valueBasis == ValueBasis.UNKNOWN })
         assertTrue(snapshots.any { it.rateLimit == RateLimitBucket.EXHAUSTED })
@@ -111,6 +112,25 @@ class FixtureIntegrityTest {
         val rows = (list.rows as NavigatorRows.Prs).rows
         assertTrue(rows.isNotEmpty())
         assertTrue(rows.all { it.reviewState == ReviewState.REVIEW_REQUIRED })
+        assertTrue(rows.all { it.state == "open" })
+        assertTrue(rows.none { it.isDraft })
+    }
+
+    @Test
+    fun openFilterProducesOnlyOpenRows() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Account,
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.PAGED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.state == "open" })
+                is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.state == "open" })
+            }
+        }
     }
 
     @Test

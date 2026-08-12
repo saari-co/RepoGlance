@@ -241,11 +241,11 @@ object Fixtures {
     // Dogfood default: one repo from each other scenario, so a single
     // MIXED corpus demonstrates every truth-rule state side by side.
     private fun mixedSnapshots(now: Instant): List<RepoSnapshot> = listOf(
-        exactSnapshots(now)[0],
+        exactSnapshots(now)[1],
         lastGoodSnapshots(now)[0],
         unknownSnapshots(now)[0],
-        rateLimitedSnapshots(now)[0],
-        noCiSnapshots(now)[0],
+        rateLimitedSnapshots(now)[1],
+        noCiSnapshots(now)[1],
     )
 
     // ---- navigator lists ------------------------------------------------
@@ -328,7 +328,8 @@ object Fixtures {
             IssueRow(
                 number = 100 + i,
                 title = rowTitle(filter, i),
-                state = if (i % 5 == 0) "closed" else "open",
+                state = if (filter == NavigatorFilter.OPEN) "open"
+                else if (i % 5 == 0) "closed" else "open",
                 labels = listOf(LABEL_POOL[i % LABEL_POOL.size]),
                 author = CAST[i % CAST.size],
                 assignee = if (filter == NavigatorFilter.MINE) YOU else CAST[(i + 1) % CAST.size],
@@ -342,13 +343,16 @@ object Fixtures {
             PrRow(
                 number = 200 + i,
                 title = rowTitle(filter, i),
-                state = if (i % 7 == 0) "closed" else "open",
+                state = if (
+                    filter == NavigatorFilter.OPEN ||
+                    filter == NavigatorFilter.AWAITING_MY_REVIEW
+                ) "open" else if (i % 7 == 0) "closed" else "open",
                 labels = listOf(LABEL_POOL[i % LABEL_POOL.size]),
                 author = CAST[i % CAST.size],
                 assignee = if (filter == NavigatorFilter.MINE) YOU else CAST[(i + 1) % CAST.size],
                 commentCount = i % 6,
                 updatedAt = now.minus(Duration.ofMinutes((i + 1) * 7L)),
-                isDraft = i % 4 == 0,
+                isDraft = filter != NavigatorFilter.AWAITING_MY_REVIEW && i % 4 == 0,
                 reviewState = if (filter == NavigatorFilter.AWAITING_MY_REVIEW) {
                     ReviewState.REVIEW_REQUIRED
                 } else {

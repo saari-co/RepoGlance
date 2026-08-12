@@ -9,6 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
+import java.time.Duration
 import java.time.Instant
 
 class ValueBasisRenderingTest {
@@ -65,5 +66,14 @@ class ValueBasisRenderingTest {
         for (count in 0..100) {
             assertEquals("—", SnapshotRendering.countText(count, ValueBasis.UNKNOWN))
         }
+    }
+
+    @Test
+    fun pushedLabelDoesNotAppendAgoToJustNow() {
+        assertEquals("Pushed just now", SnapshotRendering.pushedLabel(now.minusSeconds(5), now))
+        assertEquals(
+            "Pushed 2m ago",
+            SnapshotRendering.pushedLabel(now.minus(Duration.ofMinutes(2)), now),
+        )
     }
 }

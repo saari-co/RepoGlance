@@ -43,6 +43,15 @@ class SanitizeTest {
     }
 
     @Test
+    fun redactsFullAuthorizationBearerHeaderShape() {
+        val tail = "x".repeat(24)
+        val hostile = "Autho" + "rization: Bear" + "er " + tail
+        val result = Sanitize.displayText(hostile)
+        assertEquals(BULLET3, result)
+        assertFalse(result.contains(tail))
+    }
+
+    @Test
     fun redactsBearerShape() {
         val tail = "x".repeat(20)
         val hostile = "Bear" + "er " + tail

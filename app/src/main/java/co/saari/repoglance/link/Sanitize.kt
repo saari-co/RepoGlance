@@ -21,6 +21,8 @@ object Sanitize {
         Regex("gh[pousr]_[A-Za-z0-9]{20,}"),
         // Fine-grained PAT.
         Regex("github_pat_[A-Za-z0-9_]{20,}"),
+        // Full standard bearer authorization header, including its credential.
+        Regex("(?i)authorization\\s*:\\s*bearer\\s+[A-Za-z0-9._~+/=-]{8,}"),
         // "Authorization: <anything non-whitespace>", case-insensitive.
         Regex("(?i)authorization\\s*:\\s*\\S+"),
         // "Bearer <token>", case-insensitive.
