@@ -8,11 +8,14 @@ keeps the user code visible without opening a browser automatically, and waits
 for an explicit **Copy code & open GitHub** tap. That action copies the code,
 marks the clipboard content sensitive on Android 13 and later, and opens the
 exact returned GitHub verification URI in a Custom Tab. Returning from the tab
-leaves the code visible and **Cancel sign-in** remains available. The ViewModel
-polls at GitHub's required interval, honors slowdown, expiry, and cancellation,
-and rotates expiring access/refresh tokens without a confidential client
-credential. The authentication callback/App-Link source was removed because
-device flow does not return through the app.
+leaves the code visible and **Cancel sign-in** remains available. Activity
+resume now wakes the pending poll after the Custom Tab may have paused or frozen
+background execution. Every wake rechecks the absolute next-request deadline,
+so it cannot bypass GitHub's required interval or widened slowdown interval.
+The ViewModel honors expiry and cancellation and rotates expiring
+access/refresh tokens without a confidential client credential. The
+authentication callback/App-Link source was removed because device flow does
+not return through the app.
 
 The repair also promotes repository-content 401 responses to local session
 invalidation and **Reconnect GitHub**, updates visible age labels once per
@@ -25,17 +28,20 @@ resume, and marks every persistent fixture widget surface `FIXTURE PREVIEW`.
   `9a159f6986647350fac2a1b9e4200459ae277782`
 - Device-authorization UX repair starting head:
   `9da86ce0a970624af05feeab0f0cc1efe53a1cbe`
+- Browser-resume polling repair starting head:
+  `2a385e9cfc783c8d3215ad29c66a3aa04e6325df`
 - Repair starting head: `fbb78927d3579294c0652f41e6f39b02825fa2a5`
 - Stacked review base: `5c0a0d660b5332f40b3ccb1fbf21dd63e755f3ef`
 - Secret-free clean command:
   `ANDROID_HOME=/Users/bobbybones/Library/Android/sdk ./gradlew --no-daemon clean testDebugUnitTest assembleDebug lintDebug`
 - Gradle result: `BUILD SUCCESSFUL` (54 tasks executed)
-- JVM tests: 148 tests, 0 failures, 0 errors, 0 skipped
+- JVM tests: 153 tests, 0 failures, 0 errors, 0 skipped
 - Lint: 0 errors, 18 warnings, 3 informational findings
 - Debug APK: 60,886,928 bytes
 - Debug APK SHA-256:
-  `9b3439d12628bd2658a426b78dbd30b89f052935d6c04d84a8ceb46a1f7c3024`
-- `git diff --check`: clean for the complete UX repair tree before commit
+  `edd5269d1d139887e37dfc34db4956dca36b3fdb2ac4f06a3dcc3d6c47a37a65`
+- `git diff --check`: clean for the complete lifecycle repair tree before
+  commit
 - Post-commit proof-asset placement: pass, with 0 candidate media files, 0
   required fixes, and 0 explicit exceptions
 
@@ -44,22 +50,38 @@ configuration for obsolete confidential/callback auth paths. A dedicated UI
 guard rejects an automatic authorization-screen launch and requires one
 explicit copy-and-open callback, a visible code and paste instruction, the
 Android 13+ sensitive clipboard marker, copy-before-open ordering, and the
-unchanged verification URI. The lane also includes deterministic device-poll
-timing, slowdown, expiry, cancellation, refresh, session-invalidation,
-lifecycle freshness, and widget-label checks. A focused read-only follow-up
-review verified that cancellation and sign-out cannot persist a late
-device-flow result or allow an older flow to overwrite a newer one.
+unchanged verification URI. Lifecycle guards require the Activity resume hook
+to wake only a current active authorization. Deterministic poller tests prove
+an early resume cannot poll before GitHub's minimum interval, cannot bypass a
+slowdown deadline, and reaches an authorized result promptly when resumed
+after the deadline. The lane also includes device-poll timing, expiry,
+cancellation, refresh, session-invalidation, lifecycle freshness, and
+widget-label checks. A focused read-only follow-up review verified that
+cancellation and sign-out cannot persist a late device-flow result or allow an
+older flow to overwrite a newer one.
 
-A maintainer attempted the pre-UX-repair build at
+A maintainer first attempted the pre-UX-repair build at
 `9da86ce0a970624af05feeab0f0cc1efe53a1cbe` on the registered Pixel 10 Pro
 Fold. The code appeared only briefly before the screen automatically opened
 GitHub; Android Back recovered the code, but RepoGlance offered no copy action.
 The maintainer rejected and stopped the flow before entering or authorizing the
 code, so no sign-in, session, or live-data proof was completed. That attempt is
-defect evidence only. The source UX repair did not perform another device
-action, sign in, rotate a token, deploy, push, comment, or merge. The Fold
-evidence below remains valid only for its exact historical source, and an
-authorized exact-head Fold install/sign-in proof run must be performed again.
+defect evidence only.
+
+The maintainer then exercised the corrected UX build at
+`2a385e9cfc783c8d3215ad29c66a3aa04e6325df` on the Fold. RepoGlance kept the
+code visible and provided the explicit copy/open action. GitHub accepted the
+code and displayed its connected confirmation. After the maintainer returned,
+RepoGlance remained on the active **waiting safely** device-code screen rather
+than visibly completing the session. This proves the corrected handoff and
+GitHub-side code acceptance, but it does not prove token receipt, encrypted
+session persistence, catalog loading, or live data at that head. Source review
+found no lifecycle cancellation; the resilience gap was the absence of an
+Activity-resume wake-up for the ViewModel poll wait after background execution.
+The current source repair adds that wake-up without creating another poll loop
+or relaxing GitHub's interval. This source lane did not perform a device action,
+sign in, rotate a token, deploy, push, comment, or merge. An authorized
+exact-head Fold install/sign-in proof run must be performed again.
 After the source repair began, an operator-approved Codex browser action
 changed only **Device Flow** for the RepoGlance GitHub App and verified GitHub's
 successful-update confirmation and checked state. There was no credential/auth

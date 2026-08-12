@@ -11,7 +11,10 @@ import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -174,6 +177,73 @@ class GitHubDeviceFlowClientTest {
         assertEquals("accepted", token.accessToken)
         assertEquals(listOf(5_000L, 5_000L, 12_000L), waits)
         assertEquals(3, gateway.pollCount)
+    }
+
+    @Test
+    fun resumeWakeCannotPollBeforeGitHubsMinimumInterval() = runBlocking {
+        val gateway = QueueGateway(DevicePollResult.Authorized(nonExpiringToken("accepted")))
+        val waits = mutableListOf<Long>()
+        val authorization = authorization(expiresAt = now.plusSeconds(60), intervalSeconds = 5)
+        val poller = GitHubDeviceFlowPoller(gateway, clock) { millis ->
+            waits += millis
+            if (waits.size > 1) clock.advanceMillis(millis)
+        }
+
+        val token = poller.awaitToken(authorization)
+
+        assertEquals("accepted", token.accessToken)
+        assertEquals(listOf(5_000L, 5_000L), waits)
+        assertEquals(1, gateway.pollCount)
+    }
+
+    @Test
+    fun resumeWakeCannotBypassASlowDownDeadline() = runBlocking {
+        val gateway = QueueGateway(
+            DevicePollResult.SlowDown(null),
+            DevicePollResult.Authorized(nonExpiringToken("accepted")),
+        )
+        val waits = mutableListOf<Long>()
+        val authorization = authorization(expiresAt = now.plusSeconds(60), intervalSeconds = 5)
+        val poller = GitHubDeviceFlowPoller(gateway, clock) { millis ->
+            waits += millis
+            if (waits.size != 2) clock.advanceMillis(millis)
+        }
+
+        val token = poller.awaitToken(authorization)
+
+        assertEquals("accepted", token.accessToken)
+        assertEquals(listOf(5_000L, 10_000L, 10_000L), waits)
+        assertEquals(2, gateway.pollCount)
+    }
+
+    @Test
+    fun activityResumeSignalWakesAParkedPollWait() = runBlocking {
+        val signal = DeviceFlowPollWakeSignal()
+        val waitCompleted = async {
+            signal.await(60_000L)
+            true
+        }
+        yield()
+
+        signal.wake()
+
+        assertTrue(withTimeout(1_000L) { waitCompleted.await() })
+    }
+
+    @Test
+    fun resumeAfterTheDeadlineReachesTheAuthorizedResultImmediately() = runBlocking {
+        val signal = DeviceFlowPollWakeSignal()
+        val gateway = QueueGateway(DevicePollResult.Authorized(nonExpiringToken("accepted")))
+        val authorization = authorization(expiresAt = now.plusSeconds(60), intervalSeconds = 5)
+        val poller = GitHubDeviceFlowPoller(gateway, clock, signal::await)
+        val token = async { poller.awaitToken(authorization) }
+        yield()
+
+        clock.advanceMillis(5_000L)
+        signal.wake()
+
+        assertEquals("accepted", withTimeout(1_000L) { token.await() }.accessToken)
+        assertEquals(1, gateway.pollCount)
     }
 
     @Test

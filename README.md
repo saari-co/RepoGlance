@@ -24,10 +24,12 @@ The prototype live-data slice on this branch adds user-present GitHub App
 device-flow sign-in, Keystore-backed rotating tokens, live repository
 discovery, and repo-scoped open issue/PR lists. The earlier confidential-flow
 checkpoint was exercised on the maintainer's Pixel 10 Pro Fold; the current
-public-client device-flow repair is source- and JVM-verified only. A Fold
-attempt on the pre-UX-repair head was stopped before authorization because the
-browser opened automatically and the code had no copy action; exact-head Fold
-proof must be rerun. Widgets remain fixture-backed and visibly say
+public-client device-flow repair is source- and JVM-verified only. Fold attempts
+found and rejected an automatic browser launch, then proved the corrected
+copy/open handoff and GitHub's connected confirmation but exposed a missing
+resume wake-up when RepoGlance stayed on its waiting screen. The current
+lifecycle repair still needs an exact-head Fold rerun. Widgets remain
+fixture-backed and visibly say
 `FIXTURE PREVIEW`; background refresh, live widget content, CI/release
 pressure, and general distribution remain planned.
 
@@ -59,11 +61,12 @@ RepoGlance requests a short user code from its public GitHub App, keeps that
 code visible, and waits for an explicit **Copy code & open GitHub** tap. That
 action copies the code for pasting and opens GitHub's exact verification page
 in an Android Custom Tab; returning to RepoGlance leaves the code visible.
-The ViewModel polls no faster than GitHub's interval, honors slowdown and
-expiry responses, and stops immediately when sign-in is cancelled. The APK
-contains only the public client ID. Device-flow access and refresh tokens stay
-encrypted behind Android Keystore, including silent refresh rotation when
-GitHub issues expiring user tokens.
+Returning also wakes a paused pending check, which still rechecks GitHub's
+minimum interval before any request. The ViewModel honors slowdown and expiry
+responses and stops immediately when sign-in is cancelled. The APK contains
+only the public client ID. Device-flow access and refresh tokens stay encrypted
+behind Android Keystore, including silent refresh rotation when GitHub issues
+expiring user tokens.
 
 Current authentication has no callback-host dependency, embedded confidential
 client credential, browser-cookie reuse, or auth broker. Read-only permissions

@@ -12,6 +12,8 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 
 interface GitHubDeviceAuthorizationGateway {
@@ -207,16 +209,9 @@ class GitHubDeviceFlowPoller(
 ) {
     suspend fun awaitToken(authorization: GitHubDeviceAuthorization): GitHubUserToken {
         var intervalSeconds = authorization.intervalSeconds
+        var nextPollAt = clock.instant().plusMillis(secondsToMillis(intervalSeconds))
         while (true) {
-            val remainingMillis = Duration.between(clock.instant(), authorization.expiresAt).toMillis()
-            if (remainingMillis <= 0L) throw expiredCode()
-            val waitMillis = minOf(secondsToMillis(intervalSeconds), remainingMillis)
-            try {
-                wait(waitMillis)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            }
-            if (!clock.instant().isBefore(authorization.expiresAt)) throw expiredCode()
+            waitUntil(nextPollAt, authorization.expiresAt)
 
             when (val result = gateway.poll(authorization.deviceCode)) {
                 is DevicePollResult.Authorized -> return result.token
@@ -231,6 +226,24 @@ class GitHubDeviceFlowPoller(
                     intervalSeconds = maxOf(slowedInterval, requiredInterval)
                 }
             }
+            nextPollAt = clock.instant().plusMillis(secondsToMillis(intervalSeconds))
+        }
+    }
+
+    private suspend fun waitUntil(notBefore: Instant, expiresAt: Instant) {
+        while (true) {
+            val now = clock.instant()
+            if (!now.isBefore(expiresAt)) throw expiredCode()
+            val waitMillis = minOf(
+                Duration.between(now, notBefore).toMillis().coerceAtLeast(0L),
+                Duration.between(now, expiresAt).toMillis(),
+            )
+            if (waitMillis <= 0L) return
+            try {
+                wait(waitMillis)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            }
         }
     }
 
@@ -244,6 +257,18 @@ class GitHubDeviceFlowPoller(
 
     private companion object {
         const val SLOW_DOWN_INCREMENT_SECONDS = 5L
+    }
+}
+
+class DeviceFlowPollWakeSignal {
+    private val wakeups = Channel<Unit>(Channel.CONFLATED)
+
+    fun wake() {
+        wakeups.trySend(Unit)
+    }
+
+    suspend fun await(timeoutMillis: Long) {
+        withTimeoutOrNull(timeoutMillis) { wakeups.receive() }
     }
 }
 

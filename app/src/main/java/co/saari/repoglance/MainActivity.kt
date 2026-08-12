@@ -95,6 +95,13 @@ class MainActivity : ComponentActivity() {
         handleFixtureIntent(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::liveModel.isInitialized) {
+            liveModel.resumeGitHubAuthorization()
+        }
+    }
+
     private fun openGitHubVerification(verificationUri: String) {
         CustomTabsIntent.Builder().setShowTitle(true).build()
             .launchUrl(this, Uri.parse(verificationUri))

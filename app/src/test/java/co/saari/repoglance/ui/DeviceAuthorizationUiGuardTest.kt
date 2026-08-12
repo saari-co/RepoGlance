@@ -74,6 +74,41 @@ class DeviceAuthorizationUiGuardTest {
         )
     }
 
+    @Test
+    fun returningFromGitHubWakesThePendingAuthorizationPoll() {
+        val root = repositoryRoot()
+        val activitySource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/MainActivity.kt"),
+        )
+        val viewModelSource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt"),
+        )
+        val pollerSource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/auth/GitHubDeviceFlowClient.kt"),
+        )
+
+        val onResume = activitySource.substringAfter("override fun onResume()")
+            .substringBefore("private fun openGitHubVerification")
+        assertTrue(onResume.contains("liveModel.resumeGitHubAuthorization()"))
+
+        val resumeAuthorization = viewModelSource.substringAfter("fun resumeGitHubAuthorization()")
+            .substringBefore("fun refreshCatalog()")
+        assertTrue(resumeAuthorization.contains("LiveUiState.AwaitingDeviceAuthorization"))
+        assertTrue(resumeAuthorization.contains("authorizationJob?.isActive == true"))
+        assertTrue(resumeAuthorization.contains("deviceFlowPollWakeSignal.wake()"))
+
+        val poller = pollerSource.substringAfter("class GitHubDeviceFlowPoller(")
+            .substringBefore("class AuthorizationCommitGate")
+        assertTrue(
+            "Every early resume wake must recheck the minimum polling instant",
+            poller.contains("waitUntil(nextPollAt, authorization.expiresAt)"),
+        )
+        assertTrue(
+            "The next request must be scheduled from the prior request completion",
+            poller.contains("nextPollAt = clock.instant().plusMillis(secondsToMillis(intervalSeconds))"),
+        )
+    }
+
     private fun repositoryRoot(): Path = generateSequence(Paths.get("").toAbsolutePath()) { it.parent }
         .firstOrNull { Files.exists(it.resolve("settings.gradle.kts")) }
         ?: error("Could not find repository root")

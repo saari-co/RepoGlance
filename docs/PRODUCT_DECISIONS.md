@@ -42,7 +42,10 @@ on the earlier web-flow checkpoint. The current branch replaces that flow with
 a public-client device flow; an operator-approved Codex browser action enabled
 only Device Flow on 2026-08-12. A Fold attempt on the pre-UX-repair device-flow
 head was rejected before authorization because the verification page opened
-automatically and the code had no copy action. No new live-device sign-in or
-install proof is claimed; an exact-head Fold run remains required.
+automatically and the code had no copy action. On the corrected UX head, GitHub
+accepted the copied code and displayed its connected confirmation, but
+RepoGlance remained on the waiting screen after return. That proves the handoff,
+not token receipt, session persistence, or live data; an exact-head Fold rerun
+of the lifecycle repair remains required.
 The canonical ledger status remains unchanged until the next GrillTrack
 reconciliation.

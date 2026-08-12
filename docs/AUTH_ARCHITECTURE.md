@@ -10,8 +10,11 @@ device authorization flow, which needs only the app's public client ID:
    exact GitHub verification page in an Android Custom Tab. Returning from the
    tab leaves the code visible in RepoGlance.
 3. A ViewModel-scoped coroutine waits for GitHub's minimum interval before
-   each token request, adds GitHub's slowdown interval, and stops on success,
-   expiry, local cancellation, or a terminal GitHub response.
+   each token request. Activity resume wakes a pending wait after the Custom
+   Tab may have paused or frozen background execution, but the poller rechecks
+   its absolute next-request deadline before every request. It adds GitHub's
+   slowdown interval and stops on success, expiry, local cancellation, or a
+   terminal GitHub response.
 4. The resulting GitHub App user token is encrypted with a non-exportable
    Android Keystore key and stored in the app's no-backup directory.
 
@@ -61,9 +64,12 @@ Android App Link callback.
 
 The earlier web-flow checkpoint has source-bound Fold proof. That proof does
 not transfer to the current device-flow source. A physical attempt on the
-pre-UX-repair device-flow head was stopped and rejected before authorization:
-the verification page opened automatically after the code appeared briefly,
-and the code had no copy action. That attempt is defect evidence, not auth or
-live-data proof. The current repair is supported by local unit/build/lint and
-static public-client/explicit-action checks only until an authorized exact-head
+pre-UX-repair head was stopped before authorization because the verification
+page opened automatically and the code had no copy action. On the corrected UX
+head `2a385e9cfc783c8d3215ad29c66a3aa04e6325df`, the Fold showed the persistent
+code and explicit copy/open action, and GitHub accepted the code and displayed
+its connected confirmation. Returning to RepoGlance left the app on the active
+waiting screen, so token receipt, session persistence, and live data were not
+proved. The current resume-wake repair is supported by local unit/build/lint
+and static public-client/lifecycle checks only until an authorized exact-head
 Fold install/sign-in proof lane reruns.

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import co.saari.repoglance.auth.AuthorizationCommitGate
+import co.saari.repoglance.auth.DeviceFlowPollWakeSignal
 import co.saari.repoglance.auth.GitHubAuthConfig
 import co.saari.repoglance.auth.GitHubAuthException
 import co.saari.repoglance.auth.GitHubDeviceFlowClient
@@ -41,7 +42,11 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         tokenStore = SecureTokenStore(application),
         deviceFlowClient = deviceFlowClient,
     )
-    private val deviceFlowPoller = GitHubDeviceFlowPoller(deviceFlowClient)
+    private val deviceFlowPollWakeSignal = DeviceFlowPollWakeSignal()
+    private val deviceFlowPoller = GitHubDeviceFlowPoller(
+        gateway = deviceFlowClient,
+        wait = deviceFlowPollWakeSignal::await,
+    )
     private val authorizationCommitGate = AuthorizationCommitGate()
     private val apiClient = GitHubApiClient(session)
     private val catalogGeneration = AtomicInteger(0)
@@ -109,6 +114,15 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         authorizationJob = null
         authorizationCommitGate.invalidate(session::signOut)
         liveState.value = LiveUiState.SignedOut
+    }
+
+    fun resumeGitHubAuthorization() {
+        if (
+            liveState.value is LiveUiState.AwaitingDeviceAuthorization &&
+            authorizationJob?.isActive == true
+        ) {
+            deviceFlowPollWakeSignal.wake()
+        }
     }
 
     fun refreshCatalog() {
