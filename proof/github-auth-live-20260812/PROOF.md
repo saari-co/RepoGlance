@@ -106,6 +106,18 @@ On the registered Pixel 10 Pro Fold:
 7. The app showed no matching open issues and live open PRs #2 and #4 plus
    draft PR #3, matching GitHub at the time of capture.
 
+## Publication loop
+
+- Pushed branch: `codex/github-app-auth-live-20260812`
+- Draft PR: https://github.com/saari-co/RepoGlance/pull/5
+- Review base: `codex/slice2-glance-fixture-ui-20260729` (PR #4)
+
+After PR #5 was created, RepoGlance refreshed the live `saari-co/RepoGlance`
+repository on the Fold. The app rendered `#5 Add configurable widgets, Fold
+shell, and live GitHub data` with its Draft badge and fresh GitHub rate-limit
+state. This proves the published PR round trip through RepoGlance's own live
+read path.
+
 No browser callback URL, authorization code, token, private repository
 inventory, auth log, screenshot, or UI XML is committed in this packet.
 
