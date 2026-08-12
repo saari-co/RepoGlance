@@ -63,6 +63,22 @@ class GitHubSessionTest {
     }
 
     @Test
+    fun deviceTokenPersistenceFailureIsClearedAndReportedWithoutRawDetail() {
+        val store = FailingWriteTokenStore()
+
+        val failure = assertThrows(GitHubAuthException::class.java) {
+            session(store, HttpTransport { error("unused") }).acceptDeviceToken(
+                token("sensitive-access", "sensitive-refresh", now.plusSeconds(3600), now.plusSeconds(7200)),
+            )
+        }
+
+        assertTrue(failure.needsNewSignIn)
+        assertTrue(failure.message.orEmpty().contains("couldn't save the session"))
+        assertFalse(failure.message.orEmpty().contains("sensitive"))
+        assertTrue(store.cleared)
+    }
+
+    @Test
     fun invalidRefreshRequiresNewSignInWithoutReflectingServerDescription() {
         val store = FakeTokenStore(token("old", "refresh", now.minusSeconds(1), now.plusSeconds(7200)))
         val transport = HttpTransport {
@@ -99,6 +115,18 @@ class GitHubSessionTest {
         }
         override fun clear() {
             value = null
+        }
+    }
+
+    private class FailingWriteTokenStore : TokenStore {
+        var cleared = false
+
+        override fun read(): GitHubUserToken? = null
+        override fun write(token: GitHubUserToken) {
+            throw java.io.IOException("sensitive storage detail")
+        }
+        override fun clear() {
+            cleared = true
         }
     }
 }

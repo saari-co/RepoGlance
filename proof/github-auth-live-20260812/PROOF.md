@@ -17,6 +17,15 @@ access/refresh tokens without a confidential client credential. The
 authentication callback/App-Link source was removed because device flow does
 not return through the app.
 
+Transient transport I/O while checking authorization now remains pending only
+until local code expiry and always waits the current GitHub interval before
+retrying. Session persistence relies on `AtomicFile.finishWrite()` for its
+documented sync/close/commit instead of performing a redundant raw descriptor
+sync first. A persistence exception clears partial local state and becomes a
+fixed user-facing message that authorization succeeded but the device could not
+save the session. No token, response body, exception message, exception class,
+or cause is logged or reflected.
+
 The repair also promotes repository-content 401 responses to local session
 invalidation and **Reconnect GitHub**, updates visible age labels once per
 minute only while the UI lifecycle is resumed, refreshes them immediately on
@@ -30,18 +39,20 @@ resume, and marks every persistent fixture widget surface `FIXTURE PREVIEW`.
   `9da86ce0a970624af05feeab0f0cc1efe53a1cbe`
 - Browser-resume polling repair starting head:
   `2a385e9cfc783c8d3215ad29c66a3aa04e6325df`
+- Poll-I/O/session-persistence repair starting head:
+  `b3d8b2f8aa903c1f0574ffb206f0f397b2a72502`
 - Repair starting head: `fbb78927d3579294c0652f41e6f39b02825fa2a5`
 - Stacked review base: `5c0a0d660b5332f40b3ccb1fbf21dd63e755f3ef`
 - Secret-free clean command:
   `ANDROID_HOME=/Users/bobbybones/Library/Android/sdk ./gradlew --no-daemon clean testDebugUnitTest assembleDebug lintDebug`
 - Gradle result: `BUILD SUCCESSFUL` (54 tasks executed)
-- JVM tests: 153 tests, 0 failures, 0 errors, 0 skipped
+- JVM tests: 158 tests, 0 failures, 0 errors, 0 skipped
 - Lint: 0 errors, 18 warnings, 3 informational findings
 - Debug APK: 60,886,928 bytes
 - Debug APK SHA-256:
-  `edd5269d1d139887e37dfc34db4956dca36b3fdb2ac4f06a3dcc3d6c47a37a65`
-- `git diff --check`: clean for the complete lifecycle repair tree before
-  commit
+  `8e20f59718d2a45aaa13aafe58f5bea624b84f50b7bbe382580605acd46e9473`
+- `git diff --check`: clean for the complete poll/persistence repair tree
+  before commit
 - Post-commit proof-asset placement: pass, with 0 candidate media files, 0
   required fixes, and 0 explicit exceptions
 
@@ -59,6 +70,13 @@ cancellation, refresh, session-invalidation, lifecycle freshness, and
 widget-label checks. A focused read-only follow-up review verified that
 cancellation and sign-out cannot persist a late device-flow result or allow an
 older flow to overwrite a newer one.
+
+The poll/persistence regression lane fault-injects a transport `IOException`
+and proves the app discards its message/cause, waits the required interval, can
+later accept an authorized result, and stops retrying at local expiry. A failing
+token store proves partial state is cleared and the fixed persistence message
+contains neither injected storage detail nor token text. The static store guard
+requires atomic finish/fail handling and rejects a redundant descriptor sync.
 
 A maintainer first attempted the pre-UX-repair build at
 `9da86ce0a970624af05feeab0f0cc1efe53a1cbe` on the registered Pixel 10 Pro
@@ -82,6 +100,30 @@ The current source repair adds that wake-up without creating another poll loop
 or relaxing GitHub's interval. This source lane did not perform a device action,
 sign in, rotate a token, deploy, push, comment, or merge. An authorized
 exact-head Fold install/sign-in proof run must be performed again.
+
+The maintainer next exercised the resume-wake build at
+`b3d8b2f8aa903c1f0574ffb206f0f397b2a72502` on the Fold. In a source-blind
+attempt, GitHub again accepted the device code for **RepoGlance by Saari** and
+reached the exact `/login/device/success` confirmation. Returning to
+`MainActivity` woke the poll and RepoGlance left the awaiting screen, but then
+rendered **RepoGlance could not refresh**, **Could not start GitHub sign-in
+right now**, and **Reconnect GitHub**. There was no saved session. This proves
+the resume signal reached the authorization job and localizes the failure to a
+poll/parse/persist step before catalog loading, but it does not reveal the exact
+exception and no auth logs or credentials were inspected.
+
+Source inspection found no unsupported Fold/API call: the device is above the
+app's API 31 minimum, lint is clean of API errors, and Android Keystore
+AES-256-GCM is supported. Two safe failure classes remain consistent with the
+evidence: transient URL-connection I/O while polling, or an exception while
+persisting the authorized token. The store contained a redundant raw
+`FileDescriptor.sync()` immediately before Android's `AtomicFile.finishWrite()`,
+which already performs sync/close/commit. The current repair removes that
+extra failure point, retries only poll `IOException` at the existing bounded
+schedule, and converts any token-store exception into a fixed sanitized
+persistence failure after clearing partial state. It does not claim which
+unobserved exception occurred on the Fold. An authorized exact-head rerun must
+still prove token receipt, encrypted persistence, and live catalog loading.
 After the source repair began, an operator-approved Codex browser action
 changed only **Device Flow** for the RepoGlance GitHub App and verified GitHub's
 successful-update confirmation and checked state. There was no credential/auth

@@ -27,9 +27,11 @@ checkpoint was exercised on the maintainer's Pixel 10 Pro Fold; the current
 public-client device-flow repair is source- and JVM-verified only. Fold attempts
 found and rejected an automatic browser launch, then proved the corrected
 copy/open handoff and GitHub's connected confirmation but exposed a missing
-resume wake-up when RepoGlance stayed on its waiting screen. The current
-lifecycle repair still needs an exact-head Fold rerun. Widgets remain
-fixture-backed and visibly say
+resume wake-up when RepoGlance stayed on its waiting screen. The resume repair
+woke the check, but the Fold then surfaced a generic pre-session failure. The
+current repair handles bounded polling I/O and session persistence explicitly;
+it still needs an exact-head Fold rerun. Widgets remain fixture-backed and
+visibly say
 `FIXTURE PREVIEW`; background refresh, live widget content, CI/release
 pressure, and general distribution remain planned.
 
@@ -63,10 +65,12 @@ action copies the code for pasting and opens GitHub's exact verification page
 in an Android Custom Tab; returning to RepoGlance leaves the code visible.
 Returning also wakes a paused pending check, which still rechecks GitHub's
 minimum interval before any request. The ViewModel honors slowdown and expiry
-responses and stops immediately when sign-in is cancelled. The APK contains
-only the public client ID. Device-flow access and refresh tokens stay encrypted
-behind Android Keystore, including silent refresh rotation when GitHub issues
-expiring user tokens.
+responses, retries transient poll I/O only until code expiry, and stops
+immediately when sign-in is cancelled. Authorized tokens are committed with
+Android's atomic-file sync and encrypted behind Android Keystore; a save failure
+is cleared and reported without exposing its exception or token. The APK
+contains only the public client ID, including for silent refresh rotation when
+GitHub issues expiring user tokens.
 
 Current authentication has no callback-host dependency, embedded confidential
 client credential, browser-cookie reuse, or auth broker. Read-only permissions

@@ -13,10 +13,14 @@ device authorization flow, which needs only the app's public client ID:
    each token request. Activity resume wakes a pending wait after the Custom
    Tab may have paused or frozen background execution, but the poller rechecks
    its absolute next-request deadline before every request. It adds GitHub's
-   slowdown interval and stops on success, expiry, local cancellation, or a
-   terminal GitHub response.
+   slowdown interval, retries transient transport I/O at that same bounded
+   schedule, and stops on success, expiry, local cancellation, or a terminal
+   GitHub response.
 4. The resulting GitHub App user token is encrypted with a non-exportable
-   Android Keystore key and stored in the app's no-backup directory.
+   Android Keystore key and committed with Android's atomic-file durability in
+   the app's no-backup directory. A persistence failure clears partial local
+   state and becomes a fixed, phase-specific message; token values, response
+   bodies, exception messages, classes, and causes are not exposed.
 
 GitHub issues expiring user tokens by default. A device-flow token can be
 refreshed using the public client ID and refresh token without a confidential
@@ -70,6 +74,14 @@ head `2a385e9cfc783c8d3215ad29c66a3aa04e6325df`, the Fold showed the persistent
 code and explicit copy/open action, and GitHub accepted the code and displayed
 its connected confirmation. Returning to RepoGlance left the app on the active
 waiting screen, so token receipt, session persistence, and live data were not
-proved. The current resume-wake repair is supported by local unit/build/lint
-and static public-client/lifecycle checks only until an authorized exact-head
-Fold install/sign-in proof lane reruns.
+proved. On the resume-wake head `b3d8b2f8aa903c1f0574ffb206f0f397b2a72502`,
+returning woke the check and left the waiting state, but the app then displayed
+its generic sign-in failure and had no saved session. Source inspection cannot
+distinguish a transient poll `IOException` from a token-store exception without
+unsafe diagnostic detail. It did find one concrete redundant failure point:
+`FileDescriptor.sync()` immediately before `AtomicFile.finishWrite()`, even
+though the Android API already syncs, closes, and commits. The current repair
+removes that redundant raw sync, retries only transient polling I/O until local
+expiry, and maps token-store failures to a sanitized persistence phase. It is
+supported by local unit/build/lint and static public-client checks only until an
+authorized exact-head Fold install/sign-in proof lane reruns.

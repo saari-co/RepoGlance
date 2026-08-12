@@ -4,6 +4,7 @@ import co.saari.repoglance.data.HttpRequest
 import co.saari.repoglance.data.HttpResponse
 import co.saari.repoglance.data.HttpTransport
 import co.saari.repoglance.data.UrlConnectionTransport
+import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -19,6 +20,8 @@ import org.json.JSONObject
 interface GitHubDeviceAuthorizationGateway {
     fun poll(deviceCode: String): DevicePollResult
 }
+
+class TransientDevicePollException : Exception()
 
 sealed interface DevicePollResult {
     data class Authorized(val token: GitHubUserToken) : DevicePollResult
@@ -56,14 +59,18 @@ class GitHubDeviceFlowClient(
 
     override fun poll(deviceCode: String): DevicePollResult {
         require(deviceCode.isNotBlank()) { "GitHub device code is required" }
-        val response = post(
-            endpoint = TOKEN_ENDPOINT,
-            parameters = linkedMapOf(
-                "client_id" to config.clientId,
-                "device_code" to deviceCode,
-                "grant_type" to DEVICE_GRANT_TYPE,
-            ),
-        )
+        val response = try {
+            post(
+                endpoint = TOKEN_ENDPOINT,
+                parameters = linkedMapOf(
+                    "client_id" to config.clientId,
+                    "device_code" to deviceCode,
+                    "grant_type" to DEVICE_GRANT_TYPE,
+                ),
+            )
+        } catch (_: IOException) {
+            throw TransientDevicePollException()
+        }
         val json = response.jsonOrThrow("GitHub returned an unreadable sign-in response")
         return when (val error = json.optionalNonBlank("error")) {
             null -> {
@@ -213,18 +220,23 @@ class GitHubDeviceFlowPoller(
         while (true) {
             waitUntil(nextPollAt, authorization.expiresAt)
 
-            when (val result = gateway.poll(authorization.deviceCode)) {
-                is DevicePollResult.Authorized -> return result.token
-                DevicePollResult.Pending -> Unit
-                is DevicePollResult.SlowDown -> {
-                    val requiredInterval = result.intervalSeconds ?: 0L
-                    val slowedInterval = if (intervalSeconds > Long.MAX_VALUE - SLOW_DOWN_INCREMENT_SECONDS) {
-                        Long.MAX_VALUE
-                    } else {
-                        intervalSeconds + SLOW_DOWN_INCREMENT_SECONDS
+            try {
+                when (val result = gateway.poll(authorization.deviceCode)) {
+                    is DevicePollResult.Authorized -> return result.token
+                    DevicePollResult.Pending -> Unit
+                    is DevicePollResult.SlowDown -> {
+                        val requiredInterval = result.intervalSeconds ?: 0L
+                        val slowedInterval = if (intervalSeconds > Long.MAX_VALUE - SLOW_DOWN_INCREMENT_SECONDS) {
+                            Long.MAX_VALUE
+                        } else {
+                            intervalSeconds + SLOW_DOWN_INCREMENT_SECONDS
+                        }
+                        intervalSeconds = maxOf(slowedInterval, requiredInterval)
                     }
-                    intervalSeconds = maxOf(slowedInterval, requiredInterval)
                 }
+            } catch (_: TransientDevicePollException) {
+                // A bounded transport failure remains pending. The next request
+                // still waits for GitHub's current interval and local expiry.
             }
             nextPollAt = clock.instant().plusMillis(secondsToMillis(intervalSeconds))
         }
@@ -308,7 +320,20 @@ class GitHubSession(
 
     @Synchronized
     fun acceptDeviceToken(token: GitHubUserToken) {
-        tokenStore.write(token)
+        try {
+            tokenStore.write(token)
+        } catch (_: Exception) {
+            try {
+                tokenStore.clear()
+            } catch (_: Exception) {
+                // Preserve the fixed persistence failure below; never reflect
+                // storage exception details into the UI or auth state.
+            }
+            throw GitHubAuthException(
+                "GitHub authorized successfully, but this device couldn't save the session. Please try again.",
+                needsNewSignIn = true,
+            )
+        }
     }
 
     @Synchronized

@@ -109,6 +109,23 @@ class DeviceAuthorizationUiGuardTest {
         )
     }
 
+    @Test
+    fun tokenPersistenceUsesAtomicFileCommitWithoutRedundantDescriptorSync() {
+        val root = repositoryRoot()
+        val tokenStoreSource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/auth/SecureTokenStore.kt"),
+        )
+        val write = tokenStoreSource.substringAfter("override fun write(token: GitHubUserToken)")
+            .substringBefore("override fun clear()")
+
+        assertTrue(write.contains("tokenFile.finishWrite(stream)"))
+        assertTrue(write.contains("tokenFile.failWrite(stream)"))
+        assertFalse(
+            "AtomicFile.finishWrite already performs the durable sync",
+            write.contains(".fd.sync()"),
+        )
+    }
+
     private fun repositoryRoot(): Path = generateSequence(Paths.get("").toAbsolutePath()) { it.parent }
         .firstOrNull { Files.exists(it.resolve("settings.gradle.kts")) }
         ?: error("Could not find repository root")

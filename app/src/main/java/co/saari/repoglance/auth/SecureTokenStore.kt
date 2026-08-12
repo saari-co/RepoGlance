@@ -41,7 +41,6 @@ class SecureTokenStore(context: Context) : TokenStore {
         val stream = tokenFile.startWrite()
         try {
             stream.write(encrypted)
-            stream.fd.sync()
             tokenFile.finishWrite(stream)
         } catch (failure: Throwable) {
             tokenFile.failWrite(stream)

@@ -45,7 +45,9 @@ head was rejected before authorization because the verification page opened
 automatically and the code had no copy action. On the corrected UX head, GitHub
 accepted the copied code and displayed its connected confirmation, but
 RepoGlance remained on the waiting screen after return. That proves the handoff,
-not token receipt, session persistence, or live data; an exact-head Fold rerun
-of the lifecycle repair remains required.
+not token receipt, session persistence, or live data. The resume-wake head left
+the waiting state but then displayed a generic pre-session failure with no saved
+session. The current repair handles transient poll I/O and session persistence
+as separate sanitized phases; an exact-head Fold rerun remains required.
 The canonical ledger status remains unchanged until the next GrillTrack
 reconciliation.

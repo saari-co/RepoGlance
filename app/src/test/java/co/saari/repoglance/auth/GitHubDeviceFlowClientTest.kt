@@ -3,6 +3,7 @@ package co.saari.repoglance.auth
 import co.saari.repoglance.data.HttpRequest
 import co.saari.repoglance.data.HttpResponse
 import co.saari.repoglance.data.HttpTransport
+import java.io.IOException
 import java.net.URLDecoder
 import java.time.Clock
 import java.time.Instant
@@ -92,6 +93,18 @@ class GitHubDeviceFlowClientTest {
     }
 
     @Test
+    fun pollMapsOnlyTransportIoToASanitizedTransientFailure() {
+        val client = GitHubDeviceFlowClient(config(), HttpTransport { throw IOException("sensitive detail") }, clock)
+
+        val failure = assertThrows(TransientDevicePollException::class.java) {
+            client.poll("device-value")
+        }
+
+        assertNull(failure.message)
+        assertNull(failure.cause)
+    }
+
+    @Test
     fun refreshRotatesDeviceFlowTokenWithNoConfidentialParameter() {
         val transport = RecordingTransport(
             response(
@@ -177,6 +190,45 @@ class GitHubDeviceFlowClientTest {
         assertEquals("accepted", token.accessToken)
         assertEquals(listOf(5_000L, 5_000L, 12_000L), waits)
         assertEquals(3, gateway.pollCount)
+    }
+
+    @Test
+    fun pollerRetriesTransientTransportFailureAtTheRequiredInterval() = runBlocking {
+        val gateway = QueueGateway(
+            TransientDevicePollException(),
+            DevicePollResult.Authorized(nonExpiringToken("accepted")),
+        )
+        val waits = mutableListOf<Long>()
+        val authorization = authorization(expiresAt = now.plusSeconds(60), intervalSeconds = 5)
+        val poller = GitHubDeviceFlowPoller(gateway, clock) { millis ->
+            waits += millis
+            clock.advanceMillis(millis)
+        }
+
+        val token = poller.awaitToken(authorization)
+
+        assertEquals("accepted", token.accessToken)
+        assertEquals(listOf(5_000L, 5_000L), waits)
+        assertEquals(2, gateway.pollCount)
+    }
+
+    @Test
+    fun pollerStopsRetryingTransientTransportFailureAtLocalExpiry() = runBlocking {
+        val gateway = AlwaysTransientGateway()
+        val waits = mutableListOf<Long>()
+        val authorization = authorization(expiresAt = now.plusSeconds(10), intervalSeconds = 5)
+        val poller = GitHubDeviceFlowPoller(gateway, clock) { millis ->
+            waits += millis
+            clock.advanceMillis(millis)
+        }
+
+        val failure = assertThrows(GitHubAuthException::class.java) {
+            runBlocking { poller.awaitToken(authorization) }
+        }
+
+        assertTrue(failure.needsNewSignIn)
+        assertEquals(listOf(5_000L, 5_000L), waits)
+        assertEquals(1, gateway.pollCount)
     }
 
     @Test
@@ -342,13 +394,26 @@ class GitHubDeviceFlowClientTest {
         fun singleRequest(): HttpRequest = requests.single()
     }
 
-    private class QueueGateway(vararg results: DevicePollResult) : GitHubDeviceAuthorizationGateway {
+    private class QueueGateway(vararg results: Any) : GitHubDeviceAuthorizationGateway {
         private val queued = ArrayDeque(results.toList())
         var pollCount = 0
 
         override fun poll(deviceCode: String): DevicePollResult {
             pollCount += 1
-            return queued.removeFirst()
+            return when (val result = queued.removeFirst()) {
+                is TransientDevicePollException -> throw result
+                is DevicePollResult -> result
+                else -> error("Unsupported queued result")
+            }
+        }
+    }
+
+    private class AlwaysTransientGateway : GitHubDeviceAuthorizationGateway {
+        var pollCount = 0
+
+        override fun poll(deviceCode: String): DevicePollResult {
+            pollCount += 1
+            throw TransientDevicePollException()
         }
     }
 
