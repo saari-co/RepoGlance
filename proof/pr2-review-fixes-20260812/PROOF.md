@@ -127,6 +127,41 @@ ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
 
 This is review/repair cycle 1 of the explicitly authorized bounded slice.
 
+### Authorized Slice — Review/Repair Cycle 2
+
+Official OpenClaw reviewed exact PR head
+`039a0586dd4466c0cb46b34babef085b19655713` against immutable base
+`7c9789e8f4996f40912dc94fc516baf92ab41306` from a clean detached checkout.
+Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_182753_20720_00655f12/PROOF.md`
+in the x-api cockpit.
+
+The review reported three findings. Each was accepted as `required_fix`:
+
+1. `NavigatorList` now carries first-class `RateLimitBucket` state. Fixtures
+   cover exact, unknown, and exhausted/last-good navigator results.
+2. Navigator row lists and snapshot list maps now defensively snapshot their
+   inputs and expose unmodifiable collections, preventing caller-owned mutable
+   aliases from invalidating constructor checks.
+3. Known snapshots now reject an awaiting-my-review PR count larger than the
+   total open-PR count.
+
+Implementation commit: `8dd10bb9b93a7ea46820807165755b555639866c`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 87 unit tests, debug APK assembled
+```
+
+This is review/repair cycle 2 and reaches the automatic repair limit for the
+explicitly authorized slice. The next exact-head review is terminal for this
+route: a clean verdict may admit ClawSweeper; any accepted finding requires a
+new owner decision and no further automatic patch.
+
 ## Verification
 
 ```text
