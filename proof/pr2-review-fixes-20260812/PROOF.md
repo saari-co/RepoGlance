@@ -162,6 +162,37 @@ explicitly authorized slice. The next exact-head review is terminal for this
 route: a clean verdict may admit ClawSweeper; any accepted finding requires a
 new owner decision and no further automatic patch.
 
+## Owner-Authorized Nested-Label Repair Slice
+
+The terminal exact-head review on
+`2fbf381f8c1036e8596007af6c33ded2a5f20b9b` reported one accepted
+`required_fix`: `IssueRow` and `PrRow` retained caller-owned mutable `labels`
+aliases after the outer navigator collections had been snapshotted. Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_183611_23060_be5a4920/PROOF.md`
+in the x-api cockpit.
+
+Bobby explicitly authorized a new bounded repair slice for this one finding.
+Both row types now defensively snapshot label inputs, expose unmodifiable label
+views, and retain structural equality/hash behavior. Regression tests mutate
+the original label collections, attempt mutation through the exposed views,
+and verify the row data and hash remain unchanged.
+
+Implementation commit: `d1e3e16c3fe8654527cbcfdda4e8b265057afb9f`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 89 unit tests, debug APK assembled
+```
+
+The next exact-head OpenClaw review starts cycle 1 of this explicitly
+authorized one-finding slice. ClawSweeper remains gated on a terminal-clean
+result, green GitHub checks, passing proof-asset placement, and an unchanged
+PR head.
+
 ## Verification
 
 ```text
