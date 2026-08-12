@@ -63,6 +63,39 @@ This is repair cycle 2, the automatic repair limit for this source slice. The
 next exact-head autoreview may close clean; if it reports another finding, the
 route stops for adjudication instead of applying a third automatic patch.
 
+## Owner-Authorized Bounded Repair Slice
+
+On 2026-08-12, Bobby explicitly authorized a new bounded repair slice for the
+three findings preserved by the cycle-2 stop. This is not an automatic third
+cycle. The accepted `required_fix` findings and repairs are:
+
+1. Navigator fixture row construction now receives `NavigatorScope`. Repo
+   scope produces only the requested `RepoRef`; org scope produces only rows
+   owned by the requested login; account scope retains the cross-repo corpus.
+2. `RepoSnapshot` now rejects observation timestamps, push timestamps,
+   release metadata, and non-UNKNOWN CI state when `valueBasis` is UNKNOWN.
+   Rate-limit state remains intentionally independent and may be known.
+3. Display sanitization now replaces Unicode control characters, strips
+   Unicode format controls (including bidi overrides and isolates), and
+   normalizes all Unicode separator categories before secret-shape redaction.
+
+Implementation commit: `e1011ee867c16b7bcbdca479df5784a7fc122a81`
+
+Bounded-slice verification:
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 78 unit tests, debug APK assembled
+```
+
+The next review must bind the immutable base to the exact PR head after this
+proof update. ClawSweeper remains gated on a terminal-clean OpenClaw result,
+green GitHub checks, and an unchanged PR head.
+
 ## Verification
 
 ```text
