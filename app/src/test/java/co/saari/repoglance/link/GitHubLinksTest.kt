@@ -85,11 +85,15 @@ class GitHubLinksTest {
     }
 
     @Test
-    fun repoNameDotDotIsRejectedAtLinkLayerEvenThoughNamePatternAllowsIt() {
-        // RepoRef's name charset permits a bare "..", so construction alone
-        // does not catch this — GitHubLinks' belt-and-braces check must.
-        val dotDotRef = RepoRef("saari-co", "..")
-        assertThrows(IllegalArgumentException::class.java) { GitHubLinks.repo(dotDotRef) }
+    fun exactDotSegmentRepoNamesAreRejected() {
+        assertThrows(IllegalArgumentException::class.java) { RepoRef("saari-co", ".") }
+        assertThrows(IllegalArgumentException::class.java) { RepoRef("saari-co", "..") }
+    }
+
+    @Test
+    fun consecutiveDotsInsideRepoNameRemainNavigable() {
+        val valid = RepoRef("saari-co", "foo..bar")
+        assertEquals("https://github.com/saari-co/foo..bar", GitHubLinks.repo(valid))
     }
 
     @Test

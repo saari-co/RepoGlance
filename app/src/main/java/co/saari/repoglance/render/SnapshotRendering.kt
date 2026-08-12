@@ -43,7 +43,8 @@ object SnapshotRendering {
         RateLimitBucket.OK, RateLimitBucket.UNKNOWN -> null
     }
 
-    fun releaseLabel(release: ReleaseInfo?, now: Instant): String {
+    fun releaseLabel(release: ReleaseInfo?, basis: ValueBasis, now: Instant): String {
+        if (basis == ValueBasis.UNKNOWN) return "Latest release: unknown"
         if (release == null) return "No releases"
         return "${release.tag} · ${Ages.format(release.publishedAt, now)}"
     }

@@ -3,6 +3,7 @@ package co.saari.repoglance.model
 import java.time.Instant
 
 data class PrRow(
+    val repo: RepoRef,
     val number: Int,
     val title: String,
     val state: String, // "open" | "closed"

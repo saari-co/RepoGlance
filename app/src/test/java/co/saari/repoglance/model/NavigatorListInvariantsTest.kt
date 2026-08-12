@@ -12,6 +12,7 @@ class NavigatorListInvariantsTest {
     private val populatedRows = NavigatorRows.Issues(
         listOf(
             IssueRow(
+                repo = RepoRef("saari-co", "RepoGlance"),
                 number = 1,
                 title = "Issue",
                 state = "open",

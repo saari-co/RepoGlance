@@ -30,6 +30,11 @@ object Fixtures {
 
     private const val YOU = "octodev"
     private val CAST = listOf("octodev", "mkraft", "jrivera", "tstone")
+    private val ROW_REPOS = listOf(
+        RepoRef("saari-co", "RepoGlance"),
+        RepoRef("dinkuskit", "blocks"),
+        RepoRef("acme", "rocket"),
+    )
 
     private val LABEL_POOL = listOf(
         "bug", "enhancement", "ci", "docs", "question", "good-first-issue", "triage",
@@ -326,6 +331,7 @@ object Fixtures {
     private fun buildIssueRows(filter: NavigatorFilter, count: Int, now: Instant): List<IssueRow> =
         (0 until count).map { i ->
             IssueRow(
+                repo = ROW_REPOS[i % ROW_REPOS.size],
                 number = 100 + i,
                 title = rowTitle(filter, i),
                 state = if (filter == NavigatorFilter.OPEN) "open"
@@ -341,6 +347,7 @@ object Fixtures {
     private fun buildPrRows(filter: NavigatorFilter, count: Int, now: Instant): List<PrRow> =
         (0 until count).map { i ->
             PrRow(
+                repo = ROW_REPOS[i % ROW_REPOS.size],
                 number = 200 + i,
                 title = rowTitle(filter, i),
                 state = if (

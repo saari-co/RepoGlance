@@ -42,6 +42,27 @@ base/head tuple and reported five actionable findings.
 No finding was rejected, deferred, or routed to a human gate. This is repair
 cycle 1 for the PR #2 source slice.
 
+## Repair Cycle 2
+
+The exact-head cycle-1 rerun reported four additional actionable findings.
+All four were accepted as `required_fix`:
+
+1. Navigator issue and PR rows now carry `RepoRef`, so account- and org-wide
+   rows with identical issue numbers retain repository identity and can build
+   correct GitHub deep links. Fixtures span multiple repos and tests exercise
+   row-derived links.
+2. Release rendering now receives `ValueBasis`; a null release under UNKNOWN
+   renders `Latest release: unknown`, while a null release under an exact basis
+   remains the known-empty `No releases` state.
+3. Authorization redaction now consumes both scheme and credential for generic
+   two-token headers, covering Basic, Token, Bearer, and equivalent shapes.
+4. `RepoRef` rejects only exact `.` and `..` repo-name segments. Valid names
+   containing consecutive dots, such as `foo..bar`, remain navigable.
+
+This is repair cycle 2, the automatic repair limit for this source slice. The
+next exact-head autoreview may close clean; if it reports another finding, the
+route stops for adjudication instead of applying a third automatic patch.
+
 ## Verification
 
 ```text
@@ -50,7 +71,7 @@ git diff --check
 
 ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
   ./gradlew testDebugUnitTest assembleDebug
-  PASS — BUILD SUCCESSFUL, 69 unit tests, debug APK assembled
+  PASS — BUILD SUCCESSFUL, 73 unit tests, debug APK assembled
 ```
 
 The SDK path was supplied only as a process environment value. No

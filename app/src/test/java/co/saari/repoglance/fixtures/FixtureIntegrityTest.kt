@@ -1,5 +1,6 @@
 package co.saari.repoglance.fixtures
 
+import co.saari.repoglance.link.GitHubLinks
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.NavigatorFilter
@@ -129,6 +130,29 @@ class FixtureIntegrityTest {
             when (val rows = list.rows) {
                 is NavigatorRows.Issues -> assertTrue(rows.rows.all { it.state == "open" })
                 is NavigatorRows.Prs -> assertTrue(rows.rows.all { it.state == "open" })
+            }
+        }
+    }
+
+    @Test
+    fun accountNavigatorRowsCarryRepositoryIdentityForDeepLinks() {
+        for (mode in listOf(NavigatorMode.ISSUES, NavigatorMode.PRS)) {
+            val list = Fixtures.navigatorList(
+                scope = NavigatorScope.Account,
+                mode = mode,
+                filter = NavigatorFilter.OPEN,
+                state = ListState.LOADED,
+                now = now,
+            )
+            when (val rows = list.rows) {
+                is NavigatorRows.Issues -> {
+                    assertTrue(rows.rows.map { it.repo }.toSet().size > 1)
+                    rows.rows.forEach { assertTrue(GitHubLinks.issue(it.repo, it.number).contains(it.repo.full)) }
+                }
+                is NavigatorRows.Prs -> {
+                    assertTrue(rows.rows.map { it.repo }.toSet().size > 1)
+                    rows.rows.forEach { assertTrue(GitHubLinks.pull(it.repo, it.number).contains(it.repo.full)) }
+                }
             }
         }
     }

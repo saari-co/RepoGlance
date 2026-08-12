@@ -52,6 +52,17 @@ class SanitizeTest {
     }
 
     @Test
+    fun redactsCredentialsAfterNonBearerAuthorizationSchemes() {
+        for (scheme in listOf("Basic", "Token")) {
+            val tail = "z".repeat(24)
+            val hostile = "Autho" + "rization: " + scheme + " " + tail
+            val result = Sanitize.displayText(hostile)
+            assertEquals(BULLET3, result)
+            assertFalse(result.contains(tail))
+        }
+    }
+
+    @Test
     fun redactsBearerShape() {
         val tail = "x".repeat(20)
         val hostile = "Bear" + "er " + tail

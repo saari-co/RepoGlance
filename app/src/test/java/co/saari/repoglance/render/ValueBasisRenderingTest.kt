@@ -76,4 +76,16 @@ class ValueBasisRenderingTest {
             SnapshotRendering.pushedLabel(now.minus(Duration.ofMinutes(2)), now),
         )
     }
+
+    @Test
+    fun releaseLabelPreservesUnknownVersusKnownEmpty() {
+        assertEquals(
+            "Latest release: unknown",
+            SnapshotRendering.releaseLabel(null, ValueBasis.UNKNOWN, now),
+        )
+        assertEquals(
+            "No releases",
+            SnapshotRendering.releaseLabel(null, ValueBasis.EXACT, now),
+        )
+    }
 }
