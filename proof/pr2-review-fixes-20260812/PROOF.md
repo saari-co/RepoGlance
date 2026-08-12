@@ -96,6 +96,37 @@ The next review must bind the immutable base to the exact PR head after this
 proof update. ClawSweeper remains gated on a terminal-clean OpenClaw result,
 green GitHub checks, and an unchanged PR head.
 
+### Authorized Slice — Review/Repair Cycle 1
+
+Official OpenClaw reviewed exact PR head
+`80be65c8982be71418747481bfc5767a339c87b2` against immutable base
+`7c9789e8f4996f40912dc94fc516baf92ab41306`. Spark-2 remained on the
+previously recorded pre-review scanner blocker, so the verified local official
+helper ran from a clean detached checkout. Proof:
+`runs/official-autoreview-runs/official_autoreview_20260812_182345_19750_2a09a4c7/PROOF.md`
+in the x-api cockpit.
+
+The review reported three findings. Each was accepted as `required_fix`:
+
+1. UNKNOWN navigator lists now reject `hasMorePages = true`.
+2. Snapshot issue/PR list maps now require map keys to match each list's
+   filter and require the corresponding issue or PR row type.
+3. Release-label display now sanitizes the GitHub-sourced tag while leaving
+   the original `ReleaseInfo.tag` available to link construction.
+
+Implementation commit: `6ce64ff164f2b703c92a75ce79779e4eb54c520f`
+
+```text
+git diff --check
+  PASS
+
+ANDROID_HOME=/Users/bobbybones/Library/Android/sdk \
+  ./gradlew testDebugUnitTest assembleDebug
+  PASS — BUILD SUCCESSFUL, 82 unit tests, debug APK assembled
+```
+
+This is review/repair cycle 1 of the explicitly authorized bounded slice.
+
 ## Verification
 
 ```text
