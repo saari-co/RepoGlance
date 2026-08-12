@@ -190,7 +190,10 @@ private fun WideContent(snapshot: RepoSnapshot?, now: Instant) {
                 "  Issues " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis),
             style = TextStyle(color = GlanceTheme.colors.onBackground),
         )
-        Text(SnapshotRendering.releaseLabel(snapshot.latestRelease, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+        Text(
+            SnapshotRendering.releaseLabel(snapshot.latestRelease, snapshot.valueBasis, now),
+            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+        )
         Text(SnapshotRendering.pushedLabel(snapshot.pushedAt, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
         Text(Ages.updatedLabel(snapshot.observedAt, now), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
     }

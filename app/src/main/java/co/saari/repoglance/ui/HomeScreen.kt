@@ -232,7 +232,10 @@ private fun RepoCard(
                     " · Issues " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Text(SnapshotRendering.releaseLabel(snapshot.latestRelease, now), style = MaterialTheme.typography.bodySmall)
+            Text(
+                SnapshotRendering.releaseLabel(snapshot.latestRelease, snapshot.valueBasis, now),
+                style = MaterialTheme.typography.bodySmall,
+            )
             Text(SnapshotRendering.pushedLabel(snapshot.pushedAt, now), style = MaterialTheme.typography.bodySmall)
             Text(Ages.updatedLabel(snapshot.observedAt, now), style = MaterialTheme.typography.bodySmall)
         }
