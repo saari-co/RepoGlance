@@ -40,7 +40,9 @@ RepoGlance GitHub App, installed it for all repositories on `saariuslystoned`,
 `saari-co`, and `dinkuskit`, and completed the first live read-only Fold sign-in
 on the earlier web-flow checkpoint. The current branch replaces that flow with
 a public-client device flow; an operator-approved Codex browser action enabled
-only Device Flow on 2026-08-12, and no new live-device sign-in/install proof is
-claimed.
+only Device Flow on 2026-08-12. A Fold attempt on the pre-UX-repair device-flow
+head was rejected before authorization because the verification page opened
+automatically and the code had no copy action. No new live-device sign-in or
+install proof is claimed; an exact-head Fold run remains required.
 The canonical ledger status remains unchanged until the next GrillTrack
 reconciliation.

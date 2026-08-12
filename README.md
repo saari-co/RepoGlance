@@ -24,8 +24,10 @@ The prototype live-data slice on this branch adds user-present GitHub App
 device-flow sign-in, Keystore-backed rotating tokens, live repository
 discovery, and repo-scoped open issue/PR lists. The earlier confidential-flow
 checkpoint was exercised on the maintainer's Pixel 10 Pro Fold; the current
-public-client device-flow repair is source- and JVM-verified only and does not
-claim new device proof. Widgets remain fixture-backed and visibly say
+public-client device-flow repair is source- and JVM-verified only. A Fold
+attempt on the pre-UX-repair head was stopped before authorization because the
+browser opened automatically and the code had no copy action; exact-head Fold
+proof must be rerun. Widgets remain fixture-backed and visibly say
 `FIXTURE PREVIEW`; background refresh, live widget content, CI/release
 pressure, and general distribution remain planned.
 
@@ -54,7 +56,9 @@ pressure, and general distribution remain planned.
 ## Auth (prototype)
 
 RepoGlance requests a short user code from its public GitHub App, keeps that
-code visible, and opens GitHub's verification page in an Android Custom Tab.
+code visible, and waits for an explicit **Copy code & open GitHub** tap. That
+action copies the code for pasting and opens GitHub's exact verification page
+in an Android Custom Tab; returning to RepoGlance leaves the code visible.
 The ViewModel polls no faster than GitHub's interval, honors slowdown and
 expiry responses, and stops immediately when sign-in is cancelled. The APK
 contains only the public client ID. Device-flow access and refresh tokens stay

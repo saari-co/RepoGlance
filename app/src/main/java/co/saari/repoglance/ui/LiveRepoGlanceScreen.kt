@@ -44,7 +44,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,7 +77,7 @@ fun LiveRepoGlanceScreen(
     contentState: ContentUiState,
     connectionReady: Boolean,
     onConnectGitHub: () -> Unit,
-    onOpenGitHubVerification: (String) -> Unit,
+    onCopyCodeAndOpenGitHub: (String, String) -> Unit,
     onCancelGitHubAuthorization: () -> Unit,
     onRetry: () -> Unit,
     onSelectRepository: (LiveRepository) -> Unit,
@@ -95,7 +94,7 @@ fun LiveRepoGlanceScreen(
             userCode = state.userCode,
             verificationUri = state.verificationUri,
             expiresAt = state.expiresAt,
-            onOpenGitHub = onOpenGitHubVerification,
+            onCopyCodeAndOpenGitHub = onCopyCodeAndOpenGitHub,
             onCancel = onCancelGitHubAuthorization,
         )
         LiveUiState.Connecting -> CenteredStatus("Securing your GitHub session…", showProgress = true)
@@ -136,14 +135,11 @@ private fun AwaitingGitHubScreen(
     userCode: String,
     verificationUri: String,
     expiresAt: Instant,
-    onOpenGitHub: (String) -> Unit,
+    onCopyCodeAndOpenGitHub: (String, String) -> Unit,
     onCancel: () -> Unit,
 ) {
     val now = rememberFreshnessNow()
     val minutesRemaining = ((Duration.between(now, expiresAt).seconds.coerceAtLeast(0L) + 59L) / 60L)
-    LaunchedEffect(verificationUri) {
-        onOpenGitHub(verificationUri)
-    }
     Box(
         modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
@@ -159,8 +155,17 @@ private fun AwaitingGitHubScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(16.dp))
-            Button(onClick = { onOpenGitHub(verificationUri) }, enabled = minutesRemaining > 0L) {
-                Text("Open GitHub")
+            Text(
+                "The button copies this code so you can paste it on GitHub.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            Button(
+                onClick = { onCopyCodeAndOpenGitHub(userCode, verificationUri) },
+                enabled = minutesRemaining > 0L,
+            ) {
+                Text("Copy code & open GitHub")
             }
             Spacer(Modifier.height(8.dp))
             Text("RepoGlance is waiting safely in this screen.", style = MaterialTheme.typography.bodySmall)

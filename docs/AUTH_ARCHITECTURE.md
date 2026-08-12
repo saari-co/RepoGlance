@@ -4,8 +4,11 @@ RepoGlance is a public Android client of a GitHub App. It uses GitHub's OAuth
 device authorization flow, which needs only the app's public client ID:
 
 1. RepoGlance posts the client ID to GitHub's device-code endpoint.
-2. The app keeps the returned user code visible and opens the exact GitHub
-   verification page in an Android Custom Tab.
+2. The app keeps the returned user code visible and does not open a browser
+   automatically. An explicit **Copy code & open GitHub** tap copies the code
+   for pasting, marks it sensitive on supported Android versions, and opens the
+   exact GitHub verification page in an Android Custom Tab. Returning from the
+   tab leaves the code visible in RepoGlance.
 3. A ViewModel-scoped coroutine waits for GitHub's minimum interval before
    each token request, adds GitHub's slowdown interval, and stops on success,
    expiry, local cancellation, or a terminal GitHub response.
@@ -57,6 +60,10 @@ No release-signing App Link fingerprint is needed because device flow has no
 Android App Link callback.
 
 The earlier web-flow checkpoint has source-bound Fold proof. That proof does
-not transfer to the current device-flow source. The current repair is supported
-by local unit/build/lint and static public-client checks only until a separate,
-authorized live-device sign-in/install proof lane runs.
+not transfer to the current device-flow source. A physical attempt on the
+pre-UX-repair device-flow head was stopped and rejected before authorization:
+the verification page opened automatically after the code appeared briefly,
+and the code had no copy action. That attempt is defect evidence, not auth or
+live-data proof. The current repair is supported by local unit/build/lint and
+static public-client/explicit-action checks only until an authorized exact-head
+Fold install/sign-in proof lane reruns.

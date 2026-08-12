@@ -1,8 +1,14 @@
 package co.saari.repoglance
 
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -67,7 +73,7 @@ class MainActivity : ComponentActivity() {
                             contentState = liveModel.repositoryContent.value,
                             connectionReady = liveModel.deviceFlowReady,
                             onConnectGitHub = liveModel::beginGitHubAuthorization,
-                            onOpenGitHubVerification = ::openGitHubVerification,
+                            onCopyCodeAndOpenGitHub = ::copyCodeAndOpenGitHub,
                             onCancelGitHubAuthorization = liveModel::cancelGitHubAuthorization,
                             onRetry = liveModel::refreshCatalog,
                             onSelectRepository = liveModel::selectRepository,
@@ -92,6 +98,19 @@ class MainActivity : ComponentActivity() {
     private fun openGitHubVerification(verificationUri: String) {
         CustomTabsIntent.Builder().setShowTitle(true).build()
             .launchUrl(this, Uri.parse(verificationUri))
+    }
+
+    private fun copyCodeAndOpenGitHub(userCode: String, verificationUri: String) {
+        val clipboard = getSystemService(ClipboardManager::class.java)
+        val clip = ClipData.newPlainText("GitHub device code", userCode)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            clip.description.extras = PersistableBundle().apply {
+                putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+            }
+        }
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "Code copied", Toast.LENGTH_SHORT).show()
+        openGitHubVerification(verificationUri)
     }
 
     private fun openInstallationSettings() {
