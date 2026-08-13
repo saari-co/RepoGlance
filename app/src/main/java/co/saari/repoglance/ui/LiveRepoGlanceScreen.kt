@@ -23,17 +23,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,7 +49,9 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,9 +91,20 @@ fun LiveRepoGlanceScreen(
     onSelectRepository: (LiveRepository) -> Unit,
     onBackToRepositories: () -> Unit,
     onRefreshRepository: () -> Unit,
-    onChooseRepositories: () -> Unit,
+    onManageGitHubAccess: () -> Unit,
     onSignOut: () -> Unit,
 ) {
+    var selectedOwner by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(state) {
+        when (state) {
+            LiveUiState.SignedOut -> selectedOwner = null
+            is LiveUiState.Ready -> {
+                selectedOwner = retainedRepositoryOwner(selectedOwner, state.catalog.repositories)
+            }
+            else -> Unit
+        }
+    }
+
     when (state) {
         LiveUiState.Checking -> CenteredStatus("Checking your GitHub session…")
         LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub)
@@ -113,10 +132,15 @@ fun LiveRepoGlanceScreen(
                     catalog = state.catalog,
                     observedAt = state.observedAt,
                     rateLimit = state.rateLimit,
+                    selectedOwner = retainedRepositoryOwner(selectedOwner, state.catalog.repositories),
+                    onSelectedOwnerChange = { selectedOwner = it },
                     onSelectRepository = onSelectRepository,
                     onRefresh = onRetry,
-                    onChooseRepositories = onChooseRepositories,
-                    onSignOut = onSignOut,
+                    onManageGitHubAccess = onManageGitHubAccess,
+                    onSignOut = {
+                        selectedOwner = null
+                        onSignOut()
+                    },
                 )
             } else {
                 LiveNavigator(
@@ -272,25 +296,30 @@ private fun LiveRepositoryHome(
     catalog: LiveRepositoryCatalog,
     observedAt: Instant,
     rateLimit: RateLimitSnapshot,
+    selectedOwner: String?,
+    onSelectedOwnerChange: (String?) -> Unit,
     onSelectRepository: (LiveRepository) -> Unit,
     onRefresh: () -> Unit,
-    onChooseRepositories: () -> Unit,
+    onManageGitHubAccess: () -> Unit,
     onSignOut: () -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var confirmSignOut by remember { mutableStateOf(false) }
-    val matchingRepositories = remember(catalog.repositories, query) {
-        catalog.repositories.filter { it.ref.full.contains(query.trim(), ignoreCase = true) }
+    var accountMenuExpanded by remember { mutableStateOf(false) }
+    var ownerMenuExpanded by remember { mutableStateOf(false) }
+    val ownerOptions = remember(catalog.repositories) { availableRepositoryOwners(catalog.repositories) }
+    val matchingRepositories = remember(catalog.repositories, selectedOwner, query) {
+        visibleRepositories(catalog.repositories, selectedOwner, query)
     }
     val now = rememberFreshnessNow()
 
     if (confirmSignOut) {
         AlertDialog(
             onDismissRequest = { confirmSignOut = false },
-            title = { Text("Disconnect GitHub?") },
+            title = { Text("Disconnect RepoGlance?") },
             text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
             confirmButton = {
-                TextButton(onClick = { confirmSignOut = false; onSignOut() }) { Text("Disconnect") }
+                TextButton(onClick = { confirmSignOut = false; onSignOut() }) { Text("Disconnect GitHub") }
             },
             dismissButton = {
                 TextButton(onClick = { confirmSignOut = false }) { Text("Cancel") }
@@ -298,22 +327,7 @@ private fun LiveRepositoryHome(
         )
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedButton(onClick = onChooseRepositories, modifier = Modifier.weight(1f)) {
-                        Text("Repositories")
-                    }
-                    TextButton(onClick = { confirmSignOut = true }) { Text("Disconnect") }
-                }
-            }
-        },
-    ) { padding ->
+    Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -338,6 +352,33 @@ private fun LiveRepositoryHome(
                             IconButton(onClick = onRefresh) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Refresh repositories")
                             }
+                            Box {
+                                IconButton(onClick = { accountMenuExpanded = true }) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = "Account and access settings",
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = accountMenuExpanded,
+                                    onDismissRequest = { accountMenuExpanded = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Manage GitHub access") },
+                                        onClick = {
+                                            accountMenuExpanded = false
+                                            onManageGitHubAccess()
+                                        },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Disconnect GitHub") },
+                                        onClick = {
+                                            accountMenuExpanded = false
+                                            confirmSignOut = true
+                                        },
+                                    )
+                                }
+                            }
                         }
                         val rateText = when (rateLimit.bucket) {
                             RateLimitBucket.OK -> rateLimit.remaining?.let { "GitHub rate limit: $it remaining" }
@@ -359,14 +400,56 @@ private fun LiveRepositoryHome(
                                 },
                             )
                         }
-                        OutlinedTextField(
-                            value = query,
-                            onValueChange = { query = it },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                            label = { Text("Find a repository") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        if (catalog.repositories.isNotEmpty()) {
+                            Spacer(Modifier.height(8.dp))
+                            ExposedDropdownMenuBox(
+                                expanded = ownerMenuExpanded,
+                                onExpandedChange = { ownerMenuExpanded = it },
+                            ) {
+                                TextField(
+                                    value = selectedOwner ?: "All",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Account or organization") },
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = ownerMenuExpanded)
+                                    },
+                                    modifier = Modifier
+                                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                        .fillMaxWidth(),
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = ownerMenuExpanded,
+                                    onDismissRequest = { ownerMenuExpanded = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("All") },
+                                        onClick = {
+                                            onSelectedOwnerChange(null)
+                                            ownerMenuExpanded = false
+                                        },
+                                    )
+                                    ownerOptions.forEach { owner ->
+                                        DropdownMenuItem(
+                                            text = { Text(owner) },
+                                            onClick = {
+                                                onSelectedOwnerChange(owner)
+                                                ownerMenuExpanded = false
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = query,
+                                onValueChange = { query = it },
+                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                                label = { Text("Find a repository") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             }
@@ -379,12 +462,25 @@ private fun LiveRepositoryHome(
                     ) {
                         Text("No repositories are shared with RepoGlance")
                         Spacer(Modifier.height(12.dp))
-                        Button(onClick = onChooseRepositories) { Text("Choose repositories on GitHub") }
+                        Button(onClick = onManageGitHubAccess) { Text("Choose repositories on GitHub") }
                     }
                 }
             } else {
                 if (matchingRepositories.isEmpty()) {
-                    item { Text("No repositories match", modifier = Modifier.padding(16.dp)) }
+                    item {
+                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Text("No repositories match")
+                            Spacer(Modifier.height(4.dp))
+                            TextButton(
+                                onClick = {
+                                    onSelectedOwnerChange(null)
+                                    query = ""
+                                },
+                            ) {
+                                Text("Clear filters")
+                            }
+                        }
+                    }
                 }
                 items(matchingRepositories, key = { it.id }) { repository ->
                     ElevatedCard(
@@ -419,6 +515,27 @@ private fun LiveRepositoryHome(
             }
         }
     }
+}
+
+internal fun availableRepositoryOwners(repositories: List<LiveRepository>): List<String> =
+    repositories
+        .map { it.ref.owner }
+        .distinctBy { it.lowercase() }
+        .sortedBy { it.lowercase() }
+
+internal fun visibleRepositories(
+    repositories: List<LiveRepository>,
+    selectedOwner: String?,
+    query: String,
+): List<LiveRepository> = repositories
+    .filter { selectedOwner == null || it.ref.owner.equals(selectedOwner, ignoreCase = true) }
+    .filter { it.ref.full.contains(query.trim(), ignoreCase = true) }
+
+internal fun retainedRepositoryOwner(
+    selectedOwner: String?,
+    repositories: List<LiveRepository>,
+): String? = selectedOwner?.let { owner ->
+    repositories.firstOrNull { it.ref.owner.equals(owner, ignoreCase = true) }?.ref?.owner
 }
 
 @Composable
