@@ -1,8 +1,3 @@
----
-title: RepoGlance Privacy Policy
-permalink: /privacy/
----
-
 # RepoGlance Privacy Policy
 
 Last updated: 2026-08-17
