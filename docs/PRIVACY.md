@@ -1,3 +1,8 @@
+---
+title: RepoGlance Privacy Policy
+permalink: /privacy/
+---
+
 # RepoGlance Privacy Policy
 
 Last updated: 2026-08-17
@@ -60,7 +65,7 @@ not directed at children.
 
 Questions about this policy can be raised by opening an issue at
 <https://github.com/saari-co/RepoGlance/issues>, or by emailing
-`TODO-CONTACT-EMAIL`.
+<smokyproductcompany@gmail.com>.
 
 ## Changes
 
