@@ -567,6 +567,15 @@
           "note": "maintainer, mid-cycle 2026-07-29: sync to phone over cp-1/WireGuard once scaffolded, 'same way we are syncing updates to the swarmpocket'; quoted pipeline recorded verbatim in rationale",
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-08-17T02:21:08+00:00",
+          "choice": "Maintainer delivery rides the proven SwarmPocket rail, generalized: merge an app change -> CI builds and publishes the APK to a rolling GitHub release -> cp-1 pulls it within 30 minutes -> the update banner appears on the phone over WireGuard -> one-tap install. The public rolling release doubles as the public sideload channel; the cp-1 puller and banner configuration stay swarm-side so the product keeps zero swarm dependency. First device install is one manual sideload (REQUEST_INSTALL_PACKAGES for self-update); release signing keystore and CI secrets are maintainer-gated.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "Play Store pivot (maintainer 2026-08-16): RepoGlance ships via the Play Store and versions via semver Git tags, so the SwarmPocket-style rolling-release / cp-1-puller / one-tap-banner rail is retired. Replaced by release-model-013 (tag-driven GitHub Releases + Play Store); implemented in PR #8; swarmpocket #29 and RepoGlance canary #3 closed as superseded.",
+          "to": "superseded",
+          "verification_ref": null
         }
       ],
       "id": "delivery-rail-012",
@@ -574,9 +583,42 @@
       "question": "How do merged app changes reach the maintainer's phone (and the public)?",
       "rationale": "Maintainer's stated pipeline: 'merge an app change -> CI builds and publishes to a rolling release -> cp-1 pulls it within 30 minutes -> the pink banner appears on your phone -> one tap'. Implementable only once the build lane produces an APK and CI exists.",
       "review_ref": null,
+      "status": "superseded",
+      "superseded_by": "release-model-013",
+      "updated_at": "2026-08-17T02:21:08+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": "pattern:openclaw tag-driven GitHub Releases",
+      "candidate_refs": [],
+      "choice": "Version RepoGlance with semver Git tags (OpenClaw-style vMAJOR.MINOR.PATCH plus -beta.N). Pushing a tag runs release.yml, which builds a signed AAB + APK and publishes a GitHub Release (APK + SHA256SUMS attached, curated changelog body); versionCode is derived monotonically from the tag. The per-push rolling canary is dropped -- releases are cut only on tags. The Play Store becomes the primary distribution and update channel for the maintainer's phone and the public, with the AAB uploaded to a Play internal track via a service account. Release signing (upload keystore) and CI/Play secrets are maintainer-gated.",
+      "context_ref": "github:saari-co/RepoGlance#8",
+      "created_at": "2026-08-17T02:21:08+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "public-mit-009"
+      ],
+      "domain": "public release posture",
+      "history": [
+        {
+          "at": "2026-08-17T02:21:08+00:00",
+          "choice": "Version RepoGlance with semver Git tags (OpenClaw-style vMAJOR.MINOR.PATCH plus -beta.N). Pushing a tag runs release.yml, which builds a signed AAB + APK and publishes a GitHub Release (APK + SHA256SUMS attached, curated changelog body); versionCode is derived monotonically from the tag. The per-push rolling canary is dropped -- releases are cut only on tags. The Play Store becomes the primary distribution and update channel for the maintainer's phone and the public, with the AAB uploaded to a Play internal track via a service account. Release signing (upload keystore) and CI/Play secrets are maintainer-gated.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "release-model-013",
+      "implementation_ref": null,
+      "question": "How do merged app changes reach the maintainer's phone and the public, now that RepoGlance is Play-Store-bound?",
+      "rationale": "Maintainer 2026-08-16: 'I plan to add repoglance to play store eventually so this is all pointless... let's just plan to version repoglance with GitHub tags similar to how OpenClaw keeps up with their versions.' Once the Play Store is the update channel, the in-house daemon-served self/companion update rail (swarmpocket #29, built on #28's self-update-over-tunnel) and the cp-1 rolling-release puller are vestigial. Implemented in PR #8; swarmpocket #29 and RepoGlance canary #3 closed as superseded.",
+      "review_ref": null,
       "status": "locked",
       "superseded_by": null,
-      "updated_at": "2026-07-29T12:10:13+00:00",
+      "updated_at": "2026-08-17T02:21:08+00:00",
       "verification_ref": null
     }
   ],
@@ -597,5 +639,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-07-29T12:10:13+00:00"
+  "updated_at": "2026-08-17T02:21:08+00:00"
 }
