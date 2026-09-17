@@ -24,8 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.ViewModelProvider
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
@@ -53,6 +56,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var liveModel: RepoGlanceViewModel
     private var refreshCatalogAfterGitHubAccess = false
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,7 +70,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             RepoGlanceTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    // Publishes Compose testTag values as accessibility resource ids so
+                    // source-blind on-device validators can address controls unambiguously.
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics { testTagsAsResourceId = true },
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val currentFixtureScope = fixtureNavigatorScope.value

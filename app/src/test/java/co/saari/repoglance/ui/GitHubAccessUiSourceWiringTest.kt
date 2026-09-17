@@ -8,6 +8,7 @@ import java.nio.file.Paths
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -193,6 +194,39 @@ class GitHubAccessUiSourceWiringTest {
             "Device-flow resume should still run before any access-management refresh",
             onResumeSource.indexOf("liveModel.resumeGitHubAuthorization()") <
                 onResumeSource.indexOf("liveModel.refreshCatalog()"),
+        )
+    }
+
+    @Test
+    fun composeRootPublishesTestTagsAsAccessibilityResourceIds() {
+        val root = repositoryRoot()
+        val activitySource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/MainActivity.kt"),
+        )
+
+        assertTrue(
+            "The Compose root must publish testTag values as accessibility resource ids, " +
+                "otherwise a source-blind on-device validator cannot address controls by tag",
+            activitySource.contains("testTagsAsResourceId = true"),
+        )
+    }
+
+    @Test
+    fun loadedRepositoryHomeGivesBothEditableControlsUniqueTestTags() {
+        val loadedHomeSource = loadedHomeSource()
+
+        assertTrue(
+            "The repository search field must carry a unique test tag",
+            loadedHomeSource.contains("testTag(REPO_SEARCH_TEST_TAG)"),
+        )
+        assertTrue(
+            "The owner filter must carry a unique test tag",
+            loadedHomeSource.contains("testTag(OWNER_FILTER_TEST_TAG)"),
+        )
+        assertNotEquals(
+            "The two editable controls on the loaded home must not share a tag",
+            REPO_SEARCH_TEST_TAG,
+            OWNER_FILTER_TEST_TAG,
         )
     }
 

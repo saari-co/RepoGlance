@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.ContentUiState
 import co.saari.repoglance.LiveUiState
@@ -291,6 +292,12 @@ private fun FailureScreen(
     }
 }
 
+/** Accessibility resource id for the repository search field on the loaded home. */
+internal const val REPO_SEARCH_TEST_TAG = "repoglance:repo-search"
+
+/** Accessibility resource id for the owner (account/organization) filter on the loaded home. */
+internal const val OWNER_FILTER_TEST_TAG = "repoglance:owner-filter"
+
 @Composable
 private fun LiveRepositoryHome(
     catalog: LiveRepositoryCatalog,
@@ -416,7 +423,8 @@ private fun LiveRepositoryHome(
                                     },
                                     modifier = Modifier
                                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                                        .fillMaxWidth(),
+                                        .fillMaxWidth()
+                                        .testTag(OWNER_FILTER_TEST_TAG),
                                 )
                                 ExposedDropdownMenu(
                                     expanded = ownerMenuExpanded,
@@ -447,7 +455,7 @@ private fun LiveRepositoryHome(
                                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                                 label = { Text("Find a repository") },
                                 singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().testTag(REPO_SEARCH_TEST_TAG),
                             )
                         }
                     }
