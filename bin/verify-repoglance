@@ -102,14 +102,14 @@ launch() {
   echo "$top"
 }
 
-# Pull the current UI tree to a temp file and refuse to keep it if it shows
-# the GitHub device-code screen (scripts/verify_redact_guard.py).
+# Stream the current UI tree from the device through the redaction guard in
+# memory (scripts/verify_redact_guard.py). No file exists on the phone or the
+# host until the guard has passed; on refusal nothing is written anywhere.
 pull_tree() {
-  local dest="$1"
-  adb shell uiautomator dump /sdcard/verify-ui.xml >/dev/null 2>&1
-  adb pull /sdcard/verify-ui.xml "$dest" >/dev/null 2>&1
-  adb shell rm -f /sdcard/verify-ui.xml >/dev/null 2>&1 || true
-  if ! python3 "$ROOT/scripts/verify_redact_guard.py" "$dest"; then rm -f "$dest"; return 1; fi
+  local dest="$1" tree
+  tree=$(adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py") || return 1
+  [ -n "$tree" ] || return 1
+  printf '%s\n' "$tree" > "$dest"
 }
 
 dump() {
@@ -135,8 +135,7 @@ capture() {
   local label="${1:-capture}"
   local screen; screen=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
   [ "$screen" = "Awake" ] || { echo "capture: screen is $screen, not Awake; wake and unlock the phone first" >&2; exit 1; }
-  pull_tree "$OUT/.precapture.xml" || { echo "capture: refused; the device-code screen is visible" >&2; exit 1; }
-  rm -f "$OUT/.precapture.xml"
+  adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py" >/dev/null || { echo "capture: refused; the device-code screen is visible" >&2; exit 1; }
   local display; display=$(python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" inventory | python3 -c "import json,sys; d=json.load(sys.stdin); a=[x for x in d['physical_displays'] if x['active'] and not x['virtual']]; print(a[0]['physical_display_id'] if len(a)==1 else '')")
   [ -n "$display" ] || { echo "capture: no single active physical display (is the phone folded mid-transition?)" >&2; exit 1; }
   python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" capture --physical-display-id "$display" \

@@ -230,3 +230,17 @@ Repair:
   held the unfiltered live catalog (`nav-NO_CI.*`, from a launch that landed
   on the live screen) was deleted from the local run directory under the
   same policy.
+
+## Review repair 3: screen before any artifact exists (2026-09-18)
+
+ClawSweeper on `cc5fe2a`: `required_fix` at P1, accepted. The first guard
+ran after `uiautomator dump` had written `/sdcard/verify-ui.xml` and `adb
+pull` had written the host file, so an interrupted run could still leave the
+device code on disk. Repair: `dump` and `capture` now stream the tree with
+`adb exec-out uiautomator dump /dev/tty` straight into
+`scripts/verify_redact_guard.py`, which reads stdin, never touches disk, and
+emits the XML only when safe; the helper writes a file only from that
+output. Probes: a synthetic device-code tree on stdin → exit 1 and zero
+bytes written; a safe tree → exit 0 and the XML; on the Fold, a `dump` of the
+signed-in catalog is allowed, `capture` runs the same screen first, and no
+`/sdcard/verify-ui.xml` exists on the device afterwards.
