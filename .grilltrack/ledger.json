@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-18T16:39:42+00:00",
-    "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
-    "started_at": "2026-09-18T16:09:26+00:00",
+    "confirmed_at": "2026-09-18T22:39:00+00:00",
+    "domain": "Checking splash: RepoGlance mark (magnifying glass, status-bar legible) and the motion shown while the session is unknown",
+    "started_at": "2026-09-18T22:24:04+00:00",
     "status": "inspected",
-    "summary": "session-bootstrap-016: hasSavedSession runs on a serial IO dispatcher from viewModelScope with Checking held until it answers; the sign-in failure catches take the same hop; SecureTokenStore file handle is lazy; every signOut file delete (cancel, sign-out, catalog 401, content 401) moves onto the same serial IO dispatcher; picker loads the persisted snapshot on IO before composing. Checking stays text-only; logo splash deferred as checking-splash-018. Proof: JVM tests, gradlew check, cold-start logcat on the Fold with zero app-frame StrictMode lines for live and picker."
+    "summary": "checking-splash-018: Checking renders the A+B commit-eye mark (single monochrome vector, also the future status-bar asset) with motion D ping rings, static under reduced motion; message stays, no spinner, no counts, no sign-in control; no notification or Quick Settings tile this cycle; sign-in feature map updated; device proof on the Fold."
   },
   "decisions": [
     {
@@ -1715,7 +1715,7 @@
     {
       "baseline_ref": null,
       "candidate_refs": [],
-      "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+      "choice": "Mark: A+B Commit eye hybrid (stroke magnifier; lens holds the GitHub-style almond eye whose pupil is a hollow commit node on a vertical commit line), the maintainer-requested replacement for round-1 five. Motion: D Ping (mark holds still while two rings pulse out of the lens; static under reduced motion). Checking canvas keeps the locked message, no spinner, no counts, no sign-in control.",
       "context": " Maintainer direction (2026-09-18): no logo exists yet; include a magnifying glass; low-key; must read well as the small status-bar/notification icon on Pixels; also want a Quick Settings tile (swipe-down bar) for quick access, which is a separate feature decision beyond the splash.",
       "context_ref": null,
       "created_at": "2026-09-18T16:33:20+00:00",
@@ -1739,26 +1739,82 @@
           "review_source_identity": null,
           "to": "deferred",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T22:24:04+00:00",
+          "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+          "from": "deferred",
+          "implementation_ref": null,
+          "note": "session-bootstrap-016 verified and merged (PR #16, main 12c5068); the maintainer asked for the logo splash; this cycle builds the debug picker for the mark then the motion",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T22:35:37+00:00",
+          "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T22:43:58+00:00",
+          "choice": "Mark: A+B Commit eye hybrid (stroke magnifier; lens holds the GitHub-style almond eye whose pupil is a hollow commit node on a vertical commit line), the maintainer-requested replacement for round-1 five. Motion: D Ping (mark holds still while two rings pulse out of the lens; static under reduced motion). Checking canvas keeps the locked message, no spinner, no counts, no sign-in control.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T22:43:58+00:00",
+          "choice": "Mark: A+B Commit eye hybrid (stroke magnifier; lens holds the GitHub-style almond eye whose pupil is a hollow commit node on a vertical commit line), the maintainer-requested replacement for round-1 five. Motion: D Ping (mark holds still while two rings pulse out of the lens; static under reduced motion). Checking canvas keeps the locked message, no spinner, no counts, no sign-in control.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/ui/brand/RepoGlanceMark.kt,file:app/src/main/res/drawable/ic_repoglance_mark.xml,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#CheckingScreen",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "checking-splash-018",
-      "implementation_ref": null,
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/ui/brand/RepoGlanceMark.kt,file:app/src/main/res/drawable/ic_repoglance_mark.xml,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#CheckingScreen",
       "question": "What does the live screen show while the GitHub session is unknown: the maintainer wants the RepoGlance logo with a fun animation and a clever hook",
-      "rationale": "",
+      "rationale": "Maintainer on the live picker: combine A and B so B reads as the commit glyph too; likes the hybrid; motion D Ping over A Sweep. Legible at 20dp alpha mask as a magnifier with a ringed centre.",
       "repair_required": false,
       "review_classifications": [],
       "review_history": [],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "deferred",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:21:26+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-18T22:43:58+00:00",
+      "verification_ref": "proof/checking-splash-20260918/PROOF.md"
     }
   ],
   "last_activation": {
-    "at": "2026-09-18T19:14:08+00:00",
+    "at": "2026-09-18T22:24:04+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
@@ -1773,16 +1829,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "launcher-prefs: move the debug ScenarioLaunchActivity's AppPrefs write off the main thread so launcher-driven cold starts log zero StrictMode lines for the verifier tier",
-      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness"
+      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread",
+      "widget-freshness: background refresh path for pinned repos"
     ],
-    "reason": "session-bootstrap-016 is verified on the Fold with zero main-thread session I/O; the maintainer asked for the logo splash during this grill and it is the only deferred decision with a stated preference",
-    "recommended": "checking-splash-018: the RepoGlance logo with a fun animation and a clever hook while the session is unknown; a five-candidate visual grill, and it first needs a logo asset (the manifest declares no icon today)",
-    "recorded_at": "2026-09-18T19:14:18+00:00"
+    "reason": "checking-splash-018 is implemented and verified on the Fold; the tile is the maintainer's only other stated preference and the mark asset now exists",
+    "recommended": "quick-settings-tile-019: a Quick Settings tile for quick access to RepoGlance (maintainer direction); decide tile action, label, and the mark as its icon",
+    "recorded_at": "2026-09-18T22:43:59+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T21:20:03+00:00"
+  "updated_at": "2026-09-18T22:43:59+00:00"
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -76,6 +77,7 @@ import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
+import co.saari.repoglance.ui.brand.CheckingMark
 import java.time.Duration
 import java.time.Instant
 
@@ -107,7 +109,7 @@ fun LiveRepoGlanceScreen(
     }
 
     when (state) {
-        LiveUiState.Checking -> CenteredStatus("Checking your GitHub session…")
+        LiveUiState.Checking -> CheckingScreen()
         LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub)
         LiveUiState.RequestingDeviceCode -> CenteredStatus("Starting GitHub sign-in…", showProgress = true)
         is LiveUiState.AwaitingDeviceAuthorization -> AwaitingGitHubScreen(
@@ -239,6 +241,24 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
                     color = MaterialTheme.colorScheme.tertiary,
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun CheckingScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CheckingMark(modifier = Modifier.size(96.dp).testTag("repoglance:checking-mark"))
+            Spacer(Modifier.height(20.dp))
+            Text(
+                "Checking your GitHub session…",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.testTag("repoglance:checking-message"),
+            )
         }
     }
 }
