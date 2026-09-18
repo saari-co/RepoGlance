@@ -1346,10 +1346,38 @@
           "review_source_identity": null,
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T14:28:22+00:00",
+          "choice": "Wide (600dp+): candidate C from round navigator-detail-round-1 \u2014 a row tap fills the in-app detail pane beside the list; a second tap on the highlighted row (or the pane's Open on GitHub) opens the item in the GitHub app in split view. Narrow (cover display): maintainer-requested hybrid \u2014 a row tap raises a modal detail sheet over the full-width list (D's sheet) instead of replacing the list; Open on GitHub in the sheet. Long-press on a row opens GitHub on both widths, unchanged. The narrow behaviour recorded by feature-map-015 (nav-row-narrow: detail replaces the list) is superseded by this decision and features/navigator.md is updated accordingly.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T14:28:22+00:00",
+          "choice": "Wide (600dp+): candidate C from round navigator-detail-round-1 \u2014 a row tap fills the in-app detail pane beside the list; a second tap on the highlighted row (or the pane's Open on GitHub) opens the item in the GitHub app in split view. Narrow (cover display): maintainer-requested hybrid \u2014 a row tap raises a modal detail sheet over the full-width list (D's sheet) instead of replacing the list; Open on GitHub in the sheet. Long-press on a row opens GitHub on both widths, unchanged. The narrow behaviour recorded by feature-map-015 (nav-row-narrow: detail replaces the list) is superseded by this decision and features/navigator.md is updated accordingly.",
+          "from": "implemented",
+          "implementation_ref": "git:baadf90240b8b7efed11b689df33a26eaa7dfaf7 NavigatorScreen wide pane + second tap, narrow sheet; debug navigator picker; features/navigator.md",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "navigator-detail-017",
-      "implementation_ref": null,
+      "implementation_ref": "git:baadf90240b8b7efed11b689df33a26eaa7dfaf7 NavigatorScreen wide pane + second tap, narrow sheet; debug navigator picker; features/navigator.md",
       "question": "On the wide (600dp+) navigator layout, what does a row tap do, given that today it hands off to the GitHub app and the in-app detail pane can never be filled?",
       "rationale": "Maintainer on the live picker (2026-09-18): keep long-hold for GitHub; an opened Fold should default to split view; B or C for wide, C gives more; likes D's slide-up sheet but wants it on the closed phone, where today the list is replaced. Hybrid previewed for confirmation as a replacement for the five, not a sixth option; scope widened to the narrow slot by explicit maintainer choice (\"both in this cycle\").",
       "repair_required": false,
@@ -1358,10 +1386,10 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "locked",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T14:05:24+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-18T14:28:22+00:00",
+      "verification_ref": "file:proof/navigator-detail-20260918/PROOF.md \u2014 check+assembleDebug green; navigator.md re-driven on inner display (pane fill 69549ab1\u2026, GitHub beside 010cc7d5\u2026) and cover display (sheet 878326a3\u2026, dismissed 6fb9d64a\u2026)"
     }
   ],
   "last_activation": {
@@ -1393,5 +1421,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T14:18:58+00:00"
+  "updated_at": "2026-09-18T14:28:22+00:00"
 }
