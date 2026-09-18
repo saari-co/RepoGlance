@@ -17,7 +17,6 @@ import co.saari.repoglance.data.GitHubApiResult
 import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
-import co.saari.repoglance.data.LiveRepositoryMetadata
 import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.data.sessionInvalidationFailure
@@ -173,9 +172,6 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             val content = withContext(Dispatchers.IO) {
                 apiClient.loadRepositoryContent(repository, catalog.viewer.login)
             }
-            val metadata = withContext(Dispatchers.IO) {
-                apiClient.loadRepositoryMetadata(repository)
-            }
             if (
                 requestGeneration != repositoryContentGeneration.get() ||
                 selectedRepository.value?.id != repository.id
@@ -194,7 +190,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
             } else {
                 repositoryContent.value = ContentUiState.Ready(content)
-                persistLiveSnapshot(repository, content, metadata)
+                persistLiveSnapshot(repository, content)
             }
         }
     }
@@ -207,22 +203,32 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private suspend fun persistLiveSnapshot(
         repository: LiveRepository,
         content: LiveRepositoryContent,
-        metadata: GitHubApiResult<LiveRepositoryMetadata>,
     ) {
         val context = getApplication<Application>()
-        val metadataSuccess = metadata as? GitHubApiResult.Success
+        val issues = (content.issues as? GitHubApiResult.Success)?.value
         val prSuccess = content.pullRequests as? GitHubApiResult.Success
-        val snapshot = LiveSnapshotFactory.build(
-            repository = repository,
-            metadata = metadataSuccess?.value,
-            issues = (content.issues as? GitHubApiResult.Success)?.value,
-            pullRequests = prSuccess?.value,
-            previous = LiveSnapshotStore.load(context, repository.ref),
-            // When the data was observed, not when it was written to disk.
-            observedAt = metadataSuccess?.observedAt ?: prSuccess?.observedAt ?: Instant.now(),
-            rateLimit = metadataSuccess?.rateLimit?.bucket ?: RateLimitBucket.UNKNOWN,
-        )
-        withContext(Dispatchers.IO) { LiveSnapshotStore.save(context, snapshot) }
+
+        withContext(Dispatchers.IO) {
+            // Only worth a request when the issues page was truncated; an
+            // untruncated page is already an exact count.
+            val metadata = if (issues == null || issues.hasMorePages) {
+                apiClient.loadRepositoryMetadata(repository) as? GitHubApiResult.Success
+            } else {
+                null
+            }
+            LiveSnapshotFactory.build(
+                repository = repository,
+                metadata = metadata?.value,
+                issues = issues,
+                pullRequests = prSuccess?.value,
+                previous = LiveSnapshotStore.load(context, repository.ref),
+                // When the data was observed, not when it was written to disk.
+                observedAt = metadata?.observedAt ?: prSuccess?.observedAt ?: Instant.now(),
+                rateLimit = metadata?.rateLimit?.bucket
+                    ?: prSuccess?.rateLimit?.bucket
+                    ?: RateLimitBucket.UNKNOWN,
+            ).also { LiveSnapshotStore.save(context, it) }
+        }
         WidgetRefresh.updateAll(context)
     }
 

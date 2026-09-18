@@ -110,6 +110,53 @@ class LiveSnapshotFactoryTest {
         assertEquals(co.saari.repoglance.model.CiState.UNKNOWN, snapshot.defaultBranchCi)
     }
 
+    @Test
+    fun anUntruncatedIssuesPageIsExactWithoutTheRepositoryCounter() {
+        // No metadata at all: the issues page already excludes pull requests,
+        // so an untruncated page is an exact count on its own.
+        val snapshot = LiveSnapshotFactory.build(
+            repository = repo,
+            metadata = null,
+            issues = LivePage(rows = listOf(issue(1), issue(2), issue(3)), hasMorePages = false),
+            pullRequests = page(listOf(pr(1, true))),
+            previous = null,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+
+        assertEquals(ValueBasis.EXACT, snapshot.valueBasis)
+        assertEquals(3, snapshot.openIssues)
+        assertEquals(1, snapshot.openPrs)
+    }
+
+    @Test
+    fun aTruncatedIssuesPageFallsBackToTheRepositoryCounter() {
+        val snapshot = LiveSnapshotFactory.build(
+            repository = repo,
+            metadata = LiveRepositoryMetadata(openIssuesAndPullRequests = 12, pushedAt = earlier),
+            issues = LivePage(rows = listOf(issue(1)), hasMorePages = true),
+            pullRequests = page(listOf(pr(1, false), pr(2, false), pr(3, false))),
+            previous = null,
+            observedAt = now,
+            rateLimit = RateLimitBucket.OK,
+        )
+
+        assertEquals(ValueBasis.EXACT, snapshot.valueBasis)
+        // Falls back to 12 - 3 = 9 rather than trusting the truncated page.
+        assertEquals(9, snapshot.openIssues)
+    }
+
+    private fun issue(number: Int): LiveIssue = LiveIssue(
+        number = number,
+        title = "Issue $number",
+        author = "someone",
+        assignee = null,
+        labels = emptyList(),
+        commentCount = null,
+        updatedAt = earlier,
+        htmlUrl = "https://github.com/saari-co/RepoGlance/issues/$number",
+    )
+
     private fun build(
         openIssuesAndPrs: Int?,
         prs: LivePage<LivePullRequest>?,

@@ -37,7 +37,7 @@ object LiveSnapshotFactory {
         observedAt: Instant,
         rateLimit: RateLimitBucket,
     ): RepoSnapshot {
-        val exact = exactCounts(metadata, pullRequests)
+        val exact = exactCounts(metadata, issues, pullRequests)
         if (exact != null) {
             return RepoSnapshot(
                 repo = repository.ref,
@@ -65,14 +65,14 @@ object LiveSnapshotFactory {
     /** Counts that survive every truth rule, or null when any of them fails. */
     private fun exactCounts(
         metadata: LiveRepositoryMetadata?,
+        issues: LivePage<LiveIssue>?,
         pullRequests: LivePage<LivePullRequest>?,
     ): ExactCounts? {
-        if (metadata?.openIssuesAndPullRequests == null) return null
+        // Every count is derived from the open-PR page, so it must be whole.
         if (pullRequests == null || pullRequests.hasMorePages) return null
-
         val openPrs = pullRequests.rows.size
-        val openIssues = metadata.openIssuesAndPullRequests - openPrs
-        if (openIssues < 0) return null
+
+        val openIssues = openIssueCount(metadata, issues, openPrs) ?: return null
 
         val awaitingReview = pullRequests.rows.count { it.reviewRequestedFromViewer }
         return ExactCounts(
@@ -80,6 +80,25 @@ object LiveSnapshotFactory {
             openIssues = openIssues,
             awaitingReview = awaitingReview,
         )
+    }
+
+    /**
+     * Prefers the page already in hand: an untruncated issues page is
+     * exact on its own, because [GitHubApiClient] strips pull requests out
+     * of `/issues` before it ever gets here. Only when that page was
+     * truncated does the repository counter earn its keep, and then it has
+     * to have pull requests subtracted back out.
+     */
+    private fun openIssueCount(
+        metadata: LiveRepositoryMetadata?,
+        issues: LivePage<LiveIssue>?,
+        openPrs: Int,
+    ): Int? {
+        if (issues != null && !issues.hasMorePages) return issues.rows.size
+
+        val combined = metadata?.openIssuesAndPullRequests ?: return null
+        val derived = combined - openPrs
+        return derived.takeIf { it >= 0 }
     }
 
     private fun unknown(repository: LiveRepository, rateLimit: RateLimitBucket): RepoSnapshot =
