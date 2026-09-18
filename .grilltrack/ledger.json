@@ -1512,7 +1512,7 @@
       "context_ref": null,
       "created_at": "2026-09-18T16:09:26+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#16 merged as 7f9c7daadf94546ffde197ae1a5c13837cc467a2 (maintainer merge, 2026-09-18)",
       "dependencies": [],
       "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
       "history": [
@@ -1709,7 +1709,7 @@
       "review_source_identity": "git:67706abfb9d44abb021f07eabdd27be7a7144110",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T21:14:00+00:00",
+      "updated_at": "2026-09-18T21:20:03+00:00",
       "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 3 repair (check green; 401 device proof human-gated)"
     },
     {
@@ -1784,5 +1784,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T21:14:00+00:00"
+  "updated_at": "2026-09-18T21:20:03+00:00"
 }
