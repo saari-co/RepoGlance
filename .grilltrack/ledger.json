@@ -1614,8 +1614,9 @@
       "review_source_identity": null,
       "status": "deferred",
       "superseded_by": null,
-      "updated_at": "2026-09-18T16:33:28+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-18T19:21:26+00:00",
+      "verification_ref": null,
+      "context": " Maintainer direction (2026-09-18): no logo exists yet; include a magnifying glass; low-key; must read well as the small status-bar/notification icon on Pixels; also want a Quick Settings tile (swipe-down bar) for quick access, which is a separate feature decision beyond the splash."
     }
   ],
   "last_activation": {
