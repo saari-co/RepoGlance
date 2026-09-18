@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "codex/**"
+      - "claude/**"
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -22,8 +23,13 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Unit tests + debug assemble
-        run: ./gradlew --no-daemon testDebugUnitTest assembleDebug
+      # `check` is the hard floor (GrillTrack ci-floor-014): unit tests,
+      # Android Lint against lint-baseline.xml with warnings as errors, and
+      # detektDebug (Compose rules, formatting, comment ban, forbidden
+      # imports/calls). Kotlin compiles with allWarningsAsErrors. Any new
+      # warning anywhere fails this job; the baseline only ever shrinks.
+      - name: Hard floor (tests, lint, detekt) + debug assemble
+        run: ./gradlew --no-daemon check assembleDebug
 
       - name: Upload debug APK
         if: success()
@@ -32,9 +38,10 @@ jobs:
           name: repoglance-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload test reports on failure
+      - name: Upload lint, detekt, and test reports on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
-          path: app/build/reports/**
+          name: floor-reports
+          path: |
+            app/build/reports/**

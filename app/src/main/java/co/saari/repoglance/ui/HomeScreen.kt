@@ -13,11 +13,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -30,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,16 +54,11 @@ import co.saari.repoglance.render.CiColorRole
 import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
-import co.saari.repoglance.widget.RepoWidgetReceiver
 import co.saari.repoglance.widget.RepoWidgetConfigActivity
+import co.saari.repoglance.widget.RepoWidgetReceiver
 import co.saari.repoglance.widget.StackWidgetReceiver
 import java.time.Instant
 
-/**
- * Home screen (fixture mode): scenario switcher, pin-aware repo list, and
- * the widget-pinning debug/user affordance. All display strings read
- * through [SnapshotRendering] / [Ages] — nothing here re-derives a rule.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -103,10 +99,6 @@ fun HomeScreen(
             }
         } else {
             LazyColumn(modifier = Modifier.weight(1f)) {
-                // MIXED deliberately repeats the same repo full-name across
-                // several truth-rule demo entries (see Fixtures.mixedSnapshots),
-                // so `repo.full` alone isn't a unique LazyColumn key within
-                // that scenario — basis + rate limit disambiguate it.
                 items(repos, key = { "${it.repo.full}|${it.valueBasis}|${it.rateLimit}" }) { snapshot ->
                     RepoCard(
                         snapshot = snapshot,
@@ -184,7 +176,7 @@ private fun ScenarioSwitcher(scenario: FixtureScenario, onScenarioChange: (Fixtu
             readOnly = true,
             label = { Text("Fixture") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().width(170.dp),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).width(170.dp),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             FixtureScenario.entries.forEach { option ->

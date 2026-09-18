@@ -72,10 +72,10 @@ import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.link.GitHubAppLauncher
+import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
-import co.saari.repoglance.link.Sanitize
 import java.time.Duration
 import java.time.Instant
 
@@ -292,10 +292,8 @@ private fun FailureScreen(
     }
 }
 
-/** Accessibility resource id for the repository search field on the loaded home. */
 internal const val REPO_SEARCH_TEST_TAG = "repoglance:repo-search"
 
-/** Accessibility resource id for the owner (account/organization) filter on the loaded home. */
 internal const val OWNER_FILTER_TEST_TAG = "repoglance:owner-filter"
 
 @Composable
@@ -326,7 +324,10 @@ private fun LiveRepositoryHome(
             title = { Text("Disconnect RepoGlance?") },
             text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
             confirmButton = {
-                TextButton(onClick = { confirmSignOut = false; onSignOut() }) { Text("Disconnect GitHub") }
+                TextButton(onClick = {
+                    confirmSignOut = false
+                    onSignOut()
+                }) { Text("Disconnect GitHub") }
             },
             dismissButton = {
                 TextButton(onClick = { confirmSignOut = false }) { Text("Cancel") }
@@ -686,8 +687,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.livePullRequestSectio
             if (rows.isEmpty()) {
                 item {
                     EmptyLiveRows(
-                        if (result.value.hasMorePages) "No matches in the loaded pull requests"
-                        else "No open pull requests match",
+                        if (result.value.hasMorePages) {
+                            "No matches in the loaded pull requests"
+                        } else {
+                            "No open pull requests match"
+                        },
                     )
                 }
             }
@@ -702,14 +706,20 @@ private fun androidx.compose.foundation.lazy.LazyListScope.livePullRequestSectio
 private fun LiveIssueRow(issue: LiveIssue, now: Instant, onOpen: (String) -> Unit) {
     Surface(onClick = { onOpen(issue.htmlUrl) }, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(vertical = 12.dp)) {
-            Text("#${issue.number}  ${Sanitize.displayText(issue.title)}", style = MaterialTheme.typography.bodyLarge)
             Text(
-                "by ${Sanitize.displayText(issue.author)} · ${issue.commentCount?.let { "$it comments" } ?: "comments —"} · " +
-                    Ages.updatedLabel(issue.updatedAt, now),
+                "#${issue.number}  ${Sanitize.displayText(issue.title)}",
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            val comments = issue.commentCount?.let { "$it comments" } ?: "comments —"
+            Text(
+                "by ${Sanitize.displayText(issue.author)} · $comments · " + Ages.updatedLabel(issue.updatedAt, now),
                 style = MaterialTheme.typography.bodySmall,
             )
             if (issue.labels.isNotEmpty()) {
-                Text(issue.labels.joinToString(", ") { Sanitize.displayText(it) }, style = MaterialTheme.typography.labelSmall)
+                Text(
+                    issue.labels.joinToString(", ") { Sanitize.displayText(it) },
+                    style = MaterialTheme.typography.labelSmall,
+                )
             }
         }
     }

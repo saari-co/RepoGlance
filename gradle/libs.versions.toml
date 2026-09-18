@@ -10,6 +10,8 @@ lifecycle = "2.8.6"
 glance = "1.1.1"
 junit = "4.13.2"
 json = "20260719"
+detekt = "1.23.8"
+composeRules = "0.4.22"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -27,8 +29,11 @@ glance-testing = { group = "androidx.glance", name = "glance-testing", version.r
 glance-appwidget-testing = { group = "androidx.glance", name = "glance-appwidget-testing", version.ref = "glance" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 json-jvm = { group = "org.json", name = "json", version.ref = "json" }
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
+detekt-compose-rules = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "composeRules" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

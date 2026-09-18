@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.detekt)
 }
 
 fun String.asBuildConfigString(): String =
@@ -143,10 +144,61 @@ android {
         buildConfig = true
         compose = true
     }
+
+    // --- Hard CI floor (GrillTrack ci-floor-014) ---------------------------
+    //
+    // Lint is a gate, not a report. lint-baseline.xml freezes the warnings
+    // that existed when the gate landed; any new warning fails the build and
+    // the baseline only ever shrinks. ContentDescription is promoted to error
+    // outside the baseline (accessibility omissions were a recurring review
+    // finding). See docs/INVARIANTS.md.
+    lint {
+        abortOnError = true
+        warningsAsErrors = true
+        baseline = file("lint-baseline.xml")
+        error += "ContentDescription"
+        checkDependencies = false
+    }
 }
 
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        allWarningsAsErrors.set(true)
+    }
+}
+
+// detekt with type resolution (detektDebug) so ForbiddenMethodCall and the
+// Compose rule set can see types. The plain `detekt` task is not the gate.
+detekt {
+    config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+    // The variant task derives its own file name from this: detektDebug reads
+    // and detektBaselineDebug writes app/detekt-baseline-debug.xml. It holds
+    // only complexity/size findings that predate the gate and only shrinks.
+    baseline = file("detekt-baseline.xml")
+    source.setFrom("src/main/java")
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        sarif.required.set(false)
+        txt.required.set(false)
+    }
+}
+
+// The plain `detekt` task has no type resolution and would report a different
+// rule subset; detektDebug is the single gate.
+tasks.named("detekt") {
+    enabled = false
+}
+
+tasks.named("check") {
+    dependsOn("detektDebug")
 }
 
 // Diagnostic task for release.yml and local verification:
@@ -177,4 +229,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.json.jvm)
+
+    detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.detekt.compose.rules)
 }

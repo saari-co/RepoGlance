@@ -9,8 +9,6 @@ data class RepoWidgetConfig(
     val mode: NavigatorMode,
 )
 
-/** Private, per-app-widget configuration. App-widget IDs are assigned by the
- * launcher, so every placed widget gets independent repository and mode keys. */
 object RepoWidgetConfigStore {
     private const val PREFS_NAME = "repo_widget_configs"
     private const val REPO_SUFFIX = ".repo"

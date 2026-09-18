@@ -3,13 +3,6 @@ package co.saari.repoglance.link
 import co.saari.repoglance.model.RepoRef
 import java.net.URLEncoder
 
-/**
- * The ONLY place app deep links are built. Every function builds strictly
- * from typed parts ([RepoRef], validated numbers, tags) and every output
- * starts with "https://github.com/" — no function here accepts a raw URL
- * string, so there is no way to produce a non-github.com URL from this
- * object.
- */
 object GitHubLinks {
     private const val BASE = "https://github.com/"
 

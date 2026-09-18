@@ -33,16 +33,6 @@ import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.SnapshotStore
 import java.time.Instant
 
-/**
- * Multi-repo stack widget: a header (scenario name + oldest-observed data
- * age across the shown repos) over a [LazyColumn] of compact repo rows.
- * Content is [SnapshotStore.stackWidgetRepos] — pinned repos, or every repo
- * in the scenario when nothing is pinned yet.
- *
- * Row tap opens [MainActivity] pre-scoped to that repo (see
- * [RepoWidget]'s KDoc for why this is chosen over a raw ACTION_VIEW Intent
- * from Glance).
- */
 class StackWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {

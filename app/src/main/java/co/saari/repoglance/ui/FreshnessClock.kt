@@ -9,9 +9,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
 import java.time.Clock
 import java.time.Instant
-import kotlinx.coroutines.delay
 
 private val SystemFreshnessClock: Clock = Clock.systemUTC()
 

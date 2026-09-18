@@ -4,13 +4,12 @@ package co.saari.repoglance.ui
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -24,8 +23,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -43,6 +42,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -54,6 +54,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,8 +67,8 @@ import androidx.compose.ui.unit.dp
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.fixtures.Fixtures
 import co.saari.repoglance.fixtures.ListState
-import co.saari.repoglance.link.GitHubLinks
 import co.saari.repoglance.link.GitHubAppLauncher
+import co.saari.repoglance.link.GitHubLinks
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.IssueRow
 import co.saari.repoglance.model.NavigatorFilter
@@ -83,8 +84,8 @@ import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.state.NavigatorSection
 import co.saari.repoglance.state.SnapshotStore
-import java.time.Instant
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 internal val DefaultNavigatorMode = NavigatorMode.BOTH
 
@@ -92,13 +93,6 @@ internal fun activeSecondaryFilterCount(filter: NavigatorFilter, fixtureListStat
     (if (filter == NavigatorFilter.OPEN) 0 else 1) +
         (if (fixtureListState == ListState.LOADED) 0 else 1)
 
-/**
- * Navigator screen with a compact app-owned control block that scrolls away
- * as part of the real result list. The mode selector is the only sticky app
- * chrome. It settles below the system status bar because the opaque screen
- * surface paints behind system bars while all interactive content respects
- * safe insets.
- */
 @Composable
 fun NavigatorScreen(
     scenario: FixtureScenario,
@@ -122,8 +116,8 @@ fun NavigatorScreen(
     var selectedNumber by rememberSaveable { mutableStateOf<Int?>(null) }
     var externalGitHubMode by rememberSaveable { mutableStateOf(false) }
 
-    var issuesExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableStateOf(0) }
-    var prsExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableStateOf(0) }
+    var issuesExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableIntStateOf(0) }
+    var prsExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableIntStateOf(0) }
 
     val fixtureAnchor = remember(scenario) { Instant.now() }
     val now = rememberFreshnessNow()
@@ -204,8 +198,14 @@ fun NavigatorScreen(
                                     scopeValue = NavigatorScopeCodec.valueOf(newScope)
                                     selectedNumber = null
                                 },
-                                onFilterChange = { filter = it; selectedNumber = null },
-                                onListStateChange = { fixtureListState = it; selectedNumber = null },
+                                onFilterChange = {
+                                    filter = it
+                                    selectedNumber = null
+                                },
+                                onListStateChange = {
+                                    fixtureListState = it
+                                    selectedNumber = null
+                                },
                                 onQueryChange = { query = it },
                                 onSearchExpandedChange = { expanded ->
                                     searchExpanded = expanded
@@ -257,8 +257,14 @@ fun NavigatorScreen(
                                 scopeValue = NavigatorScopeCodec.valueOf(newScope)
                                 selectedNumber = null
                             },
-                            onFilterChange = { filter = it; selectedNumber = null },
-                            onListStateChange = { fixtureListState = it; selectedNumber = null },
+                            onFilterChange = {
+                                filter = it
+                                selectedNumber = null
+                            },
+                            onListStateChange = {
+                                fixtureListState = it
+                                selectedNumber = null
+                            },
                             onQueryChange = { query = it },
                             onSearchExpandedChange = { expanded ->
                                 searchExpanded = expanded
@@ -287,9 +293,6 @@ fun NavigatorScreen(
     }
 }
 
-/** Row payload unifying [IssueRow]/[PrRow] for shared list/detail rendering;
- *  [pr] is non-null exactly when the row came from a PR list, carrying the
- *  draft/review/CI-rollup fields issues don't have. */
 private data class RowItem(
     val repo: RepoRef,
     val number: Int,
@@ -303,14 +306,11 @@ private data class RowItem(
     val pr: PrRow?,
 )
 
-private fun IssueRow.toItem() = RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, null)
-private fun PrRow.toItem() = RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, this)
+private fun IssueRow.toItem() =
+    RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, null)
+private fun PrRow.toItem() =
+    RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, this)
 
-/** Fixture-mode "Load more" paging: appends another copy of the same fixture
- *  rows with numbers offset so they never collide with an earlier page or
- *  with the other section's number range (issues start at 100+, PRs at
- *  200+) — documented in the PR spec as an acceptable fixture stand-in for
- *  a real next-page fetch. */
 private fun pagedIssueRows(list: NavigatorList, extraPages: Int): List<IssueRow> {
     val base = (list.rows as NavigatorRows.Issues).rows
     return (0..extraPages).flatMap { pageIndex ->
@@ -385,23 +385,32 @@ private fun ScopeSwitcher(scenario: FixtureScenario, scope: NavigatorScope, onSc
             readOnly = true,
             label = { Text("Scope") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text("Account") },
-                onClick = { onScopeChange(NavigatorScope.Account); expanded = false },
+                onClick = {
+                    onScopeChange(NavigatorScope.Account)
+                    expanded = false
+                },
             )
             owners.forEach { owner ->
                 DropdownMenuItem(
                     text = { Text("Org: $owner") },
-                    onClick = { onScopeChange(NavigatorScope.Org(owner)); expanded = false },
+                    onClick = {
+                        onScopeChange(NavigatorScope.Org(owner))
+                        expanded = false
+                    },
                 )
             }
             repos.forEach { snapshot ->
                 DropdownMenuItem(
                     text = { Text(snapshot.repo.full) },
-                    onClick = { onScopeChange(NavigatorScope.Repo(snapshot.repo)); expanded = false },
+                    onClick = {
+                        onScopeChange(NavigatorScope.Repo(snapshot.repo))
+                        expanded = false
+                    },
                 )
             }
         }
@@ -659,10 +668,7 @@ private fun ListPane(
                 }
             }
         }
-        // Compose's experimental sticky header can be dropped after a long
-        // cover-display scroll on the API 36 Fold emulator. Keep an animated,
-        // opaque copy over the list once the controls item has left the viewport
-        // so the sole persistent app control remains available in every posture.
+
         AnimatedVisibility(
             visible = showPinnedMode,
             enter = fadeIn(),

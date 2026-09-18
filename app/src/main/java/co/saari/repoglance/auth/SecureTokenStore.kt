@@ -42,7 +42,7 @@ class SecureTokenStore(context: Context) : TokenStore {
         try {
             stream.write(encrypted)
             tokenFile.finishWrite(stream)
-        } catch (failure: Throwable) {
+        } catch (@Suppress("TooGenericExceptionCaught") failure: Throwable) {
             tokenFile.failWrite(stream)
             throw failure
         }
@@ -112,7 +112,9 @@ class SecureTokenStore(context: Context) : TokenStore {
         bytes.toByteArray()
     }
 
-    private fun decode(payload: ByteArray): GitHubUserToken = DataInputStream(ByteArrayInputStream(payload)).use { input ->
+    private fun decode(payload: ByteArray): GitHubUserToken = DataInputStream(
+        ByteArrayInputStream(payload),
+    ).use { input ->
         require(input.readInt() == FORMAT_VERSION) { "Unsupported token format" }
         GitHubUserToken(
             accessToken = input.readUTF(),
@@ -143,8 +145,7 @@ class SecureTokenStore(context: Context) : TokenStore {
         const val KEYSTORE_PROVIDER = "AndroidKeyStore"
         const val KEY_ALIAS = "co.saari.repoglance.github-user-token.v1"
         const val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
-        // v2 deliberately invalidates v1 web-flow sessions: only tokens minted
-        // by device flow are eligible for secret-free refresh.
+
         const val FORMAT_VERSION = 2
         const val MAX_TOKEN_PAYLOAD_BYTES = 128 * 1024
     }

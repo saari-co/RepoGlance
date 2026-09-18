@@ -44,15 +44,6 @@ import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.LiveSnapshotStore
 import java.time.Instant
 
-/**
- * Independently configured per-repository widget.
- *
- * A compact 2x1 placement is a count summary. Any placement tall enough for
- * rows becomes a single recently-updated feed whose entries are individually
- * labeled ISSUE or PR. Header/summary taps open RepoGlance at this widget's
- * repository and mode; row taps open the exact GitHub URL through Android's
- * verified-link routing.
- */
 class RepoWidget : GlanceAppWidget() {
 
     override val sizeMode: SizeMode = SizeMode.Responsive(
@@ -63,15 +54,10 @@ class RepoWidget : GlanceAppWidget() {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
         provideContent {
-            // Glance keeps a composition alive briefly after the first render.
-            // Read storage inside the composition so an explicit update after
-            // configuration/reconfiguration sees the newly persisted values.
             val config = RepoWidgetConfigStore.load(context, appWidgetId)
             val now = Instant.now()
             val scenario = AppPrefs.selectedScenario(context)
-            // Compact renders live counts published by the app; the tall row
-            // feed is still fixture-backed and says so (widget-content-priority-008
-            // is scoped to the compact slot).
+
             val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
             val fixtureSnapshot = config?.let { WidgetFixtureData.snapshotFor(it.repo, scenario, now) }
             val rows = config?.let { WidgetFixtureData.recentRows(it.repo, it.mode, now) }.orEmpty()
@@ -130,14 +116,12 @@ internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): St
             " · PRS " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis)
 }
 
-/** Retained for the tall row feed, which still renders fixture rows. */
 internal const val WIDGET_PREVIEW_LABEL = "FIXTURE PREVIEW"
 
 private val LEDGER_REPO_SIZE = 10.sp
 private val LEDGER_LABEL_SIZE = 8.sp
 private val LEDGER_VALUE_SIZE = 11.sp
 
-/** Below this height only the two headline rows fit. */
 private val LEDGER_THIRD_ROW_BREAKPOINT = 84.dp
 
 @Composable
@@ -154,13 +138,6 @@ private fun UnconfiguredContent() {
     }
 }
 
-/**
- * Freshness for the compact slot, in as few characters as the 120dp floor
- * allows. Truth rules 2-3: every surface shows its data age, and last-good
- * never reads as current. EXACT renders the bare age ("12m"), LAST_GOOD is
- * prefixed so it cannot be mistaken for a fresh value, and no observation at
- * all says so rather than showing nothing.
- */
 internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, now: Instant): String {
     val observedAt = snapshot?.observedAt
     return when {
@@ -194,12 +171,8 @@ internal fun CompactContent(
     appIntent: Intent,
     now: Instant,
 ) {
-    // No stored observation yet: every count is unknown, never zero.
     val basis = snapshot?.valueBasis ?: ValueBasis.UNKNOWN
-    // Right-aligned ledger (GrillTrack widget-content-priority-008): label
-    // left, number hard right, so digits line up in a column. The
-    // "to review" row is progressive disclosure — it renders only where
-    // there is height for it.
+
     Column(
         modifier = GlanceModifier
             .fillMaxSize()

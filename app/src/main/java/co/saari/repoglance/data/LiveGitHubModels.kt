@@ -22,13 +22,6 @@ data class LiveRepository(
     val pushedAt: Instant?,
 )
 
-/**
- * Repository-level counters from `GET /repos/{owner}/{name}`.
- *
- * [openIssuesAndPullRequests] mirrors GitHub's `open_issues_count`, which
- * counts pull requests as issues. Subtract the exact open-PR count to recover
- * true open issues; see [co.saari.repoglance.data.LiveSnapshotFactory].
- */
 data class LiveRepositoryMetadata(
     val openIssuesAndPullRequests: Int?,
     val pushedAt: Instant?,

@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:GitHubDeviceFlowClient.kt$GitHubDeviceFlowClient$uri.scheme != "https" || uri.host != "github.com" || uri.port != -1 || uri.path != "/login/device" || uri.rawQuery != null || uri.rawFragment != null || uri.userInfo != null</ID>
+    <ID>CyclomaticComplexMethod:GitHubApiClient.kt$GitHubApiClient$private fun HttpResponse.rateLimit(observedAt: Instant = clock.instant()): RateLimitSnapshot</ID>
+    <ID>CyclomaticComplexMethod:LiveRepoGlanceScreen.kt$@Composable private fun LiveRepositoryHome( catalog: LiveRepositoryCatalog, observedAt: Instant, rateLimit: RateLimitSnapshot, selectedOwner: String?, onSelectedOwnerChange: (String?) -&gt; Unit, onSelectRepository: (LiveRepository) -&gt; Unit, onRefresh: () -&gt; Unit, onManageGitHubAccess: () -&gt; Unit, onSignOut: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:NavigatorScreen.kt$@Composable fun NavigatorScreen( scenario: FixtureScenario, initialScope: NavigatorScope, initialMode: NavigatorMode = DefaultNavigatorMode, onBackToHome: () -&gt; Unit, )</ID>
+    <ID>LongMethod:Fixtures.kt$Fixtures$fun navigatorList( scope: NavigatorScope, mode: NavigatorMode, filter: NavigatorFilter, state: ListState, now: Instant, ): NavigatorList</ID>
+    <ID>LongMethod:WidgetVariantPickerActivity.kt$WidgetVariantPickerActivity$@OptIn(ExperimentalGlanceRemoteViewsApi::class) override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>LongParameterList:IssueRow.kt$IssueRow$( val repo: RepoRef, val number: Int, val title: String, val state: String, labels: List&lt;String&gt;, val author: String, val assignee: String?, val commentCount: Int, val updatedAt: Instant, )</ID>
+    <ID>LongParameterList:LiveSnapshotFactory.kt$LiveSnapshotFactory$( repository: LiveRepository, metadata: LiveRepositoryMetadata?, issues: LivePage&lt;LiveIssue&gt;?, pullRequests: LivePage&lt;LivePullRequest&gt;?, previous: RepoSnapshot?, observedAt: Instant, rateLimit: RateLimitBucket, )</ID>
+    <ID>LongParameterList:PrRow.kt$PrRow$( val repo: RepoRef, val number: Int, val title: String, val state: String, labels: List&lt;String&gt;, val author: String, val assignee: String?, val commentCount: Int, val updatedAt: Instant, val isDraft: Boolean, val reviewState: ReviewState, val ciRollup: CiState, )</ID>
+    <ID>LongParameterList:RepoSnapshot.kt$RepoSnapshot$( val repo: RepoRef, val openPrs: Int?, val prsAwaitingMyReview: Int?, val openIssues: Int?, val defaultBranchCi: CiState, val latestRelease: ReleaseInfo?, val pushedAt: Instant?, val valueBasis: ValueBasis, val observedAt: Instant?, val rateLimit: RateLimitBucket, issueLists: Map&lt;NavigatorFilter, NavigatorList&gt; = emptyMap(), prLists: Map&lt;NavigatorFilter, NavigatorList&gt; = emptyMap(), )</ID>
+    <ID>ModifierMissing:CompactCandidates.kt$CandidateA</ID>
+    <ID>ModifierMissing:CompactCandidates.kt$CandidateB</ID>
+    <ID>ModifierMissing:CompactCandidates.kt$CandidateD</ID>
+    <ID>ModifierMissing:CompactCandidates.kt$CandidateE</ID>
+    <ID>ModifierMissing:HomeScreen.kt$HomeScreen</ID>
+    <ID>ModifierMissing:NavigatorScreen.kt$NavigatorScreen</ID>
+    <ID>NestedBlockDepth:GitHubDeviceFlowClient.kt$GitHubDeviceFlowPoller$suspend fun awaitToken(authorization: GitHubDeviceAuthorization): GitHubUserToken</ID>
+    <ID>ReturnCount:RepoWidgetConfigActivity.kt$RepoWidgetConfigActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>ThrowsCount:GitHubDeviceFlowClient.kt$GitHubSession$@Synchronized fun accessToken(): String</ID>
+    <ID>TooManyFunctions:GitHubApiClient.kt$GitHubApiClient</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -7,7 +7,7 @@ class PrRow(
     val repo: RepoRef,
     val number: Int,
     val title: String,
-    val state: String, // "open" | "closed"
+    val state: String,
     labels: List<String>,
     val author: String,
     val assignee: String?,
