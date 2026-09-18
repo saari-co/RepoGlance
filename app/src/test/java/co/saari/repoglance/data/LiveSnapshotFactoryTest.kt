@@ -7,6 +7,8 @@ import co.saari.repoglance.model.ValueBasis
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LiveSnapshotFactoryTest {
@@ -144,6 +146,30 @@ class LiveSnapshotFactoryTest {
         assertEquals(ValueBasis.EXACT, snapshot.valueBasis)
         // Falls back to 12 - 3 = 9 rather than trusting the truncated page.
         assertEquals(9, snapshot.openIssues)
+    }
+
+    @Test
+    fun metadataIsNotRequestedWhenThePullRequestPageIsTruncated() {
+        val truncatedPrs = page(listOf(pr(1, false)), hasMorePages = true)
+        val truncatedIssues = LivePage(rows = listOf(issue(1)), hasMorePages = true)
+        assertFalse(LiveSnapshotFactory.needsRepositoryMetadata(truncatedIssues, truncatedPrs))
+    }
+
+    @Test
+    fun metadataIsNotRequestedWhenThePullRequestPageFailed() {
+        val truncatedIssues = LivePage(rows = listOf(issue(1)), hasMorePages = true)
+        assertFalse(LiveSnapshotFactory.needsRepositoryMetadata(truncatedIssues, null))
+        assertFalse(LiveSnapshotFactory.needsRepositoryMetadata(null, null))
+    }
+
+    @Test
+    fun metadataIsRequestedOnlyWhenItCanCompleteAnExactCount() {
+        val wholePrs = page(listOf(pr(1, false)), hasMorePages = false)
+        val truncatedIssues = LivePage(rows = listOf(issue(1)), hasMorePages = true)
+        val wholeIssues = LivePage(rows = listOf(issue(1)), hasMorePages = false)
+        assertTrue(LiveSnapshotFactory.needsRepositoryMetadata(truncatedIssues, wholePrs))
+        assertTrue(LiveSnapshotFactory.needsRepositoryMetadata(null, wholePrs))
+        assertFalse(LiveSnapshotFactory.needsRepositoryMetadata(wholeIssues, wholePrs))
     }
 
     private fun issue(number: Int): LiveIssue = LiveIssue(

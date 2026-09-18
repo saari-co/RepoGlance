@@ -28,6 +28,22 @@ import java.time.Instant
  */
 object LiveSnapshotFactory {
 
+    /**
+     * Whether a repository-metadata request can change the outcome. Every
+     * exact count derives from a whole open-PR page, so when that page is
+     * missing or truncated the metadata counter would be fetched and then
+     * discarded, spending core quota for a result that must fall back to
+     * LAST_GOOD or UNKNOWN anyway. An untruncated issues page is already
+     * exact on its own and needs no counter either.
+     */
+    fun needsRepositoryMetadata(
+        issues: LivePage<LiveIssue>?,
+        pullRequests: LivePage<LivePullRequest>?,
+    ): Boolean {
+        if (pullRequests == null || pullRequests.hasMorePages) return false
+        return issues == null || issues.hasMorePages
+    }
+
     fun build(
         repository: LiveRepository,
         metadata: LiveRepositoryMetadata?,

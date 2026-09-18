@@ -209,9 +209,10 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         val prSuccess = content.pullRequests as? GitHubApiResult.Success
 
         withContext(Dispatchers.IO) {
-            // Only worth a request when the issues page was truncated; an
-            // untruncated page is already an exact count.
-            val metadata = if (issues == null || issues.hasMorePages) {
+            // Only worth a request when it can produce an exact count: the
+            // issues page is truncated AND the PR page is whole. Otherwise the
+            // factory must fall back regardless, and the call is wasted quota.
+            val metadata = if (LiveSnapshotFactory.needsRepositoryMetadata(issues, prSuccess?.value)) {
                 apiClient.loadRepositoryMetadata(repository) as? GitHubApiResult.Success
             } else {
                 null
