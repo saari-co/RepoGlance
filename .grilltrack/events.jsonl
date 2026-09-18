@@ -70,3 +70,5 @@
 {"action": "decision_implemented", "at": "2026-09-18T12:24:15+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "30e4477e-0143-4752-b404-eaeeb58544d8"}
 {"action": "decision_verified", "at": "2026-09-18T12:24:15+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "e98abc2c-faf9-4182-b14f-3a83f281baee"}
 {"action": "decision_reviewed", "at": "2026-09-18T12:32:47+00:00", "data": {"classifications": ["required_fix"], "decision_id": "feature-map-015", "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper platinum hermit / diamond lobster, P3 validator gap; openclaw req-20260918T122651Z-365305416421 clean", "result": "findings", "reviewed_at": "2026-09-18T12:32:47+00:00", "source_identity": "git:ae5834f56478537e0922b7e5e205e07dd6637b72"}, "event_id": "47344a67-a88d-41a1-8f00-fb51b4cd9e8d"}
+{"action": "decision_implemented", "at": "2026-09-18T12:32:47+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "76324344-f463-4c0f-9a58-21e3fb39ebd0"}
+{"action": "decision_verified", "at": "2026-09-18T12:32:47+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "6412a7d5-8ce1-4c56-9880-3671f434c2b8"}
