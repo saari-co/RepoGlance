@@ -203,3 +203,15 @@ and the only case that requests metadata (truncated issues + whole PRs).
 - Lint: 0 errors, 30 warnings, 3 informational; unchanged
 - No widget, rendering, or store change since the device proof above, so the
   Fold captures at `19a3d1d` remain the widget proof for this head.
+
+## Terminal review (2026-09-18, head `7c2802a`)
+
+- OpenClaw (`req-20260918T034215Z-257845318597`): scoped-clean, 0 findings.
+- ClawSweeper: overall `platinum hermit` (4/6), proof `diamond lobster` (5/6,
+  media proof bonus), patch quality `platinum hermit`, **no actionable review
+  findings**. Verdict `needs-human` solely because background refresh for
+  pinned widgets is follow-up work — which is the next grill already recorded
+  in the ledger, deliberately outside this slice.
+
+This proof/ledger commit is the only change after the reviewed head; no
+product source differs from `7c2802a`.
