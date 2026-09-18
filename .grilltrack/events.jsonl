@@ -73,3 +73,5 @@
 {"action": "decision_implemented", "at": "2026-09-18T12:32:47+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "76324344-f463-4c0f-9a58-21e3fb39ebd0"}
 {"action": "decision_verified", "at": "2026-09-18T12:32:47+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "6412a7d5-8ce1-4c56-9880-3671f434c2b8"}
 {"action": "decision_reviewed", "at": "2026-09-18T12:44:10+00:00", "data": {"classifications": ["required_fix"], "decision_id": "feature-map-015", "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1 security: sign-in recipe permitted dumping the visible device code", "result": "findings", "reviewed_at": "2026-09-18T12:44:10+00:00", "source_identity": "git:8b3c75fa2a5bfd6d05ff1b969e3ed570f3bbe61a"}, "event_id": "3b89fbcf-58a5-464c-996c-a9e89a74593d"}
+{"action": "decision_implemented", "at": "2026-09-18T12:44:10+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "1b9ccf2f-8bdf-4f97-93eb-e3b369a4977d"}
+{"action": "decision_verified", "at": "2026-09-18T12:44:10+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "c3e065d4-1295-44dc-80f1-e0314045c32a"}
