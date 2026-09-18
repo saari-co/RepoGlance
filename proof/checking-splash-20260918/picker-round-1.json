@@ -1,0 +1,31 @@
+{
+  "schema_version": "grilltrack-picker/v0.1",
+  "round_id": "checking-splash-round-1",
+  "decision_id": "checking-splash-018",
+  "canvas_ref": "app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt CenteredStatus for LiveUiState.Checking (message locked, no spinner, no counts, no sign-in control)",
+  "renderer": "app/src/debug/java/co/saari/repoglance/devpicker/SplashVariantPickerActivity.kt + SplashCandidates.kt on the registered Pixel 11 Pro Fold, launched via bin/verify-repoglance launch MIXED splash-picker '' '' <mark>/<motion>",
+  "active_slot": "mark",
+  "target": {
+    "device": "Pixel 11 Pro Fold inner display (OPENED) and cover display (CLOSED); status-bar strip at 20dp alpha mask",
+    "browsers": []
+  },
+  "candidates": [
+    {"id": "commit-lens",      "label": "A — stroke magnifier; the lens frames one git commit node on its line",        "delta_ref": "SplashCandidates.kt drawCommitLens (MarkCandidate.COMMIT_LENS)"},
+    {"id": "glance-eye",       "label": "B — stroke magnifier; the lens is a half-lidded eye taking a glance",          "delta_ref": "SplashCandidates.kt drawGlanceEye (MarkCandidate.GLANCE_EYE)"},
+    {"id": "repo-under-glass", "label": "C — outlined repo card with the magnifier resting over its corner",            "delta_ref": "SplashCandidates.kt drawRepoUnderGlass (MarkCandidate.REPO_UNDER_GLASS)"},
+    {"id": "dial-lens",        "label": "D — lens ring is twelve ticks like an instrument dial; solid handle",          "delta_ref": "SplashCandidates.kt drawDialLens (MarkCandidate.DIAL_LENS)"},
+    {"id": "tile-cutout",      "label": "E — solid rounded tile with the magnifier cut out as negative space",          "delta_ref": "SplashCandidates.kt drawTileCutout (MarkCandidate.TILE_CUTOUT)"}
+  ],
+  "slots": [
+    {"id": "checking-message", "status": "locked", "selection_ref": "ledger:session-bootstrap-016 (Checking held until the IO read answers; text 'Checking your GitHub session…', no spinner)"},
+    {"id": "truth-state",      "status": "locked", "selection_ref": "AGENTS.md#truth-rules (Unknown never renders as zero or signed-out; nothing count-shaped on the canvas)"},
+    {"id": "mark",             "status": "unresolved"}
+  ],
+  "next_slot_after_lock": {
+    "id": "motion",
+    "candidates": ["A sweep", "B draw-in", "C double-take", "D ping", "E hold (text after 400 ms)"],
+    "delta_ref": "SplashCandidates.kt SweepMark/RevealMark/PeekMark/PingMark/HOLD (MotionCandidate)"
+  },
+  "controls": {"keyboard": true, "pointer": true, "mobile": true},
+  "production": false
+}

@@ -4,6 +4,7 @@ A user connects RepoGlance to GitHub through GitHub's device flow: the app shows
 
 ## Sub-features
 
+- `signin-checking` shows the RepoGlance mark (magnifier with the commit eye) with two pulsing rings and `Checking your GitHub session…` while the saved session is read; no counts, no `Connect GitHub`. The rings hold still when the system animator scale is off.
 - `signin-start` shows `Connect GitHub` when there is no session.
 - `signin-code` shows the user code, `Copy code & open GitHub`, and `Cancel sign-in`, with an expiry countdown (observed by the maintainer only; never persisted by the harness).
 - `signin-return` completes on return from the Custom Tab and lands on the live catalog with the `LIVE` chip.
@@ -22,6 +23,7 @@ Preconditions:
 - `bin/verify-repoglance doctor` passes.
 - **Human-gated.** Starting, completing, or cancelling a sign-in, and disconnecting, act on the maintainer's GitHub account. An agent may only observe; the maintainer performs the gated taps on the phone.
 
+- **Checking state.** It lasts tens of milliseconds in the real app, so prove it through the debug holder: `bin/verify-repoglance launch MIXED checking`, then `dump checking`. The dump contains `repoglance:checking-mark` and `repoglance:checking-message` and no `repoglance:connect-github`; then `capture checking`.
 - **Observe the entry state.** Run `bin/verify-repoglance launch MIXED live` then `dump signin`. Either the dump contains `repoglance:connect-github` (no session) or it contains `repoglance:live` (session present). Record which; do not tap `repoglance:connect-github`.
 - **Maintainer step (gated).** The maintainer taps `Connect GitHub`, then `Copy code & open GitHub`, enters the code on GitHub, and returns. While the code screen is visible the agent runs **no** `dump`, `tap`, or `capture`: the helper refuses both (`redact-guard: GitHub device-code screen detected`) because a dump persists every visible string, and a capture would show the code. The agent waits for the maintainer to say the sign-in finished.
 - **Assert completion.** After the maintainer returns, run `dump after-signin`. The dump contains `repoglance:live` and no `Connect GitHub`.

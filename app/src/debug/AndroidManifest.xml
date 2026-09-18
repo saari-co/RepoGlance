@@ -15,6 +15,14 @@
             android:exported="true"
             android:label="GrillTrack navigator picker" />
         <activity
+            android:name="co.saari.repoglance.devpicker.SplashVariantPickerActivity"
+            android:exported="true"
+            android:label="GrillTrack checking-splash picker" />
+        <activity
+            android:name="co.saari.repoglance.devlaunch.CheckingPreviewActivity"
+            android:exported="true"
+            android:label="verify-repoglance checking preview" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.ScenarioLaunchActivity"
             android:exported="true"
             android:label="verify-repoglance scenario launcher"
