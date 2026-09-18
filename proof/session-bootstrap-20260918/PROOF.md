@@ -159,3 +159,12 @@ Both 401 paths now call `clearSavedSessionNow()`, a
 `withContext(sessionDispatcher + NonCancellable)` block, which runs to
 completion even when the calling job is already cancelled (kotlinx
 `NonCancellable` contract). `./gradlew check assembleDebug` green.
+
+## Review round 4 (head `7f501322d64a0967680d402c8c40eef3dc23ce43`)
+
+- OpenClaw `req-20260918T204045Z-63881723477`: correct, 0.98, 0 findings.
+- ClawSweeper: gold shrimp 3/6 on all three tiers; the round-3 repair is
+  accepted as source-correct. One medium item left, proof only: a real
+  revoked token returning 401 through catalog or repository-content has not
+  been exercised on device. **human_gate**: it requires the maintainer to
+  revoke RepoGlance's authorization on his GitHub account.
