@@ -142,3 +142,20 @@ The clear ran on the session dispatcher and completed before the UI could be
 relaunched; the next bootstrap found no session and rendered sign-in, not a
 restored session. The maintainer's session on the phone is now disconnected;
 re-connecting is his gated step.
+
+## Review round 3 (head `f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a`)
+
+- OpenClaw `req-20260918T202343Z-59795118063`: correct, 0.99, 0 findings.
+- ClawSweeper: silver shellfish, P1 (comment 5735127182 updated): the catalog
+  401 and repository-content 401 handlers cleared the token through a
+  cancellable `withContext(sessionDispatcher)`, so a load job cancelled at
+  that point could skip a clear the base did synchronously. Adjudicated
+  **required_fix**; the proof ask for the 401 path is **human_gate** (it needs
+  the maintainer to revoke his own token on GitHub).
+
+### Repair
+
+Both 401 paths now call `clearSavedSessionNow()`, a
+`withContext(sessionDispatcher + NonCancellable)` block, which runs to
+completion even when the calling job is already cancelled (kotlinx
+`NonCancellable` contract). `./gradlew check assembleDebug` green.

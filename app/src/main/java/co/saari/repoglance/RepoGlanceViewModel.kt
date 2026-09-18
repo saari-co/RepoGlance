@@ -156,7 +156,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
                 is GitHubApiResult.Failure -> {
                     if (result.needsNewSignIn) {
-                        withContext(sessionDispatcher) { session.signOut() }
+                        clearSavedSessionNow()
                         backToRepositories()
                     }
                     liveState.value = LiveUiState.Failure(
@@ -192,7 +192,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             }
             val invalidSession = content.sessionInvalidationFailure()
             if (invalidSession != null) {
-                withContext(sessionDispatcher) { session.signOut() }
+                clearSavedSessionNow()
                 selectedRepository.value = null
                 repositoryContent.value = ContentUiState.Idle
                 liveState.value = LiveUiState.Failure(
@@ -270,6 +270,8 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private fun clearSavedSession() {
         viewModelScope.launch(sessionDispatcher + NonCancellable) { session.signOut() }
     }
+
+    private suspend fun clearSavedSessionNow() = withContext(sessionDispatcher + NonCancellable) { session.signOut() }
 
     override fun onCleared() {
         super.onCleared()

@@ -1602,14 +1602,31 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T20:40:17+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "verified",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474",
+          "to": "needs_reverification",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
         }
       ],
       "id": "session-bootstrap-016",
       "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
-      "repair_required": false,
+      "repair_required": true,
       "review_classifications": [
+        "required_fix",
         "human_gate"
       ],
       "review_history": [
@@ -1631,14 +1648,24 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T19:40:29+00:00",
           "source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474"
+        },
+        {
+          "classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T20:40:17+00:00",
+          "source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a"
         }
       ],
-      "review_ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+      "review_ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
       "review_result": "findings",
-      "review_source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474",
-      "status": "verified",
+      "review_source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a",
+      "status": "needs_reverification",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:40:29+00:00",
+      "updated_at": "2026-09-18T20:40:17+00:00",
       "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
     },
     {
@@ -1713,5 +1740,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:40:29+00:00"
+  "updated_at": "2026-09-18T20:40:17+00:00"
 }
