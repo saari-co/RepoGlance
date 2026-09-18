@@ -258,3 +258,22 @@ render a `Cached · <age>` chip, `Empty` renders `No rows match`. The recipe
 now names the chips and their renderings exactly. The structural gate does
 not check recipe strings against the UI; that is the maintenance loop's job
 and the reason the gate is called structural.
+
+## Terminal review (2026-09-18, head `725744b`)
+
+- OpenClaw (`req-20260918T125718Z-379153731252`): scoped-clean, 0 findings,
+  `patch is correct (0.96)`.
+- ClawSweeper: overall **platinum hermit (4/6)**, proof **diamond lobster
+  (5/6)**, patch quality platinum hermit, **no actionable findings**. Its two
+  remaining items are maintainer decisions: accepting a Python-backed
+  structural check inside `./gradlew check`, and waiting for CI, which it
+  saw still running.
+- This proof/ledger commit is the only change after the reviewed head; no
+  product, helper, skill, or script source differs from `725744b`.
+
+Cycle history: implementation `6f1f1db` → proof `ae5834f` → validator
+precondition-first `8b3c75f` → device-code guard `cc5fe2a` → in-memory
+guard `8fa0049` → real Fixture-state labels `725744b`. Four review-repair
+cycles, each recorded as findings → implemented → verified. The two
+security findings were about the harness's own redaction promise and were
+repaired before any sign-in was ever driven.
