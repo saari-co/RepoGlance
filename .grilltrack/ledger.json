@@ -1543,6 +1543,20 @@
           "review_source_identity": null,
           "to": "implemented",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:14:08+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "session-bootstrap-016",
@@ -1555,10 +1569,10 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "implemented",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:03:23+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-18T19:14:08+00:00",
+      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
     },
     {
       "baseline_ref": null,
@@ -1605,28 +1619,19 @@
     }
   ],
   "last_activation": {
-    "at": "2026-09-18T13:34:10+00:00",
+    "at": "2026-09-18T19:14:08+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
-    "artifact_refs": [
-      ".grilltrack/work/gates/navigator-detail-017-unlock.md",
-      ".grilltrack/work/picker/navigator-detail-round-1.json",
-      "file:app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt"
-    ],
-    "next_safe_action": "After 'unlocked': doctor, drive navigator-picker A..E, capture, present captures, await pick",
-    "paused_at": "2026-09-18T13:31:17+00:00",
-    "reason": "Registered Fold is awake but keyguard-locked (device_locked=1); candidate captures need the maintainer to unlock it",
-    "resumed_at": "2026-09-18T13:34:10+00:00"
-  },
-  "pause": {
     "artifact_refs": [
       "proof/session-bootstrap-20260918/PROOF.md"
     ],
     "next_safe_action": "When the phone is back, awake and unlocked: bin/verify-repoglance doctor, launch MIXED live and MIXED picker, capture filtered StrictMode logcat, finish proof/session-bootstrap-20260918/PROOF.md, verify in ledger",
     "paused_at": "2026-09-18T19:03:23+00:00",
-    "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof"
+    "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof",
+    "resumed_at": "2026-09-18T19:14:08+00:00"
   },
+  "pause": null,
   "recommendation": {
     "alternatives": [
       "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it",
@@ -1637,8 +1642,8 @@
     "recorded_at": "2026-09-18T15:39:49+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "paused",
+  "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:03:23+00:00"
+  "updated_at": "2026-09-18T19:14:08+00:00"
 }
