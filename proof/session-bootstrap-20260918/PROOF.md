@@ -190,3 +190,10 @@ settings. File evidence is a name-only listing of `no_backup/` via `run-as`.
 The repository-content 401 path calls the same `clearSavedSessionNow()`
 helper; it was not driven separately because revocation is consumed by the
 first request, the catalog.
+
+## Review round 5 (head `67706abfb9d44abb021f07eabdd27be7a7144110`)
+
+- OpenClaw `req-20260918T210831Z-71553323822`: correct, 0.98, 0 findings.
+- ClawSweeper (comment 5735127182): platinum hermit overall and patch, diamond
+  lobster proof; correctness 0.93, security cleared, proof sufficient, no
+  findings. Owner acceptance of the auth-boundary change is the merge gate.

@@ -1656,9 +1656,7 @@
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
       "repair_required": false,
-      "review_classifications": [
-        "human_gate"
-      ],
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -1697,14 +1695,21 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T20:45:52+00:00",
           "source_identity": "git:7f501322d64a0967680d402c8c40eef3dc23ce43"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260918T210831Z-71553323822 correct 0.98; clawsweeper platinum hermit, proof diamond lobster, no findings (PR #16 comment 5735127182)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T21:14:00+00:00",
+          "source_identity": "git:67706abfb9d44abb021f07eabdd27be7a7144110"
         }
       ],
-      "review_ref": "openclaw req-20260918T204045Z-63881723477 correct 0.98; clawsweeper gold shrimp 3/6, no code findings, 401 device proof outstanding (comment 5735127182)",
-      "review_result": "findings",
-      "review_source_identity": "git:7f501322d64a0967680d402c8c40eef3dc23ce43",
+      "review_ref": "openclaw req-20260918T210831Z-71553323822 correct 0.98; clawsweeper platinum hermit, proof diamond lobster, no findings (PR #16 comment 5735127182)",
+      "review_result": "clean",
+      "review_source_identity": "git:67706abfb9d44abb021f07eabdd27be7a7144110",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T20:45:52+00:00",
+      "updated_at": "2026-09-18T21:14:00+00:00",
       "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 3 repair (check green; 401 device proof human-gated)"
     },
     {
@@ -1779,5 +1784,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T20:45:52+00:00"
+  "updated_at": "2026-09-18T21:14:00+00:00"
 }
