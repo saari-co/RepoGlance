@@ -23,6 +23,7 @@ import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.widget.CompactContent
 import co.saari.repoglance.widget.RepoWidgetConfig
 import co.saari.repoglance.model.ValueBasis
+import co.saari.repoglance.state.LiveSnapshotStore
 import java.time.Instant
 import kotlinx.coroutines.launch
 
@@ -64,12 +65,25 @@ class WidgetVariantPickerActivity : ComponentActivity() {
         // candidate copy. Two data states prove the truth-rule rendering.
         val config = RepoWidgetConfig(RepoRef("saariuslystoned", "x-api"), NavigatorMode.BOTH)
         val intent = Intent(this, WidgetVariantPickerActivity::class.java)
+        val persistedConfig = RepoWidgetConfig(RepoRef("saari-co", "RepoGlance"), NavigatorMode.BOTH)
         val candidates: List<Pair<String, @Composable (RepoSnapshot?, Instant) -> Unit>> = listOf(
             "PRODUCTION — exact counts" to { s, n -> CompactContent(config, s, intent, n) },
             "PRODUCTION — last good, 3 days old" to { s, n ->
                 CompactContent(config, s?.copy(valueBasis = ValueBasis.LAST_GOOD, observedAt = n.minusSeconds(3 * 24 * 3600)), intent, n)
             },
             "PRODUCTION — no observation yet" to { _, n -> CompactContent(config, null, intent, n) },
+            // The real persisted path: whatever LiveSnapshotStore holds for the
+            // public saari-co/RepoGlance repository right now, aged against the
+            // wall clock. Nothing is constructed; an absent record renders as
+            // "no data" through the same production composition.
+            "PERSISTED — saari-co/RepoGlance live store, wall clock" to { _, _ ->
+                CompactContent(
+                    persistedConfig,
+                    LiveSnapshotStore.load(this@WidgetVariantPickerActivity, persistedConfig.repo),
+                    intent,
+                    Instant.now(),
+                )
+            },
         )
 
         lifecycleScope.launch {

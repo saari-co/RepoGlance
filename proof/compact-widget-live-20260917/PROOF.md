@@ -130,3 +130,56 @@ Device claims were not re-run on the merged APK: #6 changed only the in-app
 GitHub-access UI and its test, and no widget, snapshot, or Glance source
 differs between `cd737e2` and `2d19847`. The Fold captures above remain the
 widget proof for this PR.
+
+## Compact freshness repair (2026-09-18)
+
+ClawSweeper's exact-head advisory review of `2b6fc1b` (comment
+`5724629634`) reported one `required_fix` at P1: `LiveSnapshotStore` can
+persist a `LAST_GOOD` snapshot and `CompactContent` rendered bare counts with
+no age, violating truth rules 2-3. Accepted. The independent read-only OpenClaw
+pass on `2d19847` had not surfaced it because it reported at P0 threshold only.
+
+Repair, commit `19a3d1d0995fd0a05c7c88a64364e2c0899e2b80`: the compact slot
+carries a freshness element beside the repository name — bare age for `EXACT`
+(`12m`), `last good <age>` in the theme error colour and bold for `LAST_GOOD`,
+and `no data` when there is no observation. The debug picker gains a
+"last good, 3 days old" production render and a "PERSISTED" candidate that
+renders whatever `LiveSnapshotStore` actually holds for the public
+`saari-co/RepoGlance` repository against the wall clock.
+
+Deterministic verification on `19a3d1d`:
+
+- 185 JVM tests across 25 suites; 0 failures, 0 errors, 0 skips (6 new)
+- Lint: 0 errors, 30 warnings, 3 informational; unchanged
+- The `LAST_GOOD` Glance assertion was mutation-checked: `"last good 3x"` →
+  1 failed of 6; restored → green
+- Debug APK on device SHA-256
+  `de8ed1a0472b756f6e4c31a5e020a88a8da79baa41d98189c474ffd76a559d04`
+
+Device verification, Pixel 11 Pro Fold, inner display `4619827677550801152`
+(outer `4619827677550801153` OFF, virtual display excluded), production
+`CompactContent` through the real `GlanceRemoteViews` pipeline at 120x64,
+180x64, and 250x90dp:
+
+| State | Path | Rendered | Capture SHA-256 |
+| --- | --- | --- | --- |
+| EXACT, constructed 2h old | picker | `x-api · 2h · 128 / 23 / 7` | `dfac55618cd906049a63a538d89cb173cb1634666afbcbe16cd7780b29bfc57c` |
+| LAST_GOOD, constructed 3d old | picker | `x-api · last good 3d` in error colour | same capture |
+| UNKNOWN, no snapshot | picker | `x-api · no data · — / — / —` | same capture |
+| **Persisted live, online** | real `LiveSnapshotStore` after opening the repo signed in | `RepoGlance · just now · issues 2 · PRs 1 · to review 0` — matches the repository's open items | `05230e68001b757d9a70cc4db86be95fe45d85ac2f96d7a55695984470711264` |
+| **Persisted live, after real refresh failure** | airplane mode on, repo reopened, navigator showed `Could not refresh GitHub right now`; `LiveSnapshotFactory` aged the stored snapshot to `LAST_GOOD` and the store persisted it | `RepoGlance · last good 3m · 2 / 1 / 0`, label in error colour | `e0466e6e9a56090bb75d9ed324b013e3e46f936d456157bf250c71b416237ebc` (two byte-identical captures) |
+
+Source-blind guard before each live step: the catalog was filtered to the
+exact public repository and a UI dump proved `saari-co/RepoGlance` was the
+only repository-shaped label on screen before the row was opened. One earlier
+capture that showed the unfiltered catalog was discarded unread beyond
+confirming that fact and is not retained. Airplane mode was restored to off
+afterwards. Images are held locally with the hashes above, not committed.
+
+Fidelity note: at the 120dp floor the freshness label takes precedence and
+the repository name truncates (`Repo…`). The label is the truth-rule surface,
+so it wins; a later cycle may revisit the name treatment.
+
+The account-bound session on the test device was already present from the
+maintainer's earlier sign-in; no sign-in, token, or account action was
+performed, and no non-public repository content was captured.
