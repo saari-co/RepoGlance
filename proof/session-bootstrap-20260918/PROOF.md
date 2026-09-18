@@ -168,3 +168,25 @@ completion even when the calling job is already cancelled (kotlinx
   revoked token returning 401 through catalog or repository-content has not
   been exercised on device. **human_gate**: it requires the maintainer to
   revoke RepoGlance's authorization on his GitHub account.
+
+## Session persistence and the 401 final effect (2026-09-18, maintainer-gated)
+
+Run directory: `runs/verify-repoglance-runs/20260918T210000Z-401-proof/`. Head
+build on the phone: APK sha256 `2f12ea4a497425ceceee0879a10b13a48b278644d3fbc227319814b4a2f57698`
+(from `7f501322d64a0967680d402c8c40eef3dc23ce43`), doctor passing. The
+maintainer signed in himself (device flow, agent observed nothing while the
+code screen was up) and revoked RepoGlance's authorization himself in GitHub
+settings. File evidence is a name-only listing of `no_backup/` via `run-as`.
+
+| Step | Result | Evidence (sha256 prefix) |
+| --- | --- | --- |
+| Signed in: dump shows `repoglance:live`; token file present | persisted | `signed-in.txt` (db53fa453711f4a8), `token-file-signed-in.txt` (1810b49c31322a20) |
+| Force-stop, cold start on the prior build: `repoglance:live` | survives restart | `cold-persist.txt` (1c03234a1dd482a1) |
+| Install head build (data kept), cold start: `repoglance:live`, file present | survives upgrade | `cold-persist-head.txt` (3c346c55cca6b8b5), `token-file-head.txt` (1810b49c31322a20) |
+| Maintainer revokes the app on GitHub; file still present before launch | stale token on disk | `token-file-before-401.txt` (1810b49c31322a20) |
+| Cold start: catalog request 401 → "Your GitHub session needs to be renewed", `Reconnect GitHub`; token file **absent**; 0 StrictMode lines with app frames | clear ran on the session dispatcher | `after-401.txt` (db5c72f86c1e6535), `token-file-after-401.txt` (06ecf56960c01c91) |
+| Force-stop, cold start again: `repoglance:connect-github`, file still absent | stale token not reused | `cold-after-401.txt` (217ddd96a6286ec4), `token-file-cold-after-401.txt` (06ecf56960c01c91) |
+
+The repository-content 401 path calls the same `clearSavedSessionNow()`
+helper; it was not driven separately because revocation is consumed by the
+first request, the catalog.
