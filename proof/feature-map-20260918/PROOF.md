@@ -244,3 +244,17 @@ output. Probes: a synthetic device-code tree on stdin → exit 1 and zero
 bytes written; a safe tree → exit 0 and the XML; on the Fold, a `dump` of the
 signed-in catalog is allowed, `capture` runs the same screen first, and no
 `/sdcard/verify-ui.xml` exists on the device afterwards.
+
+## Review repair 4: real Fixture-state labels (2026-09-18)
+
+ClawSweeper on `8fa0049`: `required_fix` at P2, accepted. The navigator
+recipe named a `Data unavailable` chip in the Filters sheet; the sheet's
+labels are `Loaded`, `Empty`, `Paged`, `Last-good`, `Unknown`, and
+`Rate-limited` (`ListState.displayLabel()`), and `Data unavailable` is what
+the list renders after choosing `Unknown`. Verified on the Fold: the sheet
+dump shows the five visible chips; choosing `Unknown` renders
+`Data unavailable` with an `Unknown` chip, `Rate-limited` and `Last-good`
+render a `Cached · <age>` chip, `Empty` renders `No rows match`. The recipe
+now names the chips and their renderings exactly. The structural gate does
+not check recipe strings against the UI; that is the maintenance loop's job
+and the reason the gate is called structural.

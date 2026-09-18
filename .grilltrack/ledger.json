@@ -1207,14 +1207,30 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": "verify_redact_guard.py probes: code prompt and copy button red, safe tree green, real signed-in catalog dump allowed"
+        },
+        {
+          "at": "2026-09-18T12:57:00+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:58ab2fed9d515c742f35fbe40ba9cf2b6a7254e8 in-memory redaction guard",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "guard stdin probes: code tree exit 1 / 0 bytes, safe tree exit 0; Fold: signed-in dump allowed, capture pre-screened, no /sdcard/verify-ui.xml"
         }
       ],
       "id": "feature-map-015",
       "implementation_ref": "git:58ab2fed9d515c742f35fbe40ba9cf2b6a7254e8 in-memory redaction guard",
       "question": "How do agents navigate RepoGlance and prove a surface's state without a human driving the phone?",
       "rationale": "Bobby 2026-09-18 after reading cursor/plugins pstack: adopt pstack shape; .claude/skills canonical with .cursor symlink; top five features; structural CI check plus maintenance loop.",
-      "repair_required": false,
-      "review_classifications": [],
+      "repair_required": true,
+      "review_classifications": [
+        "required_fix"
+      ],
       "review_history": [
         {
           "classifications": [
@@ -1242,14 +1258,23 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T12:49:49+00:00",
           "source_identity": "git:cc5fe2a05d20f66e14704d281ad975471364356e"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P2: Fixture-state labels in recipe did not match ListState.displayLabel(); openclaw req-20260918T125006Z-377338517991 clean",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:57:00+00:00",
+          "source_identity": "git:8fa0049e2c86271bc4926900cf47a5e25f633dab"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
-      "status": "verified",
+      "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P2: Fixture-state labels in recipe did not match ListState.displayLabel(); openclaw req-20260918T125006Z-377338517991 clean",
+      "review_result": "findings",
+      "review_source_identity": "git:8fa0049e2c86271bc4926900cf47a5e25f633dab",
+      "status": "needs_reverification",
       "superseded_by": null,
-      "updated_at": "2026-09-18T12:49:49+00:00",
+      "updated_at": "2026-09-18T12:57:00+00:00",
       "verification_ref": "guard stdin probes: code tree exit 1 / 0 bytes, safe tree exit 0; Fold: signed-in dump allowed, capture pre-screened, no /sdcard/verify-ui.xml"
     }
   ],
@@ -1270,5 +1295,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T12:49:49+00:00"
+  "updated_at": "2026-09-18T12:57:00+00:00"
 }
