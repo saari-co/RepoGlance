@@ -27,3 +27,6 @@
 {"action": "focus_confirmed", "at": "2026-07-29T12:08:47+00:00", "data": {"note": "public-release bundle confirmed including the visibility flip"}, "event_id": "64f821b3-80db-4dba-bcef-f297f42b4120"}
 {"action": "implementation_recorded", "at": "2026-07-29T12:08:47+00:00", "data": {"refs": ["github:saari-co/RepoGlance (visibility=PUBLIC)", "branch:grilltrack/public-release-20260729"], "note": "flip executed and verified; docs/LICENSE via PR under maintainer merge gate"}, "event_id": "2298674d-e1cf-41c7-a943-a073e0d0dfdf"}
 {"action": "decision_locked", "at": "2026-07-29T12:10:13+00:00", "data": {"decision_id": "delivery-rail-012", "note": "maintainer-specified SwarmPocket-style delivery rail"}, "event_id": "3a4bf829-ba7f-4338-9415-906b4670ee17"}
+{"action": "decision_proposed", "at": "2026-08-17T02:21:08+00:00", "data": {"decision_id": "release-model-013"}, "event_id": "9f9a9c55-b83a-4158-bc3f-68391ee1d897"}
+{"action": "decision_locked", "at": "2026-08-17T02:21:08+00:00", "data": {"decision_id": "release-model-013"}, "event_id": "ed34b17b-2793-4a34-9b9d-697a939b75ba"}
+{"action": "decision_superseded", "at": "2026-08-17T02:21:08+00:00", "data": {"affected": [], "decision_id": "delivery-rail-012", "replacement_id": "release-model-013"}, "event_id": "8530897f-ef57-4b70-bea8-9af5489f0389"}

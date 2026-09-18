@@ -1,0 +1,205 @@
+# Tag-driven GitHub Release for RepoGlance.
+#
+# Pushing a `v*` tag builds a release APK and AAB, cuts a GitHub Release
+# (title "RepoGlance <versionName>", prerelease iff the tag contains
+# "-beta"), and attaches the APK, the AAB, and a SHA256SUMS file. Signing is
+# conditional on secret ANDROID_KEYSTORE_B64: when it's provisioned the
+# artifacts are signed with the upload key; otherwise the build falls back
+# to Gradle's default unsigned release output and the release body says so.
+#
+# See docs/RELEASING.md for the cut procedure and the versionCode formula.
+#
+# This replaces the rolling `canary` release model (build-only on unmerged
+# branch codex/canary-rail-20260729, RepoGlance PR #3): every push to main
+# no longer produces a release artifact, only annotated version tags do.
+
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Same JDK as ci.yml / canary.yml (gradle/libs.versions.toml targets
+      # JDK 17, AGP 8.7.3, Kotlin 2.0.21). No explicit Android SDK setup step:
+      # ubuntu-latest ships a preinstalled SDK/build-tools image, same as
+      # canary.yml relies on.
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Resolve version from tag
+        id: version
+        run: |
+          set -euo pipefail
+          OUTPUT=$(./gradlew --no-daemon -q printVersion)
+          echo "$OUTPUT"
+          NAME=$(printf '%s\n' "$OUTPUT" | sed -n 's/^versionName=//p')
+          CODE=$(printf '%s\n' "$OUTPUT" | sed -n 's/^versionCode=//p')
+          test -n "$NAME"
+          test -n "$CODE"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Decode signing keystore (if provisioned)
+        id: signing
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ANDROID_KEYSTORE_B64:-}" ]; then
+            KEYSTORE_PATH="$RUNNER_TEMP/repoglance-release.jks"
+            umask 077
+            printf '%s' "$ANDROID_KEYSTORE_B64" | base64 --decode > "$KEYSTORE_PATH"
+            test -s "$KEYSTORE_PATH"
+            echo "keystore_path=$KEYSTORE_PATH" >> "$GITHUB_OUTPUT"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # app/build.gradle.kts wires signingConfigs["release"] only when
+      # ANDROID_KEYSTORE_PATH points at a file that exists, so this step is
+      # safe to run unconditionally: unsigned when the keystore secret is
+      # empty, signed when it's provisioned.
+      - name: Build release APK and AAB
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ steps.signing.outputs.keystore_path }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon testDebugUnitTest assembleRelease bundleRelease
+
+      - name: Delete temporary keystore
+        if: always()
+        run: rm -f "${{ steps.signing.outputs.keystore_path }}"
+
+      - name: Package release assets
+        id: assets
+        env:
+          SIGNED: ${{ steps.signing.outputs.signed }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+
+          if [ "$SIGNED" = "true" ]; then
+            APK_SRC="app/build/outputs/apk/release/app-release.apk"
+          else
+            APK_SRC=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*-unsigned.apk' -print -quit)
+          fi
+          test -n "$APK_SRC"
+          test -f "$APK_SRC"
+
+          AAB_SRC="app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB_SRC"
+
+          APK_NAME="RepoGlance-${VERSION_NAME}.apk"
+          AAB_NAME="RepoGlance-${VERSION_NAME}.aab"
+          cp "$APK_SRC" "release-assets/$APK_NAME"
+          cp "$AAB_SRC" "release-assets/$AAB_NAME"
+          ( cd release-assets && sha256sum "$APK_NAME" "$AAB_NAME" > SHA256SUMS )
+
+          echo "apk_name=$APK_NAME" >> "$GITHUB_OUTPUT"
+          echo "aab_name=$AAB_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog section
+        id: notes
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          SIGNED: ${{ steps.signing.outputs.signed }}
+        run: |
+          set -euo pipefail
+          NOTES_FILE="$RUNNER_TEMP/release-notes.md"
+          : > "$NOTES_FILE"
+          if [ -f docs/CHANGELOG.md ]; then
+            awk -v heading="## ${VERSION_NAME}" '
+              $0 == heading { found=1; print; next }
+              found && /^## / { exit }
+              found { print }
+            ' docs/CHANGELOG.md > "$NOTES_FILE"
+          fi
+
+          if [ -s "$NOTES_FILE" ] && [ "$SIGNED" != "true" ]; then
+            {
+              echo
+              echo "---"
+              echo "**Unsigned build.** \`ANDROID_KEYSTORE_B64\` is not yet provisioned, so this APK/AAB are Gradle's default unsigned release output — not installable as-is."
+            } >> "$NOTES_FILE"
+          fi
+
+          if [ -s "$NOTES_FILE" ]; then
+            echo "has_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_notes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          HAS_NOTES: ${{ steps.notes.outputs.has_notes }}
+          SIGNED: ${{ steps.signing.outputs.signed }}
+        run: |
+          set -euo pipefail
+          TITLE="RepoGlance ${VERSION_NAME}"
+          NOTES_FILE="$RUNNER_TEMP/release-notes.md"
+
+          ARGS=(--title "$TITLE" --verify-tag)
+          if [[ "$REF_NAME" == *-beta* ]]; then
+            ARGS+=(--prerelease)
+          fi
+
+          if [ "$HAS_NOTES" = "true" ]; then
+            ARGS+=(--notes-file "$NOTES_FILE")
+          else
+            ARGS+=(--generate-notes)
+            if [ "$SIGNED" != "true" ]; then
+              ARGS+=(--notes "**Unsigned build.** \`ANDROID_KEYSTORE_B64\` is not yet provisioned, so this APK/AAB are Gradle's default unsigned release output — not installable as-is.")
+            fi
+          fi
+
+          gh release create "$REF_NAME" \
+            "${ARGS[@]}" \
+            release-assets/*
+
+  # Play Store internal-track upload. Intentionally disabled (if: false)
+  # until the following are provisioned — do not remove this job, flip the
+  # guard once they land:
+  #   1. Secret PLAY_SERVICE_ACCOUNT_JSON — a Play Console service-account
+  #      JSON key, scoped to release management for co.saari.repoglance.
+  #   2. A Play Console app entry for co.saari.repoglance, with the
+  #      mandatory first manual upload/store-listing completed (the Play
+  #      Developer API refuses uploads to an app with zero prior releases).
+  #   3. An "internal" testing track configured on that Play Console app.
+  #   4. Wire a step here (e.g. r0adkll/upload-google-play) that downloads
+  #      the AAB built above and uploads it to track: internal using
+  #      PLAY_SERVICE_ACCOUNT_JSON.
+  play-internal-upload:
+    name: play-internal-upload (disabled — Play Console not provisioned)
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: TODO — upload the release AAB to the Play Console internal track
+        run: |
+          echo "Disabled. See the job-level comment in .github/workflows/release.yml for what's required to enable this."
