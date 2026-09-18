@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.model.CiState
@@ -113,7 +114,10 @@ fun HomeScreen(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = onOpenNavigator, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = onOpenNavigator,
+            modifier = Modifier.fillMaxWidth().testTag("repoglance:fixture-navigator"),
+        ) {
             Text("Navigator")
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -176,7 +180,10 @@ private fun ScenarioSwitcher(scenario: FixtureScenario, onScenarioChange: (Fixtu
             readOnly = true,
             label = { Text("Fixture") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).width(170.dp),
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .width(170.dp)
+                .testTag("repoglance:scenario"),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             FixtureScenario.entries.forEach { option ->

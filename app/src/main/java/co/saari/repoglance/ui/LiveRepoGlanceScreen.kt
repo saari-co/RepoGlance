@@ -189,6 +189,7 @@ private fun AwaitingGitHubScreen(
             Button(
                 onClick = { onCopyCodeAndOpenGitHub(userCode, verificationUri) },
                 enabled = minutesRemaining > 0L,
+                modifier = Modifier.testTag("repoglance:copy-code"),
             ) {
                 Text("Copy code & open GitHub")
             }
@@ -223,7 +224,11 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
-            Button(onClick = onConnectGitHub, enabled = connectionReady) {
+            Button(
+                onClick = onConnectGitHub,
+                enabled = connectionReady,
+                modifier = Modifier.testTag("repoglance:connect-github"),
+            ) {
                 Text("Connect GitHub")
             }
             if (!connectionReady) {
@@ -356,8 +361,15 @@ private fun LiveRepositoryHome(
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            AssistChip(onClick = {}, label = { Text("LIVE") })
-                            IconButton(onClick = onRefresh) {
+                            AssistChip(
+                                onClick = {},
+                                label = { Text("LIVE") },
+                                modifier = Modifier.testTag("repoglance:live"),
+                            )
+                            IconButton(
+                                onClick = onRefresh,
+                                modifier = Modifier.testTag("repoglance:refresh-repositories"),
+                            ) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Refresh repositories")
                             }
                             Box {
@@ -400,6 +412,7 @@ private fun LiveRepositoryHome(
                         rateText?.let {
                             Text(
                                 it,
+                                modifier = Modifier.testTag("repoglance:rate-limit"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = if (rateLimit.bucket == RateLimitBucket.EXHAUSTED) {
                                     MaterialTheme.colorScheme.error
@@ -575,7 +588,7 @@ private fun LiveNavigator(
             item(key = "live-controls") {
                 Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                        TextButton(onClick = onBack) {
+                        TextButton(onClick = onBack, modifier = Modifier.testTag("repoglance:live-home")) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                             Spacer(Modifier.width(4.dp))
                             Text("Home")
@@ -585,7 +598,10 @@ private fun LiveNavigator(
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f),
                         )
-                        IconButton(onClick = onRefresh) {
+                        IconButton(
+                            onClick = onRefresh,
+                            modifier = Modifier.testTag("repoglance:refresh-repository"),
+                        ) {
                             Icon(Icons.Default.Refresh, contentDescription = "Refresh repository")
                         }
                     }
@@ -611,6 +627,7 @@ private fun LiveNavigator(
                                 onClick = { modeName = candidate.name },
                                 shape = SegmentedButtonDefaults.itemShape(index, NavigatorMode.entries.size),
                                 label = { Text(candidate.name) },
+                                modifier = Modifier.testTag("repoglance:live-mode-${candidate.name}"),
                             )
                         }
                     }

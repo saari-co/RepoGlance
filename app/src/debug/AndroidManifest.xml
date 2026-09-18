@@ -10,5 +10,10 @@
             android:name="co.saari.repoglance.devpicker.WidgetVariantPickerActivity"
             android:exported="true"
             android:label="GrillTrack widget picker" />
+        <activity
+            android:name="co.saari.repoglance.devlaunch.ScenarioLaunchActivity"
+            android:exported="true"
+            android:label="verify-repoglance scenario launcher"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

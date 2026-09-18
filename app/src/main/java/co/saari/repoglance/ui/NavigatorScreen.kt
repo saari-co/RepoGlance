@@ -63,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.fixtures.Fixtures
@@ -440,7 +441,7 @@ private fun NavigatorControls(
             .padding(top = 8.dp, bottom = 4.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            TextButton(onClick = onBackToHome) {
+            TextButton(onClick = onBackToHome, modifier = Modifier.testTag("repoglance:fixture-home")) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Home")
@@ -562,6 +563,7 @@ private fun ModeSwitcher(mode: NavigatorMode, onModeChange: (NavigatorMode) -> U
                 onClick = { onModeChange(m) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = NavigatorMode.entries.size),
                 label = { Text(m.name) },
+                modifier = Modifier.testTag("repoglance:fixture-mode-${m.name}"),
             )
         }
     }

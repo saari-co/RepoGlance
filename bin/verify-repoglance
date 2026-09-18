@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+# verify-repoglance: helpers the verify-repoglance skill drives the app with.
+# Registered swarm test phone over adb only; never drives an unregistered device.
+#
+#   bin/verify-repoglance doctor                 # is this device/build worth driving?
+#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode]
+#   bin/verify-repoglance dump [label]           # uiautomator tree -> runs/verify-repoglance-runs/<run>/<label>.xml (+ .txt)
+#   bin/verify-repoglance capture <label>        # inner-display PNG + manifest via phone_proof
+#   bin/verify-repoglance tap <resource-id>      # tap the centre of a node by resource-id (from the last dump)
+#   bin/verify-repoglance type <text>            # type into the focused field
+#   bin/verify-repoglance cleanup                # force-stop, restore MIXED scenario; evidence is kept
+set -euo pipefail
+
+PKG="co.saari.repoglance"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+RUN_ID="${VERIFY_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}"
+OUT="$ROOT/runs/verify-repoglance-runs/$RUN_ID"
+PHONE_PROOF="${PHONE_PROOF:-$HOME/Developer/SaariusSkills/skills/phone-proof/scripts/phone_proof.py}"
+mkdir -p "$OUT"
+
+need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1" >&2; exit 2; }; }
+serial() { adb devices | awk 'NR>1 && $2=="device"{print $1}'; }
+
+# Pin one transport. The same phone can appear twice (USB serial and a
+# wireless-debugging ip:port); prefer USB, else the single wireless entry.
+# VERIFY_SERIAL overrides. Every adb call below inherits ANDROID_SERIAL.
+pick_serial() {
+  if [ -n "${VERIFY_SERIAL:-}" ]; then export ANDROID_SERIAL="$VERIFY_SERIAL"; return; fi
+  local all usb
+  all=$(serial); usb=$(printf '%s\n' "$all" | grep -v ':' || true)
+  if [ "$(printf '%s\n' "$usb" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$usb"
+  elif [ "$(printf '%s\n' "$all" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$all"
+  else echo "doctor: expected one registered device (USB preferred), found: $(printf '%s' "$all" | tr '\n' ' ')" >&2; exit 1; fi
+}
+pick_serial
+
+doctor() {
+  need adb
+  echo "serial=$ANDROID_SERIAL"
+  local model; model=$(adb shell getprop ro.product.model | tr -d '\r')
+  local ver; ver=$(adb shell dumpsys package "$PKG" | grep -m1 versionName | tr -d ' \r')
+  local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+  local local_sha="absent" dev_sha="absent"
+  [ -f "$apk" ] && local_sha=$(shasum -a 256 "$apk" | cut -c1-64)
+  local path; path=$(adb shell pm path "$PKG" 2>/dev/null | head -1 | sed 's/^package://' | tr -d '\r')
+  if [ -n "$path" ]; then
+    adb pull "$path" "$OUT/device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/device-base.apk" | cut -c1-64) && rm -f "$OUT/device-base.apk"
+  fi
+  local launcher; launcher=$(adb shell pm dump "$PKG" 2>/dev/null | grep -c "devlaunch.ScenarioLaunchActivity" || true)
+  echo "device=$model package=$PKG $ver"
+  echo "apk_local=$local_sha"
+  echo "apk_device=$dev_sha"
+  echo "scenario_launcher_present=$([ "${launcher:-0}" -gt 0 ] && echo yes || echo no)"
+  local posture keyguard wake
+  posture=$(adb shell cmd device_state state 2>/dev/null | grep -oE "[A-Z_]+" | head -1)
+  wake=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
+  keyguard=$(adb shell dumpsys trust 2>/dev/null | grep -m1 -oE "deviceLocked=[01]" | cut -d= -f2)
+  echo "posture=${posture:-unknown} wakefulness=${wake:-unknown} device_locked=${keyguard:-unknown}"
+  echo "run_dir=$OUT"
+  [ "$wake" = "Awake" ] && [ "${keyguard:-1}" = "0" ] || { echo "doctor: phone must be awake and unlocked; it is wakefulness=$wake device_locked=${keyguard:-unknown}" >&2; exit 1; }
+  [ "$local_sha" = "$dev_sha" ] || { echo "doctor: device APK does not match the local build; run 'launch' to install" >&2; exit 1; }
+  [ "${launcher:-0}" -gt 0 ] || { echo "doctor: debug launcher missing; this is not a debug build" >&2; exit 1; }
+}
+
+launch() {
+  need adb
+  local scenario="${1:-MIXED}" screen="${2:-live}" repo="${3:-acme/rocket}" mode="${4:-BOTH}"
+  local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+  [ -f "$apk" ] || { echo "launch: build first: ./gradlew assembleDebug" >&2; exit 1; }
+  local local_sha dev_sha path
+  local_sha=$(shasum -a 256 "$apk" | cut -c1-64)
+  path=$(adb shell pm path "$PKG" 2>/dev/null | head -1 | sed 's/^package://' | tr -d '\r')
+  dev_sha=""
+  if [ -n "$path" ]; then
+    adb pull "$path" "$OUT/.device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/.device-base.apk" | cut -c1-64); rm -f "$OUT/.device-base.apk"
+  fi
+  [ "$local_sha" = "$dev_sha" ] || adb install -r "$apk" >/dev/null
+  local expect marker
+  case "$screen" in
+    picker) expect="devpicker.WidgetVariantPickerActivity"; marker="PRODUCTION" ;;
+    navigator) expect="co.saari.repoglance/.MainActivity"; marker="repoglance:fixture-home" ;;
+    *) expect="co.saari.repoglance/.MainActivity"; marker="" ;;
+  esac
+  local attempt top ok
+  for attempt in 1 2; do
+    adb shell am force-stop "$PKG"; sleep 1
+    adb shell am force-stop com.github.android 2>/dev/null || true
+    adb shell am start -W -n "$PKG/.devlaunch.ScenarioLaunchActivity" \
+      --es scenario "$scenario" --es screen "$screen" --es repo "$repo" --es mode "$mode" >/dev/null 2>&1 || true
+    ok=""
+    for _ in 1 2 3 4 5 6 7 8; do
+      sleep 1
+      top=$(adb shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | sed -E 's/.*u0 //; s/ t[0-9]+}//')
+      case "$top" in *"$expect"*) ;; *) continue ;; esac
+      if [ -z "$marker" ]; then ok=1; break; fi
+      adb shell uiautomator dump /sdcard/verify-ui.xml >/dev/null 2>&1 && adb shell cat /sdcard/verify-ui.xml 2>/dev/null | grep -qF "$marker" && { ok=1; break; }
+    done
+    [ -n "$ok" ] && break
+    echo "launch: attempt $attempt did not reach $screen (top=$top); retrying" >&2
+  done
+  [ -n "$ok" ] || { echo "launch: failed to reach $screen after 2 attempts (top=$top)" >&2; exit 1; }
+  echo "$top"
+}
+
+dump() {
+  need adb
+  local label="${1:-screen}"
+  adb shell uiautomator dump /sdcard/verify-ui.xml >/dev/null 2>&1
+  adb pull /sdcard/verify-ui.xml "$OUT/$label.xml" >/dev/null 2>&1
+  cp "$OUT/$label.xml" "$OUT/last-dump.xml"
+  python3 - "$OUT/$label.xml" > "$OUT/$label.txt" <<'PY'
+import sys, xml.etree.ElementTree as ET
+r = ET.parse(sys.argv[1]).getroot()
+for n in r.iter('node'):
+    rid = n.get('resource-id') or ''
+    t = n.get('text') or ''
+    d = n.get('content-desc') or ''
+    if rid or t or d:
+        print(f"{rid or '-'} | {t} | {d} | {n.get('bounds')}")
+PY
+  echo "$OUT/$label.txt"
+}
+
+capture() {
+  need python3
+  local label="${1:-capture}"
+  local screen; screen=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
+  [ "$screen" = "Awake" ] || { echo "capture: screen is $screen, not Awake; wake and unlock the phone first" >&2; exit 1; }
+  local display; display=$(python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" inventory | python3 -c "import json,sys; d=json.load(sys.stdin); a=[x for x in d['physical_displays'] if x['active'] and not x['virtual']]; print(a[0]['physical_display_id'] if len(a)==1 else '')")
+  [ -n "$display" ] || { echo "capture: no single active physical display (is the phone folded mid-transition?)" >&2; exit 1; }
+  python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" capture --physical-display-id "$display" \
+    --output "$OUT/$label.png" --manifest "$OUT/$label.json" \
+    | python3 -c "import json,sys; d=json.load(sys.stdin)['capture']; print(f\"$OUT/$label.png sha256={d['sha256']} bytes={d['bytes']}\")"
+}
+
+tap() {
+  need adb
+  local rid="$1"
+  [ -f "$OUT/last-dump.xml" ] || dump pre-tap >/dev/null
+  local xy; xy=$(python3 - "$OUT/last-dump.xml" "$rid" <<'PY'
+import sys, re, xml.etree.ElementTree as ET
+r = ET.parse(sys.argv[1]).getroot(); want = sys.argv[2]
+nodes = list(r.iter('node'))
+exact = [n for n in nodes if n.get('resource-id') == want or n.get('content-desc') == want or n.get('text') == want]
+prefix = [n for n in nodes if (n.get('text') or '').startswith(want) or (n.get('content-desc') or '').startswith(want)]
+for n in (exact or prefix)[:1]:
+    x1,y1,x2,y2 = map(int, re.findall(r'\d+', n.get('bounds'))); print((x1+x2)//2, (y1+y2)//2)
+PY
+)
+  [ -n "$xy" ] || { echo "tap: '$rid' not in last dump" >&2; exit 1; }
+  adb shell input -d 0 tap $xy
+  echo "tapped $rid at $xy"
+}
+
+type_text() { need adb; adb shell input text "$(printf '%s' "$1" | sed 's/ /%s/g')"; echo "typed"; }
+
+cleanup() {
+  need adb
+  adb shell am force-stop "$PKG" || true
+  adb shell am force-stop com.github.android 2>/dev/null || true
+  adb shell am start -n "$PKG/.devlaunch.ScenarioLaunchActivity" --es scenario MIXED --es screen live >/dev/null 2>&1 || true
+  sleep 1; adb shell am force-stop "$PKG" || true
+  adb shell settings get global airplane_mode_on | grep -q 1 && adb shell cmd connectivity airplane-mode disable || true
+  echo "cleanup: app stopped, scenario restored to MIXED, airplane mode off; evidence kept in $OUT"
+}
+
+case "${1:-}" in
+  doctor) doctor ;;
+  launch) shift; launch "$@" ;;
+  dump) shift; dump "$@" ;;
+  capture) shift; capture "$@" ;;
+  tap) shift; tap "$@" ;;
+  type) shift; type_text "$@" ;;
+  cleanup) cleanup ;;
+  *) sed -n 2,12p "$0"; exit 2 ;;
+esac
