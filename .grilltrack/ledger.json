@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-18T16:39:42+00:00",
     "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
     "started_at": "2026-09-18T16:09:26+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "session-bootstrap-016: hasSavedSession runs on a serial IO dispatcher from viewModelScope with Checking held until it answers; the sign-in failure catches take the same hop; SecureTokenStore file handle is lazy; every signOut file delete (cancel, sign-out, catalog 401, content 401) moves onto the same serial IO dispatcher; picker loads the persisted snapshot on IO before composing. Checking stays text-only; logo splash deferred as checking-splash-018. Proof: JVM tests, gradlew check, cold-start logcat on the Fold with zero app-frame StrictMode lines for live and picker."
   },
   "decisions": [
@@ -1634,16 +1634,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it",
-      "fixture-collision: give the MIXED account/org fixtures colliding issue/PR numbers across repositories so features/navigator.md can prove the selection-key rule on device, not only in a JVM test"
+      "launcher-prefs: move the debug ScenarioLaunchActivity's AppPrefs write off the main thread so launcher-driven cold starts log zero StrictMode lines for the verifier tier",
+      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness"
     ],
-    "reason": "navigator-detail-017 is verified on both displays and reviewed clean at platinum hermit; the next slice the floor already found is the StrictMode main-thread read, and the verification skill can now prove it end to end",
-    "recommended": "session-bootstrap-016: move SecureTokenStore session reads off the main thread during RepoGlanceViewModel construction and take the picker's persisted-store read out of composition (the CI floor's StrictMode catch: DiskReadViolations per cold start); prove with a cold-start logcat via verify-repoglance showing zero app-frame violations",
-    "recorded_at": "2026-09-18T15:39:49+00:00"
+    "reason": "session-bootstrap-016 is verified on the Fold with zero main-thread session I/O; the maintainer asked for the logo splash during this grill and it is the only deferred decision with a stated preference",
+    "recommended": "checking-splash-018: the RepoGlance logo with a fun animation and a clever hook while the session is unknown; a five-candidate visual grill, and it first needs a logo asset (the manifest declares no icon today)",
+    "recorded_at": "2026-09-18T19:14:18+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:14:08+00:00"
+  "updated_at": "2026-09-18T19:14:18+00:00"
 }
