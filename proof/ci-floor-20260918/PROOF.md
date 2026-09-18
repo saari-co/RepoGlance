@@ -185,3 +185,22 @@ session-file read at startup happens on the main thread. That is the
 behaviour on the guard's first run. It is recorded in `docs/INVARIANTS.md`
 as open ratchet debt; moving session bootstrap off the main thread is a
 behaviour change and belongs to its own bounded slice, not this CI-floor PR.
+
+## Terminal review (2026-09-18, head `084cb77`)
+
+- OpenClaw (`req-20260918T045609Z-278951618813`): scoped-clean, 0 findings,
+  `patch is correct (0.98)`.
+- ClawSweeper: overall **platinum hermit (4/6)**, proof **diamond lobster
+  (5/6)**, patch quality platinum hermit, **no actionable findings**, label
+  `status: ready for maintainer look`. Its two remaining items are maintainer
+  decisions: accepting that future PRs can fail on the new floor, and that
+  analyser behaviour changes may need deliberate gate adjustment (as the
+  dependency-age checks already did).
+- CI on `084cb77`: green on both the push and pull-request runs.
+- This proof/ledger commit is the only change after the reviewed head; no
+  product, build, or CI source differs from `084cb77`.
+
+Cycle history: implementation `752a3a8` → proof `e3a755d` → CI exposed
+dependency-age nondeterminism, repaired in `50158a0` → ClawSweeper asked for
+runtime proof and a whitespace fix, repaired in `084cb77`. Two review-repair
+cycles, each recorded in the ledger as findings → implemented → verified.

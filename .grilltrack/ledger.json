@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-18T04:01:24+00:00",
     "domain": "hard CI floor: lint, static analysis, and comment ban as ratcheting merge gates",
     "started_at": "2026-09-18T04:00:59+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "ci-floor-014: lint gate with frozen baseline and ContentDescription at error; detekt+Compose+formatting as the one analyser; Kotlin warnings as errors; full comment ban in app/src/main with rationale moved to docs/INVARIANTS.md; logging and mutable-collection forbids; StrictMode in debug; CI runs check assembleDebug. Verification: green check on the head plus one deliberate violation per new rule shown red. Excluded: baseline burn-down, feature map, verifier script, emulator lane. Merge stays with Bobby."
   },
   "decisions": [
@@ -976,14 +976,21 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T04:56:01+00:00",
           "source_identity": "git:50158a035dc0ba5d972c58fcab72b36e47a975c2"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260918T045609Z-278951618813 clean (0.98); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no actionable findings, ready for maintainer look (PR #13)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T05:04:45+00:00",
+          "source_identity": "git:084cb77eeac1150b8604822a47fd60d6cf456a28"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "openclaw req-20260918T045609Z-278951618813 clean (0.98); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no actionable findings, ready for maintainer look (PR #13)",
+      "review_result": "clean",
+      "review_source_identity": "git:084cb77eeac1150b8604822a47fd60d6cf456a28",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T04:56:01+00:00",
+      "updated_at": "2026-09-18T05:04:45+00:00",
       "verification_ref": "proof/ci-floor-20260918/PROOF.md \u00a7 Device proof: Fold cold-start logcat shows DebugHooks StrictMode active (picker + MainActivity); picker capture 9ffc8688; git diff --check clean"
     }
   ],
@@ -993,16 +1000,16 @@
   },
   "recommendation": {
     "alternatives": [
-      "Reopen pin-model-010. Its locked choice says pinned repos 'form the widget and background-refresh set', but RepoWidget selects its repository from per-widget RepoWidgetConfigStore rather than pins (0 pin references), and no background-refresh set exists at all. Only StackWidget honours the pin clause.",
-      "Convert the tall row feed to live data and retire WIDGET_PREVIEW_LABEL, the prior recommendation \u2014 still valid, but it makes more fixture surface live without addressing whether live data stays current."
+      "Bounded behaviour slice: move SecureTokenStore session bootstrap off the main thread and the picker's persisted read out of composition \u2014 the floor's first StrictMode catches (6 DiskReadViolations per cold start)",
+      "Widget freshness grill recorded on PR #12: background refresh path for pinned repos, now that the compact slot labels staleness"
     ],
-    "reason": "Making the compact slot live converted a cosmetic fixture problem into a real staleness problem: fixtures regenerated at render time and were always current, whereas a stored snapshot ages with nothing to refresh it and nothing on screen to disclose its age.",
-    "recommended": "Grill widget freshness: give the compact widget a background refresh path and a visible freshness signal. Evidence: updatePeriodMillis=0 on both widget XMLs, no WorkManager/AlarmManager/JobScheduler anywhere and no such dependency declared, and WidgetRefresh.updateAll reachable only from MainActivity (pin/scenario change) and RepoGlanceViewModel (repo opened in app). A compact widget's counts are therefore frozen at the last in-app visit to that repo, and the locked round-2 ledger composition surfaces neither observedAt age nor the LAST_GOOD basis, so an arbitrarily old count renders as a bare number.",
-    "recorded_at": "2026-09-18T02:55:16+00:00"
+    "reason": "The floor is in place and proven on CI; the next leverage per the plan is navigation (feature map), which Grill C's verifier depends on. The StrictMode catches are real but are a behaviour change, so they stay a separate slice.",
+    "recommended": "feature-map-015: FEATURE_MAP.md at product-surface grain plus a debug-only scenario launcher so every truth state (EXACT/LAST_GOOD/UNKNOWN/RATE_LIMITED/NO_CI/EMPTY/MIXED) is adb-reachable, and scripts/check_feature_map.py in the new check task",
+    "recorded_at": "2026-09-18T05:04:45+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T04:56:01+00:00"
+  "updated_at": "2026-09-18T05:04:45+00:00"
 }
