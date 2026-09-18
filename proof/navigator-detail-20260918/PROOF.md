@@ -140,3 +140,29 @@ third-party app touched was the GitHub app on the registered test phone,
 stopped to break the remembered split pair. Screen kept awake over USB with
 `svc power stayon usb` after the phone locked itself mid-run; `svc power
 stayon false` restores it. Images stay in `runs/`; hashes above.
+
+## Review round 1 (2026-09-18, head `9f3de52`)
+
+- OpenClaw (`spark-openclaw-autoreview`, base `b445dc4`): scoped-clean, 0
+  findings, "patch is correct (0.98)", P0-only threshold.
+- ClawSweeper (PR #15 comment 5731579237): gold shrimp (3/6), proof diamond
+  lobster (5/6), one P2 finding, **accepted as `required_fix`**: selection was
+  keyed by issue/PR number alone, and account/org scopes aggregate rows from
+  several repositories where numbers collide, so the highlight, the pane, and
+  the second-tap hand-off could resolve to the wrong row. The LazyColumn item
+  keys had the same flaw.
+
+Repair: rows are now identified by `rowKey(kind, repo, number)`
+(`issue:acme/rocket#100`); `selectedKey`, `findItem`, the highlight, the
+second-tap comparison, and the item keys all use it. The debug picker follows.
+`NavigatorChromeTest.selectionKeyDistinguishesSameNumberAcrossRepositoriesAndKinds`
+pins the identity (same number, different repo or kind → different key).
+
+Honest limit: the fixture corpus numbers rows uniquely within a scope
+(issues 100+i, PRs 200+i across the repositories), so the collision cannot be
+reproduced on the phone with fixtures; the JVM test is the deterministic
+proof and the recipe re-drive is the regression proof. `check assembleDebug`
+green (189 tests). The phone was folded at repair time, so the cover recipe was
+re-driven on the repaired build (sheet `02c10ef08158405332a698591d0d4c1772e488cf179af61cfa8074aa4b5c7ef3`,
+Back dismisses, list restored); the inner-display recipe re-drive waits for
+the maintainer to unfold and is recorded below when done.

@@ -67,7 +67,7 @@ private fun narrowTapEffect(sheet: Boolean): String =
 
 private typealias ListSlot = @Composable (
     openGitHubOnSelect: Boolean,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
     modifier: Modifier,
 ) -> Unit
 
@@ -94,7 +94,7 @@ fun NavigatorCandidate(
     var fixtureListState by rememberSaveable { mutableStateOf(ListState.LOADED) }
     var query by rememberSaveable { mutableStateOf("") }
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
-    var selectedNumber by rememberSaveable { mutableStateOf<Int?>(null) }
+    var selectedKey by rememberSaveable { mutableStateOf<String?>(null) }
     var externalGitHubMode by rememberSaveable { mutableStateOf(false) }
     var issuesExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableIntStateOf(0) }
     var prsExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableIntStateOf(0) }
@@ -104,7 +104,7 @@ fun NavigatorCandidate(
     val section = remember(scope, mode, filter, fixtureListState, fixtureAnchor) {
         SnapshotStore.navigatorRows(scope, mode, filter, fixtureListState, fixtureAnchor)
     }
-    val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedNumber)
+    val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedKey)
 
     fun changeMode(newMode: NavigatorMode) {
         if (newMode == mode) return
@@ -112,7 +112,7 @@ fun NavigatorCandidate(
         if (newMode == NavigatorMode.ISSUES && filter == NavigatorFilter.AWAITING_MY_REVIEW) {
             filter = NavigatorFilter.OPEN
         }
-        selectedNumber = null
+        selectedKey = null
         coroutineScope.launch { scrollState.scrollToItem(0) }
     }
 
@@ -130,23 +130,23 @@ fun NavigatorCandidate(
         }
     }
 
-    fun select(number: Int) {
-        selectedNumber = number
-        onTrace("tap on #$number \u2192 ${candidate.tapEffect}")
+    fun select(key: String) {
+        selectedKey = key
+        onTrace("tap on ${key.substringAfter(':')} \u2192 ${candidate.tapEffect}")
     }
 
-    fun selectNarrow(number: Int) {
-        selectedNumber = number
-        onTrace("tap on #$number \u2192 ${narrowTapEffect(narrowSheet)}")
+    fun selectNarrow(key: String) {
+        selectedKey = key
+        onTrace("tap on ${key.substringAfter(':')} \u2192 ${narrowTapEffect(narrowSheet)}")
     }
 
     fun clearSelection() {
-        selectedNumber = null
+        selectedKey = null
         onTrace("Back \u2192 selection cleared, list restored")
     }
 
     BackHandler {
-        if (selectedNumber != null) clearSelection() else onBackToHome()
+        if (selectedKey != null) clearSelection() else onBackToHome()
     }
 
     val controls: @Composable () -> Unit = {
@@ -162,15 +162,15 @@ fun NavigatorCandidate(
             onScopeChange = { newScope ->
                 scopeKind = NavigatorScopeCodec.kindOf(newScope)
                 scopeValue = NavigatorScopeCodec.valueOf(newScope)
-                selectedNumber = null
+                selectedKey = null
             },
             onFilterChange = {
                 filter = it
-                selectedNumber = null
+                selectedKey = null
             },
             onListStateChange = {
                 fixtureListState = it
-                selectedNumber = null
+                selectedKey = null
             },
             onQueryChange = { query = it },
             onSearchExpandedChange = { expanded ->
@@ -190,7 +190,7 @@ fun NavigatorCandidate(
             onLoadMoreIssues = { issuesExtraPages += 1 },
             onLoadMorePrs = { prsExtraPages += 1 },
             query = query,
-            selectedNumber = selectedNumber,
+            selectedKey = selectedKey,
             onSelect = onSelect,
             onOpenGitHub = ::openOnGitHub,
             openGitHubOnSelect = openGitHubOnSelect,
@@ -209,7 +209,7 @@ fun NavigatorCandidate(
     BoxWithConstraints(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         if (maxWidth < WIDE_BREAKPOINT_DP.dp) {
             NarrowLayout(
-                selected = selectedNumber != null,
+                selected = selectedKey != null,
                 externalGitHubMode = externalGitHubMode,
                 sheet = narrowSheet,
                 list = list,
@@ -244,7 +244,7 @@ private fun NarrowLayout(
     sheet: Boolean,
     list: ListSlot,
     detail: @Composable () -> Unit,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     when {
@@ -266,7 +266,7 @@ private fun WideLayout(
     selectedItem: RowItem?,
     list: ListSlot,
     detail: @Composable () -> Unit,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
     onOpenRow: (RowItem) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -275,8 +275,8 @@ private fun WideLayout(
         WideSelectionCandidate.SECOND_TAP -> ListBesideDetail(
             list = list,
             detail = detail,
-            onSelect = { number ->
-                if (selectedItem?.number == number) onOpenRow(selectedItem) else onSelect(number)
+            onSelect = { key ->
+                if (selectedItem?.key == key) onOpenRow(selectedItem) else onSelect(key)
             },
         )
         WideSelectionCandidate.LIST_ONLY -> ListOnly(list = list, onSelect = onSelect)
@@ -298,7 +298,7 @@ private fun WideLayout(
 }
 
 @Composable
-private fun ListOnly(list: ListSlot, onSelect: (Int) -> Unit) {
+private fun ListOnly(list: ListSlot, onSelect: (String) -> Unit) {
     list(true, onSelect, Modifier.fillMaxSize())
 }
 
@@ -307,7 +307,7 @@ private fun ListWithSheet(
     selected: Boolean,
     list: ListSlot,
     detail: @Composable () -> Unit,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     list(false, onSelect, Modifier.fillMaxSize())
@@ -324,7 +324,7 @@ private fun SinglePane(
     selected: Boolean,
     list: ListSlot,
     detail: @Composable () -> Unit,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     if (selected) {
@@ -335,7 +335,7 @@ private fun SinglePane(
 }
 
 @Composable
-private fun ListBesideDetail(list: ListSlot, detail: @Composable () -> Unit, onSelect: (Int) -> Unit) {
+private fun ListBesideDetail(list: ListSlot, detail: @Composable () -> Unit, onSelect: (String) -> Unit) {
     Row(modifier = Modifier.fillMaxSize()) {
         list(false, onSelect, Modifier.weight(1f).fillMaxHeight())
         Box(modifier = Modifier.weight(1f).fillMaxHeight().testTag("repoglance:navigator-detail")) { detail() }

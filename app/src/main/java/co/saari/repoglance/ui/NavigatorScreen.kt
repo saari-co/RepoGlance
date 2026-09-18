@@ -118,7 +118,7 @@ fun NavigatorScreen(
     var fixtureListState by rememberSaveable { mutableStateOf(ListState.LOADED) }
     var query by rememberSaveable { mutableStateOf("") }
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
-    var selectedNumber by rememberSaveable { mutableStateOf<Int?>(null) }
+    var selectedKey by rememberSaveable { mutableStateOf<String?>(null) }
     var externalGitHubMode by rememberSaveable { mutableStateOf(false) }
 
     var issuesExtraPages by rememberSaveable(scope, mode, filter, fixtureListState) { mutableIntStateOf(0) }
@@ -135,7 +135,7 @@ fun NavigatorScreen(
         if (newMode == NavigatorMode.ISSUES && filter == NavigatorFilter.AWAITING_MY_REVIEW) {
             filter = NavigatorFilter.OPEN
         }
-        selectedNumber = null
+        selectedKey = null
         coroutineScope.launch { navigatorScrollState.scrollToItem(0) }
     }
 
@@ -153,7 +153,7 @@ fun NavigatorScreen(
     }
 
     BackHandler {
-        if (selectedNumber != null) selectedNumber = null else onBackToHome()
+        if (selectedKey != null) selectedKey = null else onBackToHome()
     }
 
     Surface(
@@ -168,7 +168,7 @@ fun NavigatorScreen(
                 .padding(horizontal = 16.dp),
         ) {
             val isWide = maxWidth >= WIDE_BREAKPOINT_DP.dp
-            val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedNumber)
+            val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedKey)
             val controls: @Composable () -> Unit = {
                 NavigatorControls(
                     scenario = scenario,
@@ -182,15 +182,15 @@ fun NavigatorScreen(
                     onScopeChange = { newScope ->
                         scopeKind = NavigatorScopeCodec.kindOf(newScope)
                         scopeValue = NavigatorScopeCodec.valueOf(newScope)
-                        selectedNumber = null
+                        selectedKey = null
                     },
                     onFilterChange = {
                         filter = it
-                        selectedNumber = null
+                        selectedKey = null
                     },
                     onListStateChange = {
                         fixtureListState = it
-                        selectedNumber = null
+                        selectedKey = null
                     },
                     onQueryChange = { query = it },
                     onSearchExpandedChange = { expanded ->
@@ -199,7 +199,7 @@ fun NavigatorScreen(
                     },
                 )
             }
-            val list: @Composable (Boolean, (Int) -> Unit, (RowItem) -> Unit, Modifier) -> Unit =
+            val list: @Composable (Boolean, (String) -> Unit, (RowItem) -> Unit, Modifier) -> Unit =
                 { openGitHubOnSelect, onSelect, onOpenGitHub, listModifier ->
                     ListPane(
                         section = section,
@@ -210,7 +210,7 @@ fun NavigatorScreen(
                         onLoadMoreIssues = { issuesExtraPages += 1 },
                         onLoadMorePrs = { prsExtraPages += 1 },
                         query = query,
-                        selectedNumber = selectedNumber,
+                        selectedKey = selectedKey,
                         onSelect = onSelect,
                         onOpenGitHub = onOpenGitHub,
                         openGitHubOnSelect = openGitHubOnSelect,
@@ -226,11 +226,11 @@ fun NavigatorScreen(
                 Row(modifier = Modifier.fillMaxSize()) {
                     list(
                         false,
-                        { number ->
-                            if (selectedItem?.number == number) {
+                        { key ->
+                            if (selectedItem?.key == key) {
                                 openOnGitHub(selectedItem, adjacent = true)
                             } else {
-                                selectedNumber = number
+                                selectedKey = key
                             }
                         },
                         { item -> openOnGitHub(item, adjacent = true) },
@@ -252,13 +252,13 @@ fun NavigatorScreen(
             } else {
                 list(
                     externalGitHubMode,
-                    { selectedNumber = it },
+                    { selectedKey = it },
                     { item -> openOnGitHub(item, adjacent = externalGitHubMode) },
                     Modifier.fillMaxSize(),
                 )
                 if (selectedItem != null && !externalGitHubMode) {
                     ModalBottomSheet(
-                        onDismissRequest = { selectedNumber = null },
+                        onDismissRequest = { selectedKey = null },
                         modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
                             .testTag("repoglance:navigator-detail-sheet"),
@@ -288,7 +288,11 @@ internal data class RowItem(
     val commentCount: Int,
     val updatedAt: Instant,
     val pr: PrRow?,
-)
+) {
+    val key: String get() = rowKey(if (pr == null) "issue" else "pr", repo, number)
+}
+
+internal fun rowKey(kind: String, repo: RepoRef, number: Int): String = "$kind:${repo.full}#$number"
 
 internal fun IssueRow.toItem() =
     RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, null)
@@ -338,13 +342,13 @@ private fun PrRow.withNumber(newNumber: Int): PrRow = PrRow(
 
 private const val PAGE_OFFSET = 10_000
 
-internal fun findItem(section: NavigatorSection, issuesExtraPages: Int, prsExtraPages: Int, number: Int?): RowItem? {
-    if (number == null) return null
+internal fun findItem(section: NavigatorSection, issuesExtraPages: Int, prsExtraPages: Int, key: String?): RowItem? {
+    if (key == null) return null
     section.issues?.let { list ->
-        pagedIssueRows(list, issuesExtraPages).firstOrNull { it.number == number }?.let { return it.toItem() }
+        pagedIssueRows(list, issuesExtraPages).map { it.toItem() }.firstOrNull { it.key == key }?.let { return it }
     }
     section.prs?.let { list ->
-        pagedPrRows(list, prsExtraPages).firstOrNull { it.number == number }?.let { return it.toItem() }
+        pagedPrRows(list, prsExtraPages).map { it.toItem() }.firstOrNull { it.key == key }?.let { return it }
     }
     return null
 }
@@ -579,8 +583,8 @@ internal fun ListPane(
     onLoadMoreIssues: () -> Unit,
     onLoadMorePrs: () -> Unit,
     query: String,
-    selectedNumber: Int?,
-    onSelect: (Int) -> Unit,
+    selectedKey: String?,
+    onSelect: (String) -> Unit,
     onOpenGitHub: (RowItem) -> Unit,
     openGitHubOnSelect: Boolean,
     now: Instant,
@@ -611,13 +615,14 @@ internal fun ListPane(
                 if (filtered.isEmpty()) {
                     item { EmptyRowsText(list.valueBasis) }
                 } else {
-                    items(filtered, key = { "issue-${it.number}" }) { row ->
+                    items(filtered, key = { rowKey("issue", it.repo, it.number) }) { row ->
+                        val item = row.toItem()
                         NavigatorRowView(
-                            item = row.toItem(),
+                            item = item,
                             now = now,
-                            selected = selectedNumber == row.number,
+                            selected = selectedKey == item.key,
                             onSelect = {
-                                if (openGitHubOnSelect) onOpenGitHub(row.toItem()) else onSelect(row.number)
+                                if (openGitHubOnSelect) onOpenGitHub(item) else onSelect(item.key)
                             },
                             onOpenGitHub = onOpenGitHub,
                             modifier = Modifier.animateItem(),
@@ -635,13 +640,14 @@ internal fun ListPane(
                 if (filtered.isEmpty()) {
                     item { EmptyRowsText(list.valueBasis) }
                 } else {
-                    items(filtered, key = { "pr-${it.number}" }) { row ->
+                    items(filtered, key = { rowKey("pr", it.repo, it.number) }) { row ->
+                        val item = row.toItem()
                         NavigatorRowView(
-                            item = row.toItem(),
+                            item = item,
                             now = now,
-                            selected = selectedNumber == row.number,
+                            selected = selectedKey == item.key,
                             onSelect = {
-                                if (openGitHubOnSelect) onOpenGitHub(row.toItem()) else onSelect(row.number)
+                                if (openGitHubOnSelect) onOpenGitHub(item) else onSelect(item.key)
                             },
                             onOpenGitHub = onOpenGitHub,
                             modifier = Modifier.animateItem(),
