@@ -26,6 +26,10 @@ discovery, and repo-scoped open issue/PR lists. The repaired public-client
 device flow is source-, JVM-, and physical-Fold verified: the exact installed
 APK completed GitHub authorization, loaded the public live RepoGlance
 navigator, and retained its encrypted session across a force-stop/cold launch.
+The live repository home can filter visible repositories by account or
+organization before applying repository search. GitHub App installation and
+repository-sharing controls live under **Manage GitHub access** in the header
+menu rather than occupying the permanent navigation surface.
 Widgets remain fixture-backed and visibly say
 `FIXTURE PREVIEW`; background refresh, live widget content, CI/release
 pressure, signing, release, general distribution, and revocation of the earlier
