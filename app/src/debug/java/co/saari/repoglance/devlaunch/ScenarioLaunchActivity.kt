@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import co.saari.repoglance.MainActivity
+import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.state.AppPrefs
@@ -19,7 +20,7 @@ import co.saari.repoglance.widget.EXTRA_REPO_FULL
 //   adb shell am start -n co.saari.repoglance/.devlaunch.ScenarioLaunchActivity \
 //     --es scenario RATE_LIMITED --es screen navigator --es repo acme/rocket --es mode BOTH
 //
-// screen: live (default) | navigator | picker
+// screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 @SuppressLint("CustomSplashScreen")
 class ScenarioLaunchActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,18 +31,26 @@ class ScenarioLaunchActivity : Activity() {
                 AppPrefs.setSelectedScenario(this, scenario)
             }
         }
-        val next = when (intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE) {
-            SCREEN_PICKER -> Intent(this, WidgetVariantPickerActivity::class.java)
-            SCREEN_NAVIGATOR -> Intent(this, MainActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                putExtra(EXTRA_REPO_FULL, intent.getStringExtra(EXTRA_REPO) ?: DEFAULT_REPO)
-                putExtra(EXTRA_NAVIGATOR_MODE, intent.getStringExtra(EXTRA_MODE) ?: DEFAULT_MODE)
-            }
-            else -> Intent(this, MainActivity::class.java).apply { action = Intent.ACTION_MAIN }
-        }
+        val next = nextIntent(intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE)
         next.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(next)
         finish()
+    }
+
+    private fun nextIntent(screen: String): Intent = when (screen) {
+        SCREEN_PICKER -> Intent(this, WidgetVariantPickerActivity::class.java)
+        SCREEN_NAVIGATOR_PICKER -> Intent(this, NavigatorVariantPickerActivity::class.java).apply {
+            putExtra(EXTRA_REPO_FULL, intent.getStringExtra(EXTRA_REPO) ?: DEFAULT_REPO)
+            putExtra(EXTRA_NAVIGATOR_MODE, intent.getStringExtra(EXTRA_MODE) ?: DEFAULT_MODE)
+            putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
+            putExtra(EXTRA_HYBRID, intent.getStringExtra(EXTRA_CANDIDATE)?.endsWith(HYBRID_SUFFIX) == true)
+        }
+        SCREEN_NAVIGATOR -> Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            putExtra(EXTRA_REPO_FULL, intent.getStringExtra(EXTRA_REPO) ?: DEFAULT_REPO)
+            putExtra(EXTRA_NAVIGATOR_MODE, intent.getStringExtra(EXTRA_MODE) ?: DEFAULT_MODE)
+        }
+        else -> Intent(this, MainActivity::class.java).apply { action = Intent.ACTION_MAIN }
     }
 
     private companion object {
@@ -52,6 +61,10 @@ class ScenarioLaunchActivity : Activity() {
         const val SCREEN_LIVE = "live"
         const val SCREEN_NAVIGATOR = "navigator"
         const val SCREEN_PICKER = "picker"
+        const val SCREEN_NAVIGATOR_PICKER = "navigator-picker"
+        const val EXTRA_CANDIDATE = "candidate"
+        const val EXTRA_HYBRID = "hybrid"
+        const val HYBRID_SUFFIX = "+sheet"
         const val DEFAULT_REPO = "acme/rocket"
         const val DEFAULT_MODE = "BOTH"
     }

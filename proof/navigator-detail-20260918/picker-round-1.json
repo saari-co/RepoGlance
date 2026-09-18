@@ -1,0 +1,28 @@
+{
+  "schema_version": "grilltrack-picker/v0.1",
+  "round_id": "navigator-detail-round-1",
+  "decision_id": "navigator-detail-017",
+  "canvas_ref": "app/src/main/java/co/saari/repoglance/ui/NavigatorScreen.kt (production NavigatorControls + ListPane + DetailPane; narrow branch verbatim)",
+  "renderer": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorVariantPickerActivity.kt on the registered Pixel 11 Pro Fold inner display, launched via bin/verify-repoglance launch MIXED navigator-picker acme/rocket BOTH <A..E>",
+  "active_slot": "wide-selection",
+  "target": {
+    "device": "Pixel 11 Pro Fold inner display (OPENED), 2076x2152 px, >= 600dp wide",
+    "browsers": []
+  },
+  "candidates": [
+    {"id": "pane-fill",   "label": "A — detail pane fills on tap; Open on GitHub in the pane",                    "delta_ref": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt WideLayout #PANE_FILL (enum in WideSelectionCandidate.kt)"},
+    {"id": "list-only",   "label": "B — no detail pane; list fills the width; tap opens GitHub beside",           "delta_ref": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt WideLayout #LIST_ONLY (enum in WideSelectionCandidate.kt)"},
+    {"id": "second-tap",  "label": "C — detail pane fills on tap; second tap on the selected row opens GitHub",   "delta_ref": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt WideLayout #SECOND_TAP (enum in WideSelectionCandidate.kt)"},
+    {"id": "sheet",       "label": "D — no detail pane; tap opens a detail sheet over the list",                  "delta_ref": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt WideLayout #SHEET (enum in WideSelectionCandidate.kt)"},
+    {"id": "single-pane", "label": "E — detail replaces the list, as on the cover display; Back returns",         "delta_ref": "app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt WideLayout #SINGLE_PANE (enum in WideSelectionCandidate.kt)"}
+  ],
+  "slots": [
+    {"id": "navigator-chrome", "status": "locked", "selection_ref": "ledger:navigator-scope-005 (scope dropdown, ISSUES/PRS/BOTH, Filters, cached-row search)"},
+    {"id": "list-truth-state", "status": "locked", "selection_ref": "AGENTS.md#truth-rules (Unknown never zero, Cached · age chip, rate-limit banner)"},
+    {"id": "narrow-selection", "status": "locked", "selection_ref": "ledger:feature-map-015 nav-row-narrow (cover display: tap selects, detail replaces list)"},
+    {"id": "long-press",       "status": "locked", "selection_ref": "NavigatorRowView.combinedClickable onLongClick -> GitHub app (unchanged in every candidate)"},
+    {"id": "wide-selection",   "status": "unresolved"}
+  ],
+  "controls": {"keyboard": true, "pointer": true, "mobile": true},
+  "production": false
+}

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 
 package co.saari.repoglance.ui
 
@@ -43,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -61,9 +62,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.fixtures.Fixtures
@@ -163,10 +167,40 @@ fun NavigatorScreen(
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp),
         ) {
-            val isWide = maxWidth >= 600.dp
-            val keepNavigatorVisible = isWide || externalGitHubMode
-            if (isWide) {
-                Row(modifier = Modifier.fillMaxSize()) {
+            val isWide = maxWidth >= WIDE_BREAKPOINT_DP.dp
+            val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedNumber)
+            val controls: @Composable () -> Unit = {
+                NavigatorControls(
+                    scenario = scenario,
+                    scope = scope,
+                    mode = mode,
+                    filter = filter,
+                    fixtureListState = fixtureListState,
+                    query = query,
+                    searchExpanded = searchExpanded,
+                    onBackToHome = onBackToHome,
+                    onScopeChange = { newScope ->
+                        scopeKind = NavigatorScopeCodec.kindOf(newScope)
+                        scopeValue = NavigatorScopeCodec.valueOf(newScope)
+                        selectedNumber = null
+                    },
+                    onFilterChange = {
+                        filter = it
+                        selectedNumber = null
+                    },
+                    onListStateChange = {
+                        fixtureListState = it
+                        selectedNumber = null
+                    },
+                    onQueryChange = { query = it },
+                    onSearchExpandedChange = { expanded ->
+                        searchExpanded = expanded
+                        if (!expanded) query = ""
+                    },
+                )
+            }
+            val list: @Composable (Boolean, (Int) -> Unit, (RowItem) -> Unit, Modifier) -> Unit =
+                { openGitHubOnSelect, onSelect, onOpenGitHub, listModifier ->
                     ListPane(
                         section = section,
                         filter = filter,
@@ -177,47 +211,37 @@ fun NavigatorScreen(
                         onLoadMorePrs = { prsExtraPages += 1 },
                         query = query,
                         selectedNumber = selectedNumber,
-                        onSelect = { selectedNumber = it },
-                        onOpenGitHub = { item -> openOnGitHub(item, adjacent = true) },
-                        openGitHubOnSelect = true,
+                        onSelect = onSelect,
+                        onOpenGitHub = onOpenGitHub,
+                        openGitHubOnSelect = openGitHubOnSelect,
                         now = now,
                         scrollState = navigatorScrollState,
                         mode = mode,
                         onModeChange = ::changeMode,
-                        controls = {
-                            NavigatorControls(
-                                scenario = scenario,
-                                scope = scope,
-                                mode = mode,
-                                filter = filter,
-                                fixtureListState = fixtureListState,
-                                query = query,
-                                searchExpanded = searchExpanded,
-                                onBackToHome = onBackToHome,
-                                onScopeChange = { newScope ->
-                                    scopeKind = NavigatorScopeCodec.kindOf(newScope)
-                                    scopeValue = NavigatorScopeCodec.valueOf(newScope)
-                                    selectedNumber = null
-                                },
-                                onFilterChange = {
-                                    filter = it
-                                    selectedNumber = null
-                                },
-                                onListStateChange = {
-                                    fixtureListState = it
-                                    selectedNumber = null
-                                },
-                                onQueryChange = { query = it },
-                                onSearchExpandedChange = { expanded ->
-                                    searchExpanded = expanded
-                                    if (!expanded) query = ""
-                                },
-                            )
-                        },
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        controls = controls,
+                        modifier = listModifier,
                     )
-                    val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedNumber)
-                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                }
+            if (isWide) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    list(
+                        false,
+                        { number ->
+                            if (selectedItem?.number == number) {
+                                openOnGitHub(selectedItem, adjacent = true)
+                            } else {
+                                selectedNumber = number
+                            }
+                        },
+                        { item -> openOnGitHub(item, adjacent = true) },
+                        Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .testTag("repoglance:navigator-detail"),
+                    ) {
                         DetailPane(
                             item = selectedItem,
                             now = now,
@@ -225,76 +249,35 @@ fun NavigatorScreen(
                         )
                     }
                 }
-            } else if (selectedNumber == null || keepNavigatorVisible) {
-                ListPane(
-                    section = section,
-                    filter = filter,
-                    fixtureListState = fixtureListState,
-                    issuesExtraPages = issuesExtraPages,
-                    prsExtraPages = prsExtraPages,
-                    onLoadMoreIssues = { issuesExtraPages += 1 },
-                    onLoadMorePrs = { prsExtraPages += 1 },
-                    query = query,
-                    selectedNumber = selectedNumber,
-                    onSelect = { selectedNumber = it },
-                    onOpenGitHub = { item -> openOnGitHub(item, adjacent = externalGitHubMode) },
-                    openGitHubOnSelect = externalGitHubMode,
-                    now = now,
-                    scrollState = navigatorScrollState,
-                    mode = mode,
-                    onModeChange = ::changeMode,
-                    controls = {
-                        NavigatorControls(
-                            scenario = scenario,
-                            scope = scope,
-                            mode = mode,
-                            filter = filter,
-                            fixtureListState = fixtureListState,
-                            query = query,
-                            searchExpanded = searchExpanded,
-                            onBackToHome = onBackToHome,
-                            onScopeChange = { newScope ->
-                                scopeKind = NavigatorScopeCodec.kindOf(newScope)
-                                scopeValue = NavigatorScopeCodec.valueOf(newScope)
-                                selectedNumber = null
-                            },
-                            onFilterChange = {
-                                filter = it
-                                selectedNumber = null
-                            },
-                            onListStateChange = {
-                                fixtureListState = it
-                                selectedNumber = null
-                            },
-                            onQueryChange = { query = it },
-                            onSearchExpandedChange = { expanded ->
-                                searchExpanded = expanded
-                                if (!expanded) query = ""
-                            },
-                        )
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                )
             } else {
-                val selectedItem = findItem(section, issuesExtraPages, prsExtraPages, selectedNumber)
-                Column(modifier = Modifier.fillMaxSize()) {
-                    TextButton(onClick = { selectedNumber = null }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Back")
+                list(
+                    externalGitHubMode,
+                    { selectedNumber = it },
+                    { item -> openOnGitHub(item, adjacent = externalGitHubMode) },
+                    Modifier.fillMaxSize(),
+                )
+                if (selectedItem != null && !externalGitHubMode) {
+                    ModalBottomSheet(
+                        onDismissRequest = { selectedNumber = null },
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("repoglance:navigator-detail-sheet"),
+                    ) {
+                        DetailPane(
+                            item = selectedItem,
+                            now = now,
+                            onOpenGitHub = { item -> openOnGitHub(item, adjacent = false) },
+                        )
                     }
-                    DetailPane(
-                        item = selectedItem,
-                        now = now,
-                        onOpenGitHub = { item -> openOnGitHub(item, adjacent = false) },
-                    )
                 }
             }
         }
     }
 }
 
-private data class RowItem(
+private const val WIDE_BREAKPOINT_DP = 600
+
+internal data class RowItem(
     val repo: RepoRef,
     val number: Int,
     val title: String,
@@ -307,9 +290,9 @@ private data class RowItem(
     val pr: PrRow?,
 )
 
-private fun IssueRow.toItem() =
+internal fun IssueRow.toItem() =
     RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, null)
-private fun PrRow.toItem() =
+internal fun PrRow.toItem() =
     RowItem(repo, number, title, state, labels, author, assignee, commentCount, updatedAt, this)
 
 private fun pagedIssueRows(list: NavigatorList, extraPages: Int): List<IssueRow> {
@@ -355,7 +338,7 @@ private fun PrRow.withNumber(newNumber: Int): PrRow = PrRow(
 
 private const val PAGE_OFFSET = 10_000
 
-private fun findItem(section: NavigatorSection, issuesExtraPages: Int, prsExtraPages: Int, number: Int?): RowItem? {
+internal fun findItem(section: NavigatorSection, issuesExtraPages: Int, prsExtraPages: Int, number: Int?): RowItem? {
     if (number == null) return null
     section.issues?.let { list ->
         pagedIssueRows(list, issuesExtraPages).firstOrNull { it.number == number }?.let { return it.toItem() }
@@ -419,7 +402,7 @@ private fun ScopeSwitcher(scenario: FixtureScenario, scope: NavigatorScope, onSc
 }
 
 @Composable
-private fun NavigatorControls(
+internal fun NavigatorControls(
     scenario: FixtureScenario,
     scope: NavigatorScope,
     mode: NavigatorMode,
@@ -587,7 +570,7 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, onClose:
 }
 
 @Composable
-private fun ListPane(
+internal fun ListPane(
     section: NavigatorSection,
     filter: NavigatorFilter,
     fixtureListState: ListState,
@@ -785,7 +768,7 @@ private fun NavigatorRowView(
 }
 
 @Composable
-private fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) -> Unit) {
+internal fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) -> Unit) {
     if (item == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Select a row to see details", style = MaterialTheme.typography.bodyMedium)
@@ -809,7 +792,10 @@ private fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) -> 
             Text("CI: " + SnapshotRendering.ciLabel(pr.ciRollup))
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = { onOpenGitHub(item) }) {
+        Button(
+            onClick = { onOpenGitHub(item) },
+            modifier = Modifier.testTag("repoglance:navigator-open-github"),
+        ) {
             Text("Open on GitHub")
         }
     }
