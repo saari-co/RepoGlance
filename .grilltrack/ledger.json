@@ -3,12 +3,11 @@
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
     "cadence": "sequential",
-    "confirmed": true,
-    "confirmed_at": "2026-09-18T22:39:00+00:00",
-    "domain": "Checking splash: RepoGlance mark (magnifying glass, status-bar legible) and the motion shown while the session is unknown",
-    "started_at": "2026-09-18T22:24:04+00:00",
-    "status": "inspected",
-    "summary": "checking-splash-018: Checking renders the A+B commit-eye mark (single monochrome vector, also the future status-bar asset) with motion D ping rings, static under reduced motion; message stays, no spinner, no counts, no sign-in control; no notification or Quick Settings tile this cycle; sign-in feature map updated; device proof on the Fold."
+    "confirmed": false,
+    "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
+    "started_at": "2026-09-18T23:17:10+00:00",
+    "status": "grilling",
+    "summary": "Sequential: tap action first (it shapes label, subtitle and state), then what the tile shows, then how the user adds it; read-only and truth rules apply; the commit-eye mark is the icon"
   },
   "decisions": [
     {
@@ -1720,7 +1719,7 @@
       "context_ref": null,
       "created_at": "2026-09-18T16:33:20+00:00",
       "deferred_reason": "No logo asset exists; a logo plus animation is a visual grill of its own (five candidates) and out of the bounded behaviour slice. Risk: Checking stays plain text until a logo exists; the unknown window is tens of ms so no truth-rule exposure",
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#18 merged as c7a504d8e136269fede1178866618e05aad6a536",
       "dependencies": [
         "session-bootstrap-016"
       ],
@@ -1821,8 +1820,37 @@
       "review_source_identity": "git:5f793f75acd4b86d97ae214667872b41384bf4a7",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T23:12:51+00:00",
+      "updated_at": "2026-09-18T23:17:10+00:00",
       "verification_ref": "proof/checking-splash-20260918/PROOF.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "proposed: tap opens the app on the live catalog (read-only; collapses the shade); label RepoGlance; icon ic_repoglance_mark",
+      "context_ref": null,
+      "created_at": "2026-09-18T23:17:10+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "checking-splash-018",
+        "pin-model-010"
+      ],
+      "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
+      "history": [],
+      "id": "quick-settings-tile-019",
+      "implementation_ref": null,
+      "question": "What does the RepoGlance Quick Settings tile do when tapped: open the app, open the navigator for a chosen scope, or open one pinned repository",
+      "rationale": "Maintainer direction 2026-09-18: a Quick Settings tile for quick access. Facts: minSdk 31 so TileService, subtitle and stateDescription are available; API 34+ requires startActivityAndCollapse(PendingIntent); no tile code exists; the compact widget's stored snapshot (LiveSnapshotStore) is the only cached data a subtitle could honestly show, with its age",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "proposed",
+      "superseded_by": null,
+      "updated_at": "2026-09-18T23:17:10+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -1852,5 +1880,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T23:12:51+00:00"
+  "updated_at": "2026-09-18T23:17:10+00:00"
 }
