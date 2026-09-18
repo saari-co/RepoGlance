@@ -183,3 +183,23 @@ so it wins; a later cycle may revisit the name treatment.
 The account-bound session on the test device was already present from the
 maintainer's earlier sign-in; no sign-in, token, or account action was
 performed, and no non-public repository content was captured.
+
+## Metadata-quota repair (2026-09-18)
+
+OpenClaw on `5fd1643` (`req-20260918T033615Z-255670529466`): scoped-clean,
+0 findings, P0 threshold. ClawSweeper re-review on the same head: proof
+`diamond lobster` (sufficient), P1 closed, one new `required_fix` at P2 —
+the repository-metadata request was spent whenever the issues page was
+truncated, even when the PR page was missing or truncated and the factory had
+to fall back regardless. Accepted; this is repair cycle 2 of the authorized
+slice.
+
+Repair, commit `a49449707bab7d6ea33c8e510aa6b470b530e670`: the decision moves into
+`LiveSnapshotFactory.needsRepositoryMetadata`, gated on a whole PR page; the
+view model calls it. Three regression tests: truncated PR page, failed PR page,
+and the only case that requests metadata (truncated issues + whole PRs).
+
+- 188 JVM tests across 25 suites; 0 failures, 0 errors, 0 skips
+- Lint: 0 errors, 30 warnings, 3 informational; unchanged
+- No widget, rendering, or store change since the device proof above, so the
+  Fold captures at `19a3d1d` remain the widget proof for this head.
