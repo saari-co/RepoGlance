@@ -3,7 +3,7 @@
 # Registered swarm test phone over adb only; never drives an unregistered device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
-#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode]
+#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker
 #   bin/verify-repoglance dump [label]           # uiautomator tree -> runs/verify-repoglance-runs/<run>/<label>.xml (+ .txt)
 #   bin/verify-repoglance capture <label>        # inner-display PNG + manifest via phone_proof
 #   bin/verify-repoglance tap <resource-id>      # tap the centre of a node by resource-id (from the last dump)
@@ -64,7 +64,7 @@ doctor() {
 
 launch() {
   need adb
-  local scenario="${1:-MIXED}" screen="${2:-live}" repo="${3:-acme/rocket}" mode="${4:-BOTH}"
+  local scenario="${1:-MIXED}" screen="${2:-live}" repo="${3:-acme/rocket}" mode="${4:-BOTH}" candidate="${5:-}"
   local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
   [ -f "$apk" ] || { echo "launch: build first: ./gradlew assembleDebug" >&2; exit 1; }
   local local_sha dev_sha path
@@ -78,6 +78,7 @@ launch() {
   local expect marker
   case "$screen" in
     picker) expect="devpicker.WidgetVariantPickerActivity"; marker="PRODUCTION" ;;
+    navigator-picker) expect="devpicker.NavigatorVariantPickerActivity"; marker="deciding: what a row TAP does" ;;
     navigator) expect="co.saari.repoglance/.MainActivity"; marker="repoglance:fixture-home" ;;
     *) expect="co.saari.repoglance/.MainActivity"; marker="" ;;
   esac
@@ -86,7 +87,8 @@ launch() {
     adb shell am force-stop "$PKG"; sleep 1
     adb shell am force-stop com.github.android 2>/dev/null || true
     adb shell am start -W -n "$PKG/.devlaunch.ScenarioLaunchActivity" \
-      --es scenario "$scenario" --es screen "$screen" --es repo "$repo" --es mode "$mode" >/dev/null 2>&1 || true
+      --es scenario "$scenario" --es screen "$screen" --es repo "$repo" --es mode "$mode" \
+      ${candidate:+--es candidate "$candidate"} >/dev/null 2>&1 || true
     ok=""
     for _ in 1 2 3 4 5 6 7 8; do
       sleep 1
