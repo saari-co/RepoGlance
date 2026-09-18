@@ -1618,17 +1618,45 @@
           "review_source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474",
           "to": "needs_reverification",
           "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+        },
+        {
+          "at": "2026-09-18T20:40:18+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "needs_reverification",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a",
+          "to": "implemented",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+        },
+        {
+          "at": "2026-09-18T20:40:18+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:5cb5d5fbb8be33827bb4079cae8b64032c3f8293",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
         }
       ],
       "id": "session-bootstrap-016",
-      "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+      "implementation_ref": "git:5cb5d5fbb8be33827bb4079cae8b64032c3f8293",
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
-      "repair_required": true,
-      "review_classifications": [
-        "required_fix",
-        "human_gate"
-      ],
+      "repair_required": false,
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -1660,13 +1688,13 @@
           "source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a"
         }
       ],
-      "review_ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
-      "review_result": "findings",
-      "review_source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a",
-      "status": "needs_reverification",
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T20:40:17+00:00",
-      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+      "updated_at": "2026-09-18T20:40:18+00:00",
+      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 3 repair (check green; 401 device proof human-gated)"
     },
     {
       "baseline_ref": null,
@@ -1740,5 +1768,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T20:40:17+00:00"
+  "updated_at": "2026-09-18T20:40:18+00:00"
 }
