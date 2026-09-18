@@ -75,7 +75,7 @@ Seeded from the accepted review findings on RepoGlance pull requests #2, #4,
 | `UNKNOWN` snapshots carry no known metadata | PR #2 review | `RepoSnapshot` constructor `require` checks + `RepoSnapshotInvariantsTest` | 1 (runtime) + 2 |
 | Display strings are sanitised for Unicode control and format characters | PR #2 review | `SanitizeTest`; every widget/navigator text passes through `Sanitize.displayText` | 2, call-site discipline unguarded |
 | Authorization headers never reach a log path | PR #2 review | `ForbiddenImport` on `android.util.Log`, `ForbiddenMethodCall` on `println`; `GitHubApiClientTest` redaction cases | 2 |
-| No disk or network I/O on the main thread | PR #12 review (`LiveSnapshotStore.load`) | StrictMode in debug builds; verifier tiers fail on `StrictMode` log lines (Grill C) | 1 (runtime) |
+| No disk or network I/O on the main thread | PR #12 review (`LiveSnapshotStore.load`) | StrictMode in debug builds (network kills, disk logs); verifier tiers fail on `StrictMode` log lines (Grill C). **First catches, 2026-09-18, open:** `SecureTokenStore` reads the session file on the main thread during `RepoGlanceViewModel` construction (`bootstrapSessionState`), six `DiskReadViolation`s per cold start; and the debug picker's persisted-store candidate calls `LiveSnapshotStore.load` in composition. Both queued as a bounded follow-up slice. | 1 (runtime), debt recorded |
 | Network requests wait for session and request-generation checks | PR #12 review | `RepoGlanceViewModel` ordering; unguarded by test, tracked | 3 |
 | Repository metadata is requested only when it can complete an exact count | ClawSweeper P2 on PR #12 | `LiveSnapshotFactoryTest` (`needsRepositoryMetadata` cases) | 2 |
 | Interactive elements carry a content description | Play tracker #7 | Android Lint `ContentDescription` at error for View/XML; **unguarded for Compose** until the Grill C emulator tier runs `enableAccessibilityChecks()` | 2 (partial) |
@@ -140,7 +140,7 @@ still load-bearing should be promoted into the guard table or a test.
 ### `co/saari/repoglance/data/LiveGitHubModels.kt`
 
 - Repository-level counters from `GET /repos/{owner}/{name}`.
-  
+
   [openIssuesAndPullRequests] mirrors GitHub's `open_issues_count`, which
   counts pull requests as issues. Subtract the exact open-PR count to recover
   true open issues; see [co.saari.repoglance.data.LiveSnapshotFactory].
@@ -149,9 +149,9 @@ still load-bearing should be promoted into the guard table or a test.
 ### `co/saari/repoglance/data/LiveSnapshotFactory.kt`
 
 - Builds a [RepoSnapshot] from live GitHub responses.
-  
+
   Truth rules this enforces, in order:
-  
+
   1. An open-PR count is exact only when the open-PR page was not truncated.
      A truncated page is a lower bound, never a count.
   2. `GET /repos/{owner}/{name}` reports `open_issues_count` as issues **plus**
@@ -163,7 +163,7 @@ still load-bearing should be promoted into the guard table or a test.
      number instead of inventing one.
   4. With no exact fetch and no previous value, the basis is
      [ValueBasis.UNKNOWN] and every count renders as "—", never as zero.
-  
+
   Default-branch CI and latest release are not fetched by [GitHubApiClient];
   they stay absent rather than being guessed.
 
@@ -237,7 +237,7 @@ still load-bearing should be promoted into the guard table or a test.
 
 - Text-safety layer for anything sourced from GitHub (titles, labels, repo
   names, tags, ...) before it is ever shown on screen.
-  
+
   Pipeline: replace Unicode control characters with spaces, strip Unicode
   format controls, collapse ASCII and Unicode separator whitespace runs to a
   single space (and trim), then redact any token-shaped or bearer-shaped
@@ -279,7 +279,7 @@ still load-bearing should be promoted into the guard table or a test.
 ### `co/saari/repoglance/model/NavigatorList.kt`
 
 - Row payload for a [NavigatorList].
-  
+
   Shape decision (Slice 1): a navigator list holds EITHER issue rows OR PR
   rows, never a mix — every call site is already scoped to one leaf
   [NavigatorMode] (ISSUES or PRS). [NavigatorMode.BOTH] is expressed by the
@@ -326,7 +326,7 @@ still load-bearing should be promoted into the guard table or a test.
 ### `co/saari/repoglance/model/RepoSnapshot.kt`
 
 - A single repo's at-a-glance state.
-  
+
   Truth-rule invariants (enforced here, not left to the UI layer):
   - `valueBasis == UNKNOWN` forces counts and repo observation metadata to
     unknown values — we know nothing, so nothing renders as current or as
@@ -401,7 +401,7 @@ still load-bearing should be promoted into the guard table or a test.
 - Durable per-repository live counts, so a widget can render without a
   network call. Only the fields the compact widget needs are persisted;
   navigator rows stay out of storage.
-  
+
   A record that cannot be read back exactly as it was written is discarded
   rather than partially reconstructed — a half-restored snapshot would be a
   count of unknown basis, which the truth rules forbid.
@@ -446,7 +446,7 @@ still load-bearing should be promoted into the guard table or a test.
   [Fixtures.navigatorList] calls for [NavigatorMode.BOTH] (an ISSUES
   list and a PRS list, sectioned issues-then-prs) since a single
   [NavigatorList] cannot hold both row types (see [NavigatorRows]).
-  
+
   [NavigatorFilter.AWAITING_MY_REVIEW] is PR-only — [Fixtures.navigatorList]
   throws if asked for it under [NavigatorMode.ISSUES]. In [NavigatorMode.BOTH]
   with that filter selected, the issues section is therefore returned
@@ -530,7 +530,7 @@ still load-bearing should be promoted into the guard table or a test.
 ### `co/saari/repoglance/widget/RepoWidget.kt`
 
 - Independently configured per-repository widget.
-  
+
   A compact 2x1 placement is a count summary. Any placement tall enough for
   rows becomes a single recently-updated feed whose entries are individually
   labeled ISSUE or PR. Header/summary taps open RepoGlance at this widget's
@@ -589,7 +589,7 @@ still load-bearing should be promoted into the guard table or a test.
   age across the shown repos) over a [LazyColumn] of compact repo rows.
   Content is [SnapshotStore.stackWidgetRepos] — pinned repos, or every repo
   in the scenario when nothing is pinned yet.
-  
+
   Row tap opens [MainActivity] pre-scoped to that repo (see
   [RepoWidget]'s KDoc for why this is chosen over a raw ACTION_VIEW Intent
   from Glance).

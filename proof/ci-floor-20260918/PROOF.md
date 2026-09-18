@@ -103,9 +103,9 @@ tree is proven green again afterwards. Local runs; CI executes the same
 - The red probes ran locally, not as CI runs. CI proof for this head is the
   green `check` on the pull request; a CI-red proof would require pushing
   violating commits, which was not done.
-- No device run: the slice changes no rendering, storage, or network
-  behaviour. StrictMode's runtime effect is proven only by its presence in
-  `DebugHooks` and by the unchanged test suite, not by a captured violation.
+- Device proof for the runtime hook is in the section below. The slice still
+  changes no rendering, storage, or network behaviour; the StrictMode catches
+  it recorded are findings for later bounded work, not fixes in this PR.
 
 ## Probe table (local, tree green before and after)
 
@@ -137,3 +137,51 @@ the laptop's and lint baselines match on message text. Repair: those checks
 are disabled in the gate and the baseline regenerated (3 entries). Local
 `check assembleDebug` green again. This is the floor catching its own
 non-determinism, which is the kind of finding the gate exists to surface.
+
+## Device proof: Application hook and StrictMode (2026-09-18)
+
+ClawSweeper on `50158a0` asked for real-behaviour evidence that the new
+`RepoGlanceApplication` / `DebugHooks` path runs. Pixel 11 Pro Fold, inner
+display `4619827677550801152`; debug APK SHA-256
+`01a8b38b9a491580f3620c41644cc59cb0f7e3a212b4410de0e9884dbc206ffe` (the
+build from this tree) installed with `adb install -r`, process force-stopped
+before each launch so the hook ran on a cold start.
+
+Redacted logcat excerpts (only `ActivityManager` process-start lines and
+`StrictMode` lines whose frames are in `co.saari.repoglance`; no token,
+header, URL, or private content is present in the filter):
+
+1. Debug picker launch (`WidgetVariantPickerActivity`), captured after start:
+   `Start proc … co.saari.repoglance`, then
+   `StrictMode policy violation … DiskReadViolation` at
+   `LiveSnapshotStore.prefs(LiveSnapshotStore.kt:19)` ←
+   `LiveSnapshotStore.load(…:26)` ← the picker's PERSISTED candidate
+   (`WidgetVariantPickerActivity.kt:87`). The hook is installed and logging;
+   the violation is in debug-only tooling that reads the store synchronously
+   in composition.
+2. Production cold start (`MainActivity`): six `DiskReadViolation`s, all on
+   the main thread, from `SecureTokenStore.<init>` (`SecureTokenStore.kt:26`)
+   and `SecureTokenStore.read` (`:29`, `:31`) via
+   `GitHubSession.hasSavedSession` ← `RepoGlanceViewModel.bootstrapSessionState`
+   (`RepoGlanceViewModel.kt:246`) ← `RepoGlanceViewModel.<init>` ←
+   `MainActivity.onCreate(MainActivity.kt:64)`. No network violation, so the
+   process was not killed; the app reached the picker and the main screen
+   normally.
+
+Files (held locally, not committed):
+
+- `runs/ci-floor-proof-20260918-runs/launch-logcat-redacted.txt`
+- `runs/ci-floor-proof-20260918-runs/mainactivity-logcat-redacted.txt`
+- `runs/ci-floor-proof-20260918-runs/picker-after-hook.png`, SHA-256
+  `9ffc8688847d4071e5203c91ac44c8cba590cd71b810a1cb056740a9d7fa8cf0`,
+  inspected: the picker renders all four candidate rows after the hook, no
+  crash, no black or clipped region.
+
+What this proves: the manifest points at the new Application, `DebugHooks`
+installed the thread policy before the first Activity, and the disk penalty
+is `penaltyLog` as locked (the app keeps running). What it found: the
+session-file read at startup happens on the main thread. That is the
+"no disk or network I/O on the main thread" invariant catching a pre-existing
+behaviour on the guard's first run. It is recorded in `docs/INVARIANTS.md`
+as open ratchet debt; moving session bootstrap off the main thread is a
+behaviour change and belongs to its own bounded slice, not this CI-floor PR.
