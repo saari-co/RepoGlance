@@ -4,10 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 
-/** Explicit GitHub-app routing for navigator detail. Adjacent launch is a
- * best-effort Android request, not a guarantee: the system decides whether
- * the current posture and task state can form a split. Browser fallback is
- * intentionally not chosen in this slice. */
 object GitHubAppLauncher {
     const val PACKAGE_NAME = "com.github.android"
 

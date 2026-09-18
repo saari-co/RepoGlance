@@ -63,7 +63,7 @@ private fun n(v: Int?, s: RepoSnapshot) = SnapshotRendering.countText(v, s.value
 
 /** A — hero number. One number owns the widget; everything else is subordinate. */
 @Composable
-fun CandidateA(s: RepoSnapshot, now: Instant) = Shell {
+fun CandidateA(s: RepoSnapshot) = Shell {
     RepoLine(s)
     Row(verticalAlignment = Alignment.Bottom) {
         Text(
@@ -85,7 +85,7 @@ fun CandidateA(s: RepoSnapshot, now: Instant) = Shell {
 
 /** B — split columns. Two equal count blocks side by side, each number over its label. */
 @Composable
-fun CandidateB(s: RepoSnapshot, now: Instant) = Shell {
+fun CandidateB(s: RepoSnapshot) = Shell {
     RepoLine(s)
     Spacer(modifier = GlanceModifier.height(2.dp))
     Row(modifier = GlanceModifier.fillMaxWidth()) {
@@ -122,7 +122,7 @@ fun CandidateB(s: RepoSnapshot, now: Instant) = Shell {
 
 /** C — right-aligned ledger. Labels left, numbers hard right, so digits form a column. */
 @Composable
-fun CandidateC(s: RepoSnapshot, now: Instant) = Shell {
+fun CandidateC(s: RepoSnapshot) = Shell {
     RepoLine(s)
     LedgerRow("issues", n(s.openIssues, s))
     LedgerRow("PRs", n(s.openPrs, s))
@@ -192,7 +192,7 @@ private fun Badge(prefix: String, value: String) = Box(
 
 /** E — sentence. Numbers inline in prose, repo name last as the quiet attribution. */
 @Composable
-fun CandidateE(s: RepoSnapshot, now: Instant) = Shell {
+fun CandidateE(s: RepoSnapshot) = Shell {
     Text(
         "${n(s.prsAwaitingMyReview, s)} need review",
         maxLines = 1,

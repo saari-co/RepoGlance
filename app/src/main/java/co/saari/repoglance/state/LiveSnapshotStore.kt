@@ -7,18 +7,9 @@ import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
-import java.time.Instant
 import org.json.JSONObject
+import java.time.Instant
 
-/**
- * Durable per-repository live counts, so a widget can render without a
- * network call. Only the fields the compact widget needs are persisted;
- * navigator rows stay out of storage.
- *
- * A record that cannot be read back exactly as it was written is discarded
- * rather than partially reconstructed — a half-restored snapshot would be a
- * count of unknown basis, which the truth rules forbid.
- */
 object LiveSnapshotStore {
 
     private const val PREFS_NAME = "repoglance_live_snapshots"
@@ -68,8 +59,6 @@ object LiveSnapshotStore {
             )
         }
     } catch (_: Exception) {
-        // Includes RepoSnapshot's own truth-rule IllegalArgumentException: a
-        // record that no longer satisfies the invariants is not a snapshot.
         null
     }
 

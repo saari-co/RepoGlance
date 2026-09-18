@@ -3,20 +3,6 @@ package co.saari.repoglance.model
 import java.time.Instant
 import java.util.Collections
 
-/**
- * A single repo's at-a-glance state.
- *
- * Truth-rule invariants (enforced here, not left to the UI layer):
- * - `valueBasis == UNKNOWN` forces counts and repo observation metadata to
- *   unknown values — we know nothing, so nothing renders as current or as
- *   zero. Rate-limit state remains independent and may still be known.
- * - `valueBasis` in {EXACT, LAST_GOOD} requires all three counts non-null,
- *   non-negative, AND `observedAt` non-null — a value with a basis always
- *   carries the moment it was observed. Awaiting-review PRs cannot exceed
- *   the open-PR total.
- * - Navigator maps and row collections are defensively snapshotted before
- *   validation, so caller-owned mutable aliases cannot invalidate truth.
- */
 class RepoSnapshot(
     val repo: RepoRef,
     val openPrs: Int?,
@@ -35,14 +21,18 @@ class RepoSnapshot(
     val prLists: Map<NavigatorFilter, NavigatorList> = immutableMap(prLists)
 
     init {
-        require(issueLists.all { (filter, list) ->
-            filter == list.filter && list.rows is NavigatorRows.Issues
-        }) {
+        require(
+            issueLists.all { (filter, list) ->
+                filter == list.filter && list.rows is NavigatorRows.Issues
+            }
+        ) {
             "issueLists keys must match their list filters and contain only issue rows"
         }
-        require(prLists.all { (filter, list) ->
-            filter == list.filter && list.rows is NavigatorRows.Prs
-        }) {
+        require(
+            prLists.all { (filter, list) ->
+                filter == list.filter && list.rows is NavigatorRows.Prs
+            }
+        ) {
             "prLists keys must match their list filters and contain only PR rows"
         }
         when (valueBasis) {
@@ -61,7 +51,7 @@ class RepoSnapshot(
                 require(openPrs != null && prsAwaitingMyReview != null && openIssues != null) {
                     "EXACT/LAST_GOOD basis requires non-null counts"
                 }
-                require(observedAt != null) {
+                requireNotNull(observedAt) {
                     "EXACT/LAST_GOOD basis requires a non-null observedAt"
                 }
                 require(openPrs >= 0 && prsAwaitingMyReview >= 0 && openIssues >= 0) {

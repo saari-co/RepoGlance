@@ -13,12 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColors = darkColorScheme()
 private val LightColors = lightColorScheme()
 
-/**
- * RepoGlance theme: Material You dynamic color on API 31+ (minSdk is already
- * 31, so this is always available on-device), falling back to static
- * light/dark color schemes otherwise so the theme still compiles and renders
- * correctly on any future lower minSdk.
- */
 @Composable
 fun RepoGlanceTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

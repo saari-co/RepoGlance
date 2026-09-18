@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,7 +53,7 @@ private const val STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS =
 class MainActivity : ComponentActivity() {
     private val fixtureNavigatorScope = mutableStateOf<NavigatorScope?>(null)
     private val fixtureNavigatorMode = mutableStateOf(NavigatorMode.BOTH)
-    private val fixtureNavigatorRouteToken = mutableStateOf(0)
+    private val fixtureNavigatorRouteToken = mutableIntStateOf(0)
     private lateinit var liveModel: RepoGlanceViewModel
     private var refreshCatalogAfterGitHubAccess = false
 
@@ -70,8 +71,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RepoGlanceTheme {
                 Surface(
-                    // Publishes Compose testTag values as accessibility resource ids so
-                    // source-blind on-device validators can address controls unambiguously.
+
                     modifier = Modifier
                         .fillMaxSize()
                         .semantics { testTagsAsResourceId = true },
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val currentFixtureScope = fixtureNavigatorScope.value
                     if (currentFixtureScope != null) {
-                        key(fixtureNavigatorRouteToken.value) {
+                        key(fixtureNavigatorRouteToken.intValue) {
                             FixtureRoot(currentFixtureScope, fixtureNavigatorMode.value)
                         }
                     } else {
@@ -102,7 +102,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -166,13 +165,13 @@ class MainActivity : ComponentActivity() {
     private fun handleFixtureIntent(intent: Intent) {
         if (intent.action == Intent.ACTION_MAIN) {
             fixtureNavigatorScope.value = null
-            fixtureNavigatorRouteToken.value += 1
+            fixtureNavigatorRouteToken.intValue += 1
             return
         }
         val nextScope = resolveFixtureScopeFromIntent(intent) ?: return
         fixtureNavigatorScope.value = nextScope
         fixtureNavigatorMode.value = navigatorModeFromExtra(intent.getStringExtra(EXTRA_NAVIGATOR_MODE))
-        fixtureNavigatorRouteToken.value += 1
+        fixtureNavigatorRouteToken.intValue += 1
     }
 }
 

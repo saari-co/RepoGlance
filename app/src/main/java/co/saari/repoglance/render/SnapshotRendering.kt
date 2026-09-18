@@ -8,14 +8,8 @@ import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import java.time.Instant
 
-/**
- * Display-rule single source of truth for [RepoSnapshot] fields. Slice 2's
- * UI reads only through these functions — no widget or screen re-derives
- * these rules independently.
- */
 object SnapshotRendering {
 
-    /** "—" (em dash) for UNKNOWN basis or a null count — never "0" for unknown. */
     fun countText(count: Int?, basis: ValueBasis): String {
         if (basis == ValueBasis.UNKNOWN || count == null) return "—"
         return count.toString()
@@ -31,7 +25,6 @@ object SnapshotRendering {
 
     fun isStale(basis: ValueBasis): Boolean = basis == ValueBasis.LAST_GOOD
 
-    /** Non-null exactly when the snapshot's basis is LAST_GOOD. */
     fun ageChip(snapshot: RepoSnapshot, now: Instant): String? {
         if (!isStale(snapshot.valueBasis)) return null
         val observedAt = snapshot.observedAt ?: return null

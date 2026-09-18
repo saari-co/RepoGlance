@@ -3,18 +3,6 @@ package co.saari.repoglance.model
 import java.time.Instant
 import java.util.Collections
 
-/**
- * Row payload for a [NavigatorList].
- *
- * Shape decision (Slice 1): a navigator list holds EITHER issue rows OR PR
- * rows, never a mix — every call site is already scoped to one leaf
- * [NavigatorMode] (ISSUES or PRS). [NavigatorMode.BOTH] is expressed by the
- * caller holding two separate [NavigatorList] instances side by side (one
- * `Issues`, one `Prs`), not by a single list carrying both row types. This
- * keeps row rendering monomorphic and makes the "AWAITING_MY_REVIEW is
- * PR-only" rule a type-level invariant enforced in [NavigatorList]'s init,
- * rather than a runtime field check that could silently pass an empty list.
- */
 sealed interface NavigatorRows {
     class Issues(rows: List<IssueRow>) : NavigatorRows {
         val rows: List<IssueRow> = Collections.unmodifiableList(ArrayList(rows))
@@ -39,13 +27,6 @@ sealed interface NavigatorRows {
         }
 }
 
-/**
- * One page (or accumulated pages) of navigator rows for a single
- * [NavigatorFilter]. Rate-limit state lives here because account and org
- * navigator lists do not necessarily have an enclosing [RepoSnapshot].
- * `pageSize` is fixed at [PAGE_SIZE]; pagination beyond that is expressed by
- * `hasMorePages`, not by a variable page size.
- */
 data class NavigatorList(
     val filter: NavigatorFilter,
     val rows: NavigatorRows,
@@ -64,7 +45,7 @@ data class NavigatorList(
                 require(!hasMorePages) { "UNKNOWN basis cannot claim more pages" }
             }
             ValueBasis.EXACT, ValueBasis.LAST_GOOD -> {
-                require(observedAt != null) {
+                requireNotNull(observedAt) {
                     "EXACT/LAST_GOOD basis requires a non-null observedAt"
                 }
             }

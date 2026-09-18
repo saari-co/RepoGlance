@@ -17,15 +17,6 @@ import co.saari.repoglance.model.ValueBasis
 import java.time.Duration
 import java.time.Instant
 
-/**
- * Public-neutral fixture corpus: real public repos ([saari-co/RepoGlance]
- * and [dinkuskit/blocks]) plus clearly fictional ones (acme/rocket,
- * acme/api-server, octoco/infra). Nothing here claims real data about a
- * real third-party repo — the fictional repos exist purely to exercise
- * scenarios the real ones don't need to demonstrate. All ages are computed
- * relative to the `now` passed in, so fixtures stay deterministic across
- * time in golden-style tests.
- */
 object Fixtures {
 
     private const val YOU = "octodev"
@@ -37,7 +28,13 @@ object Fixtures {
     )
 
     private val LABEL_POOL = listOf(
-        "bug", "enhancement", "ci", "docs", "question", "good-first-issue", "triage",
+        "bug",
+        "enhancement",
+        "ci",
+        "docs",
+        "question",
+        "good-first-issue",
+        "triage",
     )
 
     private val TITLE_POOL = listOf(
@@ -58,12 +55,10 @@ object Fixtures {
         "Split fixtures into per-scenario builders",
     )
 
-    // ---- snapshots -----------------------------------------------------
-
     fun snapshots(scenario: FixtureScenario, now: Instant): List<RepoSnapshot> = when (scenario) {
         FixtureScenario.EXACT -> exactSnapshots(now)
         FixtureScenario.LAST_GOOD -> lastGoodSnapshots(now)
-        FixtureScenario.UNKNOWN -> unknownSnapshots(now)
+        FixtureScenario.UNKNOWN -> unknownSnapshots()
         FixtureScenario.RATE_LIMITED -> rateLimitedSnapshots(now)
         FixtureScenario.NO_CI -> noCiSnapshots(now)
         FixtureScenario.EMPTY -> emptyList()
@@ -83,8 +78,7 @@ object Fixtures {
             observedAt = now,
             rateLimit = RateLimitBucket.OK,
         ),
-        // Legitimate zero: 0 open PRs under EXACT basis is a real, known
-        // value — distinct from UNKNOWN's null/"—" rendering.
+
         RepoSnapshot(
             repo = RepoRef("dinkuskit", "blocks"),
             openPrs = 0,
@@ -150,7 +144,7 @@ object Fixtures {
         ),
     )
 
-    private fun unknownSnapshots(now: Instant): List<RepoSnapshot> = listOf(
+    private fun unknownSnapshots(): List<RepoSnapshot> = listOf(
         RepoSnapshot(
             repo = RepoRef("acme", "rocket"),
             openPrs = null,
@@ -243,25 +237,14 @@ object Fixtures {
         ),
     )
 
-    // Dogfood default: one repo from each other scenario, so a single
-    // MIXED corpus demonstrates every truth-rule state side by side.
     private fun mixedSnapshots(now: Instant): List<RepoSnapshot> = listOf(
         exactSnapshots(now)[1],
         lastGoodSnapshots(now)[0],
-        unknownSnapshots(now)[0],
+        unknownSnapshots()[0],
         rateLimitedSnapshots(now)[1],
         noCiSnapshots(now)[1],
     )
 
-    // ---- navigator lists ------------------------------------------------
-
-    /**
-     * Builds one [NavigatorList] for the given [scope]/[mode]/[filter]
-     * combination. [mode] must be [NavigatorMode.ISSUES] or
-     * [NavigatorMode.PRS] — a single [NavigatorList] cannot hold both row
-     * types (see [NavigatorRows]); a caller wanting [NavigatorMode.BOTH]
-     * calls this twice and holds the two lists side by side.
-     */
     fun navigatorList(
         scope: NavigatorScope,
         mode: NavigatorMode,
@@ -377,8 +360,11 @@ object Fixtures {
                 repo = rowRepo(repos, i),
                 number = 100 + i,
                 title = rowTitle(filter, i),
-                state = if (filter == NavigatorFilter.OPEN) "open"
-                else if (i % 5 == 0) "closed" else "open",
+                state = when {
+                    filter == NavigatorFilter.OPEN -> "open"
+                    i % 5 == 0 -> "closed"
+                    else -> "open"
+                },
                 labels = listOf(LABEL_POOL[i % LABEL_POOL.size]),
                 author = CAST[i % CAST.size],
                 assignee = if (filter == NavigatorFilter.MINE) YOU else CAST[(i + 1) % CAST.size],
@@ -398,10 +384,11 @@ object Fixtures {
                 repo = rowRepo(repos, i),
                 number = 200 + i,
                 title = rowTitle(filter, i),
-                state = if (
-                    filter == NavigatorFilter.OPEN ||
-                    filter == NavigatorFilter.AWAITING_MY_REVIEW
-                ) "open" else if (i % 7 == 0) "closed" else "open",
+                state = when {
+                    filter == NavigatorFilter.OPEN || filter == NavigatorFilter.AWAITING_MY_REVIEW -> "open"
+                    i % 7 == 0 -> "closed"
+                    else -> "open"
+                },
                 labels = listOf(LABEL_POOL[i % LABEL_POOL.size]),
                 author = CAST[i % CAST.size],
                 assignee = if (filter == NavigatorFilter.MINE) YOU else CAST[(i + 1) % CAST.size],

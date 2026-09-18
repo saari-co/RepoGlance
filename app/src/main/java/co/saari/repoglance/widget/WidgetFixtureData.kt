@@ -23,9 +23,6 @@ data class WidgetRow(
     val url: String,
 )
 
-/** Fixture-only projection used by widget configuration and rendering. The
- * catalog is stable across fixture scenario switches; current-scenario data
- * wins when available, with a deterministic catalog fallback otherwise. */
 object WidgetFixtureData {
     private val catalogScenarioOrder = listOf(
         FixtureScenario.EXACT,
@@ -48,8 +45,6 @@ object WidgetFixtureData {
         .firstOrNull { it.repo == repo }
         ?: availableSnapshots(now).firstOrNull { it.repo == repo }
 
-    /** A single recently-updated feed. BOTH intentionally interleaves issue
-     * and PR rows by update time instead of presenting two sections. */
     fun recentRows(repo: RepoRef, mode: NavigatorMode, now: Instant): List<WidgetRow> {
         val section = SnapshotStore.navigatorRows(
             scope = NavigatorScope.Repo(repo),

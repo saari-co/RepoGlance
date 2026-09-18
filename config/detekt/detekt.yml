@@ -1,0 +1,90 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: true
+
+comments:
+  active: true
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+
+naming:
+  active: true
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  active: true
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInObjects: 20
+    ignoreAnnotatedFunctions: ['Composable']
+
+coroutines:
+  active: true
+  InjectDispatcher:
+    active: false
+
+style:
+  active: true
+  ReturnCount:
+    max: 3
+    excludeGuardClauses: true
+  ForbiddenComment:
+    active: true
+    comments:
+      - reason: 'RepoGlance bans source comments in app/src/main (GrillTrack ci-floor-014). Put rationale in docs/INVARIANTS.md or a test.'
+        value: '.*'
+    excludes: ['**/src/test/**', '**/src/debug/**']
+  ForbiddenMethodCall:
+    active: true
+    methods:
+      - reason: 'No direct logging outside the redaction-aware logger (finding 4: headers reached log paths).'
+        value: 'android.util.Log.d'
+      - value: 'android.util.Log.e'
+      - value: 'android.util.Log.i'
+      - value: 'android.util.Log.v'
+      - value: 'android.util.Log.w'
+      - value: 'android.util.Log.wtf'
+      - value: 'kotlin.io.println'
+      - value: 'kotlin.io.print'
+    excludes: ['**/log/RedactingLog.kt']
+  ForbiddenImport:
+    active: true
+    imports:
+      - reason: 'No direct logging outside the redaction-aware logger (finding 4: headers reached log paths). The only permitted home is log/RedactingLog.kt.'
+        value: 'android.util.Log'
+      - reason: 'Model rows expose immutable collections only (finding 1: mutable alias leaks).'
+        value: 'java.util.ArrayList'
+      - value: 'java.util.HashMap'
+    excludes: ['**/log/RedactingLog.kt']
+  MaxLineLength:
+    maxLineLength: 120
+  MagicNumber:
+    active: false
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  MaximumLineLength:
+    maxLineLength: 120
+  TrailingCommaOnCallSite:
+    active: false
+  TrailingCommaOnDeclarationSite:
+    active: false
+
+Compose:
+  active: true

@@ -4,6 +4,8 @@ import co.saari.repoglance.auth.GitHubAuthException
 import co.saari.repoglance.auth.GitHubSession
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.RepoRef
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -11,8 +13,6 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import org.json.JSONArray
-import org.json.JSONObject
 
 class GitHubApiClient(
     private val session: GitHubSession,
@@ -80,11 +80,6 @@ class GitHubApiClient(
         )
     }
 
-    /**
-     * Repository-level counters. One core-quota call; the response's
-     * `open_issues_count` includes pull requests, which
-     * [LiveSnapshotFactory] corrects for.
-     */
     fun loadRepositoryMetadata(
         repository: LiveRepository,
     ): GitHubApiResult<LiveRepositoryMetadata> = authenticated {
@@ -184,7 +179,7 @@ class GitHubApiClient(
 
         while (page <= MAX_PAGES) {
             if (!visited.add(currentPath)) {
-                throw IllegalStateException("GitHub pagination looped")
+                error("GitHub pagination looped")
             }
 
             val response = get(currentPath)
@@ -195,7 +190,7 @@ class GitHubApiClient(
             val next = response.nextLinkPath() ?: return
             currentPath = withPageSize(next, pageSize)
         }
-        throw IllegalStateException("GitHub pagination exceeded the safety limit")
+        error("GitHub pagination exceeded the safety limit")
     }
 
     private fun get(path: String): HttpResponse {
@@ -347,10 +342,11 @@ class GitHubApiClient(
     }
 
     private fun withPageSize(path: String, pageSize: Int): String {
-        return if (path.contains("per_page=")) path else {
-            val separator = if ('?' in path) '&' else '?'
-            "$path${separator}per_page=$pageSize"
+        if (path.contains("per_page=")) {
+            return path
         }
+        val separator = if ('?' in path) '&' else '?'
+        return "$path${separator}per_page=$pageSize"
     }
 
     private fun JSONArray.labelsList(): List<String> = (0 until length()).mapNotNull { index ->
@@ -365,7 +361,7 @@ class GitHubApiClient(
         if (has(name) && !isNull(name)) getJSONArray(name).labelsList() else emptyList()
 
     private fun JSONObject.requestedReviewersList(): List<String> =
-        optJSONArray("requested_reviewers")?.loginList() ?: emptyList()
+        optJSONArray("requested_reviewers")?.loginList().orEmpty()
 
     private fun JSONArray.loginList(): List<String> = (0 until length()).mapNotNull { index ->
         when (val item = get(index)) {

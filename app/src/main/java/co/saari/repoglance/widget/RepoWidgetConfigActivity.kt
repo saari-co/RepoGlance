@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -44,12 +45,9 @@ import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
-import java.time.Instant
 import kotlinx.coroutines.launch
+import java.time.Instant
 
-/** System-launched configuration and reconfiguration surface for one repo
- * widget instance. A canceled activity leaves the widget unconfigured; Save
- * commits only this launcher's app-widget ID and then renders that ID. */
 class RepoWidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,7 +146,7 @@ private fun RepoWidgetConfigScreen(
                         readOnly = true,
                         label = { Text("Repository") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = repoMenuExpanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                     )
                     ExposedDropdownMenu(
                         expanded = repoMenuExpanded,

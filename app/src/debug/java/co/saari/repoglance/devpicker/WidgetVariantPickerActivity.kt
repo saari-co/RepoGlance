@@ -1,5 +1,6 @@
 package co.saari.repoglance.devpicker
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
@@ -15,17 +16,16 @@ import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
 import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.model.CiState
+import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.RepoRef
-import android.content.Intent
-import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoSnapshot
-import co.saari.repoglance.widget.CompactContent
-import co.saari.repoglance.widget.RepoWidgetConfig
 import co.saari.repoglance.model.ValueBasis
 import co.saari.repoglance.state.LiveSnapshotStore
-import java.time.Instant
+import co.saari.repoglance.widget.CompactContent
+import co.saari.repoglance.widget.RepoWidgetConfig
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 /**
  * GrillTrack live variant picker — development tooling, debug source set only.
@@ -69,7 +69,12 @@ class WidgetVariantPickerActivity : ComponentActivity() {
         val candidates: List<Pair<String, @Composable (RepoSnapshot?, Instant) -> Unit>> = listOf(
             "PRODUCTION — exact counts" to { s, n -> CompactContent(config, s, intent, n) },
             "PRODUCTION — last good, 3 days old" to { s, n ->
-                CompactContent(config, s?.copy(valueBasis = ValueBasis.LAST_GOOD, observedAt = n.minusSeconds(3 * 24 * 3600)), intent, n)
+                CompactContent(
+                    config,
+                    s?.copy(valueBasis = ValueBasis.LAST_GOOD, observedAt = n.minusSeconds(THREE_DAYS_SECONDS)),
+                    intent,
+                    n,
+                )
             },
             "PRODUCTION — no observation yet" to { _, n -> CompactContent(config, null, intent, n) },
             // The real persisted path: whatever LiveSnapshotStore holds for the
@@ -111,7 +116,10 @@ class WidgetVariantPickerActivity : ComponentActivity() {
                         layoutParams = LinearLayout.LayoutParams(
                             dp(size.width.value),
                             dp(size.height.value),
-                        ).apply { gravity = Gravity.START; bottomMargin = dp(10f) }
+                        ).apply {
+                            gravity = Gravity.START
+                            bottomMargin = dp(10f)
+                        }
                         addView(
                             result.remoteViews.apply(this@WidgetVariantPickerActivity, this),
                             ViewGroup.LayoutParams(
@@ -143,6 +151,9 @@ class WidgetVariantPickerActivity : ComponentActivity() {
     }
 
     private companion object {
+
+        private const val THREE_DAYS_SECONDS = 3L * 24 * 3600
+
         /**
          * The widget declares COMPACT_SIZE = 120x64dp as its floor, and treats
          * anything under TALL_BREAKPOINT = 100dp tall as compact. Width is what
@@ -158,7 +169,11 @@ class WidgetVariantPickerActivity : ComponentActivity() {
 
         /** Busy repository: worst case for text fit. */
         fun busyRepo(now: Instant): RepoSnapshot = snapshot(
-            RepoRef("saariuslystoned", "x-api"), openIssues = 128, openPrs = 23, awaiting = 7, now = now,
+            RepoRef("saariuslystoned", "x-api"),
+            openIssues = 128,
+            openPrs = 23,
+            awaiting = 7,
+            now = now,
         )
 
         fun snapshot(

@@ -4,6 +4,10 @@ import co.saari.repoglance.data.HttpRequest
 import co.saari.repoglance.data.HttpResponse
 import co.saari.repoglance.data.HttpTransport
 import co.saari.repoglance.data.UrlConnectionTransport
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
@@ -11,11 +15,6 @@ import java.nio.charset.StandardCharsets
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.withTimeoutOrNull
-import org.json.JSONObject
 
 interface GitHubDeviceAuthorizationGateway {
     fun poll(deviceCode: String): DevicePollResult
@@ -235,8 +234,6 @@ class GitHubDeviceFlowPoller(
                     }
                 }
             } catch (_: TransientDevicePollException) {
-                // A bounded transport failure remains pending. The next request
-                // still waits for GitHub's current interval and local expiry.
             }
             nextPollAt = clock.instant().plusMillis(secondsToMillis(intervalSeconds))
         }
@@ -251,11 +248,7 @@ class GitHubDeviceFlowPoller(
                 Duration.between(now, expiresAt).toMillis(),
             )
             if (waitMillis <= 0L) return
-            try {
-                wait(waitMillis)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            }
+            wait(waitMillis)
         }
     }
 
@@ -326,8 +319,6 @@ class GitHubSession(
             try {
                 tokenStore.clear()
             } catch (_: Exception) {
-                // Preserve the fixed persistence failure below; never reflect
-                // storage exception details into the UI or auth state.
             }
             throw GitHubAuthException(
                 "GitHub authorized successfully, but this device couldn't save the session. Please try again.",

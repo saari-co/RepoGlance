@@ -6,36 +6,8 @@ import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import java.time.Instant
 
-/**
- * Builds a [RepoSnapshot] from live GitHub responses.
- *
- * Truth rules this enforces, in order:
- *
- * 1. An open-PR count is exact only when the open-PR page was not truncated.
- *    A truncated page is a lower bound, never a count.
- * 2. `GET /repos/{owner}/{name}` reports `open_issues_count` as issues **plus**
- *    pull requests — GitHub's long-standing quirk — so true open issues are
- *    `open_issues_count - openPrs`. That subtraction is only sound when
- *    `openPrs` is itself exact, which is why rule 1 comes first.
- * 3. When the current fetch cannot produce exact counts, fall back to the
- *    previous snapshot as [ValueBasis.LAST_GOOD] so the widget ages an honest
- *    number instead of inventing one.
- * 4. With no exact fetch and no previous value, the basis is
- *    [ValueBasis.UNKNOWN] and every count renders as "—", never as zero.
- *
- * Default-branch CI and latest release are not fetched by [GitHubApiClient];
- * they stay absent rather than being guessed.
- */
 object LiveSnapshotFactory {
 
-    /**
-     * Whether a repository-metadata request can change the outcome. Every
-     * exact count derives from a whole open-PR page, so when that page is
-     * missing or truncated the metadata counter would be fetched and then
-     * discarded, spending core quota for a result that must fall back to
-     * LAST_GOOD or UNKNOWN anyway. An untruncated issues page is already
-     * exact on its own and needs no counter either.
-     */
     fun needsRepositoryMetadata(
         issues: LivePage<LiveIssue>?,
         pullRequests: LivePage<LivePullRequest>?,
@@ -69,7 +41,6 @@ object LiveSnapshotFactory {
             )
         }
         if (previous != null && previous.valueBasis != ValueBasis.UNKNOWN) {
-            // Age the previous observation rather than publish a bound as a count.
             return previous.copy(
                 valueBasis = ValueBasis.LAST_GOOD,
                 rateLimit = rateLimit,
@@ -78,13 +49,11 @@ object LiveSnapshotFactory {
         return unknown(repository, rateLimit)
     }
 
-    /** Counts that survive every truth rule, or null when any of them fails. */
     private fun exactCounts(
         metadata: LiveRepositoryMetadata?,
         issues: LivePage<LiveIssue>?,
         pullRequests: LivePage<LivePullRequest>?,
     ): ExactCounts? {
-        // Every count is derived from the open-PR page, so it must be whole.
         if (pullRequests == null || pullRequests.hasMorePages) return null
         val openPrs = pullRequests.rows.size
 
@@ -98,13 +67,6 @@ object LiveSnapshotFactory {
         )
     }
 
-    /**
-     * Prefers the page already in hand: an untruncated issues page is
-     * exact on its own, because [GitHubApiClient] strips pull requests out
-     * of `/issues` before it ever gets here. Only when that page was
-     * truncated does the repository counter earn its keep, and then it has
-     * to have pull requests subtracted back out.
-     */
     private fun openIssueCount(
         metadata: LiveRepositoryMetadata?,
         issues: LivePage<LiveIssue>?,
