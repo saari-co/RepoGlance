@@ -157,6 +157,11 @@ android {
         warningsAsErrors = true
         baseline = file("lint-baseline.xml")
         error += "ContentDescription"
+        // Dependency-age checks depend on what the network reports at run
+        // time, so their messages differ between a laptop and a CI runner and
+        // can never be baselined stably. They are the gardener's job (plan
+        // grill G), not a merge gate.
+        disable += listOf("GradleDependency", "AndroidGradlePluginVersion", "NewerVersionAvailable")
         checkDependencies = false
     }
 }

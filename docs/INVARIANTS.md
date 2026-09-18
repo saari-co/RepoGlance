@@ -22,7 +22,12 @@ Enforcement layers:
 
 - **Android Lint** runs with `abortOnError` and `warningsAsErrors`. The
   warnings that existed when the gate landed are frozen in
-  `app/lint-baseline.xml`; that file only ever shrinks. `ContentDescription`
+  `app/lint-baseline.xml`; that file only ever shrinks. The dependency-age
+  checks (`GradleDependency`, `AndroidGradlePluginVersion`,
+  `NewerVersionAvailable`) are disabled in the gate: their messages depend on
+  what the network reports when lint runs, so a baseline that matches on a
+  laptop fails on a CI runner (proven on the first CI run of this floor).
+  Dependency freshness is scheduled gardener work, not a merge gate. `ContentDescription`
   is promoted to error outside the baseline. Honest scope: that lint check
   covers View and XML surfaces only. A Compose `contentDescription = null`
   is invisible to it, which the deliberate-violation probe confirmed. The

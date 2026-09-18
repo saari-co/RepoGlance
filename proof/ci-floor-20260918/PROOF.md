@@ -32,11 +32,16 @@ CI ran `testDebugUnitTest assembleDebug` only; lint by hand (0 errors,
   into `check`, plain `detekt` task disabled.
 - `config/detekt/detekt.yml`: rule configuration (see `docs/INVARIANTS.md`
   for every decision and its reason).
-- `app/lint-baseline.xml`: 30 frozen entries (`GradleDependency` 24,
-  `AndroidGradlePluginVersion` 3, `OldTargetApi` 1, `ObsoleteSdkInt` 1,
-  `MissingApplicationIcon` 1). The first generation held 33; the
-  `mutableIntStateOf` fix retired three `AutoboxingStateCreation` entries and
-  the baseline was regenerated to drop them, which is the ratchet working.
+- `app/lint-baseline.xml`: 3 frozen entries (`OldTargetApi`,
+  `ObsoleteSdkInt`, `MissingApplicationIcon`). History: the first generation
+  held 33; the `mutableIntStateOf` fix retired three `AutoboxingStateCreation`
+  entries; then the first CI run failed with 27 un-baselined
+  `GradleDependency` / `AndroidGradlePluginVersion` errors because those
+  checks report whatever newer versions the network shows at run time, so
+  their messages differ between a laptop and a CI runner. They are disabled
+  in the gate (`disable += GradleDependency, AndroidGradlePluginVersion,
+  NewerVersionAvailable`) and belong to the gardener (plan grill G). The
+  baseline was regenerated and shrank from 30 to 3.
 - `app/detekt-baseline-debug.xml`: 20 frozen entries, complexity and size
   only (`ModifierMissing` 6, `LongParameterList` 4, `CyclomaticComplexMethod`
   3, `LongMethod` 2, `ComplexCondition` 1, `NestedBlockDepth` 1,
@@ -64,7 +69,8 @@ CI ran `testDebugUnitTest assembleDebug` only; lint by hand (0 errors,
   files removed between runs.
 - 188 JVM tests across 25 suites; 0 failures, 0 errors, 0 skips (unchanged
   from `main`: this slice changes no behaviour).
-- Lint outside the baseline: 0 errors, 0 warnings, 2 informational.
+- Lint outside the baseline: 0 errors, 0 warnings, 2 informational (after
+  the dependency-age checks were disabled; see above).
 - detekt outside the baseline: 0.
 - Kotlin compiler: 0 warnings.
 - Debug APK SHA-256
@@ -90,7 +96,7 @@ tree is proven green again afterwards. Local runs; CI executes the same
   `MagicNumber` is off. `FunctionNaming`, `LongMethod`, `LongParameterList`,
   and `TooManyFunctions` ignore `@Composable` functions by configuration.
   Each is a documented decision, not an accident.
-- The 20 baselined detekt findings and 30 baselined lint warnings are ratchet
+- The 20 baselined detekt findings and 3 baselined lint warnings are ratchet
   debt: the files only shrink, and burning them down is later bounded work.
 - The single permitted logger file does not exist yet; RepoGlance logs
   nothing today. The exclusion pre-blesses its path.
@@ -121,3 +127,13 @@ tree is proven green again afterwards. Local runs; CI executes the same
 After the last probe: `./gradlew check` exit 0; `Probe.kt` and
 `probe_layout.xml` absent; `git status` shows no tracked file altered by the
 probes.
+
+## CI finding and repair (2026-09-18)
+
+First CI run on `e3a755d` (GitHub runs 35307732058 / 35307729075) failed in
+`lintDebug`: 27 errors, all `GradleDependency` / `AndroidGradlePluginVersion`,
+because the runner's network view of "newer version available" differs from
+the laptop's and lint baselines match on message text. Repair: those checks
+are disabled in the gate and the baseline regenerated (3 entries). Local
+`check assembleDebug` green again. This is the floor catching its own
+non-determinism, which is the kind of finding the gate exists to surface.
