@@ -1571,17 +1571,45 @@
           "review_source_identity": null,
           "to": "needs_reverification",
           "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T19:29:10+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "needs_reverification",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f",
+          "to": "implemented",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T19:29:10+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
         }
       ],
       "id": "session-bootstrap-016",
-      "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+      "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
-      "repair_required": true,
-      "review_classifications": [
-        "required_fix",
-        "human_gate"
-      ],
+      "repair_required": false,
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -1594,13 +1622,13 @@
           "source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f"
         }
       ],
-      "review_ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
-      "review_result": "findings",
-      "review_source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f",
-      "status": "needs_reverification",
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:29:09+00:00",
-      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+      "updated_at": "2026-09-18T19:29:10+00:00",
+      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
     },
     {
       "baseline_ref": null,
@@ -1674,5 +1702,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:29:09+00:00"
+  "updated_at": "2026-09-18T19:29:10+00:00"
 }
