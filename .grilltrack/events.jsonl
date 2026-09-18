@@ -76,3 +76,5 @@
 {"action": "decision_implemented", "at": "2026-09-18T12:44:10+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "1b9ccf2f-8bdf-4f97-93eb-e3b369a4977d"}
 {"action": "decision_verified", "at": "2026-09-18T12:44:10+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "c3e065d4-1295-44dc-80f1-e0314045c32a"}
 {"action": "decision_reviewed", "at": "2026-09-18T12:49:49+00:00", "data": {"classifications": ["required_fix"], "decision_id": "feature-map-015", "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1: guard ran after the tree was written on phone and host", "result": "findings", "reviewed_at": "2026-09-18T12:49:49+00:00", "source_identity": "git:cc5fe2a05d20f66e14704d281ad975471364356e"}, "event_id": "dcc077b7-edbd-4f8a-a921-2b36d5272a1f"}
+{"action": "decision_implemented", "at": "2026-09-18T12:49:49+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "c2f7feac-f575-4e8b-a09e-f584328e41d9"}
+{"action": "decision_verified", "at": "2026-09-18T12:49:49+00:00", "data": {"decision_id": "feature-map-015"}, "event_id": "99192f3f-d78d-4b06-afa6-f56c0c23ff31"}
