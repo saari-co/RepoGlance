@@ -1529,10 +1529,24 @@
           "review_source_identity": null,
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:03:23+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
         }
       ],
       "id": "session-bootstrap-016",
-      "implementation_ref": null,
+      "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
       "repair_required": false,
@@ -1541,9 +1555,9 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "locked",
+      "status": "implemented",
       "superseded_by": null,
-      "updated_at": "2026-09-18T16:39:42+00:00",
+      "updated_at": "2026-09-18T19:03:23+00:00",
       "verification_ref": null
     },
     {
@@ -1605,7 +1619,14 @@
     "reason": "Registered Fold is awake but keyguard-locked (device_locked=1); candidate captures need the maintainer to unlock it",
     "resumed_at": "2026-09-18T13:34:10+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      "proof/session-bootstrap-20260918/PROOF.md"
+    ],
+    "next_safe_action": "When the phone is back, awake and unlocked: bin/verify-repoglance doctor, launch MIXED live and MIXED picker, capture filtered StrictMode logcat, finish proof/session-bootstrap-20260918/PROOF.md, verify in ledger",
+    "paused_at": "2026-09-18T19:03:23+00:00",
+    "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof"
+  },
   "recommendation": {
     "alternatives": [
       "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it",
@@ -1616,8 +1637,8 @@
     "recorded_at": "2026-09-18T15:39:49+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T16:39:42+00:00"
+  "updated_at": "2026-09-18T19:03:23+00:00"
 }
