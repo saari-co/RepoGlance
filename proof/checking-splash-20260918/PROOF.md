@@ -127,3 +127,17 @@ ktlint, checkFeatureMap, warnings as errors, no comments in app/src/main).
 
 Quick Settings tile for quick access (maintainer direction 2026-09-18): a
 separate feature decision; the mark vector is ready to serve as its icon.
+
+## Review (source identity git:5f793f75acd4b86d97ae214667872b41384bf4a7, PR #18)
+
+- OpenClaw `req-20260918T230653Z-9496833793`: correct (0.98), 0 findings.
+- ClawSweeper: platinum hermit 4/6 overall, patch diamond lobster 5/6,
+  proof platinum hermit with media bonus, no code or security findings
+  (PR #18 comment 5737299348). One merge-readiness item: the reduced-motion
+  branch is source-evident, not device-proven.
+
+Adjudication: no required fixes. The reduced-motion item is classified
+`human_gate`: proving it means changing the phone's animator duration scale,
+a device setting that stays with the maintainer; the branch is a single
+`if` on `Settings.Global.ANIMATOR_DURATION_SCALE == 0f` that skips composing
+the rings. Merge is the maintainer's.

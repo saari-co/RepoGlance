@@ -1802,14 +1802,26 @@
       "question": "What does the live screen show while the GitHub session is unknown: the maintainer wants the RepoGlance logo with a fun animation and a clever hook",
       "rationale": "Maintainer on the live picker: combine A and B so B reads as the commit glyph too; likes the hybrid; motion D Ping over A Sweep. Legible at 20dp alpha mask as a magnifier with a ringed centre.",
       "repair_required": false,
-      "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_classifications": [
+        "human_gate"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T230653Z-9496833793 correct 0.98, 0 findings; clawsweeper platinum hermit 4/6, patch diamond lobster 5/6, no findings (PR #18 comment 5737299348); one gate: reduced-motion branch not device-proven",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T23:12:51+00:00",
+          "source_identity": "git:5f793f75acd4b86d97ae214667872b41384bf4a7"
+        }
+      ],
+      "review_ref": "openclaw req-20260918T230653Z-9496833793 correct 0.98, 0 findings; clawsweeper platinum hermit 4/6, patch diamond lobster 5/6, no findings (PR #18 comment 5737299348); one gate: reduced-motion branch not device-proven",
+      "review_result": "findings",
+      "review_source_identity": "git:5f793f75acd4b86d97ae214667872b41384bf4a7",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T22:43:58+00:00",
+      "updated_at": "2026-09-18T23:12:51+00:00",
       "verification_ref": "proof/checking-splash-20260918/PROOF.md"
     }
   ],
@@ -1840,5 +1852,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T22:43:59+00:00"
+  "updated_at": "2026-09-18T23:12:51+00:00"
 }
