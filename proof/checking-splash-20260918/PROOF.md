@@ -141,3 +141,15 @@ Adjudication: no required fixes. The reduced-motion item is classified
 a device setting that stays with the maintainer; the branch is a single
 `if` on `Settings.Global.ANIMATOR_DURATION_SCALE == 0f` that skips composing
 the rings. Merge is the maintainer's.
+
+## Reduced-motion proof (maintainer-approved setting change, 2026-09-18)
+
+With the maintainer's approval the animator duration scale was set to 0 over
+adb (`settings put global animator_duration_scale 0`; it was unset before
+and was returned to unset with `settings delete` afterwards). `launch MIXED
+checking`, `dump checking-reduced`: `repoglance:checking-mark` and
+`repoglance:checking-message` present. Two captures two seconds apart,
+`checking-reduced` and `checking-reduced-2`, have the identical SHA-256
+`bcf7c983b24e9bd5f7ad55288d8f3f2c03dc47374b501437b08fdad9b862b014`:
+the mark and message only, no rings, nothing moving. Inspected. The
+ClawSweeper merge-readiness item is closed by this evidence.
