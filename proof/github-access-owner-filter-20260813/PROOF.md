@@ -1,4 +1,4 @@
-# GitHub Access Menu And Owner Filter Proof — 2026-08-13
+# GitHub Access Menu And Owner Filter Proof — 2026-08-13, re-run 2026-09-17
 
 ## Scope
 
@@ -9,19 +9,41 @@ re-authorization, release, or public distribution.
 
 ## Exact identity
 
-- Proven source: `6a45a50eb964a36c4031a60528d6dbeca0ed8bff`
+- Proven source: `a089e50ffc3568b7fb72f31acb7eb2fb3cad6f74`
 - Base: RepoGlance `main` at
   `08d8545f0e94878fe3031a1f5812bd8c1ac0960d`
 - APK SHA-256:
-  `329dda255896f7b107b276c03196f8e5297859969cfd74def7a43a41e955e423`
+  `547ba3dc96381f3fecf80078414b576eefe9c223faf12865dd4a604ad54bad56`
 - APK size: 60,919,696 bytes
 - Installed package: `co.saari.repoglance`, `0.3.0-auth-live` / version code 3
-- Device: registered Pixel 10 Pro Fold, Android 16 / API 36, 2076×2152 inner
-  display
+- Device: registered **Pixel 11 Pro Fold**, Android 17 / API 37, 2076×2152
+  inner display, physical id `4619827677550801152` (outer display
+  `4619827677550801153` was OFF and excluded)
 
 The fresh local APK and the device's installed `base.apk` had the same SHA-256.
-Installation used replacement mode only; app data and the existing authorized
-session were preserved.
+Installation used replacement mode only; app data was preserved.
+
+Debug APKs are **not byte-reproducible** — the same commit built twice in one
+session yields different hashes, because the build embeds timestamps. The hash
+above identifies the exact artifact installed for this run and pins the
+local-build/device-install match; it is not re-derivable from the commit alone.
+The 60,919,696-byte size is the stable signal across builds.
+
+### Prior run
+
+An earlier packet for this branch proved `6a45a50eb964a36c4031a60528d6dbeca0ed8bff`
+on a Pixel 10 Pro Fold (Android 16 / API 36, APK SHA-256
+`329dda255896f7b107b276c03196f8e5297859969cfd74def7a43a41e955e423`). Its
+sanitized media remains valid for that commit and is retained below. This packet
+supersedes it and covers the current branch head, which adds unique
+accessibility identifiers to the two editable controls on the loaded home.
+
+### Session
+
+The device's August authorization had expired. The maintainer re-authorized the
+device flow on the phone on 2026-09-17 before this run. The agent did not
+complete, observe, or retain any part of that authorization. No credential,
+token, or authorization value entered agent context.
 
 ## Implemented behavior
 
@@ -38,11 +60,15 @@ session were preserved.
 
 ## Automated verification
 
-- Focused `GitHubAccessUiSourceWiringTest`: 8 tests, 0 failures/errors/skips.
-- Full `clean testDebugUnitTest assembleDebug lintDebug`: PASS, 54 tasks.
-- Android lint: 0 errors; 18 warnings retained.
+- Focused `GitHubAccessUiSourceWiringTest`: **10** tests, 0 failures/errors/skips.
+- Full suite: **168 tests across 22 suites**, 0 failures/errors/skips.
+- Full `clean testDebugUnitTest assembleDebug lintDebug`: PASS, 54 tasks executed.
+- Android lint: **0 errors; 27 warnings** retained. The rise from the prior
+  run's 18 is dependency-age warnings accrued since August plus three
+  `AutoboxingStateCreation` warnings that a clean run surfaces on pre-existing
+  `main` code. This branch's diff contributes no warnings.
 - `git diff --check`: PASS.
-- Independent read-only review: CLEAN; no P1/P2/P3 finding.
+- Independent read-only review: CLEAN at `6a45a50`; not re-run for `a089e50`.
 
 ## Physical Fold verification
 
@@ -59,11 +85,37 @@ cold-launched RepoGlance without clearing data. Clauses proven on-device:
    repository-shaped labels: five owned by `saari-co`, zero by another owner.
    No repository label left the device.
 
-The validator stopped before typing into search because Android accessibility
-exposed two editable controls without a unique allowlisted search label. Search
-composition remains covered by deterministic JVM tests; the packet does not
-claim source-blind Fold proof for search typing, the `dinkuskit` result list, or
-filter persistence across a cold launch.
+### Clauses newly proven at `a089e50`
+
+The prior run stopped before typing into search because Android accessibility
+exposed two editable controls without a unique allowlisted search label.
+`a089e50` publishes Compose `testTag` values as accessibility resource ids and
+tags both controls, which closes that gap. Re-run on the Pixel 11 Pro Fold with
+a live session:
+
+6. Both controls are uniquely addressable through accessibility:
+   `repoglance:repo-search` and `repoglance:owner-filter` appear as
+   `resource-id` values on the loaded home. Two editable controls are present,
+   as before, but each is now individually selectable.
+7. **Search entry.** Addressing the field by its resource id, typing `glance`
+   left the field reading exactly `glance` and reduced the visible repository
+   list from five rows to one, and that row matched the query.
+8. **Owner menu.** The selector offered `All` plus exactly three owner choices:
+   `dinkuskit`, `saari-co`, `saariuslystoned`.
+9. **`dinkuskit` result list.** Selecting `dinkuskit` set the selector to
+   `dinkuskit` and produced five repository rows, five owned by `dinkuskit` and
+   zero owned by anyone else.
+10. **Cold-launch behavior.** After `am force-stop` and a cold relaunch the
+    owner filter read `All` and the search field was empty. The filter is
+    therefore session-scoped and does **not** survive process death. This is
+    consistent with the branch's claim, which is retention across catalog
+    refresh rather than across cold launch, and it is now a verified result
+    rather than an open question.
+
+The live session remained intact throughout. No repository name, URL,
+authentication material, or clipboard content was captured or retained; the
+counts above were derived from accessibility structure and the raw uiautomator
+dumps were discarded after measurement.
 
 ## Sanitized media
 
@@ -83,6 +135,11 @@ repository name. Raw and unselected captures remain outside product git.
 
 - No GitHub App setting, account, repository permission, token, or device
   setting changed.
-- No sign-out, uninstall, data clear, re-authorization, release, or merge
-  occurred during this proof.
+- No sign-out, uninstall, data clear, release, or merge occurred during this
+  proof. The agent performed no re-authorization: the maintainer completed the
+  expired device flow himself before the run, and the agent neither tapped
+  through nor observed it.
+- On-device actions were limited to: tap search, type, clear, open the owner
+  menu, select an owner, force-stop, relaunch. `Manage GitHub access` and
+  `Disconnect GitHub` were never invoked.
 - The branch still requires normal CI/review and maintainer merge approval.
