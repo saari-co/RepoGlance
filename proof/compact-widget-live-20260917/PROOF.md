@@ -95,3 +95,38 @@ Reviewed `d2463aa` on both axes. Three `required_fix`, all repaired in
   specified one `GET /repos/{owner}/{name}` per refresh. Exactness is unchanged
   or better in every case; quota use is strictly lower.
 - No release, merge, tag, account, or Play Console action occurred.
+
+## Merged-head re-verification (2026-09-18)
+
+After [saari-co/RepoGlance#6](https://github.com/saari-co/RepoGlance/pull/6)
+merged, `origin/main` (`91ef720a4aa22ce35b0cc01a04851c3913cc03e1`) was merged
+into this branch, not rebased, so the source identities above remain
+ancestors. Merge commit: `2d19847e19054608e91d6e57ac4b6ca1e1fc1567`, no
+conflicts.
+
+Deterministic verification on `2d19847`:
+
+- `clean testDebugUnitTest assembleDebug lintDebug`: BUILD SUCCESSFUL
+- 179 JVM tests across 24 suites (10 tests / 1 suite added by #6); 0 failures,
+  0 errors, 0 skips
+- Lint: 0 errors, 30 warnings, 3 informational; all pre-existing on `main`
+- Debug APK: 60,985,304 bytes, SHA-256
+  `6bc5c3d6160667458bebab7562794b0a495e60b30cf5bc8fe224d801a5e8707d`
+- GrillTrack ledger: `validate` passes on this head (it fails on `main` only
+  because the bootstrap seed left decision 008 without a choice; this branch
+  supplies it)
+
+Independent review on exact head `2d19847` via the canonical Spark-2 OpenClaw
+rail (`req-20260918T031246Z-25096762431`, engine codex, model gpt-5.6-sol,
+thinking high): `scoped-clean`, overall `patch is correct (0.99)`, 0 findings.
+The reviewer states its threshold explicitly: only P0 defects and credential
+exposure were reportable; lower-priority correctness, freshness, debug-surface,
+and test concerns were not surfaced. The widget-freshness gap is therefore
+still open and is recorded in the ledger as the next grill, not resolved by
+this verdict. Proof: x-api
+`runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T031312Z-11965/PROOF.md`.
+
+Device claims were not re-run on the merged APK: #6 changed only the in-app
+GitHub-access UI and its test, and no widget, snapshot, or Glance source
+differs between `cd737e2` and `2d19847`. The Fold captures above remain the
+widget proof for this PR.

@@ -533,14 +533,21 @@
           "result": "clean",
           "reviewed_at": "2026-09-18T00:58:06+00:00",
           "source_identity": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20"
+        },
+        {
+          "classifications": [],
+          "ref": "x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T031312Z-11965/PROOF.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T03:14:08+00:00",
+          "source_identity": "git:2d19847e19054608e91d6e57ac4b6ca1e1fc1567"
         }
       ],
-      "review_ref": "proof/compact-widget-live-20260917/PROOF.md",
+      "review_ref": "x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T031312Z-11965/PROOF.md",
       "review_result": "clean",
-      "review_source_identity": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20",
+      "review_source_identity": "git:2d19847e19054608e91d6e57ac4b6ca1e1fc1567",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T00:58:06+00:00",
+      "updated_at": "2026-09-18T03:14:08+00:00",
       "verification_ref": "tests:169/23-suites+lint:0-errors+device:fold-inner-stable-x2"
     },
     {
@@ -761,5 +768,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T02:55:16+00:00"
+  "updated_at": "2026-09-18T03:14:08+00:00"
 }
