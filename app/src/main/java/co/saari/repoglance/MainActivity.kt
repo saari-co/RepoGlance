@@ -24,8 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.ViewModelProvider
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
@@ -41,16 +44,25 @@ import co.saari.repoglance.widget.WidgetRefresh
 import co.saari.repoglance.widget.navigatorModeFromExtra
 import kotlinx.coroutines.launch
 
+internal const val REPOGLANCE_INSTALLATION_SETTINGS_URL =
+    "https://github.com/apps/repoglance-by-saari/installations/new"
+private const val STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS =
+    "refreshCatalogAfterGitHubAccess"
+
 class MainActivity : ComponentActivity() {
     private val fixtureNavigatorScope = mutableStateOf<NavigatorScope?>(null)
     private val fixtureNavigatorMode = mutableStateOf(NavigatorMode.BOTH)
     private val fixtureNavigatorRouteToken = mutableStateOf(0)
     private lateinit var liveModel: RepoGlanceViewModel
+    private var refreshCatalogAfterGitHubAccess = false
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         liveModel = ViewModelProvider(this)[RepoGlanceViewModel::class.java]
+        refreshCatalogAfterGitHubAccess =
+            savedInstanceState?.getBoolean(STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS) == true
 
         fixtureNavigatorScope.value = resolveFixtureScopeFromIntent(intent)
         fixtureNavigatorMode.value = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
@@ -58,7 +70,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             RepoGlanceTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    // Publishes Compose testTag values as accessibility resource ids so
+                    // source-blind on-device validators can address controls unambiguously.
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics { testTagsAsResourceId = true },
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val currentFixtureScope = fixtureNavigatorScope.value
@@ -79,7 +95,7 @@ class MainActivity : ComponentActivity() {
                             onSelectRepository = liveModel::selectRepository,
                             onBackToRepositories = liveModel::backToRepositories,
                             onRefreshRepository = liveModel::refreshSelectedRepository,
-                            onChooseRepositories = ::openInstallationSettings,
+                            onManageGitHubAccess = ::openInstallationSettings,
                             onSignOut = liveModel::signOut,
                         )
                     }
@@ -95,10 +111,22 @@ class MainActivity : ComponentActivity() {
         handleFixtureIntent(intent)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(
+            STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS,
+            refreshCatalogAfterGitHubAccess,
+        )
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onResume() {
         super.onResume()
         if (::liveModel.isInitialized) {
             liveModel.resumeGitHubAuthorization()
+            if (refreshCatalogAfterGitHubAccess) {
+                refreshCatalogAfterGitHubAccess = false
+                liveModel.refreshCatalog()
+            }
         }
     }
 
@@ -121,9 +149,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openInstallationSettings() {
+        refreshCatalogAfterGitHubAccess = true
         CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(
             this,
-            Uri.parse("https://github.com/apps/repoglance-by-saari/installations/new"),
+            Uri.parse(REPOGLANCE_INSTALLATION_SETTINGS_URL),
         )
     }
 
