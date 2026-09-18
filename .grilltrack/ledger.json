@@ -750,16 +750,16 @@
   },
   "recommendation": {
     "alternatives": [
-      "Close this track and cut v0.3.0 stable: land PR #6, flip the stale release.yml job name, fix the three real contentDescription misses, and push the tag.",
-      "Grill background refresh: widgets only update when the app opens a repository, so a home-screen widget can age indefinitely without the user ever seeing it refresh."
+      "Reopen pin-model-010. Its locked choice says pinned repos 'form the widget and background-refresh set', but RepoWidget selects its repository from per-widget RepoWidgetConfigStore rather than pins (0 pin references), and no background-refresh set exists at all. Only StackWidget honours the pin clause.",
+      "Convert the tall row feed to live data and retire WIDGET_PREVIEW_LABEL, the prior recommendation \u2014 still valid, but it makes more fixture surface live without addressing whether live data stays current."
     ],
-    "reason": "The compact slot now tells the truth, which makes the tall path's fixture rows the most visible remaining dishonesty in a Play-published build.",
-    "recommended": "Convert the tall widget row feed to live data and retire WIDGET_PREVIEW_LABEL entirely, so no surface of RepoGlance renders fixture content.",
-    "recorded_at": "2026-09-18T00:58:55+00:00"
+    "reason": "Making the compact slot live converted a cosmetic fixture problem into a real staleness problem: fixtures regenerated at render time and were always current, whereas a stored snapshot ages with nothing to refresh it and nothing on screen to disclose its age.",
+    "recommended": "Grill widget freshness: give the compact widget a background refresh path and a visible freshness signal. Evidence: updatePeriodMillis=0 on both widget XMLs, no WorkManager/AlarmManager/JobScheduler anywhere and no such dependency declared, and WidgetRefresh.updateAll reachable only from MainActivity (pin/scenario change) and RepoGlanceViewModel (repo opened in app). A compact widget's counts are therefore frozen at the last in-app visit to that repo, and the locked round-2 ledger composition surfaces neither observedAt age nor the LAST_GOOD basis, so an arbitrarily old count renders as a bare number.",
+    "recorded_at": "2026-09-18T02:55:16+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T00:58:55+00:00"
+  "updated_at": "2026-09-18T02:55:16+00:00"
 }
