@@ -120,3 +120,25 @@ has no device capture in this packet. **human_gate** for that proof.
   the sign-out/cancel token-clear final effect is not exercised on device.
   Adjudicated **human_gate**: it requires the maintainer to tap
   `Disconnect GitHub` and later re-connect on his own account.
+
+## Sign-out final effect (2026-09-18, human-gated tap by the maintainer)
+
+Run directory: `runs/verify-repoglance-runs/20260918T200000Z-signout-proof/`.
+The agent drove to the account menu (`launch MIXED live`, tap
+`Account and access settings`, dump shows `Manage GitHub access` and
+`Disconnect GitHub`); the maintainer tapped `Disconnect GitHub` himself.
+File evidence is a name-only directory listing of the app's no-backup dir via
+`run-as`; no file contents were read.
+
+| Step | Evidence (sha256 prefix) |
+| --- | --- |
+| Before: `github-user-token.enc` present in `no_backup/` | `token-file-before.txt` (c4e3dd6e569c84e9) |
+| Immediately after the tap: dump shows `repoglance:connect-github` / `Connect GitHub`, no `repoglance:live` | `after-disconnect.txt` (217ddd96a6286ec4) |
+| Immediately after the tap: `github-user-token.enc` absent | `token-file-after.txt` (06ecf56960c01c91) |
+| Force-stop, cold start `MainActivity`: dump shows `Connect GitHub`, no Checking text, 0 StrictMode lines with app frames | `cold-after-disconnect.txt` (217ddd96a6286ec4) |
+| After the cold start: file still absent | `token-file-after-coldstart.txt` (06ecf56960c01c91) |
+
+The clear ran on the session dispatcher and completed before the UI could be
+relaunched; the next bootstrap found no session and rendered sign-in, not a
+restored session. The maintainer's session on the phone is now disconnected;
+re-connecting is his gated step.
