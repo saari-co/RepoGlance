@@ -1609,7 +1609,9 @@
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
       "repair_required": false,
-      "review_classifications": [],
+      "review_classifications": [
+        "human_gate"
+      ],
       "review_history": [
         {
           "classifications": [
@@ -1620,14 +1622,23 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T19:29:09+00:00",
           "source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f"
+        },
+        {
+          "classifications": [
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T19:40:29+00:00",
+          "source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+      "review_result": "findings",
+      "review_source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:29:10+00:00",
+      "updated_at": "2026-09-18T19:40:29+00:00",
       "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
     },
     {
@@ -1702,5 +1713,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:29:10+00:00"
+  "updated_at": "2026-09-18T19:40:29+00:00"
 }

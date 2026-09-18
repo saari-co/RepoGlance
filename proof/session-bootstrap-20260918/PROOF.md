@@ -110,3 +110,13 @@ dispatcher, after the delete. `./gradlew check assembleDebug` green again.
 Not proven on device: sign-out and cancel act on the maintainer's GitHub
 account and are human-gated (features/sign-in.md), so the token-clear path
 has no device capture in this packet. **human_gate** for that proof.
+
+## Review round 2 (head `b340d2e263ff5d0e39102cfae19cb9c050808474`)
+
+- OpenClaw `req-20260918T192935Z-4432381584`: correct, 0.99, 0 findings; the
+  NonCancellable repair acknowledged.
+- ClawSweeper: silver shellfish, patch tier gold shrimp, no code findings; the
+  P1 is acknowledged as fixed. One item left, proof sufficiency (medium, 0.86):
+  the sign-out/cancel token-clear final effect is not exercised on device.
+  Adjudicated **human_gate**: it requires the maintainer to tap
+  `Disconnect GitHub` and later re-connect on his own account.
