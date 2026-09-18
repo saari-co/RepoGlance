@@ -1,0 +1,199 @@
+# session-bootstrap-016: session store I/O off the main thread
+
+GrillTrack decision `session-bootstrap-016` (track `gt-20260728163459-227573`),
+branch `claude/session-bootstrap-016`, base `main` at
+`bd5ea67` (after saari-co/RepoGlance#15).
+
+## Problem (from proof/ci-floor-20260918/PROOF.md)
+
+- `RepoGlanceViewModel.<init>` called `GitHubSession.hasSavedSession()` on the
+  main thread: six `DiskReadViolation`s per cold start from
+  `SecureTokenStore.<init>` and `SecureTokenStore.read`.
+- The debug picker's PERSISTED candidate called `LiveSnapshotStore.load`
+  inside the composable handed to `GlanceRemoteViews.compose`.
+
+## Confirmed slice
+
+1. `SecureTokenStore.tokenFile` is `lazy`, so construction touches no disk.
+2. The ViewModel owns a single-thread `sessionDispatcher`. `hasSavedSession()`
+   runs there from `viewModelScope` in `init`; `liveState` stays
+   `LiveUiState.Checking` ("Checking your GitHub session…", text only) until
+   the answer, then `refreshCatalog()` or `SignedOut`. Unknown never renders as
+   signed-out or as a count.
+3. The two sign-in failure catches take the same hop and re-check the commit
+   generation after suspending.
+4. Every session write leaves the main thread on the same dispatcher: the
+   device-token commit, and `signOut()` from cancel, sign-out, catalog 401 and
+   repository-content 401 (maintainer widened the slice to include these).
+5. The picker loads the persisted snapshot once on `Dispatchers.IO` before
+   composing and passes the value into the candidate.
+6. Deferred: `checking-splash-018` (logo with an animation while checking);
+   no logo asset exists in the repo.
+
+Feature map unchanged: no user-visible behaviour changed, the Checking state
+already existed.
+
+## Proof: CI floor (local, 2026-09-18)
+
+```
+ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew --no-daemon -q check assembleDebug
+EXIT=0
+feature-map: ok (5 features, 6 skill sections)
+jvm tests=189 failures=0
+app-debug.apk sha256=1b85c80cff878a93f29fe857d0e5ea0a7fe851e0e8594f3731a28d7788dfd315
+```
+
+## Proof: device cold start (2026-09-18, Pixel 11 Pro Fold)
+
+Run directory (ignored by git): `runs/verify-repoglance-runs/20260918T164500Z-session-bootstrap/`.
+`bin/verify-repoglance doctor` before install reported the APK mismatch;
+`launch MIXED live` installed the build; `doctor` after passed:
+`apk_device=1b85c80cff878a93f29fe857d0e5ea0a7fe851e0e8594f3731a28d7788dfd315`,
+`scenario_launcher_present=yes`, `posture=C wakefulness=Awake device_locked=0`.
+
+Each launch force-stopped the process first; `adb logcat -c` before, `-d`
+after, then filtered to `ActivityManager Start proc` lines for the package and
+`StrictMode policy violation` blocks whose frames include `co.saari.repoglance`.
+No token, header, URL or private content is in the filtered files.
+
+| Cold start | Thread-policy violations with app frames (disk/network) | Other app-frame lines | File (sha256 prefix) |
+| --- | --- | --- | --- |
+| `am start -n …/.MainActivity` (the user path) | **0** | 1 `UntaggedSocketViolation` (VM policy, IO thread, `UrlConnectionTransport.execute`) | `logcat-main-direct-strictmode.txt` (5bfb066ef9506a8a) |
+| `am start -n …/.devpicker.WidgetVariantPickerActivity` | **0** | 0 | `logcat-picker-direct-strictmode.txt` (a9e18408eb9f9b7d) |
+| `launch MIXED live` via `ScenarioLaunchActivity` | 3 `DiskReadViolation`, all `AppPrefs.setSelectedScenario` ← `ScenarioLaunchActivity.onCreate` (debug launcher) | 1 `UntaggedSocketViolation` as above | `logcat-live-strictmode.txt` (0112f3b93bff8fd9) |
+| `launch MIXED picker` via `ScenarioLaunchActivity` | 3, same launcher frames | 0 | `logcat-picker-strictmode.txt` (f858d0b8db6d296c) |
+
+Before this slice the MainActivity cold start logged six `DiskReadViolation`s
+from `SecureTokenStore` via `RepoGlanceViewModel.<init>`, and the picker logged
+one from `LiveSnapshotStore.load` in composition. Neither frame appears in any
+of the four captures.
+
+UI after the direct MainActivity cold start (`main-direct.txt`,
+a1d243116fd785da): `repoglance:live`, `repoglance:owner-filter`,
+`repoglance:rate-limit`, `repoglance:refresh-repositories`,
+`repoglance:repo-search`; no "Checking your GitHub session" text and no
+`repoglance:connect-github`. The saved session on the phone was found on the
+session dispatcher and the catalog loaded. Cleanup restored MIXED.
+
+## Remaining risk and findings outside the lock
+
+- Debug `ScenarioLaunchActivity.onCreate` writes `AppPrefs` on the main thread
+  (three DiskReads per launcher-driven start). Debug source set only, never on
+  the user path, but the verifier tier fails on StrictMode lines, so it is a
+  bounded follow-up for the verification skill's launcher, not this slice.
+- `UntaggedSocketViolation` from `UrlConnectionTransport` is the VM policy's
+  `detectAll()` on the IO thread, pre-existing, unrelated to main-thread I/O.
+
+- `GitHubSession.accessToken()` may refresh and write the token; it already
+  runs on `Dispatchers.IO` inside `GitHubApiClient`, unchanged.
+- Ordering of a queued `signOut()` against a later device-token write relies on
+  the single-thread dispatcher's FIFO order; both go through it.
+
+## Review round 1 (head `7825436174d5e7cb96be56d591d809c4526d8e8f`)
+
+- OpenClaw `req-20260918T192156Z-42255632497`: correct, 0.98, 0 findings.
+- ClawSweeper: silver shellfish, P1 (PR #16 comment 5735127182):
+  `clearSavedSession()` launched `session.signOut()` as a cancellable
+  `viewModelScope` child, so a ViewModel cleared before the queued job ran
+  could leave the previous token on disk. Adjudicated **required_fix**.
+
+### Repair
+
+`clearSavedSession()` now launches with `sessionDispatcher + NonCancellable`,
+so the clear is detached from ViewModel cancellation and still runs off the
+main thread, in FIFO order on the single-thread session dispatcher.
+`onCleared()` calls `close()` on that dispatcher, which is an orderly
+`shutdown()`: already-queued tasks still execute. `SignedOut` is published
+before the file delete completes; the next bootstrap reads on the same
+dispatcher, after the delete. `./gradlew check assembleDebug` green again.
+
+Not proven on device: sign-out and cancel act on the maintainer's GitHub
+account and are human-gated (features/sign-in.md), so the token-clear path
+has no device capture in this packet. **human_gate** for that proof.
+
+## Review round 2 (head `b340d2e263ff5d0e39102cfae19cb9c050808474`)
+
+- OpenClaw `req-20260918T192935Z-4432381584`: correct, 0.99, 0 findings; the
+  NonCancellable repair acknowledged.
+- ClawSweeper: silver shellfish, patch tier gold shrimp, no code findings; the
+  P1 is acknowledged as fixed. One item left, proof sufficiency (medium, 0.86):
+  the sign-out/cancel token-clear final effect is not exercised on device.
+  Adjudicated **human_gate**: it requires the maintainer to tap
+  `Disconnect GitHub` and later re-connect on his own account.
+
+## Sign-out final effect (2026-09-18, human-gated tap by the maintainer)
+
+Run directory: `runs/verify-repoglance-runs/20260918T200000Z-signout-proof/`.
+The agent drove to the account menu (`launch MIXED live`, tap
+`Account and access settings`, dump shows `Manage GitHub access` and
+`Disconnect GitHub`); the maintainer tapped `Disconnect GitHub` himself.
+File evidence is a name-only directory listing of the app's no-backup dir via
+`run-as`; no file contents were read.
+
+| Step | Evidence (sha256 prefix) |
+| --- | --- |
+| Before: `github-user-token.enc` present in `no_backup/` | `token-file-before.txt` (c4e3dd6e569c84e9) |
+| Immediately after the tap: dump shows `repoglance:connect-github` / `Connect GitHub`, no `repoglance:live` | `after-disconnect.txt` (217ddd96a6286ec4) |
+| Immediately after the tap: `github-user-token.enc` absent | `token-file-after.txt` (06ecf56960c01c91) |
+| Force-stop, cold start `MainActivity`: dump shows `Connect GitHub`, no Checking text, 0 StrictMode lines with app frames | `cold-after-disconnect.txt` (217ddd96a6286ec4) |
+| After the cold start: file still absent | `token-file-after-coldstart.txt` (06ecf56960c01c91) |
+
+The clear ran on the session dispatcher and completed before the UI could be
+relaunched; the next bootstrap found no session and rendered sign-in, not a
+restored session. The maintainer's session on the phone is now disconnected;
+re-connecting is his gated step.
+
+## Review round 3 (head `f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a`)
+
+- OpenClaw `req-20260918T202343Z-59795118063`: correct, 0.99, 0 findings.
+- ClawSweeper: silver shellfish, P1 (comment 5735127182 updated): the catalog
+  401 and repository-content 401 handlers cleared the token through a
+  cancellable `withContext(sessionDispatcher)`, so a load job cancelled at
+  that point could skip a clear the base did synchronously. Adjudicated
+  **required_fix**; the proof ask for the 401 path is **human_gate** (it needs
+  the maintainer to revoke his own token on GitHub).
+
+### Repair
+
+Both 401 paths now call `clearSavedSessionNow()`, a
+`withContext(sessionDispatcher + NonCancellable)` block, which runs to
+completion even when the calling job is already cancelled (kotlinx
+`NonCancellable` contract). `./gradlew check assembleDebug` green.
+
+## Review round 4 (head `7f501322d64a0967680d402c8c40eef3dc23ce43`)
+
+- OpenClaw `req-20260918T204045Z-63881723477`: correct, 0.98, 0 findings.
+- ClawSweeper: gold shrimp 3/6 on all three tiers; the round-3 repair is
+  accepted as source-correct. One medium item left, proof only: a real
+  revoked token returning 401 through catalog or repository-content has not
+  been exercised on device. **human_gate**: it requires the maintainer to
+  revoke RepoGlance's authorization on his GitHub account.
+
+## Session persistence and the 401 final effect (2026-09-18, maintainer-gated)
+
+Run directory: `runs/verify-repoglance-runs/20260918T210000Z-401-proof/`. Head
+build on the phone: APK sha256 `2f12ea4a497425ceceee0879a10b13a48b278644d3fbc227319814b4a2f57698`
+(from `7f501322d64a0967680d402c8c40eef3dc23ce43`), doctor passing. The
+maintainer signed in himself (device flow, agent observed nothing while the
+code screen was up) and revoked RepoGlance's authorization himself in GitHub
+settings. File evidence is a name-only listing of `no_backup/` via `run-as`.
+
+| Step | Result | Evidence (sha256 prefix) |
+| --- | --- | --- |
+| Signed in: dump shows `repoglance:live`; token file present | persisted | `signed-in.txt` (db53fa453711f4a8), `token-file-signed-in.txt` (1810b49c31322a20) |
+| Force-stop, cold start on the prior build: `repoglance:live` | survives restart | `cold-persist.txt` (1c03234a1dd482a1) |
+| Install head build (data kept), cold start: `repoglance:live`, file present | survives upgrade | `cold-persist-head.txt` (3c346c55cca6b8b5), `token-file-head.txt` (1810b49c31322a20) |
+| Maintainer revokes the app on GitHub; file still present before launch | stale token on disk | `token-file-before-401.txt` (1810b49c31322a20) |
+| Cold start: catalog request 401 → "Your GitHub session needs to be renewed", `Reconnect GitHub`; token file **absent**; 0 StrictMode lines with app frames | clear ran on the session dispatcher | `after-401.txt` (db5c72f86c1e6535), `token-file-after-401.txt` (06ecf56960c01c91) |
+| Force-stop, cold start again: `repoglance:connect-github`, file still absent | stale token not reused | `cold-after-401.txt` (217ddd96a6286ec4), `token-file-cold-after-401.txt` (06ecf56960c01c91) |
+
+The repository-content 401 path calls the same `clearSavedSessionNow()`
+helper; it was not driven separately because revocation is consumed by the
+first request, the catalog.
+
+## Review round 5 (head `67706abfb9d44abb021f07eabdd27be7a7144110`)
+
+- OpenClaw `req-20260918T210831Z-71553323822`: correct, 0.98, 0 findings.
+- ClawSweeper (comment 5735127182): platinum hermit overall and patch, diamond
+  lobster proof; correctness 0.93, security cleared, proof sufficient, no
+  findings. Owner acceptance of the auth-boundary change is the merge gate.

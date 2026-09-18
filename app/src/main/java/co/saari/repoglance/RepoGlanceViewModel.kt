@@ -24,12 +24,16 @@ import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -53,8 +57,11 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     )
     private val authorizationCommitGate = AuthorizationCommitGate()
     private val apiClient = GitHubApiClient(session)
+    private val sessionDispatcher: ExecutorCoroutineDispatcher =
+        Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val catalogGeneration = AtomicInteger(0)
     private val repositoryContentGeneration = AtomicInteger(0)
+    private var bootstrapJob: Job? = null
     private var authorizationJob: Job? = null
     private var catalogLoadJob: Job? = null
     private var repositoryContentLoadJob: Job? = null
@@ -90,24 +97,29 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                     deviceFlowPoller.awaitToken(authorization)
                 }
                 currentCoroutineContext().ensureActive()
-                if (!authorizationCommitGate.commit(requestGeneration) { session.acceptDeviceToken(token) }) {
-                    return@launch
+                val committed = withContext(sessionDispatcher) {
+                    authorizationCommitGate.commit(requestGeneration) { session.acceptDeviceToken(token) }
                 }
+                if (!committed) return@launch
                 liveState.value = LiveUiState.Connecting
                 refreshCatalog()
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (failure: GitHubAuthException) {
                 if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
+                val needsNewSignIn = failure.needsNewSignIn || !hasSavedSession()
+                if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
                 liveState.value = LiveUiState.Failure(
                     message = failure.message ?: "GitHub sign-in failed",
-                    needsNewSignIn = failure.needsNewSignIn || !session.hasSavedSession(),
+                    needsNewSignIn = needsNewSignIn,
                 )
             } catch (_: Exception) {
                 if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
+                val needsNewSignIn = !hasSavedSession()
+                if (!authorizationCommitGate.isCurrent(requestGeneration)) return@launch
                 liveState.value = LiveUiState.Failure(
                     message = "Could not start GitHub sign-in right now",
-                    needsNewSignIn = !session.hasSavedSession(),
+                    needsNewSignIn = needsNewSignIn,
                 )
             }
         }
@@ -116,7 +128,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     fun cancelGitHubAuthorization() {
         authorizationJob?.cancel()
         authorizationJob = null
-        authorizationCommitGate.invalidate(session::signOut)
+        authorizationCommitGate.invalidate(::clearSavedSession)
         liveState.value = LiveUiState.SignedOut
     }
 
@@ -144,7 +156,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
                 is GitHubApiResult.Failure -> {
                     if (result.needsNewSignIn) {
-                        session.signOut()
+                        clearSavedSessionNow()
                         backToRepositories()
                     }
                     liveState.value = LiveUiState.Failure(
@@ -180,7 +192,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             }
             val invalidSession = content.sessionInvalidationFailure()
             if (invalidSession != null) {
-                session.signOut()
+                clearSavedSessionNow()
                 selectedRepository.value = null
                 repositoryContent.value = ContentUiState.Idle
                 liveState.value = LiveUiState.Failure(
@@ -233,9 +245,10 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun signOut() {
+        bootstrapJob?.cancel()
         authorizationJob?.cancel()
         authorizationJob = null
-        authorizationCommitGate.invalidate(session::signOut)
+        authorizationCommitGate.invalidate(::clearSavedSession)
         catalogLoadJob?.cancel()
         catalogGeneration.incrementAndGet()
         backToRepositories()
@@ -243,11 +256,26 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun bootstrapSessionState() {
-        if (session.hasSavedSession()) {
-            refreshCatalog()
-        } else {
-            liveState.value = LiveUiState.SignedOut
+        bootstrapJob = viewModelScope.launch {
+            if (hasSavedSession()) {
+                refreshCatalog()
+            } else {
+                liveState.value = LiveUiState.SignedOut
+            }
         }
+    }
+
+    private suspend fun hasSavedSession(): Boolean = withContext(sessionDispatcher) { session.hasSavedSession() }
+
+    private fun clearSavedSession() {
+        viewModelScope.launch(sessionDispatcher + NonCancellable) { session.signOut() }
+    }
+
+    private suspend fun clearSavedSessionNow() = withContext(sessionDispatcher + NonCancellable) { session.signOut() }
+
+    override fun onCleared() {
+        super.onCleared()
+        sessionDispatcher.close()
     }
 }
 

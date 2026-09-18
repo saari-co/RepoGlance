@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-18T14:18:58+00:00",
-    "domain": "navigator detail: what a row tap does on the wide (600dp+) layout, where the in-app detail pane can never be filled because selection hands off to the GitHub app",
-    "started_at": "2026-09-18T13:25:50+00:00",
+    "confirmed_at": "2026-09-18T16:39:42+00:00",
+    "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
+    "started_at": "2026-09-18T16:09:26+00:00",
     "status": "inspected",
-    "summary": "navigator-detail-017: wide (600dp+) row tap fills the in-app detail pane beside the list; second tap on the highlighted row or the pane's Open on GitHub opens the GitHub app in split view. Narrow (cover display) row tap raises a modal detail sheet over the full-width list with Open on GitHub; replaces 'detail replaces the list'. Long-press opens GitHub on both widths, unchanged. Bounded to NavigatorScreen plus stable test tags on detail pane, sheet and Open on GitHub; debug picker stays dev-only. Preserve navigator-scope-005 chrome, truth rules, read-only, CI floor; update features/navigator.md and re-drive it with the helpers; cover-display steps maintainer-gated; proof under proof/navigator-detail-20260918/PROOF.md with capture SHA-256s. Excluded: posture emulation, GitHub writes, commit/PR until asked. Maintainer confirmed 2026-09-18 after trying the hybrid preview on the live picker."
+    "summary": "session-bootstrap-016: hasSavedSession runs on a serial IO dispatcher from viewModelScope with Checking held until it answers; the sign-in failure catches take the same hop; SecureTokenStore file handle is lazy; every signOut file delete (cancel, sign-out, catalog 401, content 401) moves onto the same serial IO dispatcher; picker loads the persisted snapshot on IO before composing. Checking stays text-only; logo splash deferred as checking-splash-018. Proof: JVM tests, gradlew check, cold-start logcat on the Fold with zero app-frame StrictMode lines for live and picker."
   },
   "decisions": [
     {
@@ -1504,36 +1504,285 @@
       "superseded_by": null,
       "updated_at": "2026-09-18T15:39:49+00:00",
       "verification_ref": "proof/navigator-detail-20260918/PROOF.md \u00a7 round 2: inner-display recipe on repaired head (pane b9e8eb66\u2026, GitHub a7f68e1a\u2026, home 873e5fc3\u2026) + cover sheet 02c10ef0\u2026"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+      "context_ref": null,
+      "created_at": "2026-09-18T16:09:26+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
+      "history": [
+        {
+          "at": "2026-09-18T16:39:42+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:03:23+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:14:08+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:29:09+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "verified",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T19:29:10+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "needs_reverification",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f",
+          "to": "implemented",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T19:29:10+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
+        },
+        {
+          "at": "2026-09-18T20:40:17+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "verified",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474",
+          "to": "needs_reverification",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+        },
+        {
+          "at": "2026-09-18T20:40:18+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "needs_reverification",
+          "implementation_ref": "git:8f308b840cc068a895fc344206320523e91b00ad",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "review_ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
+          "review_result": "findings",
+          "review_source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a",
+          "to": "implemented",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+        },
+        {
+          "at": "2026-09-18T20:40:18+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "implemented",
+          "implementation_ref": "git:5cb5d5fbb8be33827bb4079cae8b64032c3f8293",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 1 repair (check green; device sign-out proof human-gated)"
+        }
+      ],
+      "id": "session-bootstrap-016",
+      "implementation_ref": "git:5cb5d5fbb8be33827bb4079cae8b64032c3f8293",
+      "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
+      "rationale": "",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T19:29:09+00:00",
+          "source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f"
+        },
+        {
+          "classifications": [
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T192935Z-4432381584 correct 0.99; clawsweeper silver shellfish, no code findings, proof gap on sign-out token clear (PR #16 comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T19:40:29+00:00",
+          "source_identity": "git:b340d2e263ff5d0e39102cfae19cb9c050808474"
+        },
+        {
+          "classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T202343Z-59795118063 correct 0.99; clawsweeper silver shellfish P1 cancellable 401 clears (comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T20:40:17+00:00",
+          "source_identity": "git:f2e52ec9dab698dd0b61998f79be6f3d26ef2f5a"
+        },
+        {
+          "classifications": [
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T204045Z-63881723477 correct 0.98; clawsweeper gold shrimp 3/6, no code findings, 401 device proof outstanding (comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T20:45:52+00:00",
+          "source_identity": "git:7f501322d64a0967680d402c8c40eef3dc23ce43"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260918T210831Z-71553323822 correct 0.98; clawsweeper platinum hermit, proof diamond lobster, no findings (PR #16 comment 5735127182)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T21:14:00+00:00",
+          "source_identity": "git:67706abfb9d44abb021f07eabdd27be7a7144110"
+        }
+      ],
+      "review_ref": "openclaw req-20260918T210831Z-71553323822 correct 0.98; clawsweeper platinum hermit, proof diamond lobster, no findings (PR #16 comment 5735127182)",
+      "review_result": "clean",
+      "review_source_identity": "git:67706abfb9d44abb021f07eabdd27be7a7144110",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-18T21:14:00+00:00",
+      "verification_ref": "proof/session-bootstrap-20260918/PROOF.md \u00a7 Review round 3 repair (check green; 401 device proof human-gated)"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+      "context": " Maintainer direction (2026-09-18): no logo exists yet; include a magnifying glass; low-key; must read well as the small status-bar/notification icon on Pixels; also want a Quick Settings tile (swipe-down bar) for quick access, which is a separate feature decision beyond the splash.",
+      "context_ref": null,
+      "created_at": "2026-09-18T16:33:20+00:00",
+      "deferred_reason": "No logo asset exists; a logo plus animation is a visual grill of its own (five candidates) and out of the bounded behaviour slice. Risk: Checking stays plain text until a logo exists; the unknown window is tens of ms so no truth-rule exposure",
+      "delivery_ref": null,
+      "dependencies": [
+        "session-bootstrap-016"
+      ],
+      "domain": "session bootstrap off the main thread (StrictMode DiskReadViolations at cold start; picker persisted read in composition)",
+      "history": [
+        {
+          "at": "2026-09-18T16:33:28+00:00",
+          "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "No logo asset exists; a logo plus animation is a visual grill of its own (five candidates) and out of the bounded behaviour slice. Risk: Checking stays plain text until a logo exists; the unknown window is tens of ms so no truth-rule exposure",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "deferred",
+          "verification_ref": null
+        }
+      ],
+      "id": "checking-splash-018",
+      "implementation_ref": null,
+      "question": "What does the live screen show while the GitHub session is unknown: the maintainer wants the RepoGlance logo with a fun animation and a clever hook",
+      "rationale": "",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "deferred",
+      "superseded_by": null,
+      "updated_at": "2026-09-18T19:21:26+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
-    "at": "2026-09-18T13:34:10+00:00",
+    "at": "2026-09-18T19:14:08+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
     "artifact_refs": [
-      ".grilltrack/work/gates/navigator-detail-017-unlock.md",
-      ".grilltrack/work/picker/navigator-detail-round-1.json",
-      "file:app/src/debug/java/co/saari/repoglance/devpicker/NavigatorCandidates.kt"
+      "proof/session-bootstrap-20260918/PROOF.md"
     ],
-    "next_safe_action": "After 'unlocked': doctor, drive navigator-picker A..E, capture, present captures, await pick",
-    "paused_at": "2026-09-18T13:31:17+00:00",
-    "reason": "Registered Fold is awake but keyguard-locked (device_locked=1); candidate captures need the maintainer to unlock it",
-    "resumed_at": "2026-09-18T13:34:10+00:00"
+    "next_safe_action": "When the phone is back, awake and unlocked: bin/verify-repoglance doctor, launch MIXED live and MIXED picker, capture filtered StrictMode logcat, finish proof/session-bootstrap-20260918/PROOF.md, verify in ledger",
+    "paused_at": "2026-09-18T19:03:23+00:00",
+    "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof",
+    "resumed_at": "2026-09-18T19:14:08+00:00"
   },
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it",
-      "fixture-collision: give the MIXED account/org fixtures colliding issue/PR numbers across repositories so features/navigator.md can prove the selection-key rule on device, not only in a JVM test"
+      "launcher-prefs: move the debug ScenarioLaunchActivity's AppPrefs write off the main thread so launcher-driven cold starts log zero StrictMode lines for the verifier tier",
+      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness"
     ],
-    "reason": "navigator-detail-017 is verified on both displays and reviewed clean at platinum hermit; the next slice the floor already found is the StrictMode main-thread read, and the verification skill can now prove it end to end",
-    "recommended": "session-bootstrap-016: move SecureTokenStore session reads off the main thread during RepoGlanceViewModel construction and take the picker's persisted-store read out of composition (the CI floor's StrictMode catch: DiskReadViolations per cold start); prove with a cold-start logcat via verify-repoglance showing zero app-frame violations",
-    "recorded_at": "2026-09-18T15:39:49+00:00"
+    "reason": "session-bootstrap-016 is verified on the Fold with zero main-thread session I/O; the maintainer asked for the logo splash during this grill and it is the only deferred decision with a stated preference",
+    "recommended": "checking-splash-018: the RepoGlance logo with a fun animation and a clever hook while the session is unknown; a five-candidate visual grill, and it first needs a logo asset (the manifest declares no icon today)",
+    "recorded_at": "2026-09-18T19:14:18+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T15:39:49+00:00"
+  "updated_at": "2026-09-18T21:14:00+00:00"
 }

@@ -23,7 +23,7 @@ interface TokenStore {
 }
 
 class SecureTokenStore(context: Context) : TokenStore {
-    private val tokenFile = AtomicFile(File(context.noBackupFilesDir, TOKEN_FILE_NAME))
+    private val tokenFile by lazy { AtomicFile(File(context.noBackupFilesDir, TOKEN_FILE_NAME)) }
 
     override fun read(): GitHubUserToken? {
         if (!tokenFile.baseFile.exists()) return null
