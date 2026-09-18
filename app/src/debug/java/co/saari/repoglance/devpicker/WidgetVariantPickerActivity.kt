@@ -65,8 +65,11 @@ class WidgetVariantPickerActivity : ComponentActivity() {
         val config = RepoWidgetConfig(RepoRef("saariuslystoned", "x-api"), NavigatorMode.BOTH)
         val intent = Intent(this, WidgetVariantPickerActivity::class.java)
         val candidates: List<Pair<String, @Composable (RepoSnapshot?, Instant) -> Unit>> = listOf(
-            "PRODUCTION — exact counts" to { s, _ -> CompactContent(config, s, intent) },
-            "PRODUCTION — no observation yet" to { _, _ -> CompactContent(config, null, intent) },
+            "PRODUCTION — exact counts" to { s, n -> CompactContent(config, s, intent, n) },
+            "PRODUCTION — last good, 3 days old" to { s, n ->
+                CompactContent(config, s?.copy(valueBasis = ValueBasis.LAST_GOOD, observedAt = n.minusSeconds(3 * 24 * 3600)), intent, n)
+            },
+            "PRODUCTION — no observation yet" to { _, n -> CompactContent(config, null, intent, n) },
         )
 
         lifecycleScope.launch {

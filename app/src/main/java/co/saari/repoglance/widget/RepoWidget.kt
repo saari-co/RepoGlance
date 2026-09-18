@@ -89,7 +89,7 @@ class RepoWidget : GlanceAppWidget() {
                         isTall && fixtureSnapshot != null ->
                             TallContent(config, fixtureSnapshot, rows, now, appIntent)
                         isTall -> UnconfiguredContent()
-                        else -> CompactContent(config, liveSnapshot, appIntent)
+                        else -> CompactContent(config, liveSnapshot, appIntent, now)
                     }
                 }
             }
@@ -154,11 +154,45 @@ private fun UnconfiguredContent() {
     }
 }
 
+/**
+ * Freshness for the compact slot, in as few characters as the 120dp floor
+ * allows. Truth rules 2-3: every surface shows its data age, and last-good
+ * never reads as current. EXACT renders the bare age ("12m"), LAST_GOOD is
+ * prefixed so it cannot be mistaken for a fresh value, and no observation at
+ * all says so rather than showing nothing.
+ */
+internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, now: Instant): String {
+    val observedAt = snapshot?.observedAt
+    return when {
+        snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN -> "no data"
+        snapshot.valueBasis == ValueBasis.LAST_GOOD -> "last good " + Ages.format(observedAt, now)
+        else -> Ages.format(observedAt, now)
+    }
+}
+
+internal const val LEDGER_FRESHNESS_TAG = "ledger-freshness"
+
+@Composable
+internal fun CompactFreshness(snapshot: RepoSnapshot?, now: Instant) {
+    val stale = snapshot?.valueBasis != ValueBasis.EXACT
+    Text(
+        compactFreshnessLabel(snapshot, now),
+        maxLines = 1,
+        style = TextStyle(
+            color = if (stale) GlanceTheme.colors.error else GlanceTheme.colors.onSurfaceVariant,
+            fontSize = LEDGER_LABEL_SIZE,
+            fontWeight = if (stale) FontWeight.Bold else FontWeight.Normal,
+        ),
+        modifier = GlanceModifier.semantics { testTag = LEDGER_FRESHNESS_TAG },
+    )
+}
+
 @Composable
 internal fun CompactContent(
     config: RepoWidgetConfig,
     snapshot: RepoSnapshot?,
     appIntent: Intent,
+    now: Instant,
 ) {
     // No stored observation yet: every count is unknown, never zero.
     val basis = snapshot?.valueBasis ?: ValueBasis.UNKNOWN
@@ -172,14 +206,22 @@ internal fun CompactContent(
             .clickable(actionStartActivity(appIntent))
             .padding(horizontal = 8.dp, vertical = 6.dp),
     ) {
-        Text(
-            config.repo.name,
-            maxLines = 1,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
-                fontSize = LEDGER_REPO_SIZE,
-            ),
-        )
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                config.repo.name,
+                maxLines = 1,
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = LEDGER_REPO_SIZE,
+                ),
+                modifier = GlanceModifier.defaultWeight(),
+            )
+            Spacer(modifier = GlanceModifier.width(4.dp))
+            CompactFreshness(snapshot, now)
+        }
         LedgerRow("issues", SnapshotRendering.countText(snapshot?.openIssues, basis))
         LedgerRow("PRs", SnapshotRendering.countText(snapshot?.openPrs, basis))
         if (LocalSize.current.height >= LEDGER_THIRD_ROW_BREAKPOINT) {
