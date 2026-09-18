@@ -17,8 +17,12 @@ import co.saari.repoglance.data.GitHubApiResult
 import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
+import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.data.sessionInvalidationFailure
+import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.state.LiveSnapshotStore
+import co.saari.repoglance.widget.WidgetRefresh
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.cancellation.CancellationException
@@ -186,8 +190,47 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
             } else {
                 repositoryContent.value = ContentUiState.Ready(content)
+                persistLiveSnapshot(repository, content)
             }
         }
+    }
+
+    /**
+     * Publishes the compact widget's counts. Runs only after a successful
+     * content load, so a failed refresh leaves the previous stored snapshot
+     * alone to age honestly rather than overwriting it with nothing.
+     */
+    private suspend fun persistLiveSnapshot(
+        repository: LiveRepository,
+        content: LiveRepositoryContent,
+    ) {
+        val context = getApplication<Application>()
+        val issues = (content.issues as? GitHubApiResult.Success)?.value
+        val prSuccess = content.pullRequests as? GitHubApiResult.Success
+
+        withContext(Dispatchers.IO) {
+            // Only worth a request when it can produce an exact count: the
+            // issues page is truncated AND the PR page is whole. Otherwise the
+            // factory must fall back regardless, and the call is wasted quota.
+            val metadata = if (LiveSnapshotFactory.needsRepositoryMetadata(issues, prSuccess?.value)) {
+                apiClient.loadRepositoryMetadata(repository) as? GitHubApiResult.Success
+            } else {
+                null
+            }
+            LiveSnapshotFactory.build(
+                repository = repository,
+                metadata = metadata?.value,
+                issues = issues,
+                pullRequests = prSuccess?.value,
+                previous = LiveSnapshotStore.load(context, repository.ref),
+                // When the data was observed, not when it was written to disk.
+                observedAt = metadata?.observedAt ?: prSuccess?.observedAt ?: Instant.now(),
+                rateLimit = metadata?.rateLimit?.bucket
+                    ?: prSuccess?.rateLimit?.bucket
+                    ?: RateLimitBucket.UNKNOWN,
+            ).also { LiveSnapshotStore.save(context, it) }
+        }
+        WidgetRefresh.updateAll(context)
     }
 
     fun backToRepositories() {

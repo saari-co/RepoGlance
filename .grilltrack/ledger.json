@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-07-29T12:08:47+00:00",
-    "domain": "public release posture",
-    "started_at": "2026-07-29T12:02:53+00:00",
-    "status": "implementing",
-    "summary": "Repo public under MIT with full history published as-is; honest-main discipline; no preset pins (in-place pin toggle, pins = widget + background-refresh set); GitHub App publicly installable with maintainer installs as personal config. Public docs rework + LICENSE land via PR #1 (maintainer merge gate). Delivery rail locked: rolling-release APKs pulled by cp-1 with one-tap banner installs, public sideload channel for everyone else."
+    "confirmed_at": "2026-09-18T00:43:43+00:00",
+    "domain": "compact widget content and its live truth basis",
+    "started_at": "2026-09-17T23:40:59+00:00",
+    "status": "inspected",
+    "summary": "Compact widget adopts the round-2 right-aligned ledger composition with shrunk type; counts become live via one GET /repos/{owner}/{name} per refresh with issues derived as open_issues_count minus openPrs; basis degrades honestly rather than rendering a bound as exact. Bounded to the compact slot: the tall row feed keeps its FIXTURE PREVIEW label until a later cycle. Verification is JVM unit tests (adding glance-appwidget-testing) plus a rendered Fold capture; live-data-on-device proof is a Bobby-gated step."
   },
   "decisions": [
     {
@@ -391,7 +391,7 @@
     {
       "baseline_ref": "plan:x-api/plans/repobar-pixel-companion-plan-20260728.md#pixel-optimization-contract",
       "candidate_refs": [],
-      "choice": null,
+      "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
       "context_ref": "plan:grill-skills-family-20260719.md#grill-frontend",
       "created_at": "2026-07-28T16:34:59+00:00",
       "deferred_reason": "Best decided with the grill-frontend five-variant picker against real Slice 2 widget fixtures; an abstract preference now would be low-fidelity.",
@@ -409,17 +409,259 @@
           "note": "deferred by agent recommendation, accepted in the shared-understanding summary",
           "to": "deferred",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-17T23:40:27+00:00",
+          "choice": "Undecided \u2014 deferred before any candidate was selected. The small-widget number set is to be chosen with the grill-frontend five-variant picker against real widget fixtures; see deferred_reason.",
+          "from": "deferred",
+          "implementation_ref": null,
+          "note": "Widgets still render FIXTURE PREVIEW while the app ships on Play internal testing; the small-widget number set must be decided against live data constraints before widgets can tell the truth.",
+          "repair_required": false,
+          "review_classifications": null,
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T00:40:10+00:00",
+          "choice": "Undecided \u2014 deferred before any candidate was selected. The small-widget number set is to be chosen with the grill-frontend five-variant picker against real widget fixtures; see deferred_reason.",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": null,
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T00:58:06+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": null,
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T00:58:06+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "implemented",
+          "implementation_ref": "git:d2463aabb2d7f561fc5e55dc684f64704c4b3b1c",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T00:58:06+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "verified",
+          "implementation_ref": "git:d2463aabb2d7f561fc5e55dc684f64704c4b3b1c",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "tests:167/23-suites+device:fold-inner-4619827677550801152"
+        },
+        {
+          "at": "2026-09-18T00:58:06+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:d2463aabb2d7f561fc5e55dc684f64704c4b3b1c",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "proof/compact-widget-live-20260917/PROOF.md",
+          "review_result": "findings",
+          "review_source_identity": "git:d2463aabb2d7f561fc5e55dc684f64704c4b3b1c",
+          "to": "implemented",
+          "verification_ref": "tests:167/23-suites+device:fold-inner-4619827677550801152"
+        },
+        {
+          "at": "2026-09-18T00:58:06+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "implemented",
+          "implementation_ref": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "tests:167/23-suites+device:fold-inner-4619827677550801152"
+        },
+        {
+          "at": "2026-09-18T03:35:39+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "verified",
+          "implementation_ref": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": "x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T031312Z-11965/PROOF.md",
+          "review_result": "clean",
+          "review_source_identity": "git:2d19847e19054608e91d6e57ac4b6ca1e1fc1567",
+          "to": "needs_reverification",
+          "verification_ref": "tests:169/23-suites+lint:0-errors+device:fold-inner-stable-x2"
+        },
+        {
+          "at": "2026-09-18T03:35:39+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/12#issuecomment-5724629634",
+          "review_result": "findings",
+          "review_source_identity": "git:2b6fc1b633598c079fd1df3e8bc5a53c9d2c3472",
+          "to": "implemented",
+          "verification_ref": "tests:169/23-suites+lint:0-errors+device:fold-inner-stable-x2"
+        },
+        {
+          "at": "2026-09-18T03:35:39+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "implemented",
+          "implementation_ref": "git:19a3d1d0995fd0a05c7c88a64364e2c0899e2b80 compact freshness label (last good / age / no data)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "tests:169/23-suites+lint:0-errors+device:fold-inner-stable-x2"
+        },
+        {
+          "at": "2026-09-18T03:41:59+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "verified",
+          "implementation_ref": "git:19a3d1d0995fd0a05c7c88a64364e2c0899e2b80 compact freshness label (last good / age / no data)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "tests:185/25-suites+lint:0-errors+device:fold-inner picker exact/last-good/no-data + persisted live store exact->last-good after real offline refresh failure"
+        },
+        {
+          "at": "2026-09-18T03:41:59+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:19a3d1d0995fd0a05c7c88a64364e2c0899e2b80 compact freshness label (last good / age / no data)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/12 clawsweeper re-review (openclaw req-20260918T033615Z-255670529466 clean)",
+          "review_result": "findings",
+          "review_source_identity": "git:5fd1643e052dbc1c6fa3bdd1691851ea6af91804",
+          "to": "implemented",
+          "verification_ref": "tests:185/25-suites+lint:0-errors+device:fold-inner picker exact/last-good/no-data + persisted live store exact->last-good after real offline refresh failure"
+        },
+        {
+          "at": "2026-09-18T03:41:59+00:00",
+          "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
+          "from": "implemented",
+          "implementation_ref": "git:a49449707bab7d6ea33c8e510aa6b470b530e670 metadata request gated on whole PR page",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "tests:185/25-suites+lint:0-errors+device:fold-inner picker exact/last-good/no-data + persisted live store exact->last-good after real offline refresh failure"
         }
       ],
       "id": "widget-content-priority-008",
-      "implementation_ref": null,
+      "implementation_ref": "git:a49449707bab7d6ea33c8e510aa6b470b530e670 metadata request gated on whole PR page",
       "question": "Which two-three numbers earn the small-widget slot?",
       "rationale": null,
-      "review_ref": null,
-      "status": "deferred",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "proof/compact-widget-live-20260917/PROOF.md",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T00:58:06+00:00",
+          "source_identity": "git:d2463aabb2d7f561fc5e55dc684f64704c4b3b1c"
+        },
+        {
+          "classifications": [],
+          "ref": "proof/compact-widget-live-20260917/PROOF.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T00:58:06+00:00",
+          "source_identity": "git:cd737e2a5b219b82080bbc8e3b0d5d931f8c2e20"
+        },
+        {
+          "classifications": [],
+          "ref": "x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T031312Z-11965/PROOF.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T03:14:08+00:00",
+          "source_identity": "git:2d19847e19054608e91d6e57ac4b6ca1e1fc1567"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/12#issuecomment-5724629634",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T03:35:39+00:00",
+          "source_identity": "git:2b6fc1b633598c079fd1df3e8bc5a53c9d2c3472"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/12 clawsweeper re-review (openclaw req-20260918T033615Z-255670529466 clean)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T03:41:59+00:00",
+          "source_identity": "git:5fd1643e052dbc1c6fa3bdd1691851ea6af91804"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T034355Z-19421/PROOF.md clean; clawsweeper platinum hermit, proof diamond lobster, 0 findings (PR #12 comment 5724629634)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T03:49:15+00:00",
+          "source_identity": "git:7c2802adda77adf3e1f02c501245ee6c6b9c496d"
+        }
+      ],
+      "review_ref": "openclaw x-api:runs/spark-openclaw-autoreview-runs/spark-openclaw-autoreview-20260918T034355Z-19421/PROOF.md clean; clawsweeper platinum hermit, proof diamond lobster, 0 findings (PR #12 comment 5724629634)",
+      "review_result": "clean",
+      "review_source_identity": "git:7c2802adda77adf3e1f02c501245ee6c6b9c496d",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-07-28T16:34:59+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-18T03:49:15+00:00",
+      "verification_ref": "tests:188/25-suites+lint:0-errors; no widget/render change since device proof at 19a3d1d"
     },
     {
       "baseline_ref": "decision:license-posture-007",
@@ -623,21 +865,21 @@
     }
   ],
   "last_activation": {
-    "at": "2026-07-28T16:10:40+00:00",
-    "mechanism": "explicit"
+    "at": "2026-09-17T23:40:27+00:00",
+    "mechanism": "$grilltrack"
   },
   "recommendation": {
     "alternatives": [
-      "Grill navigator information density and scope UI before any build, if the navigator matters more than widgets",
-      "Pause the track here; the ledger resumes cleanly in a fresh session once the build lane lands"
+      "Reopen pin-model-010. Its locked choice says pinned repos 'form the widget and background-refresh set', but RepoWidget selects its repository from per-widget RepoWidgetConfigStore rather than pins (0 pin references), and no background-refresh set exists at all. Only StackWidget honours the pin clause.",
+      "Convert the tall row feed to live data and retire WIDGET_PREVIEW_LABEL, the prior recommendation \u2014 still valid, but it makes more fixture surface live without addressing whether live data stays current."
     ],
-    "reason": "Every decision blocking the build is locked or explicitly Bobby-manual (GitHub App registration); the one deferred decision needs real rendered widget context to be judged with fidelity.",
-    "recommended": "Route the Slice 1-2 build lane (snapshot model + fixtures + fixture-first Glance widget shell, Fold first), then run GrillTrack cycle 2: small-widget content priority as a five-variant visual grill against the real fixtures.",
-    "recorded_at": "2026-07-28T16:40:28+00:00"
+    "reason": "Making the compact slot live converted a cosmetic fixture problem into a real staleness problem: fixtures regenerated at render time and were always current, whereas a stored snapshot ages with nothing to refresh it and nothing on screen to disclose its age.",
+    "recommended": "Grill widget freshness: give the compact widget a background refresh path and a visible freshness signal. Evidence: updatePeriodMillis=0 on both widget XMLs, no WorkManager/AlarmManager/JobScheduler anywhere and no such dependency declared, and WidgetRefresh.updateAll reachable only from MainActivity (pin/scenario change) and RepoGlanceViewModel (repo opened in app). A compact widget's counts are therefore frozen at the last in-app visit to that repo, and the locked round-2 ledger composition surfaces neither observedAt age nor the LAST_GOOD basis, so an arbitrarily old count renders as a bare number.",
+    "recorded_at": "2026-09-18T02:55:16+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-08-17T02:21:08+00:00"
+  "updated_at": "2026-09-18T03:49:15+00:00"
 }

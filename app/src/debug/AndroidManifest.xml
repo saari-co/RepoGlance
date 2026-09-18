@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only overlay. The GrillTrack variant picker is development tooling and
+  must never enter a release build; keeping it in the debug source set is what
+  enforces that.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="co.saari.repoglance.devpicker.WidgetVariantPickerActivity"
+            android:exported="true"
+            android:label="GrillTrack widget picker" />
+    </application>
+</manifest>
