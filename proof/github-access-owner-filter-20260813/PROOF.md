@@ -9,19 +9,30 @@ re-authorization, release, or public distribution.
 
 ## Exact identity
 
-- Proven source: `a089e50ffc3568b7fb72f31acb7eb2fb3cad6f74`
+- Proven application source: `a089e50ffc3568b7fb72f31acb7eb2fb3cad6f74`
+- Branch head at this run: `393579d` — a merge of `origin/main` into the
+  branch. The merge changes no file under `app/src`, so the proven
+  application source above is unaffected by it; `a089e50` remains an ancestor
+  of the head.
 - Base: RepoGlance `main` at
-  `08d8545f0e94878fe3031a1f5812bd8c1ac0960d`
+  `08d8545f0e94878fe3031a1f5812bd8c1ac0960d`, brought current by the merge
 - APK SHA-256:
-  `547ba3dc96381f3fecf80078414b576eefe9c223faf12865dd4a604ad54bad56`
-- APK size: 60,919,696 bytes
-- Installed package: `co.saari.repoglance`, `0.3.0-auth-live` / version code 3
+  `191a32d014e7c8f6c0fc03cd86f41f5eb66c908845983d33165e0980d5be940e`
+- APK size: 60,919,688 bytes
+- Installed package: `co.saari.repoglance`, **`0.0.0-dev` / version code 1**
 - Device: registered **Pixel 11 Pro Fold**, Android 17 / API 37, 2076×2152
   inner display, physical id `4619827677550801152` (outer display
   `4619827677550801153` was OFF and excluded)
 
 The fresh local APK and the device's installed `base.apk` had the same SHA-256.
 Installation used replacement mode only; app data was preserved.
+
+The version is no longer `0.3.0-auth-live` / code 3. Merging `main` brought in
+the tag-driven versioning from the release pipeline, which derives the version
+from an exact Git tag and otherwise falls back to a development identity. This
+head is ten commits past `v0.3.0-beta.1`, so it reports `0.0.0-dev` / code 1.
+That is the designed behavior for a non-tagged build, not a regression, and it
+means any branch build now carries a development version.
 
 Debug APKs are **not byte-reproducible** — the same commit built twice in one
 session yields different hashes, because the build embeds timestamps. The hash
@@ -41,7 +52,8 @@ accessibility identifiers to the two editable controls on the loaded home.
 ### Session
 
 The device's August authorization had expired. The maintainer re-authorized the
-device flow on the phone on 2026-09-17 before this run. The agent did not
+device flow on the phone on 2026-09-17 before this run, and the session
+remained live across the subsequent merge and reinstall. The agent did not
 complete, observe, or retain any part of that authorization. No credential,
 token, or authorization value entered agent context.
 
@@ -112,10 +124,27 @@ a live session:
     refresh rather than across cold launch, and it is now a verified result
     rather than an open question.
 
+### Re-verified after merging `main`
+
+Clauses 6 and 7 were re-run against the merged head's APK
+(`191a32d014e7c8f6c0fc03cd86f41f5eb66c908845983d33165e0980d5be940e`, matching
+the device's installed `base.apk` exactly). Both controls still expose
+`repoglance:repo-search` and `repoglance:owner-filter`, and typing `glance`
+again left the field reading `glance` with the list reduced from five rows to
+one. Clauses 8 to 10 rest on application source the merge does not touch.
+
 The live session remained intact throughout. No repository name, URL,
 authentication material, or clipboard content was captured or retained; the
 counts above were derived from accessibility structure and the raw uiautomator
 dumps were discarded after measurement.
+
+### Known repository condition, not caused by this branch
+
+`grilltrack_ledger.py validate` fails on this branch with
+`widget-content-priority-008.choice must be a non-empty string`. That is a
+pre-existing defect in the bootstrap seed on `main`, which this branch merely
+inherits through the merge; `main`'s own ledger carries the same null value. It
+is repaired separately in the compact-widget branch and is out of scope here.
 
 ## Sanitized media
 
