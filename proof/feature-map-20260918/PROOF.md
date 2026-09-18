@@ -204,3 +204,29 @@ with prose before it fails (`first non-blank line is 'Some prose before the
 preconditions.'`) and the five feature files pass. OpenClaw on `ae5834f`:
 scoped-clean, 0 findings (after a first queue attempt that I had given a
 mangled base SHA; re-queued with the real `main` head).
+
+## Review repair 2: device-code redaction (2026-09-18)
+
+ClawSweeper on `8b3c75f`: `required_fix` at P1, security boundary,
+accepted. `features/sign-in.md` allowed `dump code-screen` while GitHub's
+device code was visible, and `dump` writes every visible string to the run
+directory, so the recipe's promise that the code is never stored was false
+as written. No such dump was ever taken (sign-in was never driven), but the
+path existed.
+
+Repair:
+
+- `scripts/verify_redact_guard.py` refuses a UI tree that contains
+  `Enter this code on GitHub`, `Copy code & open GitHub`, or
+  `Code expires in about`; `bin/verify-repoglance dump` pulls the tree to a
+  temp file, runs the guard, and deletes the file and exits 1 when it
+  trips; `capture` runs the same guard on a fresh tree before writing a PNG.
+- `features/sign-in.md` now says the agent runs no `dump`, `tap`, or
+  `capture` while the code screen is visible and waits for the maintainer;
+  `SKILL.md` documents the guard under Evidence and Helpers.
+- Probes: synthetic trees with the code prompt and with the copy button →
+  exit 1 with the guard message; a safe tree → exit 0; a real `dump` of the
+  signed-in catalog on the Fold → allowed. One earlier run artifact that
+  held the unfiltered live catalog (`nav-NO_CI.*`, from a launch that landed
+  on the live screen) was deleted from the local run directory under the
+  same policy.

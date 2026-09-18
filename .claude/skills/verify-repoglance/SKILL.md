@@ -92,8 +92,11 @@ bin/verify-repoglance capture <label>       # PNG of the single active physical 
 is active, so a recipe that needs the cover display sets the posture first
 (`adb shell cmd device_state state 0`) and names it in its proof.
 
-Standards: exercise the real user path (a scenario launched through the
-launcher counts; setting preferences by hand does not); capture the action
+Standards: `dump` and `capture` refuse to write while the GitHub
+device-code screen is showing (`scripts/verify_redact_guard.py`), so a live
+sign-in code can never land in a run artifact; exercise the real user path
+(a scenario launched through the launcher counts; setting preferences by
+hand does not); capture the action
 and the resulting state, not only the final screen; assert the observable
 strings from a `dump`, then screenshot; for the live screen, filter the
 catalog to `saari-co/RepoGlance` and prove from the dump that it is the only
@@ -116,6 +119,9 @@ survives cleanup, and the feature file names where it is.
 
 - `bin/verify-repoglance` — `doctor`, `launch`, `dump`, `tap`, `type`,
   `capture`, `cleanup`; invocation shown above and in each feature file.
+- `scripts/verify_redact_guard.py` — refuses a UI tree that shows the GitHub
+  device-code screen; called by `dump` and `capture` before anything is
+  written.
 - `scripts/check_feature_map.py` — structural gate run by `./gradlew check`
   (`checkFeatureMap`): index vs files, the four fixed feature headings,
   helpers present and executable, the `.cursor` symlink intact.
