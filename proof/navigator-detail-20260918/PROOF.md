@@ -166,3 +166,26 @@ green (189 tests). The phone was folded at repair time, so the cover recipe was
 re-driven on the repaired build (sheet `02c10ef08158405332a698591d0d4c1772e488cf179af61cfa8074aa4b5c7ef3`,
 Back dismisses, list restored); the inner-display recipe re-drive waits for
 the maintainer to unfold and is recorded below when done.
+
+## Review round 2 (2026-09-18, head `e0e3b8c`) and inner-display re-drive
+
+- OpenClaw: scoped-clean, 0 findings, "patch is correct (0.98)".
+- ClawSweeper: patch quality platinum hermit (4/6), proof gold shrimp (3/6),
+  overall gold shrimp; the P2 from round 1 confirmed fixed; one P1
+  merge-risk, **accepted as `required_fix`**: the inner-display pane-fill and
+  second-tap flow had not been re-driven on the repaired head.
+
+Re-driven on the repaired build (device APK equals local
+`cf5aca57e6a4ebb9171edce2d5aa185e88940b7b533e8ba89099f86d6abb3646`, Fold
+awake, unlocked, OPENED), run `nd017-repair-20260918`, zero assertion failures:
+
+| Step | Observed | Capture SHA-256 |
+| --- | --- | --- |
+| `launch MIXED navigator acme/rocket BOTH`, ISSUES | placeholder present; `Issues` only | navigator-issues `4ad72e4c1eac0d0f87286a95eb51b976c54cc8b164268e41b04fb7acc1d8284d` |
+| tap "Fix flaky retry in sync worker" | `repoglance:navigator-detail` holds `Author:` and `repoglance:navigator-open-github`; placeholder gone | navigator-row-wide `b9e8eb66433209715df6f749e8ddc183ed927eab551991545d7591413bfc5f32` |
+| tap a different row, "Add pagination to issue navigator" | selection moves: that title now appears twice (row and pane); no GitHub window | |
+| tap the same row again | GitHub app beside the list, `com.github.android`, "Could not resolve … 'acme/rocket'" | navigator-row-github `a7f68e1ac8e9ba8f7ce0d773e386447d22dd2c3285ad2231876120137ed8463a` |
+| force-stop GitHub, `tap repoglance:fixture-home` | `repoglance:scenario` present | navigator-home `873e5fc37001ae6350022429bc52cef0e2501bbc24b8c888a2bc267369bc35d7` |
+
+Both displays are now proven on the repaired head; no source differs from
+`e0e3b8c` after this proof commit.

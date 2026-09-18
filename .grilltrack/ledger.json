@@ -1418,10 +1418,54 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": "file:proof/navigator-detail-20260918/PROOF.md \u2014 check+assembleDebug green; navigator.md re-driven on inner display (pane fill 69549ab1\u2026, GitHub beside 010cc7d5\u2026) and cover display (sheet 878326a3\u2026, dismissed 6fb9d64a\u2026)"
+        },
+        {
+          "at": "2026-09-18T15:33:10+00:00",
+          "choice": "Wide (600dp+): candidate C from round navigator-detail-round-1 \u2014 a row tap fills the in-app detail pane beside the list; a second tap on the highlighted row (or the pane's Open on GitHub) opens the item in the GitHub app in split view. Narrow (cover display): maintainer-requested hybrid \u2014 a row tap raises a modal detail sheet over the full-width list (D's sheet) instead of replacing the list; Open on GitHub in the sheet. Long-press on a row opens GitHub on both widths, unchanged. The narrow behaviour recorded by feature-map-015 (nav-row-narrow: detail replaces the list) is superseded by this decision and features/navigator.md is updated accordingly.",
+          "from": "verified",
+          "implementation_ref": "git:60efed56b875492bf9be9bf05c178d04b62e17ce selection keyed by kind:repo#number; NavigatorChromeTest key test",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "check green 189 tests; cover recipe re-driven on repaired build (sheet 02c10ef0\u2026); inner recipe re-drive pending unfold"
+        },
+        {
+          "at": "2026-09-18T15:33:10+00:00",
+          "choice": "Wide (600dp+): candidate C from round navigator-detail-round-1 \u2014 a row tap fills the in-app detail pane beside the list; a second tap on the highlighted row (or the pane's Open on GitHub) opens the item in the GitHub app in split view. Narrow (cover display): maintainer-requested hybrid \u2014 a row tap raises a modal detail sheet over the full-width list (D's sheet) instead of replacing the list; Open on GitHub in the sheet. Long-press on a row opens GitHub on both widths, unchanged. The narrow behaviour recorded by feature-map-015 (nav-row-narrow: detail replaces the list) is superseded by this decision and features/navigator.md is updated accordingly.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:60efed56b875492bf9be9bf05c178d04b62e17ce selection keyed by kind:repo#number; NavigatorChromeTest key test",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260918T144240Z-402862529694 clean (0.98); clawsweeper gold shrimp 3/6 (patch platinum hermit), P1 inner-display proof not re-driven on repaired head",
+          "review_result": "findings",
+          "review_source_identity": "git:e0e3b8cd8e8d574376a98665c347c78b5917e4ce",
+          "to": "implemented",
+          "verification_ref": "check green 189 tests; cover recipe re-driven on repaired build (sheet 02c10ef0\u2026); inner recipe re-drive pending unfold"
+        },
+        {
+          "at": "2026-09-18T15:33:10+00:00",
+          "choice": "Wide (600dp+): candidate C from round navigator-detail-round-1 \u2014 a row tap fills the in-app detail pane beside the list; a second tap on the highlighted row (or the pane's Open on GitHub) opens the item in the GitHub app in split view. Narrow (cover display): maintainer-requested hybrid \u2014 a row tap raises a modal detail sheet over the full-width list (D's sheet) instead of replacing the list; Open on GitHub in the sheet. Long-press on a row opens GitHub on both widths, unchanged. The narrow behaviour recorded by feature-map-015 (nav-row-narrow: detail replaces the list) is superseded by this decision and features/navigator.md is updated accordingly.",
+          "from": "implemented",
+          "implementation_ref": "git:e0e3b8cd8e8d574376a98665c347c78b5917e4ce unchanged source; proof re-driven",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "check green 189 tests; cover recipe re-driven on repaired build (sheet 02c10ef0\u2026); inner recipe re-drive pending unfold"
         }
       ],
       "id": "navigator-detail-017",
-      "implementation_ref": "git:60efed56b875492bf9be9bf05c178d04b62e17ce selection keyed by kind:repo#number; NavigatorChromeTest key test",
+      "implementation_ref": "git:e0e3b8cd8e8d574376a98665c347c78b5917e4ce unchanged source; proof re-driven",
       "question": "On the wide (600dp+) navigator layout, what does a row tap do, given that today it hands off to the GitHub app and the in-app detail pane can never be filled?",
       "rationale": "Maintainer on the live picker (2026-09-18): keep long-hold for GitHub; an opened Fold should default to split view; B or C for wide, C gives more; likes D's slide-up sheet but wants it on the closed phone, where today the list is replaced. Hybrid previewed for confirmation as a replacement for the five, not a sixth option; scope widened to the narrow slot by explicit maintainer choice (\"both in this cycle\").",
       "repair_required": false,
@@ -1435,6 +1479,15 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T14:42:10+00:00",
           "source_identity": "git:9f3de52f8662c35c2a666c8a8144ed18fc3770ee"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260918T144240Z-402862529694 clean (0.98); clawsweeper gold shrimp 3/6 (patch platinum hermit), P1 inner-display proof not re-driven on repaired head",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T15:33:10+00:00",
+          "source_identity": "git:e0e3b8cd8e8d574376a98665c347c78b5917e4ce"
         }
       ],
       "review_ref": null,
@@ -1442,8 +1495,8 @@
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T14:42:10+00:00",
-      "verification_ref": "check green 189 tests; cover recipe re-driven on repaired build (sheet 02c10ef0\u2026); inner recipe re-drive pending unfold"
+      "updated_at": "2026-09-18T15:33:10+00:00",
+      "verification_ref": "proof/navigator-detail-20260918/PROOF.md \u00a7 round 2: inner-display recipe on repaired head (pane b9e8eb66\u2026, GitHub a7f68e1a\u2026, home 873e5fc3\u2026) + cover sheet 02c10ef0\u2026"
     }
   ],
   "last_activation": {
@@ -1475,5 +1528,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T14:42:10+00:00"
+  "updated_at": "2026-09-18T15:33:10+00:00"
 }
