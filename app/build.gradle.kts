@@ -202,8 +202,17 @@ tasks.named("detekt") {
     enabled = false
 }
 
+// Structural gate for the verify-repoglance feature map (GrillTrack
+// feature-map-015): index vs files, the four fixed H2s, helpers executable.
+val checkFeatureMap = tasks.register<Exec>("checkFeatureMap") {
+    group = "verification"
+    description = "Validates .claude/skills/verify-repoglance structure"
+    workingDir = rootProject.projectDir
+    commandLine("python3", "scripts/check_feature_map.py")
+}
+
 tasks.named("check") {
-    dependsOn("detektDebug")
+    dependsOn("detektDebug", checkFeatureMap)
 }
 
 // Diagnostic task for release.yml and local verification:

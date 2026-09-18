@@ -4,6 +4,7 @@
 # Repo shape
 /runs/
 /worktrees/
+.claude/worktrees/
 .grilltrack/work/
 
 # Android (pre-seeded for the future build lane)

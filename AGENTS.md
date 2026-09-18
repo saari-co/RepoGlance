@@ -49,6 +49,16 @@ about what has actually merged and been proven.
 - Honest `main`: README and docs distinguish planned, available, and
   proven behavior; unproven behavior is never claimed.
 
+## Verification Skill
+
+`.claude/skills/verify-repoglance/` (also reachable as
+`.cursor/skills/verify-repoglance`) is the maintained way to drive the real
+app and prove user-visible behaviour: launch into a named fixture scenario,
+walk a mapped feature, dump the UI tree, capture the inner display. Read its
+`features/README.md` before claiming any UI behaviour. `./gradlew check`
+validates its structure; pstack's `maintain-verification-skill` loop keeps it
+honest and may edit only that directory.
+
 ## Hygiene And Proof
 
 - Root markdown stays at the front-door set (`README.md`, `AGENTS.md`,

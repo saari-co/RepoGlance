@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-18T04:01:24+00:00",
-    "domain": "hard CI floor: lint, static analysis, and comment ban as ratcheting merge gates",
-    "started_at": "2026-09-18T04:00:59+00:00",
+    "confirmed_at": "2026-09-18T11:48:49+00:00",
+    "domain": "feature map: product-surface navigation contract, debug-only scenario launcher, and a validating check task",
+    "started_at": "2026-09-18T11:41:35+00:00",
     "status": "inspected",
-    "summary": "ci-floor-014: lint gate with frozen baseline and ContentDescription at error; detekt+Compose+formatting as the one analyser; Kotlin warnings as errors; full comment ban in app/src/main with rationale moved to docs/INVARIANTS.md; logging and mutable-collection forbids; StrictMode in debug; CI runs check assembleDebug. Verification: green check on the head plus one deliberate violation per new rule shown red. Excluded: baseline burn-down, feature map, verifier script, emulator lane. Merge stays with Bobby."
+    "summary": "feature-map-015 (pstack shape): .claude/skills/verify-repoglance/ with SKILL.md (Launch/Doctor/Drive/Evidence/Cleanup/Helpers), features/README.md, five user-POV feature files with four fixed H2s; .cursor symlink; AGENTS.md pointer; bin/verify-repoglance helpers over adb/uiautomator/Pixel Use/phone_proof; debug-only ScenarioLaunchActivity; testTags on driven controls; scripts/check_feature_map.py structural gate in check. Verify: green check, broken-file red, every scenario reached on the Fold, one feature driven end to end with evidence surviving cleanup. Excluded: tiers/receipts/emulator, session-bootstrap and freshness fixes. Merge stays with Bobby."
   },
   "decisions": [
     {
@@ -992,24 +992,343 @@
       "superseded_by": null,
       "updated_at": "2026-09-18T05:04:45+00:00",
       "verification_ref": "proof/ci-floor-20260918/PROOF.md \u00a7 Device proof: Fold cold-start logcat shows DebugHooks StrictMode active (picker + MainActivity); picker capture 9ffc8688; git diff --check clean"
+    },
+    {
+      "baseline_ref": "git:fb220e8",
+      "candidate_refs": [],
+      "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+      "context_ref": "x-api:plans/repoglance-poteto-verification-plan-20260917.md",
+      "created_at": "2026-09-18T11:37:28+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "ci-floor-014"
+      ],
+      "domain": "feature map: product-surface navigation contract, debug-only scenario launcher, and a validating check task",
+      "history": [
+        {
+          "at": "2026-09-18T11:37:28+00:00",
+          "choice": "FEATURE_MAP.md at product-surface grain (one row per user-facing surface: compact widget, stack widget, widget config, sign-in, owner filter, repo search, pin toggle, navigator scope/mode/filter, scenario selector, freshness labels, rate-limit state, GitHub deep links, access settings, refresh), each row naming owned paths, entry point, driver actions (testTag resource-ids, adb intents, posture commands), observable success strings, applicable truth rules, quick verifier, full proof command, and proven-on devices; account-bound live states listed as human-gated rows; a debug-only ScenarioLaunchActivity that sets the FixtureScenario and screen from adb extras so every truth state is reachable without an account; scripts/check_feature_map.py (stdlib) wired into the Gradle check task as a hard gate from day one.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T11:41:35+00:00",
+          "choice": "FEATURE_MAP.md at product-surface grain (one row per user-facing surface: compact widget, stack widget, widget config, sign-in, owner filter, repo search, pin toggle, navigator scope/mode/filter, scenario selector, freshness labels, rate-limit state, GitHub deep links, access settings, refresh), each row naming owned paths, entry point, driver actions (testTag resource-ids, adb intents, posture commands), observable success strings, applicable truth rules, quick verifier, full proof command, and proven-on devices; account-bound live states listed as human-gated rows; a debug-only ScenarioLaunchActivity that sets the FixtureScenario and screen from adb extras so every truth state is reachable without an account; scripts/check_feature_map.py (stdlib) wired into the Gradle check task as a hard gate from day one.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "Maintainer asked to check Lauren Tan's pstack before committing; create-verification-skill and maintain-verification-skill define the map as a project-local verification skill directory (SKILL.md + features/ with four fixed H2s, user POV), seeded with the top 3-5 features and proven by driving one end to end. The table shape and path/testTag validator are superseded.",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T11:41:35+00:00",
+          "choice": "FEATURE_MAP.md at product-surface grain (one row per user-facing surface: compact widget, stack widget, widget config, sign-in, owner filter, repo search, pin toggle, navigator scope/mode/filter, scenario selector, freshness labels, rate-limit state, GitHub deep links, access settings, refresh), each row naming owned paths, entry point, driver actions (testTag resource-ids, adb intents, posture commands), observable success strings, applicable truth rules, quick verifier, full proof command, and proven-on devices; account-bound live states listed as human-gated rows; a debug-only ScenarioLaunchActivity that sets the FixtureScenario and screen from adb extras so every truth state is reachable without an account; scripts/check_feature_map.py (stdlib) wired into the Gradle check task as a hard gate from day one.",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T12:24:15+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T12:24:15+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "implemented",
+          "implementation_ref": "git:6f1f1db6ad376e6ed0c464a2e08e254d04f42b17",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T12:32:47+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:6f1f1db6ad376e6ed0c464a2e08e254d04f42b17",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/feature-map-20260918/PROOF.md: check assembleDebug green with checkFeatureMap; validator 4 red probes; Fold: 7/7 scenarios via launcher, navigator recipe driven end to end 0 failures (inner-display GitHub hand-off, Last-good chip, home return), cover-display step maintainer-gated"
+        },
+        {
+          "at": "2026-09-18T12:32:47+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:6f1f1db6ad376e6ed0c464a2e08e254d04f42b17",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper platinum hermit / diamond lobster, P3 validator gap; openclaw req-20260918T122651Z-365305416421 clean",
+          "review_result": "findings",
+          "review_source_identity": "git:ae5834f56478537e0922b7e5e205e07dd6637b72",
+          "to": "implemented",
+          "verification_ref": "proof/feature-map-20260918/PROOF.md: check assembleDebug green with checkFeatureMap; validator 4 red probes; Fold: 7/7 scenarios via launcher, navigator recipe driven end to end 0 failures (inner-display GitHub hand-off, Last-good chip, home return), cover-display step maintainer-gated"
+        },
+        {
+          "at": "2026-09-18T12:32:47+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "implemented",
+          "implementation_ref": "git:a85619aea610abf9c70a9119f0df42115334b950 validator precondition-first",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/feature-map-20260918/PROOF.md: check assembleDebug green with checkFeatureMap; validator 4 red probes; Fold: 7/7 scenarios via launcher, navigator recipe driven end to end 0 failures (inner-display GitHub hand-off, Last-good chip, home return), cover-display step maintainer-gated"
+        },
+        {
+          "at": "2026-09-18T12:44:10+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:a85619aea610abf9c70a9119f0df42115334b950 validator precondition-first",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "check_feature_map.py: prose-before-preconditions probe red, five features green; gradle checkFeatureMap ok"
+        },
+        {
+          "at": "2026-09-18T12:44:10+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:a85619aea610abf9c70a9119f0df42115334b950 validator precondition-first",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1 security: sign-in recipe permitted dumping the visible device code",
+          "review_result": "findings",
+          "review_source_identity": "git:8b3c75fa2a5bfd6d05ff1b969e3ed570f3bbe61a",
+          "to": "implemented",
+          "verification_ref": "check_feature_map.py: prose-before-preconditions probe red, five features green; gradle checkFeatureMap ok"
+        },
+        {
+          "at": "2026-09-18T12:44:10+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "implemented",
+          "implementation_ref": "git:f7785b7e3b76c440190664fa088eeee496179974 device-code redaction guard",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "check_feature_map.py: prose-before-preconditions probe red, five features green; gradle checkFeatureMap ok"
+        },
+        {
+          "at": "2026-09-18T12:49:49+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:f7785b7e3b76c440190664fa088eeee496179974 device-code redaction guard",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "verify_redact_guard.py probes: code prompt and copy button red, safe tree green, real signed-in catalog dump allowed"
+        },
+        {
+          "at": "2026-09-18T12:49:49+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:f7785b7e3b76c440190664fa088eeee496179974 device-code redaction guard",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1: guard ran after the tree was written on phone and host",
+          "review_result": "findings",
+          "review_source_identity": "git:cc5fe2a05d20f66e14704d281ad975471364356e",
+          "to": "implemented",
+          "verification_ref": "verify_redact_guard.py probes: code prompt and copy button red, safe tree green, real signed-in catalog dump allowed"
+        },
+        {
+          "at": "2026-09-18T12:49:49+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "implemented",
+          "implementation_ref": "git:58ab2fed9d515c742f35fbe40ba9cf2b6a7254e8 in-memory redaction guard",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "verify_redact_guard.py probes: code prompt and copy button red, safe tree green, real signed-in catalog dump allowed"
+        },
+        {
+          "at": "2026-09-18T12:57:00+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:58ab2fed9d515c742f35fbe40ba9cf2b6a7254e8 in-memory redaction guard",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "guard stdin probes: code tree exit 1 / 0 bytes, safe tree exit 0; Fold: signed-in dump allowed, capture pre-screened, no /sdcard/verify-ui.xml"
+        },
+        {
+          "at": "2026-09-18T12:57:00+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:58ab2fed9d515c742f35fbe40ba9cf2b6a7254e8 in-memory redaction guard",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P2: Fixture-state labels in recipe did not match ListState.displayLabel(); openclaw req-20260918T125006Z-377338517991 clean",
+          "review_result": "findings",
+          "review_source_identity": "git:8fa0049e2c86271bc4926900cf47a5e25f633dab",
+          "to": "implemented",
+          "verification_ref": "guard stdin probes: code tree exit 1 / 0 bytes, safe tree exit 0; Fold: signed-in dump allowed, capture pre-screened, no /sdcard/verify-ui.xml"
+        },
+        {
+          "at": "2026-09-18T12:57:00+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "implemented",
+          "implementation_ref": "git:fd04b218214aa44042f18d6815f99669f4afcb55 fixture-state labels",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "guard stdin probes: code tree exit 1 / 0 bytes, safe tree exit 0; Fold: signed-in dump allowed, capture pre-screened, no /sdcard/verify-ui.xml"
+        }
+      ],
+      "id": "feature-map-015",
+      "implementation_ref": "git:fd04b218214aa44042f18d6815f99669f4afcb55 fixture-state labels",
+      "question": "How do agents navigate RepoGlance and prove a surface's state without a human driving the phone?",
+      "rationale": "Bobby 2026-09-18 after reading cursor/plugins pstack: adopt pstack shape; .claude/skills canonical with .cursor symlink; top five features; structural CI check plus maintenance loop.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper platinum hermit / diamond lobster, P3 validator gap; openclaw req-20260918T122651Z-365305416421 clean",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:32:47+00:00",
+          "source_identity": "git:ae5834f56478537e0922b7e5e205e07dd6637b72"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1 security: sign-in recipe permitted dumping the visible device code",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:44:10+00:00",
+          "source_identity": "git:8b3c75fa2a5bfd6d05ff1b969e3ed570f3bbe61a"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P1: guard ran after the tree was written on phone and host",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:49:49+00:00",
+          "source_identity": "git:cc5fe2a05d20f66e14704d281ad975471364356e"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper P2: Fixture-state labels in recipe did not match ListState.displayLabel(); openclaw req-20260918T125006Z-377338517991 clean",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:57:00+00:00",
+          "source_identity": "git:8fa0049e2c86271bc4926900cf47a5e25f633dab"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260918T125718Z-379153731252 clean (0.96); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no actionable findings (PR #14)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T13:01:50+00:00",
+          "source_identity": "git:725744b3680b94511b112e9a529f71f9c2ac4192"
+        }
+      ],
+      "review_ref": "openclaw req-20260918T125718Z-379153731252 clean (0.96); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no actionable findings (PR #14)",
+      "review_result": "clean",
+      "review_source_identity": "git:725744b3680b94511b112e9a529f71f9c2ac4192",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-18T13:01:50+00:00",
+      "verification_ref": "Fold: Filters sheet chips Loaded/Empty/Last-good/Unknown/Rate-limited; Unknown->Data unavailable, Rate-limited/Last-good->Cached chip, Empty->No rows match"
     }
   ],
   "last_activation": {
-    "at": "2026-09-17T23:40:27+00:00",
-    "mechanism": "$grilltrack"
+    "at": "2026-09-18T11:41:35+00:00",
+    "mechanism": "implicit"
   },
   "recommendation": {
     "alternatives": [
-      "Bounded behaviour slice: move SecureTokenStore session bootstrap off the main thread and the picker's persisted read out of composition \u2014 the floor's first StrictMode catches (6 DiskReadViolations per cold start)",
-      "Widget freshness grill recorded on PR #12: background refresh path for pinned repos, now that the compact slot labels staleness"
+      "navigator-detail-017: on the inner display the 'Select a row to see details' pane can never be filled because selection hands off to the GitHub app; decide whether the pane goes or selection fills it, then re-drive features/navigator.md",
+      "widget-freshness (recorded on PR #12): background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it"
     ],
-    "reason": "The floor is in place and proven on CI; the next leverage per the plan is navigation (feature map), which Grill C's verifier depends on. The StrictMode catches are real but are a behaviour change, so they stay a separate slice.",
-    "recommended": "feature-map-015: FEATURE_MAP.md at product-surface grain plus a debug-only scenario launcher so every truth state (EXACT/LAST_GOOD/UNKNOWN/RATE_LIMITED/NO_CI/EMPTY/MIXED) is adb-reachable, and scripts/check_feature_map.py in the new check task",
-    "recorded_at": "2026-09-18T05:04:45+00:00"
+    "reason": "The floor and the map are both in place and proven; the highest-leverage next slice is the one the floor already found, and verify-repoglance can now prove it end to end. Grill C (tiers, receipts, emulator lane) can follow once a behaviour slice has exercised the skill.",
+    "recommended": "session-bootstrap-016: move SecureTokenStore session reads off the main thread during RepoGlanceViewModel construction (the CI floor's first StrictMode catch: 6 DiskReadViolations per cold start) and take the picker's persisted-store read out of composition; prove with a cold-start logcat showing zero app-frame StrictMode violations via verify-repoglance",
+    "recorded_at": "2026-09-18T13:01:50+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T05:04:45+00:00"
+  "updated_at": "2026-09-18T13:01:50+00:00"
 }
