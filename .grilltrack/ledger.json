@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "sequential",
+    "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-09-18T00:43:43+00:00",
-    "domain": "compact widget content and its live truth basis",
-    "started_at": "2026-09-17T23:40:59+00:00",
-    "status": "inspected",
-    "summary": "Compact widget adopts the round-2 right-aligned ledger composition with shrunk type; counts become live via one GET /repos/{owner}/{name} per refresh with issues derived as open_issues_count minus openPrs; basis degrades honestly rather than rendering a bound as exact. Bounded to the compact slot: the tall row feed keeps its FIXTURE PREVIEW label until a later cycle. Verification is JVM unit tests (adding glance-appwidget-testing) plus a rendered Fold capture; live-data-on-device proof is a Bobby-gated step."
+    "confirmed_at": "2026-09-18T04:01:24+00:00",
+    "domain": "hard CI floor: lint, static analysis, and comment ban as ratcheting merge gates",
+    "started_at": "2026-09-18T04:00:59+00:00",
+    "status": "confirmed",
+    "summary": "ci-floor-014: lint gate with frozen baseline and ContentDescription at error; detekt+Compose+formatting as the one analyser; Kotlin warnings as errors; full comment ban in app/src/main with rationale moved to docs/INVARIANTS.md; logging and mutable-collection forbids; StrictMode in debug; CI runs check assembleDebug. Verification: green check on the head plus one deliberate violation per new rule shown red. Excluded: baseline burn-down, feature map, verifier script, emulator lane. Merge stays with Bobby."
   },
   "decisions": [
     {
@@ -862,6 +862,75 @@
       "superseded_by": null,
       "updated_at": "2026-08-17T02:21:08+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": "git:f40a916b46acad51194064fea9098629710aedda",
+      "candidate_refs": [],
+      "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+      "context_ref": "x-api:plans/repoglance-poteto-verification-plan-20260917.md",
+      "created_at": "2026-09-18T04:01:24+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "hard CI floor: lint, static analysis, and comment ban as ratcheting merge gates",
+      "history": [
+        {
+          "at": "2026-09-18T04:01:24+00:00",
+          "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T04:38:22+00:00",
+          "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T04:38:22+00:00",
+          "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+          "from": "implemented",
+          "implementation_ref": "git:752a3a81143470ac9e9d01be28bb36925119ba39",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "ci-floor-014",
+      "implementation_ref": "git:752a3a81143470ac9e9d01be28bb36925119ba39",
+      "question": "What hard CI floor does RepoGlance adopt so that review feedback becomes a gate agents cannot forget?",
+      "rationale": "Bobby 2026-09-18: baseline-and-ratchet over fix-all-first; one analyser over two; full poteto comment ban over TODO/FIXME-only. Source: x-api plans/repoglance-poteto-verification-plan-20260917.md Grill A.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-18T04:38:22+00:00",
+      "verification_ref": "proof/ci-floor-20260918/PROOF.md: check assembleDebug green x3; 188/25 tests; lint 0 outside 30-entry baseline; detekt 0 outside 20-entry baseline; 10 red probes + 2 disclosed non-catches"
     }
   ],
   "last_activation": {
@@ -881,5 +950,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T03:49:15+00:00"
+  "updated_at": "2026-09-18T04:38:22+00:00"
 }
