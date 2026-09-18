@@ -88,3 +88,25 @@ session dispatcher and the catalog loaded. Cleanup restored MIXED.
   runs on `Dispatchers.IO` inside `GitHubApiClient`, unchanged.
 - Ordering of a queued `signOut()` against a later device-token write relies on
   the single-thread dispatcher's FIFO order; both go through it.
+
+## Review round 1 (head `7825436174d5e7cb96be56d591d809c4526d8e8f`)
+
+- OpenClaw `req-20260918T192156Z-42255632497`: correct, 0.98, 0 findings.
+- ClawSweeper: silver shellfish, P1 (PR #16 comment 5735127182):
+  `clearSavedSession()` launched `session.signOut()` as a cancellable
+  `viewModelScope` child, so a ViewModel cleared before the queued job ran
+  could leave the previous token on disk. Adjudicated **required_fix**.
+
+### Repair
+
+`clearSavedSession()` now launches with `sessionDispatcher + NonCancellable`,
+so the clear is detached from ViewModel cancellation and still runs off the
+main thread, in FIFO order on the single-thread session dispatcher.
+`onCleared()` calls `close()` on that dispatcher, which is an orderly
+`shutdown()`: already-queued tasks still execute. `SignedOut` is published
+before the file delete completes; the next bootstrap reads on the same
+dispatcher, after the delete. `./gradlew check assembleDebug` green again.
+
+Not proven on device: sign-out and cancel act on the maintainer's GitHub
+account and are human-gated (features/sign-in.md), so the token-clear path
+has no device capture in this packet. **human_gate** for that proof.

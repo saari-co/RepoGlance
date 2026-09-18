@@ -26,6 +26,7 @@ import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -267,7 +268,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private suspend fun hasSavedSession(): Boolean = withContext(sessionDispatcher) { session.hasSavedSession() }
 
     private fun clearSavedSession() {
-        viewModelScope.launch(sessionDispatcher) { session.signOut() }
+        viewModelScope.launch(sessionDispatcher + NonCancellable) { session.signOut() }
     }
 
     override fun onCleared() {

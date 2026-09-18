@@ -1557,27 +1557,56 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T19:29:09+00:00",
+          "choice": "proposed: viewModelScope on Dispatchers.IO with Checking held until the read completes; picker loads the persisted snapshot on IO before composing",
+          "from": "verified",
+          "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
         }
       ],
       "id": "session-bootstrap-016",
       "implementation_ref": "git:5da340eeabafdd79b1f93be12be718d76b7c992f (app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt, auth/SecureTokenStore.kt, debug devpicker/WidgetVariantPickerActivity.kt)",
       "question": "Where does the saved-session check run at cold start, what does the UI show while the session is unknown, and how does the debug picker read the persisted store?",
       "rationale": "",
-      "repair_required": false,
-      "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
-      "status": "verified",
+      "repair_required": true,
+      "review_classifications": [
+        "required_fix",
+        "human_gate"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "human_gate"
+          ],
+          "ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T19:29:09+00:00",
+          "source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f"
+        }
+      ],
+      "review_ref": "openclaw req-20260918T192156Z-42255632497 correct 0.98; clawsweeper silver shellfish P1 cancellable token clear (PR #16 comment 5735127182)",
+      "review_result": "findings",
+      "review_source_identity": "git:7825436174d5e7cb96be56d591d809c4526d8e8f",
+      "status": "needs_reverification",
       "superseded_by": null,
-      "updated_at": "2026-09-18T19:14:08+00:00",
+      "updated_at": "2026-09-18T19:29:09+00:00",
       "verification_ref": "proof/session-bootstrap-20260918/PROOF.md (gradlew check green, 189 JVM tests; Fold cold start: 0 thread-policy app-frame violations for MainActivity and picker)"
     },
     {
       "baseline_ref": null,
       "candidate_refs": [],
       "choice": "deferred: no logo asset exists (manifest has no icon, no mipmap); needs a brand asset and a five-candidate visual grill; this cycle keeps Checking as text",
+      "context": " Maintainer direction (2026-09-18): no logo exists yet; include a magnifying glass; low-key; must read well as the small status-bar/notification icon on Pixels; also want a Quick Settings tile (swipe-down bar) for quick access, which is a separate feature decision beyond the splash.",
       "context_ref": null,
       "created_at": "2026-09-18T16:33:20+00:00",
       "deferred_reason": "No logo asset exists; a logo plus animation is a visual grill of its own (five candidates) and out of the bounded behaviour slice. Risk: Checking stays plain text until a logo exists; the unknown window is tens of ms so no truth-rule exposure",
@@ -1615,8 +1644,7 @@
       "status": "deferred",
       "superseded_by": null,
       "updated_at": "2026-09-18T19:21:26+00:00",
-      "verification_ref": null,
-      "context": " Maintainer direction (2026-09-18): no logo exists yet; include a magnifying glass; low-key; must read well as the small status-bar/notification icon on Pixels; also want a Quick Settings tile (swipe-down bar) for quick access, which is a separate feature decision beyond the splash."
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -1646,5 +1674,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T19:14:18+00:00"
+  "updated_at": "2026-09-18T19:29:09+00:00"
 }
