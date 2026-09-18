@@ -929,16 +929,44 @@
           "review_source_identity": null,
           "to": "needs_reverification",
           "verification_ref": "proof/ci-floor-20260918/PROOF.md: check assembleDebug green x3; 188/25 tests; lint 0 outside 30-entry baseline; detekt 0 outside 20-entry baseline; 10 red probes + 2 disclosed non-catches"
+        },
+        {
+          "at": "2026-09-18T04:56:01+00:00",
+          "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:752a3a81143470ac9e9d01be28bb36925119ba39",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "https://github.com/saari-co/RepoGlance/pull/13 clawsweeper (silver shellfish: runtime proof for Application/DebugHooks missing; trailing whitespace in docs/INVARIANTS.md); openclaw req-20260918T044455Z-27397147855 clean",
+          "review_result": "findings",
+          "review_source_identity": "git:50158a035dc0ba5d972c58fcab72b36e47a975c2",
+          "to": "implemented",
+          "verification_ref": "proof/ci-floor-20260918/PROOF.md: check assembleDebug green x3; 188/25 tests; lint 0 outside 30-entry baseline; detekt 0 outside 20-entry baseline; 10 red probes + 2 disclosed non-catches"
+        },
+        {
+          "at": "2026-09-18T04:56:01+00:00",
+          "choice": "Android Lint as a gate (abortOnError, warningsAsErrors, frozen lint-baseline.xml holding today's warnings, ContentDescription at error); detekt 1.23.8 with Compose rules 0.4.22 and the ktlint formatting wrapper as the single Kotlin analyser; Kotlin allWarningsAsErrors; full comment ban in app/src/main (ForbiddenComment), rationale migrated to docs/INVARIANTS.md; ForbiddenMethodCall on println/android.util.Log outside one redaction-aware logger; StrictMode in debug builds (network death, disk log); ci.yml runs 'check assembleDebug' and uploads reports on failure.",
+          "from": "implemented",
+          "implementation_ref": "git:0b891c04df5eb28bcfb0db2be4c632e90ea7bfab device proof + whitespace repair",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/ci-floor-20260918/PROOF.md: check assembleDebug green x3; 188/25 tests; lint 0 outside 30-entry baseline; detekt 0 outside 20-entry baseline; 10 red probes + 2 disclosed non-catches"
         }
       ],
       "id": "ci-floor-014",
-      "implementation_ref": "git:752a3a81143470ac9e9d01be28bb36925119ba39",
+      "implementation_ref": "git:0b891c04df5eb28bcfb0db2be4c632e90ea7bfab device proof + whitespace repair",
       "question": "What hard CI floor does RepoGlance adopt so that review feedback becomes a gate agents cannot forget?",
       "rationale": "Bobby 2026-09-18: baseline-and-ratchet over fix-all-first; one analyser over two; full poteto comment ban over TODO/FIXME-only. Source: x-api plans/repoglance-poteto-verification-plan-20260917.md Grill A.",
-      "repair_required": true,
-      "review_classifications": [
-        "required_fix"
-      ],
+      "repair_required": false,
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -950,13 +978,13 @@
           "source_identity": "git:50158a035dc0ba5d972c58fcab72b36e47a975c2"
         }
       ],
-      "review_ref": "https://github.com/saari-co/RepoGlance/pull/13 clawsweeper (silver shellfish: runtime proof for Application/DebugHooks missing; trailing whitespace in docs/INVARIANTS.md); openclaw req-20260918T044455Z-27397147855 clean",
-      "review_result": "findings",
-      "review_source_identity": "git:50158a035dc0ba5d972c58fcab72b36e47a975c2",
-      "status": "needs_reverification",
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
       "superseded_by": null,
       "updated_at": "2026-09-18T04:56:01+00:00",
-      "verification_ref": "proof/ci-floor-20260918/PROOF.md: check assembleDebug green x3; 188/25 tests; lint 0 outside 30-entry baseline; detekt 0 outside 20-entry baseline; 10 red probes + 2 disclosed non-catches"
+      "verification_ref": "proof/ci-floor-20260918/PROOF.md \u00a7 Device proof: Fold cold-start logcat shows DebugHooks StrictMode active (picker + MainActivity); picker capture 9ffc8688; git diff --check clean"
     }
   ],
   "last_activation": {
