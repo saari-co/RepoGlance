@@ -189,3 +189,17 @@ awake, unlocked, OPENED), run `nd017-repair-20260918`, zero assertion failures:
 
 Both displays are now proven on the repaired head; no source differs from
 `e0e3b8c` after this proof commit.
+
+## Terminal review (2026-09-18, head `780ab1c`)
+
+- OpenClaw: scoped-clean, 0 findings, "patch is correct (0.99)".
+- ClawSweeper (PR #15 comment 5731579237): overall **platinum hermit (4/6)**,
+  proof **diamond lobster (5/6)**, patch quality platinum hermit, no
+  findings, no security items, "Ready for maintainer review". Labels
+  `proof: sufficient`, `rating: platinum hermit`, `status: ready for
+  maintainer look`.
+
+Cycle history: implementation `baadf90` → proof `9f3de52` → selection key
+`60efed5` → ledger `e0e3b8c` → inner re-drive proof `780ab1c`. Two review
+round trips, both accepted as `required_fix` and repaired. This commit
+changes only proof and ledger; no source differs from `780ab1c`.

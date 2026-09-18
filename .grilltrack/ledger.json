@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-18T14:18:58+00:00",
     "domain": "navigator detail: what a row tap does on the wide (600dp+) layout, where the in-app detail pane can never be filled because selection hands off to the GitHub app",
     "started_at": "2026-09-18T13:25:50+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "navigator-detail-017: wide (600dp+) row tap fills the in-app detail pane beside the list; second tap on the highlighted row or the pane's Open on GitHub opens the GitHub app in split view. Narrow (cover display) row tap raises a modal detail sheet over the full-width list with Open on GitHub; replaces 'detail replaces the list'. Long-press opens GitHub on both widths, unchanged. Bounded to NavigatorScreen plus stable test tags on detail pane, sheet and Open on GitHub; debug picker stays dev-only. Preserve navigator-scope-005 chrome, truth rules, read-only, CI floor; update features/navigator.md and re-drive it with the helpers; cover-display steps maintainer-gated; proof under proof/navigator-detail-20260918/PROOF.md with capture SHA-256s. Excluded: posture emulation, GitHub writes, commit/PR until asked. Maintainer confirmed 2026-09-18 after trying the hybrid preview on the live picker."
   },
   "decisions": [
@@ -1488,14 +1488,21 @@
           "result": "findings",
           "reviewed_at": "2026-09-18T15:33:10+00:00",
           "source_identity": "git:e0e3b8cd8e8d574376a98665c347c78b5917e4ce"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw clean (0.99); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no findings (PR #15 comment 5731579237)",
+          "result": "clean",
+          "reviewed_at": "2026-09-18T15:39:49+00:00",
+          "source_identity": "git:780ab1c2a5d8890c604b9aea0dad33f68b50ecf8"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "openclaw clean (0.99); clawsweeper platinum hermit 4/6, proof diamond lobster 5/6, no findings (PR #15 comment 5731579237)",
+      "review_result": "clean",
+      "review_source_identity": "git:780ab1c2a5d8890c604b9aea0dad33f68b50ecf8",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T15:33:10+00:00",
+      "updated_at": "2026-09-18T15:39:49+00:00",
       "verification_ref": "proof/navigator-detail-20260918/PROOF.md \u00a7 round 2: inner-display recipe on repaired head (pane b9e8eb66\u2026, GitHub a7f68e1a\u2026, home 873e5fc3\u2026) + cover sheet 02c10ef0\u2026"
     }
   ],
@@ -1517,16 +1524,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "navigator-detail-017: on the inner display the 'Select a row to see details' pane can never be filled because selection hands off to the GitHub app; decide whether the pane goes or selection fills it, then re-drive features/navigator.md",
-      "widget-freshness (recorded on PR #12): background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it"
+      "widget-freshness: background refresh path for pinned repos now that the compact slot labels staleness and the map can prove it",
+      "fixture-collision: give the MIXED account/org fixtures colliding issue/PR numbers across repositories so features/navigator.md can prove the selection-key rule on device, not only in a JVM test"
     ],
-    "reason": "The floor and the map are both in place and proven; the highest-leverage next slice is the one the floor already found, and verify-repoglance can now prove it end to end. Grill C (tiers, receipts, emulator lane) can follow once a behaviour slice has exercised the skill.",
-    "recommended": "session-bootstrap-016: move SecureTokenStore session reads off the main thread during RepoGlanceViewModel construction (the CI floor's first StrictMode catch: 6 DiskReadViolations per cold start) and take the picker's persisted-store read out of composition; prove with a cold-start logcat showing zero app-frame StrictMode violations via verify-repoglance",
-    "recorded_at": "2026-09-18T13:01:50+00:00"
+    "reason": "navigator-detail-017 is verified on both displays and reviewed clean at platinum hermit; the next slice the floor already found is the StrictMode main-thread read, and the verification skill can now prove it end to end",
+    "recommended": "session-bootstrap-016: move SecureTokenStore session reads off the main thread during RepoGlanceViewModel construction and take the picker's persisted-store read out of composition (the CI floor's StrictMode catch: DiskReadViolations per cold start); prove with a cold-start logcat via verify-repoglance showing zero app-frame violations",
+    "recorded_at": "2026-09-18T15:39:49+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T15:33:10+00:00"
+  "updated_at": "2026-09-18T15:39:49+00:00"
 }
