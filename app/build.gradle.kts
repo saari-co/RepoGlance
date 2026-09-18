@@ -135,6 +135,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
     buildFeatures {
         buildConfig = true
         compose = true
@@ -166,6 +170,10 @@ dependencies {
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
     debugImplementation(libs.compose.ui.tooling)
+
+    // JVM-only Glance composable assertions: no device, no UI Automator.
+    testImplementation(libs.glance.testing)
+    testImplementation(libs.glance.appwidget.testing)
 
     testImplementation(libs.junit)
     testImplementation(libs.json.jvm)

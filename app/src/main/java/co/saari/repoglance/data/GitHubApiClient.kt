@@ -80,6 +80,27 @@ class GitHubApiClient(
         )
     }
 
+    /**
+     * Repository-level counters. One core-quota call; the response's
+     * `open_issues_count` includes pull requests, which
+     * [LiveSnapshotFactory] corrects for.
+     */
+    fun loadRepositoryMetadata(
+        repository: LiveRepository,
+    ): GitHubApiResult<LiveRepositoryMetadata> = authenticated {
+        val owner = pathEncode(repository.ref.owner)
+        val name = pathEncode(repository.ref.name)
+        val response = get("/repos/$owner/$name")
+        val json = response.requireObject()
+        SuccessPayload(
+            value = LiveRepositoryMetadata(
+                openIssuesAndPullRequests = json.optionalNonNegativeInt("open_issues_count"),
+                pushedAt = json.optionalInstant("pushed_at"),
+            ),
+            rateLimit = response.rateLimit(),
+        )
+    }
+
     fun loadRepositoryContent(
         repository: LiveRepository,
         viewerLogin: String,

@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-07-29T12:08:47+00:00",
-    "domain": "public release posture",
-    "started_at": "2026-07-29T12:02:53+00:00",
-    "status": "implementing",
-    "summary": "Repo public under MIT with full history published as-is; honest-main discipline; no preset pins (in-place pin toggle, pins = widget + background-refresh set); GitHub App publicly installable with maintainer installs as personal config. Public docs rework + LICENSE land via PR #1 (maintainer merge gate). Delivery rail locked: rolling-release APKs pulled by cp-1 with one-tap banner installs, public sideload channel for everyone else."
+    "confirmed_at": "2026-09-18T00:43:43+00:00",
+    "domain": "compact widget content and its live truth basis",
+    "started_at": "2026-09-17T23:40:59+00:00",
+    "status": "confirmed",
+    "summary": "Compact widget adopts the round-2 right-aligned ledger composition with shrunk type; counts become live via one GET /repos/{owner}/{name} per refresh with issues derived as open_issues_count minus openPrs; basis degrades honestly rather than rendering a bound as exact. Bounded to the compact slot: the tall row feed keeps its FIXTURE PREVIEW label until a later cycle. Verification is JVM unit tests (adding glance-appwidget-testing) plus a rendered Fold capture; live-data-on-device proof is a Bobby-gated step."
   },
   "decisions": [
     {
@@ -391,7 +391,7 @@
     {
       "baseline_ref": "plan:x-api/plans/repobar-pixel-companion-plan-20260728.md#pixel-optimization-contract",
       "candidate_refs": [],
-      "choice": null,
+      "choice": "Compact widget uses a right-aligned ledger composition: repository name on top, then label-left/number-right rows \u2014 'issues N', 'PRs N', and 'to review N'. Type shrinks so rows fit at the declared 120x64dp COMPACT_SIZE floor; the 'to review' row is progressive disclosure that appears when height allows. Counts come from live data: one GET /repos/{owner}/{name} per refresh supplies open_issues_count, and true issues = open_issues_count - openPrs (GitHub counts PRs as issues). Basis falls back to LAST_GOOD when the open-PR list is itself page-truncated, never rendering a bound as an exact count. Selected in picker round compact-widget-content-round-2 (round 1 rejected: five wordings of one layout read as the same widget). Scope: compact slot only; the tall row feed stays on fixtures for a later cycle.",
       "context_ref": "plan:grill-skills-family-20260719.md#grill-frontend",
       "created_at": "2026-07-28T16:34:59+00:00",
       "deferred_reason": "Best decided with the grill-frontend five-variant picker against real Slice 2 widget fixtures; an abstract preference now would be low-fidelity.",
@@ -409,6 +409,34 @@
           "note": "deferred by agent recommendation, accepted in the shared-understanding summary",
           "to": "deferred",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-17T23:40:27+00:00",
+          "choice": "Undecided \u2014 deferred before any candidate was selected. The small-widget number set is to be chosen with the grill-frontend five-variant picker against real widget fixtures; see deferred_reason.",
+          "from": "deferred",
+          "implementation_ref": null,
+          "note": "Widgets still render FIXTURE PREVIEW while the app ships on Play internal testing; the small-widget number set must be decided against live data constraints before widgets can tell the truth.",
+          "repair_required": false,
+          "review_classifications": null,
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T00:40:10+00:00",
+          "choice": "Undecided \u2014 deferred before any candidate was selected. The small-widget number set is to be chosen with the grill-frontend five-variant picker against real widget fixtures; see deferred_reason.",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": null,
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
         }
       ],
       "id": "widget-content-priority-008",
@@ -416,9 +444,9 @@
       "question": "Which two-three numbers earn the small-widget slot?",
       "rationale": null,
       "review_ref": null,
-      "status": "deferred",
+      "status": "locked",
       "superseded_by": null,
-      "updated_at": "2026-07-28T16:34:59+00:00",
+      "updated_at": "2026-09-18T00:40:10+00:00",
       "verification_ref": null
     },
     {
@@ -623,8 +651,8 @@
     }
   ],
   "last_activation": {
-    "at": "2026-07-28T16:10:40+00:00",
-    "mechanism": "explicit"
+    "at": "2026-09-17T23:40:27+00:00",
+    "mechanism": "$grilltrack"
   },
   "recommendation": {
     "alternatives": [
@@ -639,5 +667,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-08-17T02:21:08+00:00"
+  "updated_at": "2026-09-18T00:43:43+00:00"
 }

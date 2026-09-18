@@ -17,8 +17,13 @@ import co.saari.repoglance.data.GitHubApiResult
 import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
+import co.saari.repoglance.data.LiveRepositoryMetadata
+import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.data.sessionInvalidationFailure
+import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.state.LiveSnapshotStore
+import co.saari.repoglance.widget.WidgetRefresh
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.cancellation.CancellationException
@@ -168,6 +173,9 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             val content = withContext(Dispatchers.IO) {
                 apiClient.loadRepositoryContent(repository, catalog.viewer.login)
             }
+            val metadata = withContext(Dispatchers.IO) {
+                apiClient.loadRepositoryMetadata(repository)
+            }
             if (
                 requestGeneration != repositoryContentGeneration.get() ||
                 selectedRepository.value?.id != repository.id
@@ -186,8 +194,36 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
             } else {
                 repositoryContent.value = ContentUiState.Ready(content)
+                persistLiveSnapshot(repository, content, metadata)
             }
         }
+    }
+
+    /**
+     * Publishes the compact widget's counts. Runs only after a successful
+     * content load, so a failed refresh leaves the previous stored snapshot
+     * alone to age honestly rather than overwriting it with nothing.
+     */
+    private suspend fun persistLiveSnapshot(
+        repository: LiveRepository,
+        content: LiveRepositoryContent,
+        metadata: GitHubApiResult<LiveRepositoryMetadata>,
+    ) {
+        val context = getApplication<Application>()
+        val metadataSuccess = metadata as? GitHubApiResult.Success
+        val prSuccess = content.pullRequests as? GitHubApiResult.Success
+        val snapshot = LiveSnapshotFactory.build(
+            repository = repository,
+            metadata = metadataSuccess?.value,
+            issues = (content.issues as? GitHubApiResult.Success)?.value,
+            pullRequests = prSuccess?.value,
+            previous = LiveSnapshotStore.load(context, repository.ref),
+            // When the data was observed, not when it was written to disk.
+            observedAt = metadataSuccess?.observedAt ?: prSuccess?.observedAt ?: Instant.now(),
+            rateLimit = metadataSuccess?.rateLimit?.bucket ?: RateLimitBucket.UNKNOWN,
+        )
+        withContext(Dispatchers.IO) { LiveSnapshotStore.save(context, snapshot) }
+        WidgetRefresh.updateAll(context)
     }
 
     fun backToRepositories() {
