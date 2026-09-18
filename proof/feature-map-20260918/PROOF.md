@@ -192,3 +192,15 @@ Images are held locally with the hashes above, not committed. No sign-in,
 token, account, GitHub write, or Play action occurred; the only third-party
 app touched was the GitHub app, stopped on the registered test phone to break
 a remembered split pair.
+
+## Review repair (2026-09-18)
+
+ClawSweeper on `ae5834f`: platinum hermit (4/6), proof diamond lobster
+(5/6), one `required_fix` at P3, accepted: `check_feature_map.py` only
+checked that `Preconditions:` appeared somewhere in a driving section, while
+the feature contract requires it first. The validator now requires
+`Preconditions:` to be the first non-blank line of that section; a probe
+with prose before it fails (`first non-blank line is 'Some prose before the
+preconditions.'`) and the five feature files pass. OpenClaw on `ae5834f`:
+scoped-clean, 0 findings (after a first queue attempt that I had given a
+mangled base SHA; re-queued with the real `main` head).

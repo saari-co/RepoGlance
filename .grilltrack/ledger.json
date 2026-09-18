@@ -1075,21 +1075,47 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-18T12:32:47+00:00",
+          "choice": "Project-local verification skill in pstack shape at .claude/skills/verify-repoglance/ (with a .cursor/skills/verify-repoglance symlink and an AGENTS.md pointer): SKILL.md with Launch, Doctor, Drive, Evidence, Cleanup, Helpers; features/README.md (baseline preconditions, driving conventions, proof and skip reporting, feature entry contract); one user-POV file per feature with exactly four H2s (Sub-features; How to get to it (user POV); Driving it with verify-repoglance; Gotchas). Top five features this cycle: compact widget truth states, navigator, owner filter and repo search, sign-in (human-gated), refresh and freshness. Harness = bin/verify-repoglance helpers over adb, uiautomator dump, Pixel Use, and phone_proof capture, plus a debug-only ScenarioLaunchActivity so every FixtureScenario and screen is reachable from adb. scripts/check_feature_map.py in the Gradle check task validates structure only (index vs files, the four H2s, helpers exist and are executable). Upkeep is the pstack maintain-verification-skill loop as the gardener grill. Grill C's remaining scope shrinks to tiers, receipts, and the emulator lane.",
+          "from": "verified",
+          "implementation_ref": "git:6f1f1db6ad376e6ed0c464a2e08e254d04f42b17",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/feature-map-20260918/PROOF.md: check assembleDebug green with checkFeatureMap; validator 4 red probes; Fold: 7/7 scenarios via launcher, navigator recipe driven end to end 0 failures (inner-display GitHub hand-off, Last-good chip, home return), cover-display step maintainer-gated"
         }
       ],
       "id": "feature-map-015",
       "implementation_ref": "git:6f1f1db6ad376e6ed0c464a2e08e254d04f42b17",
       "question": "How do agents navigate RepoGlance and prove a surface's state without a human driving the phone?",
       "rationale": "Bobby 2026-09-18 after reading cursor/plugins pstack: adopt pstack shape; .claude/skills canonical with .cursor symlink; top five features; structural CI check plus maintenance loop.",
-      "repair_required": false,
-      "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
-      "status": "verified",
+      "repair_required": true,
+      "review_classifications": [
+        "required_fix"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper platinum hermit / diamond lobster, P3 validator gap; openclaw req-20260918T122651Z-365305416421 clean",
+          "result": "findings",
+          "reviewed_at": "2026-09-18T12:32:47+00:00",
+          "source_identity": "git:ae5834f56478537e0922b7e5e205e07dd6637b72"
+        }
+      ],
+      "review_ref": "https://github.com/saari-co/RepoGlance/pull/14 clawsweeper platinum hermit / diamond lobster, P3 validator gap; openclaw req-20260918T122651Z-365305416421 clean",
+      "review_result": "findings",
+      "review_source_identity": "git:ae5834f56478537e0922b7e5e205e07dd6637b72",
+      "status": "needs_reverification",
       "superseded_by": null,
-      "updated_at": "2026-09-18T12:24:15+00:00",
+      "updated_at": "2026-09-18T12:32:47+00:00",
       "verification_ref": "proof/feature-map-20260918/PROOF.md: check assembleDebug green with checkFeatureMap; validator 4 red probes; Fold: 7/7 scenarios via launcher, navigator recipe driven end to end 0 failures (inner-display GitHub hand-off, Last-good chip, home return), cover-display step maintainer-gated"
     }
   ],
@@ -1110,5 +1136,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T12:24:15+00:00"
+  "updated_at": "2026-09-18T12:32:47+00:00"
 }

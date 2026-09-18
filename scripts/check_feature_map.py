@@ -78,8 +78,13 @@ def main() -> int:
                 f"features/{name}: H2s must be exactly {FEATURE_H2S}, found {found}"
             )
         drive = re.search(r"^## Driving it with verify-repoglance\n(.*?)(?=^## |\Z)", text, re.M | re.S)
-        if drive and "Preconditions:" not in drive.group(1):
-            failures.append(f"features/{name}: driving section must start with 'Preconditions:'")
+        if drive:
+            first_line = next((line for line in drive.group(1).splitlines() if line.strip()), "")
+            if first_line.strip() != "Preconditions:":
+                failures.append(
+                    f"features/{name}: driving section must start with 'Preconditions:' "
+                    f"(first non-blank line is {first_line.strip()!r})"
+                )
 
     link = ROOT / ".cursor" / "skills" / "verify-repoglance"
     if not link.is_symlink():
