@@ -6,6 +6,7 @@ A RepoGlance tile in the swipe-down Quick Settings shade opens the live catalog 
 
 - `tile-label` shows `RepoGlance` with the commit-eye mark.
 - `tile-subtitle` reads `owner/name · <push age>` from the last catalog load; `owner/name · open to refresh` when that load is over a day old; `Open to connect` (inactive tile) with no session.
+- `tile-locked` shows `Unlock to see the latest push` instead of any repository name while the phone is locked.
 - `tile-tap` collapses the shade and opens the live catalog; on a locked phone it asks to unlock first.
 
 ## How to get to it (user POV)
@@ -24,6 +25,7 @@ Preconditions:
 - **Populate the subtitle.** Run `bin/verify-repoglance launch MIXED live` so a catalog load writes the latest-push record; then `adb shell am force-stop co.saari.repoglance`.
 - **Open the shade.** Run `adb shell cmd statusbar expand-settings`, then `dump shade`. The dump contains a node whose `content-desc` starts with `RepoGlance, latest push to`. Capture only if the shade shows nothing private; the shade holds other apps' notifications, so treat the image as local evidence and cite its hash only.
 - **Tap.** Run `adb shell cmd statusbar click-tile co.saari.repoglance/.tile.RepoGlanceTileService`, wait, then `dump after-tile-tap`. The top resumed activity is `co.saari.repoglance/.MainActivity`; the dump contains `repoglance:live` and no `RepoGlance, latest push` node (the shade collapsed).
+- **Locked shade (name must not leak).** With the phone on its lock screen (`adb shell input keyevent KEYCODE_SLEEP`, then `KEYCODE_WAKEUP`), run `adb shell cmd statusbar expand-settings` and dump the tree with `adb exec-out uiautomator dump /dev/tty`. The RepoGlance tile node's `content-desc` is `RepoGlance, Unlock to see the latest push` and no `latest push to` text appears. The maintainer unlocks afterwards; the helper's `dump` and `capture` are not used on a locked phone.
 - **Cleanup.** `adb shell cmd statusbar collapse`; `bin/verify-repoglance cleanup`.
 
 ## Gotchas

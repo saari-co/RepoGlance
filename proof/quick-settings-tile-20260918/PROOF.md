@@ -113,3 +113,30 @@ Tile (maintainer approved adding it over adb in the confirmed plan):
   registered serial pinned because a second device was on adb): catalog
   loads with the sort chips, shade dump still carries
   `RepoGlance, latest push to saari-co/swarm-intercom updated 1m ago`.
+
+## Review round 2 (source identity git:bb4663f9c8f2c1e7ca27a36abc8af0fa7abed378, PR #19)
+
+- OpenClaw `req-20260919T003058Z-113321017073`: correct (0.98), 0 findings.
+- ClawSweeper: round-1 findings cleared; one late P1 (security, medium,
+  present since round 1): `onStartListening` rendered the repository name
+  on the shade while the phone was locked, and catalog repositories can be
+  private. Accepted as `required_fix`.
+
+### Repair
+
+- `RepoGlanceTileService` reads `isSecure` when SystemUI starts listening;
+  `TileTexts.of(record, now, locked = true)` renders the subtitle
+  "Unlock to see the latest push" and a content description without any
+  repository name. The tile stays active if a record exists, so the state
+  colour leaks nothing beyond "signed in".
+- `TileTextTest.lockedShadeNeverCarriesTheRepositoryName`. Feature map:
+  `tile-locked` sub-feature and a locked-shade drive step.
+- Device proof (Fold, serial pinned, run
+  `runs/verify-repoglance-runs/tile-locked`): unlocked shade node
+  `RepoGlance, latest push to saari-co/RepoGlance updated 8m ago`; after
+  `KEYCODE_SLEEP` + `KEYCODE_WAKEUP` (`mDreamingLockscreen=true`,
+  `deviceLocked=1`) the shade tree, saved as `locked-shade.xml`, holds
+  `RepoGlance, Unlock to see the latest push` and contains neither
+  "latest push to" nor any repository name. Raw `uiautomator dump` was used
+  because the helper refuses a locked phone by design; no capture was
+  taken. The maintainer unlocks afterwards.

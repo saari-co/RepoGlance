@@ -11,10 +11,14 @@ data class TileText(val subtitle: String, val active: Boolean, val contentDescri
 object TileTexts {
     const val LABEL = "RepoGlance"
     private const val CONNECT = "Open to connect"
+    private const val LOCKED = "Unlock to see the latest push"
     private const val REFRESH = "open to refresh"
     private val STALE_AFTER: Duration = Duration.ofHours(24)
 
-    fun of(record: LatestPushRecord?, now: Instant): TileText {
+    fun of(record: LatestPushRecord?, now: Instant, locked: Boolean = false): TileText {
+        if (locked) {
+            return TileText(LOCKED, active = record != null, contentDescription = "$LABEL, $LOCKED")
+        }
         if (record == null) {
             return TileText(CONNECT, active = false, contentDescription = "$LABEL, $CONNECT")
         }

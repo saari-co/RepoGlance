@@ -35,6 +35,17 @@ class TileTextTest {
     }
 
     @Test
+    fun lockedShadeNeverCarriesTheRepositoryName() {
+        val record = LatestPushRecord("saari-co/private-thing", now.minus(Duration.ofHours(3)), now)
+        val text = TileTexts.of(record, now, locked = true)
+        assertFalse(text.subtitle.contains("private-thing"))
+        assertFalse(text.contentDescription.contains("private-thing"))
+        assertEquals("Unlock to see the latest push", text.subtitle)
+        assertTrue(text.active)
+        assertFalse(TileTexts.of(null, now, locked = true).active)
+    }
+
+    @Test
     fun repositoryNameIsSanitised() {
         val record = LatestPushRecord("evil/‮name", now, now)
         assertFalse(TileTexts.of(record, now).subtitle.contains('‮'))
