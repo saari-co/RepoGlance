@@ -60,8 +60,10 @@ Carried forward (open, not blockers for this map):
   refresh or an in-app open; pinning doesn't trigger a refresh.
 - Deleting a repo widget unpins without redrawing the stack; it catches up
   at the next redraw.
-- StrictMode logs main-thread disk reads from both widgets' `provideContent`
-  (found in 025). A separate session is already working on this.
-- `bin/verify-repoglance doctor` misreads the Fold posture as `C` on this
-  Android build.
+- ~~StrictMode logs main-thread disk reads from both widgets' `provideContent`
+  (found in 025).~~ Struck 2026-09-19: fixed by PR #26 (`2998c7c1`), store
+  reads moved off the main thread; guarded by `WidgetStoreReadsTest`.
+- ~~`bin/verify-repoglance doctor` misreads the Fold posture as `C` on this
+  Android build.~~ Struck 2026-09-19: fixed by PR #25 (`948c1593`); doctor
+  prints `posture=CLOSED` on the Pixel 11 Pro Fold.
 - Live CI is not fetched, so the widgets have no CI column.
