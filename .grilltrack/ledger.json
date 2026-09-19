@@ -2229,7 +2229,7 @@
       "context_ref": ".grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T01:43:33+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#21 merged as 06cd6cf237d84a924ecf5b9edbac75b1cacf35b0",
       "dependencies": [
         "live-pins-021",
         "widget-content-priority-008"
@@ -2617,7 +2617,7 @@
       "review_source_identity": "git:a7d9cea844299eb938a5ec121d4441b11e2cb4d5",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T04:35:42+00:00",
+      "updated_at": "2026-09-19T04:41:45+00:00",
       "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-6"
     }
   ],
@@ -2634,7 +2634,15 @@
     "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof",
     "resumed_at": "2026-09-18T19:14:08+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      ".grilltrack/maps/live-widgets.md",
+      "proof/widget-live-config-20260919/PROOF.md"
+    ],
+    "next_safe_action": "In the new session: check out claude/widget-background-refresh-023 (holds the PR #21 delivery record and this pause), resume the ledger, focus map node 3, discover facts (no WorkManager dependency yet; GitHubApiClient rate-limit handling; pinned set from AppPrefs.livePins), then grill sequentially: trigger and cadence, rate-limit budget and back-off, age label between refreshes",
+    "paused_at": "2026-09-19T04:42:02+00:00",
+    "reason": "Maintainer asked for the next grill (widget-background-refresh-023, live-widgets map node 3) to run in a new session"
+  },
   "recommendation": {
     "alternatives": [
       "stack-widget-live-024: the stack widget over the live pinned set (map node 4)",
@@ -2645,8 +2653,8 @@
     "recorded_at": "2026-09-19T03:06:36+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T04:35:42+00:00"
+  "updated_at": "2026-09-19T04:42:02+00:00"
 }
