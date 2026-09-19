@@ -54,8 +54,15 @@ Carried forward (open, not blockers for this map):
 
 - The compact widget's `last good` label doesn't leave room for the
   repository name at the 120dp floor.
-- LOW/EXHAUSTED rate-limit rows and headers are unit-tested only, not
-  device-run (023, 024).
+- ~~LOW/EXHAUSTED rate-limit rows and headers are unit-tested only, not
+  device-run (023, 024).~~ Struck 2026-09-19: device-proven on the Pixel 11
+  Pro Fold for tall, compact, stack and catalog, with recovery
+  (`rate-limit-device-proof-026`,
+  `proof/rate-limit-device-proof-20260919/PROOF.md`). The LOW skip of pins
+  without a repo widget stays unit-tested only.
+- While rate limited, the one-line tall header renders
+  `rate limited · resets HH:MM P…`, hiding the counts and `as of` time, and
+  the stack header cuts the reset time (found in 026).
 - A newly pinned repository reads `no data` until the next background
   refresh or an in-app open; pinning doesn't trigger a refresh.
 - Deleting a repo widget unpins without redrawing the stack; it catches up
