@@ -32,5 +32,6 @@ Preconditions:
 
 - The stack reads the numbers the background refresh saved. A newly pinned repository reads `no data` until the next refresh (about every 30 minutes) or until it is opened in the app.
 - At a low rate limit only repositories with their own repo widget refresh; other stack rows keep their numbers with an older clock time.
+- After an app update both widgets (repo and stack) redraw from saved data without the app being opened; no GitHub call is made, so the numbers and their time are whatever was last saved.
 - CI is not fetched on the live path, so the stack has no CI column.
 - Glance test tags (`stack-header`, `stack-age`, `stack-counts`) are visible to the JVM Glance tests only; on device assert by visible text.

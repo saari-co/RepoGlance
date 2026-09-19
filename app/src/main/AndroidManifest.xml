@@ -73,6 +73,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stack_widget_info" />
         </receiver>
+
+        <!-- Redraws both widget kinds from saved data after this app is
+             updated; the system sends MY_PACKAGE_REPLACED only to this
+             package. No network, no service. -->
+        <receiver
+            android:name=".widget.AppUpdateReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
