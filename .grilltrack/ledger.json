@@ -2728,7 +2728,10 @@
       "question": "How is the pinned live set refreshed in the background: trigger and cadence, rate-limit budget and back-off, and what the widget shows between and during refreshes?",
       "rationale": "Q1 maintainer picked the recommended 30-minute periodic (about 72 calls/h at 12 pins). Q2 after a plain-language restatement of run and budget, picked widget repos only at LOW. Q3 after the interactive age-label picker (artifact Q2GNAJzeimKDHxrmkqi2PZ) picked A: a frozen relative age understates the age between runs, and a refreshing state can stick if the job is killed.",
       "repair_required": false,
-      "review_classifications": [],
+      "review_classifications": [
+        "human_gate",
+        "defer"
+      ],
       "review_history": [
         {
           "classifications": [
@@ -2738,14 +2741,24 @@
           "result": "findings",
           "reviewed_at": "2026-09-19T06:10:07+00:00",
           "source_identity": "git:728d09641883e9211aa2f4741bed54ec073b989d"
+        },
+        {
+          "classifications": [
+            "human_gate",
+            "defer"
+          ],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 2, gold shrimp 3/6); openclaw req-20260919T061403Z-19305683503",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T06:19:48+00:00",
+          "source_identity": "git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 2, gold shrimp 3/6); openclaw req-20260919T061403Z-19305683503",
+      "review_result": "findings",
+      "review_source_identity": "git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T06:13:30+00:00",
+      "updated_at": "2026-09-19T06:19:48+00:00",
       "verification_ref": "test:GitHubSessionTest,LiveRowsStoreTest,LatestPushRecordTest; gradlew check green"
     }
   ],
@@ -2777,5 +2790,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T06:13:30+00:00"
+  "updated_at": "2026-09-19T06:19:48+00:00"
 }

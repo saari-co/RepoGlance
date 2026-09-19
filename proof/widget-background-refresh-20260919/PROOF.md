@@ -154,3 +154,50 @@ awake, unlocked). The maintainer's ISSUES widget (id 18,
 - The final-effect proof ClawSweeper asked for (disconnect while a worker is
   in flight on the phone) needs a sign-out, which is the maintainer's gated
   action; the race is covered by the concurrent unit test instead.
+
+## Review round 2 (source identity git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b, PR #22)
+
+- OpenClaw `req-20260919T061403Z-19305683503`: correct (0.96), 0 findings.
+- ClawSweeper: gold shrimp 3/6. Round-1 race confirmed repaired in source.
+  One medium finding, classified `human_gate`: no device proof that an
+  in-flight refresh is refused when a sign-out lands before its save
+  (`LiveRefresh.kt:42`). Also listed: the natural periodic run had no widget
+  dump (`defer` until the phone was free), and LOW/EXHAUSTED are unit-tested
+  only (`defer`, unchanged gap).
+
+### Repair and proof (maintainer chose a debug-only probe plus his sign-out)
+
+- `hooks/RefreshProbe` exists in both flavours: the release flavour is a
+  no-op; the debug flavour, armed once through `ScenarioLaunchActivity`
+  (`--el probeCommitDelaySeconds N`), holds the next `LiveRefresh.persist`
+  after its network work and before `commitIfCurrent`, and records only its
+  own `armed`/`holding`/`released` timestamps.
+- Natural periodic run with a widget dump (phone free again, nobody opened
+  the app): the job history shows periodic `#u0a383/54` START at 02:31:28 and
+  STOP at 02:31:30 (`job-history.txt`); stored `observedAt
+  2026-09-19T06:31:30Z`; the home tree reads `ISSUES 2 · as of 2:31 AM`,
+  unchanged at 02:37. Capture home-widget-periodic
+  `1b65cb07f74b319a96eb445a74720a8daa43633950910b7e203715b2281f9446`
+  (maintainer's home screen; local only).
+- Picker (`launch MIXED picker`, debug build with the probe, doctor hashes
+  equal `1833aa00…`): exact `17:00`, last-good `last good Mon 19:00`,
+  no-data `no data`/`—`, persisted `02:31`. Capture compact-states
+  `bb3929ee867cd72db1ca87f33c4bdb4598e8160eb10e46527a27cfcd890109f0`.
+  Fit gap: at the 120dp floor `last good Mon 19:00` squeezes the repository
+  name to `…` (the feature map already allows `Repo…` there; a bare ellipsis
+  is worse, raised with the maintainer rather than changed).
+- In-flight sign-out (run `runs/verify-repoglance-runs/signout-proof`):
+  probe armed 06:39:34Z (300 s); `Save widget` on widget 18 at 02:39:55; the
+  worker fetched and held at 06:39:55Z with the store still at 06:39:18Z
+  from the preceding refresh. The maintainer tapped Disconnect GitHub; the
+  WorkManager log records the work `was cancelled` at 02:42:31 (the clear's
+  `BackgroundRefresh.cancel`), but the held thread kept running because
+  cancellation is cooperative. The probe released at 06:44:55Z; at 02:45:13
+  `repoglance_live_snapshots`, `repoglance_live_rows`,
+  `repoglance_rate_limit`, `repo_widget_configs` and
+  `repoglance_catalog_names` were all `<map />`: the save was refused by the
+  session generation. The home tree reads `FIXTURE PREVIEW` / `Choose a
+  repository`. Capture widget-after-signout
+  `e5ff5ba7ae061cb04a0a05bbf32cfc6320b2c2c25d5dd4b7cf0658bf977a58f0`.
+  The maintainer then signed in again himself; the device-code screen was
+  never dumped or captured.

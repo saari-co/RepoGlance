@@ -9,6 +9,7 @@ import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
+import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
@@ -24,6 +25,7 @@ import co.saari.repoglance.widget.EXTRA_REPO_FULL
 // screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | checking (the production Checking screen held open)
+// probeCommitDelaySeconds (long, optional): arms hooks.RefreshProbe once.
 @SuppressLint("CustomSplashScreen")
 class ScenarioLaunchActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,9 @@ class ScenarioLaunchActivity : Activity() {
             if (scenario != null) {
                 AppPrefs.setSelectedScenario(this, scenario)
             }
+        }
+        intent.getLongExtra(EXTRA_PROBE_COMMIT_DELAY, 0L).takeIf { it > 0L }?.let { seconds ->
+            RefreshProbe.arm(this, seconds)
         }
         val next = nextIntent(intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE)
         next.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -67,6 +72,7 @@ class ScenarioLaunchActivity : Activity() {
     private companion object {
         const val EXTRA_SCENARIO = "scenario"
         const val EXTRA_SCREEN = "screen"
+        const val EXTRA_PROBE_COMMIT_DELAY = "probeCommitDelaySeconds"
         const val EXTRA_REPO = "repo"
         const val EXTRA_MODE = "mode"
         const val SCREEN_LIVE = "live"

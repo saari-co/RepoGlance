@@ -1,6 +1,7 @@
 package co.saari.repoglance.data
 
 import android.content.Context
+import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
@@ -39,6 +40,7 @@ object LiveRefresh {
         )
         val rows = LiveRowsStore.replacementRows(issues?.rows, prSuccess?.value?.rows)
         val rateLimit = latestRateLimit(listOfNotNull(content.issues, content.pullRequests, metadataResult))
+        RefreshProbe.beforeCommit(context)
         return services.session.commitIfCurrent(sessionGeneration) {
             LiveSnapshotStore.save(context, snapshot)
             rows?.let { LiveRowsStore.save(context, repository.ref, it) }
