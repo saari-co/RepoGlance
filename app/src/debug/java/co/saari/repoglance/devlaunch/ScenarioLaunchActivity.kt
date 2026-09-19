@@ -1,9 +1,10 @@
 package co.saari.repoglance.devlaunch
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
@@ -13,6 +14,9 @@ import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // Debug-only entry point for the verify-repoglance skill: one adb command
 // puts the app into a named fixture scenario and opens a named screen, so an
@@ -26,23 +30,28 @@ import co.saari.repoglance.widget.EXTRA_REPO_FULL
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | checking (the production Checking screen held open)
 // probeCommitDelaySeconds (long, optional): arms hooks.RefreshProbe once.
+//
+// The preference writes run on Dispatchers.IO before the next screen starts,
+// so a cold launch logs no StrictMode disk read from this launcher and the
+// next screen still sees the scenario (the loaded SharedPreferences instance
+// is process-wide and apply() updates it in memory at once).
 @SuppressLint("CustomSplashScreen")
-class ScenarioLaunchActivity : Activity() {
+class ScenarioLaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        intent.getStringExtra(EXTRA_SCENARIO)?.let { name ->
-            val scenario = runCatching { FixtureScenario.valueOf(name) }.getOrNull()
-            if (scenario != null) {
-                AppPrefs.setSelectedScenario(this, scenario)
-            }
-        }
-        intent.getLongExtra(EXTRA_PROBE_COMMIT_DELAY, 0L).takeIf { it > 0L }?.let { seconds ->
-            RefreshProbe.arm(this, seconds)
-        }
+        val scenario = intent.getStringExtra(EXTRA_SCENARIO)
+            ?.let { name -> runCatching { FixtureScenario.valueOf(name) }.getOrNull() }
+        val probeSeconds = intent.getLongExtra(EXTRA_PROBE_COMMIT_DELAY, 0L).takeIf { it > 0L }
         val next = nextIntent(intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE)
         next.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(next)
-        finish()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                scenario?.let { AppPrefs.setSelectedScenario(applicationContext, it) }
+                probeSeconds?.let { RefreshProbe.arm(applicationContext, it) }
+            }
+            startActivity(next)
+            finish()
+        }
     }
 
     private fun nextIntent(screen: String): Intent = when (screen) {
