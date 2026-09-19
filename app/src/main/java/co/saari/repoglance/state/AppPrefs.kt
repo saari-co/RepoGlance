@@ -7,12 +7,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import co.saari.repoglance.data.CatalogSort
 import co.saari.repoglance.fixtures.FixtureScenario
 
 object AppPrefs {
     private const val PREFS_NAME = "repoglance"
     private const val KEY_SCENARIO = "selected_scenario"
     private const val KEY_PINNED = "pinned_repos"
+    private const val KEY_CATALOG_SORT = "catalog_sort"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -34,6 +36,19 @@ object AppPrefs {
         val next = if (repoFull in current) current - repoFull else current + repoFull
         prefs(context).edit().putStringSet(KEY_PINNED, next).apply()
     }
+
+    fun catalogSort(context: Context): CatalogSort {
+        val stored = prefs(context).getString(KEY_CATALOG_SORT, null) ?: return CatalogSort.RECENT
+        return runCatching { CatalogSort.valueOf(stored) }.getOrDefault(CatalogSort.RECENT)
+    }
+
+    fun setCatalogSort(context: Context, sort: CatalogSort) {
+        prefs(context).edit().putString(KEY_CATALOG_SORT, sort.name).apply()
+    }
+
+    @Composable
+    fun rememberCatalogSort(context: Context): State<CatalogSort> =
+        rememberPrefsState(context, KEY_CATALOG_SORT) { catalogSort(context) }
 
     @Composable
     fun rememberScenario(context: Context): State<FixtureScenario> =

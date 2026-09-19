@@ -36,6 +36,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +66,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.ContentUiState
 import co.saari.repoglance.LiveUiState
+import co.saari.repoglance.data.CatalogSort
 import co.saari.repoglance.data.GitHubApiResult
 import co.saari.repoglance.data.LiveIssue
 import co.saari.repoglance.data.LivePullRequest
@@ -72,11 +74,13 @@ import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.RateLimitSnapshot
+import co.saari.repoglance.data.orderRepositories
 import co.saari.repoglance.link.GitHubAppLauncher
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
+import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.ui.brand.CheckingMark
 import java.time.Duration
 import java.time.Instant
@@ -320,6 +324,8 @@ private fun FailureScreen(
 internal const val REPO_SEARCH_TEST_TAG = "repoglance:repo-search"
 
 internal const val OWNER_FILTER_TEST_TAG = "repoglance:owner-filter"
+internal const val CATALOG_SORT_RECENT_TEST_TAG = "repoglance:catalog-sort-recent"
+internal const val CATALOG_SORT_ALPHA_TEST_TAG = "repoglance:catalog-sort-alpha"
 
 @Composable
 private fun LiveRepositoryHome(
@@ -338,8 +344,10 @@ private fun LiveRepositoryHome(
     var accountMenuExpanded by remember { mutableStateOf(false) }
     var ownerMenuExpanded by remember { mutableStateOf(false) }
     val ownerOptions = remember(catalog.repositories) { availableRepositoryOwners(catalog.repositories) }
-    val matchingRepositories = remember(catalog.repositories, selectedOwner, query) {
-        visibleRepositories(catalog.repositories, selectedOwner, query)
+    val context = LocalContext.current
+    val sort by AppPrefs.rememberCatalogSort(context)
+    val matchingRepositories = remember(catalog.repositories, selectedOwner, query, sort) {
+        visibleRepositories(catalog.repositories, selectedOwner, query, sort)
     }
     val now = rememberFreshnessNow()
 
@@ -491,6 +499,8 @@ private fun LiveRepositoryHome(
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth().testTag(REPO_SEARCH_TEST_TAG),
                             )
+                            Spacer(Modifier.height(8.dp))
+                            CatalogSortToggle(sort) { AppPrefs.setCatalogSort(context, it) }
                         }
                     }
                 }
@@ -569,9 +579,35 @@ internal fun visibleRepositories(
     repositories: List<LiveRepository>,
     selectedOwner: String?,
     query: String,
-): List<LiveRepository> = repositories
+    sort: CatalogSort = CatalogSort.RECENT,
+): List<LiveRepository> = orderRepositories(repositories, sort)
     .filter { selectedOwner == null || it.ref.owner.equals(selectedOwner, ignoreCase = true) }
     .filter { it.ref.full.contains(query.trim(), ignoreCase = true) }
+
+@Composable
+private fun CatalogSortToggle(sort: CatalogSort, onSortChange: (CatalogSort) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            "Sort",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.width(8.dp))
+        FilterChip(
+            selected = sort == CatalogSort.RECENT,
+            onClick = { onSortChange(CatalogSort.RECENT) },
+            label = { Text("Recent push") },
+            modifier = Modifier.testTag(CATALOG_SORT_RECENT_TEST_TAG),
+        )
+        Spacer(Modifier.width(6.dp))
+        FilterChip(
+            selected = sort == CatalogSort.ALPHABETICAL,
+            onClick = { onSortChange(CatalogSort.ALPHABETICAL) },
+            label = { Text("A to Z") },
+            modifier = Modifier.testTag(CATALOG_SORT_ALPHA_TEST_TAG),
+        )
+    }
+}
 
 internal fun retainedRepositoryOwner(
     selectedOwner: String?,

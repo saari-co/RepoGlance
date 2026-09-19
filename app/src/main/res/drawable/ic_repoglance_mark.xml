@@ -3,8 +3,7 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="?android:attr/colorForeground">
+    android:viewportHeight="24">
     <path
         android:pathData="M10.1,10.1 m-6.7,0 a6.7,6.7 0 1,1 13.4,0 a6.7,6.7 0 1,1 -13.4,0"
         android:strokeColor="#FF000000"

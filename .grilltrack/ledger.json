@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-18T22:39:00+00:00",
-    "domain": "Checking splash: RepoGlance mark (magnifying glass, status-bar legible) and the motion shown while the session is unknown",
-    "started_at": "2026-09-18T22:24:04+00:00",
-    "status": "inspected",
-    "summary": "checking-splash-018: Checking renders the A+B commit-eye mark (single monochrome vector, also the future status-bar asset) with motion D ping rings, static under reduced motion; message stays, no spinner, no counts, no sign-in control; no notification or Quick Settings tile this cycle; sign-in feature map updated; device proof on the Fold."
+    "confirmed_at": "2026-09-19T00:07:03+00:00",
+    "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
+    "started_at": "2026-09-18T23:17:10+00:00",
+    "status": "confirmed",
+    "summary": "catalog-sort-020: recency default (pushed_at desc, unknown last, labelled) with a remembered alphabetical toggle. quick-settings-tile-019: TileService launcher into the catalog, label RepoGlance, commit-eye icon, subtitle from a persisted latest-push record with push age, 'open to refresh' past 24h, 'Open to connect' inactive when no record; cleared on sign-out; no network, no polling. Proof: JVM tests, gradlew check, Fold verifier for sort and tile."
   },
   "decisions": [
     {
@@ -1720,7 +1720,7 @@
       "context_ref": null,
       "created_at": "2026-09-18T16:33:20+00:00",
       "deferred_reason": "No logo asset exists; a logo plus animation is a visual grill of its own (five candidates) and out of the bounded behaviour slice. Risk: Checking stays plain text until a logo exists; the unknown window is tens of ms so no truth-rule exposure",
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#18 merged as c7a504d8e136269fede1178866618e05aad6a536",
       "dependencies": [
         "session-bootstrap-016"
       ],
@@ -1821,8 +1821,326 @@
       "review_source_identity": "git:5f793f75acd4b86d97ae214667872b41384bf4a7",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-18T23:12:51+00:00",
+      "updated_at": "2026-09-18T23:17:10+00:00",
       "verification_ref": "proof/checking-splash-20260918/PROOF.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+      "context_ref": null,
+      "created_at": "2026-09-18T23:17:10+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "checking-splash-018",
+        "pin-model-010"
+      ],
+      "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
+      "history": [
+        {
+          "at": "2026-09-18T23:58:21+00:00",
+          "choice": "proposed: tap opens the app on the live catalog (read-only; collapses the shade); label RepoGlance; icon ic_repoglance_mark",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T00:15:36+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T00:15:36+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt,file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt,file:app/src/main/AndroidManifest.xml#RepoGlanceTileService",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T00:30:27+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt,file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt,file:app/src/main/AndroidManifest.xml#RepoGlanceTileService",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T00:30:27+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt,file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt,file:app/src/main/AndroidManifest.xml#RepoGlanceTileService",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T002048Z-110778117861 correct 0.98; clawsweeper gold shrimp 3/6, two findings on stale LatestPushStore, both accepted (PR #19 comment 5737818227)",
+          "review_result": "findings",
+          "review_source_identity": "git:a3d9b3cb408f6a4ab8a5679edbf1013535474509",
+          "to": "implemented",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T00:30:27+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt#replace,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T00:39:36+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt#replace,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#repair"
+        },
+        {
+          "at": "2026-09-19T00:39:36+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LatestPushStore.kt#replace,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T003058Z-113321017073 correct 0.98; clawsweeper late P1: repository name shown on the locked shade (PR #19 comment 5737818227), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:bb4663f9c8f2c1e7ca27a36abc8af0fa7abed378",
+          "to": "implemented",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#repair"
+        },
+        {
+          "at": "2026-09-19T00:39:36+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt#isSecure,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt#locked",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#repair"
+        },
+        {
+          "at": "2026-09-19T00:47:57+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt#isSecure,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt#locked",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#review-round-2"
+        },
+        {
+          "at": "2026-09-19T00:47:57+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt#isSecure,file:app/src/main/java/co/saari/repoglance/tile/TileText.kt#locked",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T004005Z-115855818912 correct 0.99; clawsweeper P2: isSecure misses a non-secure keyguard (PR #19 comment 5737818227), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:7fba904ac45648c35170421d76127965f27e14ab",
+          "to": "implemented",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#review-round-2"
+        },
+        {
+          "at": "2026-09-19T00:47:57+00:00",
+          "choice": "Tap opens the app on the live catalog (recency-sorted per catalog-sort-020), collapsing the shade via startActivityAndCollapse(PendingIntent). Label RepoGlance, icon ic_repoglance_mark, state ACTIVE while signed in. Subtitle names the most recently pushed repository from a small persisted record written on each successful catalog load ({repo, pushedAt, observedAt}) and cleared on sign-out: 'owner/name \u00b7 <push age>'; when the record was observed over 24h ago the subtitle reads 'owner/name \u00b7 open to refresh'; with no record (signed out or never loaded) the subtitle is 'Open to connect' and the tile is INACTIVE. No network from the tile, no polling.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt#isLocked",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#review-round-2"
+        }
+      ],
+      "id": "quick-settings-tile-019",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt#isLocked",
+      "question": "What does the RepoGlance Quick Settings tile do when tapped: open the app, open the navigator for a chosen scope, or open one pinned repository",
+      "rationale": "Maintainer 2026-09-18 after mockups: option 3, the tile names the latest-pushed repository; ties to the recency sort. Truth rules: data age carried in the subtitle, Unknown never shown as zero, read-only.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T002048Z-110778117861 correct 0.98; clawsweeper gold shrimp 3/6, two findings on stale LatestPushStore, both accepted (PR #19 comment 5737818227)",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T00:30:27+00:00",
+          "source_identity": "git:a3d9b3cb408f6a4ab8a5679edbf1013535474509"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T003058Z-113321017073 correct 0.98; clawsweeper late P1: repository name shown on the locked shade (PR #19 comment 5737818227), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T00:39:36+00:00",
+          "source_identity": "git:bb4663f9c8f2c1e7ca27a36abc8af0fa7abed378"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T004005Z-115855818912 correct 0.99; clawsweeper P2: isSecure misses a non-secure keyguard (PR #19 comment 5737818227), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T00:47:57+00:00",
+          "source_identity": "git:7fba904ac45648c35170421d76127965f27e14ab"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260919T004826Z-118511520594 correct 0.98, 0 findings; clawsweeper platinum hermit 4/6, no findings (PR #19 comment 5737818227)",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T00:54:51+00:00",
+          "source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47"
+        }
+      ],
+      "review_ref": "openclaw req-20260919T004826Z-118511520594 correct 0.98, 0 findings; clawsweeper platinum hermit 4/6, no findings (PR #19 comment 5737818227)",
+      "review_result": "clean",
+      "review_source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T00:54:51+00:00",
+      "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#review-round-3"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Recency is the canonical default: most recently pushed first (GitHub pushed_at covers commits on any branch including PR branches); repositories with an unknown push time sort last and keep their 'Push time unknown' label. An alphabetical option is offered as a visible sort toggle in the catalog and remembered between launches. Find a repository stays as is.",
+      "context_ref": null,
+      "created_at": "2026-09-18T23:24:41+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "access-model-004"
+      ],
+      "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
+      "history": [
+        {
+          "at": "2026-09-18T23:58:21+00:00",
+          "choice": "Recency is the canonical default: most recently pushed first (GitHub pushed_at covers commits on any branch including PR branches); repositories with an unknown push time sort last and keep their 'Push time unknown' label. An alphabetical option is offered as a visible sort toggle in the catalog and remembered between launches. Find a repository stays as is.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T00:15:36+00:00",
+          "choice": "Recency is the canonical default: most recently pushed first (GitHub pushed_at covers commits on any branch including PR branches); repositories with an unknown push time sort last and keep their 'Push time unknown' label. An alphabetical option is offered as a visible sort toggle in the catalog and remembered between launches. Find a repository stays as is.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T00:15:36+00:00",
+          "choice": "Recency is the canonical default: most recently pushed first (GitHub pushed_at covers commits on any branch including PR branches); repositories with an unknown push time sort last and keep their 'Push time unknown' label. An alphabetical option is offered as a visible sort toggle in the catalog and remembered between launches. Find a repository stays as is.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/data/CatalogSort.kt,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#CatalogSortToggle",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "catalog-sort-020",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/data/CatalogSort.kt,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#CatalogSortToggle",
+      "question": "How is the live repository catalog ordered",
+      "rationale": "Maintainer 2026-09-18: recency should be the canonical default everywhere the catalog opens; alphabetical remains useful for finding a specific repository quickly",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": "reviewed with quick-settings-tile-019 on PR #19: openclaw clean, clawsweeper platinum hermit, no findings on the sort",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T00:54:51+00:00",
+          "source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47"
+        }
+      ],
+      "review_ref": "reviewed with quick-settings-tile-019 on PR #19: openclaw clean, clawsweeper platinum hermit, no findings on the sort",
+      "review_result": "clean",
+      "review_source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T00:54:51+00:00",
+      "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
     }
   ],
   "last_activation": {
@@ -1852,5 +2170,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-18T23:12:51+00:00"
+  "updated_at": "2026-09-19T00:54:51+00:00"
 }
