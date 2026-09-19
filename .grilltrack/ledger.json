@@ -3,12 +3,11 @@
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
     "cadence": "sequential",
-    "confirmed": true,
-    "confirmed_at": "2026-09-19T01:19:22+00:00",
-    "domain": "Live pins: pinning repositories on the live catalog as the widget and background-refresh set (frontier node 1 of the live-widgets map)",
-    "started_at": "2026-09-19T00:59:32+00:00",
-    "status": "inspected",
-    "summary": "live-pins-021: thumbtack toggle per live catalog row; pinned group first ordered by recency, rest by the active sort; live pins persisted under their own AppPrefs key; cleared on every session-clear path via the shared helper; widget config untouched (map node 2). Proof: JVM tests, gradlew check, Fold pin/unpin with guarded capture."
+    "confirmed": false,
+    "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
+    "started_at": "2026-09-19T01:43:33+00:00",
+    "status": "grilling",
+    "summary": "Sequential: configuration source first, then the empty/no-data story, then the tall size"
   },
   "decisions": [
     {
@@ -2149,7 +2148,7 @@
       "context_ref": ".grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T00:59:32+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#20 merged as 5b73ac7a478c73f1bcdaf90491ca128367196a73",
       "dependencies": [
         "pin-model-010",
         "catalog-sort-020"
@@ -2219,8 +2218,37 @@
       "review_source_identity": "git:93f53cd9a7c980579e9401774e5329142dab24fe",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T01:36:36+00:00",
+      "updated_at": "2026-09-19T01:43:13+00:00",
       "verification_ref": "proof/live-pins-20260919/PROOF.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "proposed: the configuration list is the pinned live set; compact shows the live snapshot or 'no data'",
+      "context_ref": ".grilltrack/maps/live-widgets.md",
+      "created_at": "2026-09-19T01:43:33+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "live-pins-021",
+        "widget-content-priority-008"
+      ],
+      "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
+      "history": [],
+      "id": "widget-live-config-022",
+      "implementation_ref": null,
+      "question": "Which repositories can a home-screen widget be configured with, and what does it show before live data exists",
+      "rationale": "RepoWidgetConfigActivity lists fixture repositories only; the compact widget already reads LiveSnapshotStore for its configured repo but that store is written only when the repo is opened in the app; the tall size renders fixture rows",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "proposed",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T01:43:33+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -2250,5 +2278,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T01:36:36+00:00"
+  "updated_at": "2026-09-19T01:43:33+00:00"
 }
