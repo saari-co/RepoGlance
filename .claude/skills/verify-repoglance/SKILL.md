@@ -44,10 +44,14 @@ Teardown is `bin/verify-repoglance cleanup`.
 bin/verify-repoglance doctor
 ```
 
-Read-only. Pins one transport (USB preferred over a wireless-debugging
-entry for the same phone; `VERIFY_SERIAL` overrides) and passes only when
+Read-only. Pins one transport of the registered phone `66261FDDJ002J5`,
+matched by `ro.serialno` so a wireless `ip:port` entry counts (USB
+preferred over a wireless-debugging entry for the same phone), and fails
+when only other devices are attached. `VERIFY_SERIAL` is the explicit
+override and skips that check. It passes only when
 the installed APK's SHA-256 equals the local debug build's, the debug
-scenario launcher is present in the installed package, and the phone is
+scenario launcher resolves (`cmd package resolve-activity --components`),
+and the phone is
 awake and unlocked. It also prints the Fold posture (`CLOSED`,
 `HALF_OPENED`, `OPENED`) and the run directory every later helper writes
 into. Run it first, again after any failed drive, and never drive a device
@@ -59,7 +63,8 @@ The registered phone may be attached over USB or wireless debugging. When
 `adb devices` is empty, `adb mdns services` lists the phone as
 `adb-<serial>-…  _adb-tls-connect._tcp  <ip>:<port>` once it is paired;
 `adb connect <ip>:<port>` brings it back, and `doctor` then passes. A serial
-that is not the registered one is not a target.
+that is not the registered one is not a target; `doctor` refuses it unless
+`VERIFY_SERIAL` names it on purpose.
 
 ## Drive
 

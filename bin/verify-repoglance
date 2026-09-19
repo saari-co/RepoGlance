@@ -21,18 +21,42 @@ mkdir -p "$OUT"
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1" >&2; exit 2; }; }
 serial() { adb devices | awk 'NR>1 && $2=="device"{print $1}'; }
 
-# Pin one transport. The same phone can appear twice (USB serial and a
-# wireless-debugging ip:port); prefer USB, else the single wireless entry.
-# VERIFY_SERIAL overrides. Every adb call below inherits ANDROID_SERIAL.
+# The one registered swarm test phone (Pixel 11 Pro Fold). Any other attached
+# device is not a target.
+REGISTERED_SERIAL="66261FDDJ002J5"
+
+# Pin one transport of the registered phone. It can appear twice (USB serial
+# and a wireless-debugging ip:port), so each entry is identified by its
+# hardware serial; prefer USB, else the single wireless entry. VERIFY_SERIAL
+# is the explicit override and skips the registration check. Every adb call
+# below inherits ANDROID_SERIAL.
 pick_serial() {
-  if [ -n "${VERIFY_SERIAL:-}" ]; then export ANDROID_SERIAL="$VERIFY_SERIAL"; return; fi
-  local all usb
-  all=$(serial); usb=$(printf '%s\n' "$all" | grep -v ':' || true)
+  if [ -n "${VERIFY_SERIAL:-}" ]; then
+    export ANDROID_SERIAL="$VERIFY_SERIAL"
+    echo "note: VERIFY_SERIAL=$VERIFY_SERIAL overrides the registered-phone check ($REGISTERED_SERIAL)" >&2
+    return
+  fi
+  local all t hw mine="" seen=""
+  all=$(serial)
+  for t in $all; do
+    hw=$(adb -s "$t" shell getprop ro.serialno 2>/dev/null | tr -d '\r')
+    seen="$seen $t(${hw:-?})"
+    [ "$hw" = "$REGISTERED_SERIAL" ] && mine="$mine$t"$'\n'
+  done
+  local usb; usb=$(printf '%s' "$mine" | grep -v ':' || true)
   if [ "$(printf '%s\n' "$usb" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$usb"
-  elif [ "$(printf '%s\n' "$all" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$all"
-  else echo "doctor: expected one registered device (USB preferred), found: $(printf '%s' "$all" | tr '\n' ' ')" >&2; exit 1; fi
+  elif [ "$(printf '%s' "$mine" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="${mine%$'\n'}"
+  else echo "doctor: expected the registered phone $REGISTERED_SERIAL (USB preferred), found:${seen:- none}; set VERIFY_SERIAL to drive another device on purpose" >&2; exit 1; fi
 }
 pick_serial
+
+# `Committed state: DeviceState{identifier=3, name='OPENED', …}` on newer
+# Android, `Committed state: OPENED (3)`-style on older; print the name.
+parse_posture() {
+  local line; line=$(grep -m1 "Committed state" || true)
+  if [[ "$line" =~ name=\'([A-Z_]+)\' ]]; then echo "${BASH_REMATCH[1]}"
+  else printf '%s\n' "${line#*Committed state:}" | grep -oE "[A-Z][A-Z_]+" | head -1 || true; fi
+}
 
 doctor() {
   need adb
@@ -46,13 +70,15 @@ doctor() {
   if [ -n "$path" ]; then
     adb pull "$path" "$OUT/device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/device-base.apk" | cut -c1-64) && rm -f "$OUT/device-base.apk"
   fi
-  local launcher; launcher=$(adb shell pm dump "$PKG" 2>/dev/null | grep -c "devlaunch.ScenarioLaunchActivity" || true)
+  # Resolve the explicit component: the launcher is exported with no intent
+  # filter, so it never shows in pm dump's resolver tables on newer Android.
+  local launcher; launcher=$(adb shell cmd package resolve-activity --components -n "$PKG/.devlaunch.ScenarioLaunchActivity" 2>/dev/null | tr -d '\r' | grep -c "^$PKG/.*devlaunch\.ScenarioLaunchActivity$" || true)
   echo "device=$model package=$PKG $ver"
   echo "apk_local=$local_sha"
   echo "apk_device=$dev_sha"
   echo "scenario_launcher_present=$([ "${launcher:-0}" -gt 0 ] && echo yes || echo no)"
   local posture keyguard wake
-  posture=$(adb shell cmd device_state state 2>/dev/null | grep -oE "[A-Z_]+" | head -1)
+  posture=$(adb shell cmd device_state state 2>/dev/null | tr -d '\r' | parse_posture)
   wake=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
   keyguard=$(adb shell dumpsys trust 2>/dev/null | grep -m1 -oE "deviceLocked=[01]" | cut -d= -f2)
   echo "posture=${posture:-unknown} wakefulness=${wake:-unknown} device_locked=${keyguard:-unknown}"
