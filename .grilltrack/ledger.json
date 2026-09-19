@@ -2821,22 +2821,76 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T12:38:24+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "verified",
+          "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#implementation",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/stack-widget-live-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T12:53:46+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#implementation",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "github:saari-co/RepoGlance#23 comment 5741923103 (round 1, gold shrimp 3/6); openclaw req-20260919T123153Z-25966123586",
+          "review_result": "findings",
+          "review_source_identity": "git:a4d2639a5091035de125c13aad7fc53ac61677e3",
+          "to": "implemented",
+          "verification_ref": "file:proof/stack-widget-live-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T12:53:46+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "implemented",
+          "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#review-round-1",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/stack-widget-live-20260919/PROOF.md#device-proof"
         }
       ],
       "id": "stack-widget-live-024",
-      "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#implementation",
+      "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#review-round-1",
       "question": "What does the stack widget show over the live pinned set, how is its age shown, where do taps go, and does it change the LOW refresh budget?",
       "rationale": "Sequential grill: Q1-Q3 recommended options chosen; Q4 restated with a 12-pin example after the first phrasing was unclear, then repo-widget-only chosen to keep 023's LOW guard meaningful.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "github:saari-co/RepoGlance#23 comment 5741923103 (round 1, gold shrimp 3/6); openclaw req-20260919T123153Z-25966123586",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T12:38:24+00:00",
+          "source_identity": "git:a4d2639a5091035de125c13aad7fc53ac61677e3"
+        }
+      ],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T12:28:05+00:00",
-      "verification_ref": "file:proof/stack-widget-live-20260919/PROOF.md#device-proof"
+      "updated_at": "2026-09-19T12:53:46+00:00",
+      "verification_ref": "test:StackWidgetTest,CatalogNamesStoreTest; gradlew check; Fold stack-order dump"
     }
   ],
   "last_activation": {
@@ -2867,5 +2921,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T12:28:05+00:00"
+  "updated_at": "2026-09-19T12:53:46+00:00"
 }

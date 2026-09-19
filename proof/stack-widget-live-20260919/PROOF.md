@@ -96,6 +96,40 @@ widget (id 12) was already on his first home page.
 - Deleting a repo widget unpins through `RepoWidgetReceiver.onDeleted`
   without redrawing the stack; it catches up at the next redraw.
 - LOW/EXHAUSTED rows and header are unit-tested, not device-run (as in 023).
-- Row `pushedAt` comes from the saved snapshot, which a background run
-  refreshes only when it needed the repository metadata call; order can lag
-  the catalog's until an in-app catalog load and repository open.
+
+## Review round 1 (source identity git:a4d2639a5091035de125c13aad7fc53ac61677e3, PR #23)
+
+- OpenClaw `req-20260919T123153Z-25966123586`: correct (0.99), 0 findings.
+- ClawSweeper: gold shrimp 3/6 (proof diamond lobster 5/6), one P2 accepted
+  as `required_fix`: the stack sorted only by the saved snapshot's
+  `pushedAt`, so a newly pinned repository (no snapshot, or a snapshot
+  without a push time, which is what a background run writes) fell to the
+  bottom instead of taking the catalog's recent-push position (PR #23
+  comment 5741923103).
+
+### Repair
+
+- `CatalogNamesStore` also saves each repository's push time from every
+  catalog load (cleared with the session like the names).
+- `StackRows.order` sorts by the newer of the snapshot's and the catalog's
+  push time, unknown last, then name: the catalog's pinned-group rule. No
+  extra GitHub calls.
+- Tests: `StackWidgetTest` (a new pin without a snapshot takes its catalog
+  push time and sorts above an older pin; the newer of the two times wins),
+  `CatalogNamesStoreTest` (round trip; missing or malformed times decode to
+  nothing). `./gradlew check` green.
+- Device (Fold, doctor hashes equal `685f05ea…`): after a catalog load,
+  pinned `saari-co/x-api`; the catalog's pinned group reads
+  `saari-co/RepoGlance`, `saari-co/x-api`; the stack reads `Pinned · 2`,
+  `saari-co/RepoGlance` then `saari-co/x-api` (`issues 8 · PRs 10 ·
+  review 0`, refreshed by the overdue periodic run at 8:52). The stored
+  x-api snapshot has `pushedAt: null`, so its place came from the catalog
+  push time (RepoGlance `2026-09-19T12:31:23Z`, x-api
+  `2026-09-18T23:06:26Z`). Honest limit: with these two pins the old
+  comparator would also have put x-api second; the distinguishing case (a
+  new pin pushed more recently than an existing pin) is covered by the unit
+  test only. Capture stack-order
+  `7bbb9e40507a5b3cf8a8650c67ee23235503ec480cbfde0a0613de1f3431e7a5`
+  (maintainer's home screen; local only). The phone was folded mid-run; the
+  maintainer unfolded it before the stack dump. Restored: x-api unpinned,
+  pins `saari-co/RepoGlance` only, stack `Pinned · 1`.

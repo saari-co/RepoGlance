@@ -53,14 +53,36 @@ class StackWidgetTest {
             "a/new" to snapshot("a/new", pushedAt = now.minusSeconds(60)),
             "a/nopush" to snapshot("a/nopush", pushedAt = null),
         )
-        val entries = StackRows.order(listOf("a/old", "b/unloaded", "a/nopush", "a/new", "not a repo")) { snapshots[it.full] }
+        val entries = StackRows.order(listOf("a/old", "b/unloaded", "a/nopush", "a/new", "not a repo"), emptyMap()) {
+            snapshots[it.full]
+        }
         assertEquals(listOf("a/new", "a/old", "a/nopush", "b/unloaded"), entries.map { it.repo.full })
         assertNull(entries.last().snapshot)
     }
 
     @Test
+    fun aNewlyPinnedRepositoryTakesItsCatalogPushTimeBeforeItHasASnapshot() {
+        val snapshots = mapOf("a/old" to snapshot("a/old", pushedAt = now.minusSeconds(86_400)))
+        val catalog = mapOf("a/fresh" to now.minusSeconds(30), "a/old" to now.minusSeconds(90_000))
+        val entries = StackRows.order(listOf("a/old", "a/fresh", "a/gone"), catalog) { snapshots[it.full] }
+        assertEquals(listOf("a/fresh", "a/old", "a/gone"), entries.map { it.repo.full })
+        assertNull(entries.first().snapshot)
+    }
+
+    @Test
+    fun theNewerOfSnapshotAndCatalogPushTimeWins() {
+        val snapshots = mapOf(
+            "a/x" to snapshot("a/x", pushedAt = now.minusSeconds(10)),
+            "a/y" to snapshot("a/y", pushedAt = now.minusSeconds(7_200)),
+        )
+        val catalog = mapOf("a/x" to now.minusSeconds(3_600), "a/y" to now.minusSeconds(5))
+        val entries = StackRows.order(listOf("a/x", "a/y"), catalog) { snapshots[it.full] }
+        assertEquals(listOf("a/y", "a/x"), entries.map { it.repo.full })
+    }
+
+    @Test
     fun noPinsMeansNoRowsAndTheEmptyStateLabel() {
-        assertTrue(StackRows.order(emptySet()) { null }.isEmpty())
+        assertTrue(StackRows.order(emptySet(), emptyMap()) { null }.isEmpty())
         assertEquals("Pin repositories in RepoGlance", STACK_EMPTY_LABEL)
     }
 

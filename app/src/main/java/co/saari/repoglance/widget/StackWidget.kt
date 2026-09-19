@@ -34,6 +34,7 @@ import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
 import java.time.Instant
@@ -49,7 +50,11 @@ class StackWidget : GlanceAppWidget() {
                     clock = widgetClock(context),
                     rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now),
                 )
-                val entries = StackRows.order(AppPrefs.livePins(context)) { LiveSnapshotStore.load(context, it) }
+                val catalogPushedAt = CatalogNamesStore.pushedAt(context)
+                val entries = StackRows.order(
+                    pins = AppPrefs.livePins(context),
+                    catalogPushedAt = catalogPushedAt,
+                ) { LiveSnapshotStore.load(context, it) }
                 val catalogIntent = liveCatalogIntent(context)
 
                 GlanceTheme {
@@ -82,15 +87,21 @@ data class StackEntry(
 )
 
 object StackRows {
-    fun order(pins: Collection<String>, snapshotFor: (RepoRef) -> RepoSnapshot?): List<StackEntry> = pins
-        .mapNotNull(::parseRef)
-        .distinct()
-        .map { StackEntry(it, snapshotFor(it)) }
-        .sortedWith(
-            compareBy<StackEntry> { it.snapshot?.pushedAt == null }
-                .thenByDescending { it.snapshot?.pushedAt ?: Instant.EPOCH }
+    fun order(
+        pins: Collection<String>,
+        catalogPushedAt: Map<String, Instant>,
+        snapshotFor: (RepoRef) -> RepoSnapshot?,
+    ): List<StackEntry> {
+        val entries = pins.mapNotNull(::parseRef).distinct().map { StackEntry(it, snapshotFor(it)) }
+        val latestPush = entries.associateWith { entry ->
+            listOfNotNull(entry.snapshot?.pushedAt, catalogPushedAt[entry.repo.full]).maxOrNull()
+        }
+        return entries.sortedWith(
+            compareBy<StackEntry> { latestPush[it] == null }
+                .thenByDescending { latestPush[it] ?: Instant.EPOCH }
                 .thenBy { it.repo.full.lowercase() },
         )
+    }
 
     private fun parseRef(full: String): RepoRef? {
         val parts = full.split('/', limit = 2)
