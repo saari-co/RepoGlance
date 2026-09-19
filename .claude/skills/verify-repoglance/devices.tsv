@@ -1,0 +1,8 @@
+# Approved RepoGlance test phones. bin/verify-repoglance drives only these.
+# Host-independent: a phone is approved wherever it is plugged in.
+# One phone per line, tab-separated: serial (ro.serialno) <TAB> model <TAB> note
+# Lines starting with # are ignored.
+66261FDDJ002J5	Pixel 11 Pro Fold	Bobby's MacBook (2026-09-19)
+59151FDCG000JA	Pixel 10 Pro Fold	Bobby's MacBook (2026-09-19)
+# TODO: Pixel 10 Pro XL on AI Worker1. Serial unknown; add it from `adb shell getprop ro.serialno`.
+# TODO: Pixel 9 on AI Worker2. Serial unknown; add it from `adb shell getprop ro.serialno`.

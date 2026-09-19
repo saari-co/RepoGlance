@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # verify-repoglance: helpers the verify-repoglance skill drives the app with.
-# Registered swarm test phone over adb only; never drives an unregistered device.
+# Approved test phones (.claude/skills/verify-repoglance/devices.tsv) over adb only; never drives any other device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
 #   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|checking
@@ -21,32 +21,42 @@ mkdir -p "$OUT"
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1" >&2; exit 2; }; }
 serial() { adb devices | awk 'NR>1 && $2=="device"{print $1}'; }
 
-# The one registered swarm test phone (Pixel 11 Pro Fold). Any other attached
-# device is not a target.
-REGISTERED_SERIAL="66261FDDJ002J5"
+# Approved test phones, keyed by ro.serialno; host-independent.
+DEVICES="$ROOT/.claude/skills/verify-repoglance/devices.tsv"
+approved_model() { [ -n "$1" ] && awk -F'\t' -v s="$1" '!/^#/ && $1==s {print $2; f=1; exit} END{exit !f}' "$DEVICES"; }
 
-# Pin one transport of the registered phone. It can appear twice (USB serial
-# and a wireless-debugging ip:port), so each entry is identified by its
-# hardware serial; prefer USB, else the single wireless entry. VERIFY_SERIAL
-# is the explicit override and skips the registration check. Every adb call
-# below inherits ANDROID_SERIAL.
+# Pin one transport of one approved phone. A phone can appear more than once
+# (USB serial, wireless ip:port, mDNS adb-<serial>-…), so every entry is
+# identified by its ro.serialno and counted once; USB is preferred. Exactly
+# one approved phone attached: use it. More than one: VERIFY_SERIAL (a
+# registry serial or one of its adb transports) must choose, and must be
+# approved itself. Every adb call below inherits ANDROID_SERIAL.
 pick_serial() {
-  if [ -n "${VERIFY_SERIAL:-}" ]; then
-    export ANDROID_SERIAL="$VERIFY_SERIAL"
-    echo "note: VERIFY_SERIAL=$VERIFY_SERIAL overrides the registered-phone check ($REGISTERED_SERIAL)" >&2
-    return
-  fi
-  local all t hw mine="" seen=""
-  all=$(serial)
-  for t in $all; do
+  [ -f "$DEVICES" ] || { echo "doctor: device registry missing: $DEVICES" >&2; exit 1; }
+  local t hw pairs="" seen="" want="${VERIFY_SERIAL:-}"
+  for t in $(serial); do
     hw=$(adb -s "$t" shell getprop ro.serialno 2>/dev/null | tr -d '\r')
     seen="$seen $t(${hw:-?})"
-    [ "$hw" = "$REGISTERED_SERIAL" ] && mine="$mine$t"$'\n'
+    approved_model "$hw" >/dev/null && pairs="$pairs$hw $t"$'\n'
   done
-  local usb; usb=$(printf '%s' "$mine" | grep -v ':' || true)
-  if [ "$(printf '%s\n' "$usb" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$usb"
-  elif [ "$(printf '%s' "$mine" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="${mine%$'\n'}"
-  else echo "doctor: expected the registered phone $REGISTERED_SERIAL (USB preferred), found:${seen:- none}; set VERIFY_SERIAL to drive another device on purpose" >&2; exit 1; fi
+  if [ -n "$want" ]; then
+    local pick; pick=$(printf '%s' "$pairs" | awk -v w="$want" '$1==w || $2==w {print $1; exit}')
+    [ -n "$pick" ] || { approved_model "$want" >/dev/null \
+      && echo "doctor: VERIFY_SERIAL=$want is approved but not attached; attached:${seen:- none}" >&2 \
+      || echo "doctor: VERIFY_SERIAL=$want is not in $DEVICES; refusing" >&2; exit 1; }
+    pairs=$(printf '%s' "$pairs" | awk -v p="$pick" -v w="$want" '$1==p && (w==p || $2==w)')$'\n'
+  fi
+  local phones; phones=$(printf '%s' "$pairs" | awk '{print $1}' | sort -u)
+  case "$(printf '%s' "$phones" | grep -c .)" in
+    0) echo "doctor: no approved phone attached (registry: $DEVICES); found:${seen:- none}" >&2; exit 1 ;;
+    1) ;;
+    *) echo "doctor: more than one approved phone attached: $(printf '%s' "$phones" | tr '\n' ' '); set VERIFY_SERIAL to choose" >&2; exit 1 ;;
+  esac
+  DEVICE_SERIAL="$phones"; DEVICE_MODEL=$(approved_model "$DEVICE_SERIAL")
+  # USB lists the bare serial; otherwise take the first wireless entry.
+  ANDROID_SERIAL=$(printf '%s' "$pairs" | awk '$2==$1 {print $2; exit}')
+  [ -n "$ANDROID_SERIAL" ] || ANDROID_SERIAL=$(printf '%s' "$pairs" | awk 'NF {print $2; exit}')
+  export ANDROID_SERIAL
 }
 pick_serial
 
@@ -60,7 +70,7 @@ parse_posture() {
 
 doctor() {
   need adb
-  echo "serial=$ANDROID_SERIAL"
+  echo "serial=$DEVICE_SERIAL model=$DEVICE_MODEL transport=$ANDROID_SERIAL"
   local model; model=$(adb shell getprop ro.product.model | tr -d '\r')
   local ver; ver=$(adb shell dumpsys package "$PKG" | grep -m1 versionName | tr -d ' \r')
   local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"

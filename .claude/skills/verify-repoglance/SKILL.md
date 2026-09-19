@@ -1,6 +1,6 @@
 ---
 name: verify-repoglance
-description: "Drive RepoGlance on the registered Pixel test phone the way a user does and capture proof: launch into a named fixture scenario, walk a mapped feature, dump the UI tree, screenshot the inner display. Use before claiming any RepoGlance UI behavior, to reproduce a bug report, or to verify a PR's visible result."
+description: "Drive RepoGlance on an approved Pixel test phone the way a user does and capture proof: launch into a named fixture scenario, walk a mapped feature, dump the UI tree, screenshot the inner display. Use before claiming any RepoGlance UI behavior, to reproduce a bug report, or to verify a PR's visible result."
 ---
 
 # verify-repoglance
@@ -14,8 +14,8 @@ incomplete when the map lists others.
 
 ## Launch
 
-There is no server. Launch means: build the debug APK, install it on the one
-registered test phone, and start the app in a named state through the
+There is no server. Launch means: build the debug APK, install it on one
+approved test phone ([devices.tsv](devices.tsv)), and start the app in a named state through the
 debug-only scenario launcher.
 
 ```bash
@@ -44,11 +44,15 @@ Teardown is `bin/verify-repoglance cleanup`.
 bin/verify-repoglance doctor
 ```
 
-Read-only. Pins one transport of the registered phone `66261FDDJ002J5`,
-matched by `ro.serialno` so a wireless `ip:port` entry counts (USB
-preferred over a wireless-debugging entry for the same phone), and fails
-when only other devices are attached. `VERIFY_SERIAL` is the explicit
-override and skips that check. It passes only when
+Read-only. Targets only phones listed in [devices.tsv](devices.tsv), the
+approved-phone registry keyed by `ro.serialno`. The registry is
+host-independent: a phone is approved wherever it is plugged in. USB,
+wireless `ip:port` and mDNS `adb-<serial>-…` entries for the same phone
+count as one phone, and USB is preferred. With exactly one approved phone
+attached, doctor uses it. With more than one, it refuses until
+`VERIFY_SERIAL` (a registry serial, or one of that phone's adb transports)
+chooses. An unregistered `VERIFY_SERIAL` is refused. Every run prints
+`serial= model= transport=` so proof names its device. It passes only when
 the installed APK's SHA-256 equals the local debug build's, the debug
 scenario launcher resolves (`cmd package resolve-activity --components`),
 and the phone is
@@ -59,12 +63,13 @@ it did not pass on. A locked or sleeping phone makes every dump show the
 keyguard and every capture show the lock screen; that is a doctor failure,
 not app evidence.
 
-The registered phone may be attached over USB or wireless debugging. When
+An approved phone may be attached over USB or wireless debugging. When
 `adb devices` is empty, `adb mdns services` lists the phone as
 `adb-<serial>-…  _adb-tls-connect._tcp  <ip>:<port>` once it is paired;
 `adb connect <ip>:<port>` brings it back, and `doctor` then passes. A serial
-that is not the registered one is not a target; `doctor` refuses it unless
-`VERIFY_SERIAL` names it on purpose.
+that is not in the registry is not a target. To approve a new phone, add a
+line to `devices.tsv` with its `adb shell getprop ro.serialno`, its model and
+a note.
 
 ## Drive
 
