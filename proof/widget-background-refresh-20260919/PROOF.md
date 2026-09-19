@@ -201,6 +201,11 @@ awake, unlocked). The maintainer's ISSUES widget (id 18,
   `e5ff5ba7ae061cb04a0a05bbf32cfc6320b2c2c25d5dd4b7cf0658bf977a58f0`.
   The maintainer then signed in again himself; the device-code screen was
   never dumped or captured.
+- Restore (02:59): after his sign-in and catalog load, widget 18 was set up
+  again over adb (`saari-co/RepoGlance`, `ISSUES`, capture restore-setup
+  `c54747b97967cf18ca52d772937fc09cdff9b54c40ce6c09cabc2b2708a3cde2`);
+  the save re-pinned it and its one-time run drew `ISSUES 2 · as of 2:59 AM`
+  with rows.
 
 ## Review round 3 (source identity git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3, PR #22)
 
