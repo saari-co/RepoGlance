@@ -1,12 +1,13 @@
 # RepoGlance verification map
 
 This directory is the maintained source for verifying RepoGlance's
-user-facing behaviour on the registered Pixel test phone. Read this index
+user-facing behaviour on an approved Pixel test phone
+(`../devices.tsv`). Read this index
 before driving, then use the matching feature file as the recipe.
 
 ## Baseline preconditions
 
-- The registered test phone over adb (USB or wireless debugging), awake,
+- One approved test phone over adb (USB or wireless debugging), awake,
   unlocked, and open on the inner display unless a recipe names another
   posture. `bin/verify-repoglance doctor` passes: device APK SHA-256 equals
   the local debug build, debug launcher present, phone awake and unlocked.

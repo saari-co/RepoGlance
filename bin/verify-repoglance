@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # verify-repoglance: helpers the verify-repoglance skill drives the app with.
-# Registered swarm test phone over adb only; never drives an unregistered device.
+# Approved test phones (.claude/skills/verify-repoglance/devices.tsv) over adb only; never drives any other device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
 #   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|checking
@@ -19,24 +19,69 @@ PHONE_PROOF="${PHONE_PROOF:-$HOME/Developer/SaariusSkills/skills/phone-proof/scr
 mkdir -p "$OUT"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1" >&2; exit 2; }; }
+# Run "$@" for at most $1 seconds (macOS has no timeout(1)). The command runs
+# in its own process group and the whole group is killed, so a child holding
+# stdout open can't keep a $(…) waiting.
+bounded() {
+  perl -e '$t = shift; $p = fork // exit 125;
+    if (!$p) { setpgrp(0, 0); exec @ARGV or exit 127 }
+    setpgrp($p, $p); $SIG{ALRM} = sub { kill "KILL", -$p; exit 124 };
+    alarm $t; waitpid $p, 0; exit($? >> 8)' "$@"
+}
 serial() { adb devices | awk 'NR>1 && $2=="device"{print $1}'; }
 
-# Pin one transport. The same phone can appear twice (USB serial and a
-# wireless-debugging ip:port); prefer USB, else the single wireless entry.
-# VERIFY_SERIAL overrides. Every adb call below inherits ANDROID_SERIAL.
+# Approved test phones, keyed by ro.serialno; host-independent.
+DEVICES="$ROOT/.claude/skills/verify-repoglance/devices.tsv"
+approved_model() { [ -n "$1" ] && awk -F'\t' -v s="$1" '!/^#/ && $1==s {print $2; f=1; exit} END{exit !f}' "$DEVICES"; }
+
+# Pin one transport of one approved phone. A phone can appear more than once
+# (USB serial, wireless ip:port, mDNS adb-<serial>-…), so every entry is
+# identified by its ro.serialno and counted once; USB is preferred. Exactly
+# one approved phone attached: use it. More than one: VERIFY_SERIAL (a
+# registry serial or one of its adb transports) must choose, and must be
+# approved itself. Every adb call below inherits ANDROID_SERIAL.
 pick_serial() {
-  if [ -n "${VERIFY_SERIAL:-}" ]; then export ANDROID_SERIAL="$VERIFY_SERIAL"; return; fi
-  local all usb
-  all=$(serial); usb=$(printf '%s\n' "$all" | grep -v ':' || true)
-  if [ "$(printf '%s\n' "$usb" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$usb"
-  elif [ "$(printf '%s\n' "$all" | grep -c .)" = "1" ]; then export ANDROID_SERIAL="$all"
-  else echo "doctor: expected one registered device (USB preferred), found: $(printf '%s' "$all" | tr '\n' ' ')" >&2; exit 1; fi
+  [ -f "$DEVICES" ] || { echo "doctor: device registry missing: $DEVICES" >&2; exit 1; }
+  local t hw pairs="" seen="" want="${VERIFY_SERIAL:-}"
+  for t in $(serial); do
+    # A stale or dropped transport (e.g. a tls entry after Wi-Fi loss) must
+    # not abort or hang the run; a failed lookup is just an unapproved t(?).
+    hw=$(bounded 5 adb -s "$t" shell getprop ro.serialno 2>/dev/null | tr -d '\r' || true)
+    seen="$seen $t(${hw:-?})"
+    approved_model "$hw" >/dev/null && pairs="$pairs$hw $t"$'\n'
+  done
+  if [ -n "$want" ]; then
+    local pick; pick=$(printf '%s' "$pairs" | awk -v w="$want" '$1==w || $2==w {print $1; exit}')
+    [ -n "$pick" ] || { approved_model "$want" >/dev/null \
+      && echo "doctor: VERIFY_SERIAL=$want is approved but not attached; attached:${seen:- none}" >&2 \
+      || echo "doctor: VERIFY_SERIAL=$want is not in $DEVICES; refusing" >&2; exit 1; }
+    pairs=$(printf '%s' "$pairs" | awk -v p="$pick" -v w="$want" '$1==p && (w==p || $2==w)')$'\n'
+  fi
+  local phones; phones=$(printf '%s' "$pairs" | awk '{print $1}' | sort -u)
+  case "$(printf '%s' "$phones" | grep -c .)" in
+    0) echo "doctor: no approved phone attached (registry: $DEVICES); found:${seen:- none}" >&2; exit 1 ;;
+    1) ;;
+    *) echo "doctor: more than one approved phone attached: $(printf '%s' "$phones" | tr '\n' ' '); set VERIFY_SERIAL to choose" >&2; exit 1 ;;
+  esac
+  DEVICE_SERIAL="$phones"; DEVICE_MODEL=$(approved_model "$DEVICE_SERIAL")
+  # USB lists the bare serial; otherwise take the first wireless entry.
+  ANDROID_SERIAL=$(printf '%s' "$pairs" | awk '$2==$1 {print $2; exit}')
+  [ -n "$ANDROID_SERIAL" ] || ANDROID_SERIAL=$(printf '%s' "$pairs" | awk 'NF {print $2; exit}')
+  export ANDROID_SERIAL
 }
 pick_serial
 
+# `Committed state: DeviceState{identifier=3, name='OPENED', …}` on newer
+# Android, `Committed state: OPENED (3)`-style on older; print the name.
+parse_posture() {
+  local line; line=$(grep -m1 "Committed state" || true)
+  if [[ "$line" =~ name=\'([A-Z_]+)\' ]]; then echo "${BASH_REMATCH[1]}"
+  else printf '%s\n' "${line#*Committed state:}" | grep -oE "[A-Z][A-Z_]+" | head -1 || true; fi
+}
+
 doctor() {
   need adb
-  echo "serial=$ANDROID_SERIAL"
+  echo "serial=$DEVICE_SERIAL model=$DEVICE_MODEL transport=$ANDROID_SERIAL"
   local model; model=$(adb shell getprop ro.product.model | tr -d '\r')
   local ver; ver=$(adb shell dumpsys package "$PKG" | grep -m1 versionName | tr -d ' \r')
   local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
@@ -46,13 +91,15 @@ doctor() {
   if [ -n "$path" ]; then
     adb pull "$path" "$OUT/device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/device-base.apk" | cut -c1-64) && rm -f "$OUT/device-base.apk"
   fi
-  local launcher; launcher=$(adb shell pm dump "$PKG" 2>/dev/null | grep -c "devlaunch.ScenarioLaunchActivity" || true)
+  # Resolve the explicit component: the launcher is exported with no intent
+  # filter, so it never shows in pm dump's resolver tables on newer Android.
+  local launcher; launcher=$(adb shell cmd package resolve-activity --components -n "$PKG/.devlaunch.ScenarioLaunchActivity" 2>/dev/null | tr -d '\r' | grep -c "^$PKG/.*devlaunch\.ScenarioLaunchActivity$" || true)
   echo "device=$model package=$PKG $ver"
   echo "apk_local=$local_sha"
   echo "apk_device=$dev_sha"
   echo "scenario_launcher_present=$([ "${launcher:-0}" -gt 0 ] && echo yes || echo no)"
   local posture keyguard wake
-  posture=$(adb shell cmd device_state state 2>/dev/null | grep -oE "[A-Z_]+" | head -1)
+  posture=$(adb shell cmd device_state state 2>/dev/null | tr -d '\r' | parse_posture)
   wake=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
   keyguard=$(adb shell dumpsys trust 2>/dev/null | grep -m1 -oE "deviceLocked=[01]" | cut -d= -f2)
   echo "posture=${posture:-unknown} wakefulness=${wake:-unknown} device_locked=${keyguard:-unknown}"
