@@ -72,3 +72,5 @@ required state, commands, and observable proof.
   latest-push subtitle, and the tap that opens the live catalog.
 - [Refresh and freshness](./refresh-freshness.md) covers refresh controls,
   data-age labels, rate-limit state, and a real failed refresh.
+- [Stack widget](./stack-widget.md) covers the large widget over the live
+  pinned set: order, per-row clock times, empty state, and taps.

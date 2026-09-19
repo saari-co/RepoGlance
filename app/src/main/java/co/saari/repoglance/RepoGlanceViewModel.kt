@@ -259,9 +259,10 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private fun recordLatestPush(catalog: LiveRepositoryCatalog, observedAt: Instant) {
         val record = latestPushRecordFor(catalog.repositories, observedAt)
         val names = orderRepositories(catalog.repositories, CatalogSort.RECENT).map { it.ref.full }
+        val pushedAt = catalog.repositories.mapNotNull { repo -> repo.pushedAt?.let { repo.ref.full to it } }.toMap()
         viewModelScope.launch(sessionDispatcher) {
             LatestPushStore.replace(getApplication(), record)
-            CatalogNamesStore.save(getApplication(), names, catalog.viewer.login)
+            CatalogNamesStore.save(getApplication(), names, catalog.viewer.login, pushedAt)
             BackgroundRefresh.schedule(getApplication())
         }
     }

@@ -40,6 +40,7 @@ import co.saari.repoglance.MainActivity
 import co.saari.repoglance.link.GitHubAppLauncher
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
+import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import co.saari.repoglance.render.Ages
@@ -71,7 +72,7 @@ class RepoWidget : GlanceAppWidget() {
 
                 val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
                 val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
-                val appIntent = config?.let { navigatorIntent(context, it) }
+                val appIntent = config?.let { liveRepositoryIntent(context, it.repo) }
 
                 GlanceTheme {
                     val isTall = LocalSize.current.height >= TALL_BREAKPOINT
@@ -99,16 +100,16 @@ class RepoWidget : GlanceAppWidget() {
     }
 }
 
-private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent =
+internal fun liveRepositoryIntent(context: Context, repo: RepoRef): Intent =
     Intent(context, MainActivity::class.java).apply {
         action = Intent.ACTION_VIEW
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         data = Uri.Builder()
             .scheme("repoglance")
             .authority("live")
-            .appendPath(config.repo.full)
+            .appendPath(repo.full)
             .build()
-        putExtra(EXTRA_LIVE_REPO_FULL, config.repo.full)
+        putExtra(EXTRA_LIVE_REPO_FULL, repo.full)
     }
 
 internal data class WidgetFreshness(
@@ -117,7 +118,7 @@ internal data class WidgetFreshness(
     val rateLimitedUntil: Instant?,
 )
 
-private fun widgetClock(context: Context): ClockLabel = ClockLabel(
+internal fun widgetClock(context: Context): ClockLabel = ClockLabel(
     zone = ZoneId.systemDefault(),
     is24Hour = DateFormat.is24HourFormat(context),
     locale = Locale.getDefault(),

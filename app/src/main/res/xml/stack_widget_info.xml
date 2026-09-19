@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Fixture-mode widget: updatePeriodMillis is 0 because fixtures never
-     refresh on their own — the app calls WidgetRefresh.updateAll after a
-     scenario or pin change instead. -->
+<!-- updatePeriodMillis is 0: the app redraws this widget through
+     WidgetRefresh after a live pin change and each 30-minute WorkManager
+     refresh of the pinned set. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="250dp"
     android:minHeight="180dp"
