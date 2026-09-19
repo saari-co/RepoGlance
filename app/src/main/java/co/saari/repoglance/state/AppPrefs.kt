@@ -15,6 +15,7 @@ object AppPrefs {
     private const val KEY_SCENARIO = "selected_scenario"
     private const val KEY_PINNED = "pinned_repos"
     private const val KEY_CATALOG_SORT = "catalog_sort"
+    private const val KEY_LIVE_PINS = "live_pinned_repos"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -36,6 +37,23 @@ object AppPrefs {
         val next = if (repoFull in current) current - repoFull else current + repoFull
         prefs(context).edit().putStringSet(KEY_PINNED, next).apply()
     }
+
+    fun livePins(context: Context): Set<String> =
+        prefs(context).getStringSet(KEY_LIVE_PINS, emptySet()).orEmpty().toSet()
+
+    fun toggleLivePin(context: Context, repoFull: String) {
+        val current = livePins(context)
+        val next = if (repoFull in current) current - repoFull else current + repoFull
+        prefs(context).edit().putStringSet(KEY_LIVE_PINS, next).apply()
+    }
+
+    fun clearLivePins(context: Context) {
+        prefs(context).edit().remove(KEY_LIVE_PINS).apply()
+    }
+
+    @Composable
+    fun rememberLivePins(context: Context): State<Set<String>> =
+        rememberPrefsState(context, KEY_LIVE_PINS) { livePins(context) }
 
     fun catalogSort(context: Context): CatalogSort {
         val stored = prefs(context).getString(KEY_CATALOG_SORT, null) ?: return CatalogSort.RECENT

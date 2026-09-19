@@ -38,6 +38,20 @@ class CatalogOrderingTest {
     }
 
     @Test
+    fun pinnedRepositoriesLeadInRecencyOrderThenTheRestFollowTheActiveSort() {
+        val pins = setOf("zeta/old", "alpha/unknown")
+        val recent = orderCatalog(repos, CatalogSort.RECENT, pins).map { it.ref.full }
+        assertEquals(listOf("zeta/old", "alpha/unknown", "mid/newest", "gamma/tie", "beta/unknown"), recent)
+        val alpha = orderCatalog(repos, CatalogSort.ALPHABETICAL, pins).map { it.ref.full }
+        assertEquals(listOf("zeta/old", "alpha/unknown", "beta/unknown", "gamma/tie", "mid/newest"), alpha)
+    }
+
+    @Test
+    fun noPinsLeavesTheActiveSortUntouched() {
+        assertEquals(orderRepositories(repos, CatalogSort.RECENT), orderCatalog(repos, CatalogSort.RECENT, emptySet()))
+    }
+
+    @Test
     fun mostRecentlyPushedSkipsUnknownAndIsNullWhenNothingHasAPushTime() {
         assertEquals("mid/newest", mostRecentlyPushed(repos)?.ref?.full)
         assertNull(mostRecentlyPushed(listOf(repo("a/b", 9, null))))

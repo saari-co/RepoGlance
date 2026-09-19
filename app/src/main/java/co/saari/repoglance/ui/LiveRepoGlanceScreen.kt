@@ -25,8 +25,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -74,7 +76,7 @@ import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.RateLimitSnapshot
-import co.saari.repoglance.data.orderRepositories
+import co.saari.repoglance.data.orderCatalog
 import co.saari.repoglance.link.GitHubAppLauncher
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
@@ -346,8 +348,9 @@ private fun LiveRepositoryHome(
     val ownerOptions = remember(catalog.repositories) { availableRepositoryOwners(catalog.repositories) }
     val context = LocalContext.current
     val sort by AppPrefs.rememberCatalogSort(context)
-    val matchingRepositories = remember(catalog.repositories, selectedOwner, query, sort) {
-        visibleRepositories(catalog.repositories, selectedOwner, query, sort)
+    val pins by AppPrefs.rememberLivePins(context)
+    val matchingRepositories = remember(catalog.repositories, selectedOwner, query, sort, pins) {
+        visibleRepositories(catalog.repositories, selectedOwner, query, sort, pins)
     }
     val now = rememberFreshnessNow()
 
@@ -540,7 +543,18 @@ private fun LiveRepositoryHome(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
-                            Text(repository.ref.full, style = MaterialTheme.typography.titleMedium)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    repository.ref.full,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                PinToggle(
+                                    repoFull = repository.ref.full,
+                                    pinned = repository.ref.full in pins,
+                                    onToggle = { AppPrefs.toggleLivePin(context, repository.ref.full) },
+                                )
+                            }
                             Text(
                                 buildString {
                                     append(if (repository.isPrivate) "Private" else "Public")
@@ -580,9 +594,24 @@ internal fun visibleRepositories(
     selectedOwner: String?,
     query: String,
     sort: CatalogSort = CatalogSort.RECENT,
-): List<LiveRepository> = orderRepositories(repositories, sort)
+    pinned: Set<String> = emptySet(),
+): List<LiveRepository> = orderCatalog(repositories, sort, pinned)
     .filter { selectedOwner == null || it.ref.owner.equals(selectedOwner, ignoreCase = true) }
     .filter { it.ref.full.contains(query.trim(), ignoreCase = true) }
+
+@Composable
+private fun PinToggle(repoFull: String, pinned: Boolean, onToggle: () -> Unit) {
+    IconButton(
+        onClick = onToggle,
+        modifier = Modifier.testTag("repoglance:pin-$repoFull"),
+    ) {
+        Icon(
+            if (pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+            contentDescription = if (pinned) "Unpin $repoFull" else "Pin $repoFull",
+            tint = if (pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 @Composable
 private fun CatalogSortToggle(sort: CatalogSort, onSortChange: (CatalogSort) -> Unit) {
