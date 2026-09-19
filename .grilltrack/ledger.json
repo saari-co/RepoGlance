@@ -2926,10 +2926,38 @@
           "review_source_identity": null,
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T13:38:07+00:00",
+          "choice": "Only the app's own update: a manifest receiver for ACTION_MY_PACKAGE_REPLACED redraws both widget kinds through WidgetRefresh.updateAll from saved data, with no network call. Time zone, clock, locale and boot changes are not handled; the next refresh (at most about 30 minutes) redraws.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T13:43:01+00:00",
+          "choice": "Only the app's own update: a manifest receiver for ACTION_MY_PACKAGE_REPLACED redraws both widget kinds through WidgetRefresh.updateAll from saved data, with no network call. Time zone, clock, locale and boot changes are not handled; the next refresh (at most about 30 minutes) redraws.",
+          "from": "implemented",
+          "implementation_ref": "git:65dcd2196b70210c0e1133f980397213cb57d011 app/src/main/java/co/saari/repoglance/widget/AppUpdateReceiver.kt",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "widget-update-redraw-025",
-      "implementation_ref": null,
+      "implementation_ref": "git:65dcd2196b70210c0e1133f980397213cb57d011 app/src/main/java/co/saari/repoglance/widget/AppUpdateReceiver.kt",
       "question": "Which events make RepoGlance redraw its widgets from saved data?",
       "rationale": "Maintainer chose app update only over also redrawing on time/zone/locale changes or boot.",
       "repair_required": false,
@@ -2938,35 +2966,27 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "locked",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T13:08:25+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-19T13:43:01+00:00",
+      "verification_ref": "file:proof/widget-update-redraw-20260919/PROOF.md"
     }
   ],
   "last_activation": {
-    "at": "2026-09-19T04:46:02+00:00",
+    "at": "2026-09-19T13:32:46+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
-    "artifact_refs": [
-      ".grilltrack/maps/live-widgets.md",
-      "proof/widget-live-config-20260919/PROOF.md"
-    ],
-    "next_safe_action": "In the new session: check out claude/widget-background-refresh-023 (holds the PR #21 delivery record and this pause), resume the ledger, focus map node 3, discover facts (no WorkManager dependency yet; GitHubApiClient rate-limit handling; pinned set from AppPrefs.livePins), then grill sequentially: trigger and cadence, rate-limit budget and back-off, age label between refreshes",
-    "paused_at": "2026-09-19T04:42:02+00:00",
-    "reason": "Maintainer asked for the next grill (widget-background-refresh-023, live-widgets map node 3) to run in a new session",
-    "resumed_at": "2026-09-19T04:46:02+00:00"
-  },
-  "pause": {
     "artifact_refs": [
       "proof/stack-widget-live-20260919/PROOF.md",
       ".grilltrack/maps/live-widgets.md"
     ],
     "next_safe_action": "In a fresh isolated worktree: check out claude/widget-update-redraw-025, resume the ledger, implement the confirmed receiver (ACTION_MY_PACKAGE_REPLACED -> goAsync -> WidgetRefresh.updateAll), test, gradlew check, Fold proof (install, no app open, home dump shows both widgets with data), proof under proof/widget-update-redraw-20260919/PROOF.md; PR and review rails only when the maintainer asks",
     "paused_at": "2026-09-19T13:19:36+00:00",
-    "reason": "Maintainer asked to implement widget-update-redraw-025 in a fresh session (Opus 5, high effort)"
+    "reason": "Maintainer asked to implement widget-update-redraw-025 in a fresh session (Opus 5, high effort)",
+    "resumed_at": "2026-09-19T13:32:46+00:00"
   },
+  "pause": null,
   "recommendation": {
     "alternatives": [
       "compact-floor-fit: short compact-only last-good label so the repository name survives at 120dp",
@@ -2977,8 +2997,8 @@
     "recorded_at": "2026-09-19T12:59:49+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "paused",
+  "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T13:19:36+00:00"
+  "updated_at": "2026-09-19T13:43:01+00:00"
 }
