@@ -24,3 +24,6 @@ fun orderCatalog(
 
 fun mostRecentlyPushed(repositories: List<LiveRepository>): LiveRepository? =
     orderRepositories(repositories, CatalogSort.RECENT).firstOrNull { it.pushedAt != null }
+
+fun findRepositoryByName(repositories: List<LiveRepository>, full: String): LiveRepository? =
+    repositories.firstOrNull { it.ref.full.equals(full, ignoreCase = true) }

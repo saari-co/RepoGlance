@@ -38,6 +38,16 @@ object RepoWidgetConfigStore {
             .apply()
     }
 
+    fun clearAll(context: Context) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+    }
+
+    fun configuredRepos(context: Context): List<String> =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).all
+            .filterKeys { it.endsWith(REPO_SUFFIX) }
+            .values
+            .mapNotNull { it as? String }
+
     internal fun decode(repoFull: String?, modeName: String?): RepoWidgetConfig? {
         val parts = repoFull?.split('/', limit = 2) ?: return null
         if (parts.size != 2) return null

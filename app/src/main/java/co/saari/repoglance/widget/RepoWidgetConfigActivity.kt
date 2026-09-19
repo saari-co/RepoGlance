@@ -39,14 +39,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.lifecycleScope
+import co.saari.repoglance.MainActivity
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
+import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 class RepoWidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,12 +75,13 @@ class RepoWidgetConfigActivity : ComponentActivity() {
             return
         }
 
-        val repos = WidgetFixtureData.availableSnapshots(Instant.now()).map { it.repo }
+        val repos = WidgetPins.configurationList(CatalogNamesStore.load(this), AppPrefs.livePins(this))
+        val saved = RepoWidgetConfigStore.load(this, appWidgetId)
         if (repos.isEmpty()) {
-            finish()
+            enableEdgeToEdge()
+            setContent { RepoGlanceTheme { NoRepositoriesScreen(onOpenApp = ::openApp) } }
             return
         }
-        val saved = RepoWidgetConfigStore.load(this, appWidgetId)
         val initialRepo = saved?.repo?.takeIf { it in repos } ?: repos.first()
         val initialMode = saved?.mode ?: NavigatorMode.BOTH
 
@@ -87,19 +92,56 @@ class RepoWidgetConfigActivity : ComponentActivity() {
                     repos = repos,
                     initialRepo = initialRepo,
                     initialMode = initialMode,
-                    onSave = { repo, mode ->
-                        RepoWidgetConfigStore.save(this, appWidgetId, RepoWidgetConfig(repo, mode))
-                        lifecycleScope.launch {
-                            RepoWidget().update(this@RepoWidgetConfigActivity, glanceId)
-                            setResult(
-                                Activity.RESULT_OK,
-                                Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId),
-                            )
-                            finish()
-                        }
-                    },
+                    onSave = { repo, mode -> saveAndFinish(appWidgetId, glanceId, saved?.repo?.full, repo, mode) },
                 )
             }
+        }
+    }
+
+    private fun saveAndFinish(
+        appWidgetId: Int,
+        glanceId: GlanceId,
+        previousRepo: String?,
+        repo: RepoRef,
+        mode: NavigatorMode,
+    ) {
+        RepoWidgetConfigStore.save(this, appWidgetId, RepoWidgetConfig(repo, mode))
+        AppPrefs.addLivePin(this, repo.full)
+        if (previousRepo != null && previousRepo != repo.full) {
+            AppPrefs.removeLivePins(
+                this,
+                WidgetPins.releasedRepositories(listOf(previousRepo), RepoWidgetConfigStore.configuredRepos(this)),
+            )
+        }
+        lifecycleScope.launch {
+            RepoWidget().update(this@RepoWidgetConfigActivity, glanceId)
+            setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
+            finish()
+        }
+    }
+
+    private fun openApp() {
+        startActivity(Intent(this, MainActivity::class.java).apply { action = Intent.ACTION_MAIN })
+        finish()
+    }
+}
+
+@Composable
+private fun NoRepositoriesScreen(onOpenApp: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("No repositories to choose from yet", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.padding(6.dp))
+        Text(
+            "Open RepoGlance and load your repositories, then add the widget again.",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Spacer(Modifier.padding(10.dp))
+        Button(onClick = onOpenApp, modifier = Modifier.testTag("repoglance:widget-config-open-app")) {
+            Text("Open RepoGlance")
         }
     }
 }
@@ -177,7 +219,8 @@ private fun RepoWidgetConfigScreen(
                     }
                 }
                 Text(
-                    "Fixture data only in this build. BOTH is a single recently updated feed.",
+                    "Saving pins this repository in RepoGlance; removing the widget unpins it. " +
+                        "Counts and rows come from the last time the repository was opened in the app.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

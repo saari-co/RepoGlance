@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T01:19:22+00:00",
-    "domain": "Live pins: pinning repositories on the live catalog as the widget and background-refresh set (frontier node 1 of the live-widgets map)",
-    "started_at": "2026-09-19T00:59:32+00:00",
+    "confirmed_at": "2026-09-19T02:30:55+00:00",
+    "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
+    "started_at": "2026-09-19T01:43:33+00:00",
     "status": "inspected",
-    "summary": "live-pins-021: thumbtack toggle per live catalog row; pinned group first ordered by recency, rest by the active sort; live pins persisted under their own AppPrefs key; cleared on every session-clear path via the shared helper; widget config untouched (map node 2). Proof: JVM tests, gradlew check, Fold pin/unpin with guarded capture."
+    "summary": "widget-live-config-022: setup lists the saved catalog names pinned first; save pins, delete/reconfigure unpins when no widget holds the repo; compact live counts or no data; tall shows rows saved on the last in-app open with ages; snapshot store v3 with rows; fixture picker untouched; proof on the Fold via adb-placed widget."
   },
   "decisions": [
     {
@@ -2149,7 +2149,7 @@
       "context_ref": ".grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T00:59:32+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#20 merged as 5b73ac7a478c73f1bcdaf90491ca128367196a73",
       "dependencies": [
         "pin-model-010",
         "catalog-sort-020"
@@ -2219,8 +2219,406 @@
       "review_source_identity": "git:93f53cd9a7c980579e9401774e5329142dab24fe",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T01:36:36+00:00",
+      "updated_at": "2026-09-19T01:43:13+00:00",
       "verification_ref": "proof/live-pins-20260919/PROOF.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+      "context_ref": ".grilltrack/maps/live-widgets.md",
+      "created_at": "2026-09-19T01:43:33+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "live-pins-021",
+        "widget-content-priority-008"
+      ],
+      "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
+      "history": [
+        {
+          "at": "2026-09-19T02:24:40+00:00",
+          "choice": "proposed: the configuration list is the pinned live set; compact shows the live snapshot or 'no data'",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T02:49:46+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T03:06:36+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T031141Z-14753179313 correct 0.98; clawsweeper gold shrimp, P1 rows blanked on partial refresh (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:2451aa9dc5dfe24e01b3e5eedfc4bc4e73ecda59",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#replacementRows",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T03:28:53+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#replacementRows",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-1"
+        },
+        {
+          "at": "2026-09-19T03:28:53+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#replacementRows",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T032129Z-14992405731 correct 0.98; clawsweeper late P1: rows not filtered by feed mode (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:0e5a1e731b9b31357713af442905cef5bbc08156",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-1"
+        },
+        {
+          "at": "2026-09-19T03:28:53+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt#rowsForMode",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-1"
+        },
+        {
+          "at": "2026-09-19T03:50:00+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt#rowsForMode",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-2"
+        },
+        {
+          "at": "2026-09-19T03:50:00+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt#rowsForMode",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T032922Z-151857110422 correct 0.99; clawsweeper P2: mixed cap before mode filter (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:f1f3d7fb67da8494d1c6d6844286174404a8fdcd",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-2"
+        },
+        {
+          "at": "2026-09-19T03:50:00+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#MAX_ROWS_PER_KIND",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-2"
+        },
+        {
+          "at": "2026-09-19T04:05:23+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#MAX_ROWS_PER_KIND",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-3"
+        },
+        {
+          "at": "2026-09-19T04:05:23+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#MAX_ROWS_PER_KIND",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T035030Z-159645024328 correct 0.98; clawsweeper late P2: header routed to the fixture navigator (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:745d030ccc0e6f94bc97c4cc39b0a525622f6f60",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-3"
+        },
+        {
+          "at": "2026-09-19T04:05:23+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#navigatorIntent,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#openRepositoryByName,file:app/src/main/java/co/saari/repoglance/MainActivity.kt#handleLiveIntent",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-3"
+        },
+        {
+          "at": "2026-09-19T04:16:30+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#navigatorIntent,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#openRepositoryByName,file:app/src/main/java/co/saari/repoglance/MainActivity.kt#handleLiveIntent",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-4"
+        },
+        {
+          "at": "2026-09-19T04:16:30+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#navigatorIntent,file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#openRepositoryByName,file:app/src/main/java/co/saari/repoglance/MainActivity.kt#handleLiveIntent",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T040556Z-16282514003 correct 0.99; clawsweeper late P1: widget configs and snapshots survive disconnect (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:51106f075a6eb8aa8d5443962dcef14b3b8de3bf",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-4"
+        },
+        {
+          "at": "2026-09-19T04:16:30+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigStore.kt#clearAll",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-4"
+        },
+        {
+          "at": "2026-09-19T04:28:18+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigStore.kt#clearAll",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-5"
+        },
+        {
+          "at": "2026-09-19T04:28:19+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt#clearSessionAndTileRecord,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigStore.kt#clearAll",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T041659Z-16553063590 correct 0.98; clawsweeper late P1: row taps via generic ACTION_VIEW (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:14dcbbe32d030e1933e11afe3fe36f5a939e6a23",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-5"
+        },
+        {
+          "at": "2026-09-19T04:28:19+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/link/GitHubAppLauncher.kt#intent,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#githubIntent",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-5"
+        }
+      ],
+      "id": "widget-live-config-022",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/link/GitHubAppLauncher.kt#intent,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#githubIntent",
+      "question": "Which repositories can a home-screen widget be configured with, and what does it show before live data exists",
+      "rationale": "Maintainer 2026-09-19: any repo configurable; pins and widgets are the same set (option 1 plus unpin on removal); tall size option 3 after mockups.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T031141Z-14753179313 correct 0.98; clawsweeper gold shrimp, P1 rows blanked on partial refresh (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T03:20:32+00:00",
+          "source_identity": "git:2451aa9dc5dfe24e01b3e5eedfc4bc4e73ecda59"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T032129Z-14992405731 correct 0.98; clawsweeper late P1: rows not filtered by feed mode (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T03:28:53+00:00",
+          "source_identity": "git:0e5a1e731b9b31357713af442905cef5bbc08156"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T032922Z-151857110422 correct 0.99; clawsweeper P2: mixed cap before mode filter (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T03:50:00+00:00",
+          "source_identity": "git:f1f3d7fb67da8494d1c6d6844286174404a8fdcd"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T035030Z-159645024328 correct 0.98; clawsweeper late P2: header routed to the fixture navigator (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T04:05:23+00:00",
+          "source_identity": "git:745d030ccc0e6f94bc97c4cc39b0a525622f6f60"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T040556Z-16282514003 correct 0.99; clawsweeper late P1: widget configs and snapshots survive disconnect (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T04:16:30+00:00",
+          "source_identity": "git:51106f075a6eb8aa8d5443962dcef14b3b8de3bf"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T041659Z-16553063590 correct 0.98; clawsweeper late P1: row taps via generic ACTION_VIEW (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T04:28:18+00:00",
+          "source_identity": "git:14dcbbe32d030e1933e11afe3fe36f5a939e6a23"
+        },
+        {
+          "classifications": [],
+          "ref": "openclaw req-20260919T042852Z-16851296860 correct 0.99, 0 findings; clawsweeper platinum hermit 4/6, no findings (PR #21 comment 5738925554)",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T04:35:42+00:00",
+          "source_identity": "git:a7d9cea844299eb938a5ec121d4441b11e2cb4d5"
+        }
+      ],
+      "review_ref": "openclaw req-20260919T042852Z-16851296860 correct 0.99, 0 findings; clawsweeper platinum hermit 4/6, no findings (PR #21 comment 5738925554)",
+      "review_result": "clean",
+      "review_source_identity": "git:a7d9cea844299eb938a5ec121d4441b11e2cb4d5",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T04:35:42+00:00",
+      "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-6"
     }
   ],
   "last_activation": {
@@ -2239,16 +2637,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread",
-      "row-copy: the catalog row says 'Updated Nm ago' for what is the push time; rename to Pushed"
+      "stack-widget-live-024: the stack widget over the live pinned set (map node 4)",
+      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread"
     ],
-    "reason": "live-pins-021 is verified and reviewed clean; the live-widgets map names widget configuration as the next dependent node",
-    "recommended": "widget-live-config-022: widget configuration picks from the pinned live set and the compact widget shows the live snapshot or no data (map node 2)",
-    "recorded_at": "2026-09-19T01:36:36+00:00"
+    "reason": "widget-live-config-022 is verified on the Fold; widgets now show live data but only refresh on an in-app open, which node 3 resolves",
+    "recommended": "widget-background-refresh-023: trigger and cadence for refreshing the pinned set in the background (WorkManager periodic vs on-unlock), rate-limit budget, back-off, and the age label between refreshes (map node 3)",
+    "recorded_at": "2026-09-19T03:06:36+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T01:36:36+00:00"
+  "updated_at": "2026-09-19T04:35:42+00:00"
 }

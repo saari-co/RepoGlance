@@ -34,13 +34,14 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import co.saari.repoglance.MainActivity
+import co.saari.repoglance.link.GitHubAppLauncher
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.SnapshotRendering
-import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import java.time.Instant
 
@@ -56,11 +57,9 @@ class RepoWidget : GlanceAppWidget() {
         provideContent {
             val config = RepoWidgetConfigStore.load(context, appWidgetId)
             val now = Instant.now()
-            val scenario = AppPrefs.selectedScenario(context)
 
             val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
-            val fixtureSnapshot = config?.let { WidgetFixtureData.snapshotFor(it.repo, scenario, now) }
-            val rows = config?.let { WidgetFixtureData.recentRows(it.repo, it.mode, now) }.orEmpty()
+            val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
             val appIntent = config?.let { navigatorIntent(context, it) }
 
             GlanceTheme {
@@ -72,9 +71,7 @@ class RepoWidget : GlanceAppWidget() {
                 ) {
                     when {
                         config == null || appIntent == null -> UnconfiguredContent()
-                        isTall && fixtureSnapshot != null ->
-                            TallContent(config, fixtureSnapshot, rows, now, appIntent)
-                        isTall -> UnconfiguredContent()
+                        isTall -> TallContent(config, liveSnapshot, rows, now, appIntent)
                         else -> CompactContent(config, liveSnapshot, appIntent, now)
                     }
                 }
@@ -92,21 +89,17 @@ class RepoWidget : GlanceAppWidget() {
 
 private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent =
     Intent(context, MainActivity::class.java).apply {
+        action = Intent.ACTION_VIEW
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         data = Uri.Builder()
             .scheme("repoglance")
-            .authority("navigator")
+            .authority("live")
             .appendPath(config.repo.full)
-            .appendQueryParameter("mode", config.mode.name)
             .build()
-        putExtra(EXTRA_REPO_FULL, config.repo.full)
-        putExtra(EXTRA_NAVIGATOR_MODE, config.mode.name)
+        putExtra(EXTRA_LIVE_REPO_FULL, config.repo.full)
     }
 
-private fun githubIntent(row: WidgetRow): Intent =
-    Intent(Intent.ACTION_VIEW, Uri.parse(row.url)).apply {
-        addCategory(Intent.CATEGORY_BROWSABLE)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+private fun githubIntent(row: WidgetRow): Intent = GitHubAppLauncher.intent(row.url, adjacent = false)
 
 internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): String = when (mode) {
     NavigatorMode.ISSUES -> "ISSUES " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis)
@@ -242,7 +235,7 @@ internal fun LedgerRow(label: String, value: String) {
 @Composable
 private fun TallContent(
     config: RepoWidgetConfig,
-    snapshot: RepoSnapshot,
+    snapshot: RepoSnapshot?,
     rows: List<WidgetRow>,
     now: Instant,
     appIntent: Intent,
@@ -261,24 +254,24 @@ private fun TallContent(
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
             )
             Text(
-                "$WIDGET_PREVIEW_LABEL · " + widgetCountSummary(snapshot, config.mode) +
-                    " · " + Ages.updatedLabel(snapshot.observedAt, now),
+                tallHeaderLabel(snapshot, config.mode, now),
                 maxLines = 1,
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+                modifier = GlanceModifier.semantics { testTag = TALL_HEADER_TAG },
             )
         }
         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
             if (rows.isEmpty()) {
                 item {
                     Text(
-                        "No recent rows",
+                        NO_ROWS_LABEL,
                         modifier = GlanceModifier.padding(10.dp),
                         style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
                     )
                 }
             } else {
                 items(rows.take(MAX_WIDGET_ROWS).size) { index ->
-                    WidgetFeedRow(rows[index])
+                    WidgetFeedRow(rows[index], now)
                 }
             }
         }
@@ -286,23 +279,29 @@ private fun TallContent(
 }
 
 private const val MAX_WIDGET_ROWS = 10
+internal const val TALL_HEADER_TAG = "tall-header"
+internal const val NO_ROWS_LABEL = "No saved rows · open RepoGlance to load"
+
+internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, now: Instant): String {
+    if (snapshot == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data · open RepoGlance to load"
+    val basis = if (snapshot.valueBasis == ValueBasis.LAST_GOOD) "last good · " else ""
+    return basis + widgetCountSummary(snapshot, mode) + " · as of " + Ages.format(snapshot.observedAt ?: now, now)
+}
 
 @Composable
-private fun WidgetFeedRow(row: WidgetRow) {
+private fun WidgetFeedRow(row: WidgetRow, now: Instant) {
     val tapAction = actionStartActivity(githubIntent(row))
-    Row(
+    Column(
         modifier = GlanceModifier
             .fillMaxWidth()
             .clickable(tapAction)
             .padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "${row.kind.name} #${row.number}",
+            "${row.kind.name} #${row.number} \u00b7 ${Ages.format(row.updatedAt, now)}",
             maxLines = 1,
             style = TextStyle(color = GlanceTheme.colors.primary, fontWeight = FontWeight.Bold),
         )
-        Spacer(modifier = GlanceModifier.width(8.dp))
         Text(
             Sanitize.displayText(row.title),
             maxLines = 1,
