@@ -40,6 +40,9 @@ class WidgetPinsTest {
         val header = widget.substringAfter("private fun navigatorIntent(").substringBefore("private fun githubIntent(")
         assertEquals(true, header.contains("EXTRA_LIVE_REPO_FULL"))
         assertEquals(false, header.contains("EXTRA_REPO_FULL,") || header.contains("EXTRA_NAVIGATOR_MODE"))
+        val rowTap = widget.substringAfter("private fun githubIntent(").substringBefore("\n\n")
+        assertEquals(true, rowTap.contains("GitHubAppLauncher.intent("))
+        assertEquals(false, rowTap.contains("Intent(Intent.ACTION_VIEW"))
         val activity = read("app/src/main/java/co/saari/repoglance/MainActivity.kt")
         assertEquals(true, activity.contains("EXTRA_LIVE_REPO_FULL") && activity.contains("openRepositoryByName("))
     }

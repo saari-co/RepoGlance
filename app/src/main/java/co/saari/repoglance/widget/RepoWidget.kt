@@ -34,6 +34,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import co.saari.repoglance.MainActivity
+import co.saari.repoglance.link.GitHubAppLauncher
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoSnapshot
@@ -98,11 +99,7 @@ private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent 
         putExtra(EXTRA_LIVE_REPO_FULL, config.repo.full)
     }
 
-private fun githubIntent(row: WidgetRow): Intent =
-    Intent(Intent.ACTION_VIEW, Uri.parse(row.url)).apply {
-        addCategory(Intent.CATEGORY_BROWSABLE)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+private fun githubIntent(row: WidgetRow): Intent = GitHubAppLauncher.intent(row.url, adjacent = false)
 
 internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): String = when (mode) {
     NavigatorMode.ISSUES -> "ISSUES " + SnapshotRendering.countText(snapshot.openIssues, snapshot.valueBasis)

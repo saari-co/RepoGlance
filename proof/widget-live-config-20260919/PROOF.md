@@ -210,3 +210,25 @@ widget onto the home screen; the setup screen was opened for id 14 through
   clear and that the widget refresh is called. Feature map gotcha
   updated. `./gradlew check` green; installed on the Fold.
 - Not device-proven: Disconnect GitHub is the maintainer's gated action.
+
+## Review round 6 (source identity git:14dcbbe32d030e1933e11afe3fe36f5a939e6a23, PR #21)
+
+- OpenClaw `req-20260919T041659Z-16553063590`: correct (0.98), 0 findings.
+- ClawSweeper: round-5 session-clear item cleared; one late P1 /
+  security-medium accepted as `required_fix`: tall-widget row taps built a
+  generic `ACTION_VIEW` intent, so a private item URL could reach a browser
+  or another link handler instead of the installed GitHub app
+  (PR #21 comment 5738925554).
+
+### Repair
+
+- `GitHubAppLauncher.intent(url, adjacent)` is the single builder (package
+  pinned to `com.github.android`, browsable, new task); `RepoWidget`'s row
+  tap uses it. `WidgetPinsTest` asserts the row-tap path uses the launcher
+  and no generic view intent.
+- Device proof (Fold, run `runs/verify-repoglance-runs/widget-row-tap`):
+  with the GitHub app force-stopped first, tapping the widget row
+  `ISSUE #11` on the home screen made the top resumed activity
+  `com.github.android/.main.MainActivity` (`after-row-tap-top.txt`). No
+  capture: the GitHub app screen is not RepoGlance evidence.
+- `./gradlew check` green; installed on the Fold.
