@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,7 +20,6 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -62,30 +60,25 @@ class RepoWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
+        val read = { readRepoWidgetData(context, appWidgetId) }
+        val initial = readWidgetStores(read)
+
         provideContent {
-            key(currentState(WidgetRefresh.REDRAW_KEY)) {
-                val config = RepoWidgetConfigStore.load(context, appWidgetId)
-                val now = Instant.now()
-                val clock = widgetClock(context)
-                val rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now)
-                val freshness = WidgetFreshness(now, clock, rateLimitedUntil)
+            val data = redrawnWidgetData(initial, read)
+            val config = data.config
+            val appIntent = config?.let { liveRepositoryIntent(context, it.repo) }
 
-                val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
-                val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
-                val appIntent = config?.let { liveRepositoryIntent(context, it.repo) }
-
-                GlanceTheme {
-                    val isTall = LocalSize.current.height >= TALL_BREAKPOINT
-                    Box(
-                        modifier = GlanceModifier
-                            .fillMaxSize()
-                            .background(GlanceTheme.colors.background),
-                    ) {
-                        when {
-                            config == null || appIntent == null -> UnconfiguredContent()
-                            isTall -> TallContent(config, liveSnapshot, rows, freshness, appIntent)
-                            else -> CompactContent(config, liveSnapshot, appIntent, freshness)
-                        }
+            GlanceTheme {
+                val isTall = LocalSize.current.height >= TALL_BREAKPOINT
+                Box(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .background(GlanceTheme.colors.background),
+                ) {
+                    when {
+                        config == null || appIntent == null -> UnconfiguredContent()
+                        isTall -> TallContent(config, data.snapshot, data.rows, data.freshness, appIntent)
+                        else -> CompactContent(config, data.snapshot, appIntent, data.freshness)
                     }
                 }
             }
@@ -98,6 +91,28 @@ class RepoWidget : GlanceAppWidget() {
         private val WIDE_TALL_SIZE = DpSize(250.dp, 140.dp)
         private val TALL_BREAKPOINT = 100.dp
     }
+}
+
+internal data class RepoWidgetData(
+    val config: RepoWidgetConfig?,
+    val snapshot: RepoSnapshot?,
+    val rows: List<WidgetRow>,
+    val freshness: WidgetFreshness,
+)
+
+internal fun readRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData {
+    val config = RepoWidgetConfigStore.load(context, appWidgetId)
+    val now = Instant.now()
+    return RepoWidgetData(
+        config = config,
+        snapshot = config?.let { LiveSnapshotStore.load(context, it.repo) },
+        rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty(),
+        freshness = WidgetFreshness(
+            now = now,
+            clock = widgetClock(context),
+            rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now),
+        ),
+    )
 }
 
 internal fun liveRepositoryIntent(context: Context, repo: RepoRef): Intent =
