@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-19T13:19:36+00:00",
     "domain": "Widget redraw after an app update (follow-up to the live-widgets map: the stack sat on the launcher's loading placeholder after an install)",
     "started_at": "2026-09-19T13:08:25+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "widget-update-redraw-025: manifest receiver for ACTION_MY_PACKAGE_REPLACED redraws both widget kinds via WidgetRefresh.updateAll from saved data (goAsync, no network, nothing long-running); no time/zone/locale/boot triggers; feature map gotcha lines for stack and setup; proof: receiver test, gradlew check, Fold install then home dump without opening the app shows both widgets with data instead of the loading placeholder."
   },
   "decisions": [
@@ -2906,7 +2906,7 @@
       "context_ref": "file:proof/stack-widget-live-20260919/PROOF.md#gaps",
       "created_at": "2026-09-19T13:08:25+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#24 merged as a21fb7e2c650f9da3497db85f504c0797fca8482",
       "dependencies": [
         "stack-widget-live-024",
         "widget-background-refresh-023"
@@ -2976,7 +2976,7 @@
       "review_source_identity": "git:84a8665e27c2ab1f87f6a2cdbfc662d131b78970",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T13:57:12+00:00",
+      "updated_at": "2026-09-19T15:02:48+00:00",
       "verification_ref": "file:proof/widget-update-redraw-20260919/PROOF.md"
     }
   ],
@@ -2998,15 +2998,15 @@
   "recommendation": {
     "alternatives": [
       "compact-floor-fit: short compact-only last-good label so the repository name survives at 120dp",
-      "rate-limit-device-proof: exercise LOW/EXHAUSTED end to end with a debug-only transport fault"
+      "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes"
     ],
-    "reason": "stack-widget-live-024 verified and reviewed clean at platinum hermit; it was the last node of .grilltrack/maps/live-widgets.md",
-    "recommended": "closeout of the live-widgets map (all four frontier nodes verified and reviewed clean), with a small follow-up: redraw both widgets after an app update so the stack never sits on the launcher's loading placeholder",
-    "recorded_at": "2026-09-19T12:59:49+00:00"
+    "reason": "live-widgets map closed at the maintainer's request: nodes 021-024 and follow-up 025 verified, reviewed clean and merged (PR #24 a21fb7e2); the rate-limit states are the only truth-rule surface of the map still without device proof",
+    "recommended": "rate-limit-device-proof: drive LOW and EXHAUSTED end to end on the Fold with a debug-only transport fault, so truth rule 4 is proven on the placed repo and stack widgets rather than only unit-tested",
+    "recorded_at": "2026-09-19T15:03:05+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T13:57:12+00:00"
+  "updated_at": "2026-09-19T15:03:05+00:00"
 }

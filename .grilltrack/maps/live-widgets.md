@@ -28,3 +28,40 @@ Frontier nodes (one per GrillTrack cycle):
 4. `stack-widget-live-024` — the stack widget over the live pinned set.
 
 Dependencies: 2 needs 1; 3 needs 2; 4 needs 2 and 3.
+
+## Closeout (2026-09-19, main a21fb7e2c650f9da3497db85f504c0797fca8482)
+
+Status: **closed** at the maintainer's request. The destination is reached:
+the home-screen widgets show real GitHub data for the pinned set and
+refresh in the background. Every node was verified on the Pixel 11 Pro Fold,
+reviewed clean (OpenClaw 0 findings, ClawSweeper platinum hermit or better
+with no findings) and merged by the maintainer.
+
+| Node | Result | Proof | Reviewed source | Delivery |
+| --- | --- | --- | --- | --- |
+| `live-pins-021` | In-place pin toggle on live catalog rows; pinned group first, most recent push first | `proof/live-pins-20260919/PROOF.md` | `93f53cd9` | PR #20, `5b73ac7a` |
+| `widget-live-config-022` | Widget configuration picks from the last catalog load, pinned first; the compact widget shows the live snapshot or `no data` | `proof/widget-live-config-20260919/PROOF.md` | `a7d9cea8` | PR #21, `06cd6cf2` |
+| `widget-background-refresh-023` | WorkManager periodic refresh every 30 minutes on a network connection, one-time run on widget save, rate-limit budget and back-off, clock-time age labels | `proof/widget-background-refresh-20260919/PROOF.md` | `b7d1f699` | PR #22, `b9b2d988` |
+| `stack-widget-live-024` | Stack lists every live pin by push recency with per-row counts and time; row and header taps; empty state | `proof/stack-widget-live-20260919/PROOF.md` | `d1c5d5f6` | PR #23, `948d6627` |
+| `widget-update-redraw-025` (follow-up) | Both widgets redraw from saved data after an app update (`MY_PACKAGE_REPLACED`) | `proof/widget-update-redraw-20260919/PROOF.md` | `84a8665e` | PR #24, `a21fb7e2` |
+
+Superseded along the way: the fixture stack path and its `FIXTURE PREVIEW`
+header, and the catalog footer "Widgets still use preview data in this
+checkpoint" (both removed in 024). `README.md` status now describes the live
+widgets instead of fixture-backed ones.
+
+Carried forward (open, not blockers for this map):
+
+- The compact widget's `last good` label doesn't leave room for the
+  repository name at the 120dp floor.
+- LOW/EXHAUSTED rate-limit rows and headers are unit-tested only, not
+  device-run (023, 024).
+- A newly pinned repository reads `no data` until the next background
+  refresh or an in-app open; pinning doesn't trigger a refresh.
+- Deleting a repo widget unpins without redrawing the stack; it catches up
+  at the next redraw.
+- StrictMode logs main-thread disk reads from both widgets' `provideContent`
+  (found in 025). A separate session is already working on this.
+- `bin/verify-repoglance doctor` misreads the Fold posture as `C` on this
+  Android build.
+- Live CI is not fetched, so the widgets have no CI column.
