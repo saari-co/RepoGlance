@@ -19,6 +19,15 @@ PHONE_PROOF="${PHONE_PROOF:-$HOME/Developer/SaariusSkills/skills/phone-proof/scr
 mkdir -p "$OUT"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1" >&2; exit 2; }; }
+# Run "$@" for at most $1 seconds (macOS has no timeout(1)). The command runs
+# in its own process group and the whole group is killed, so a child holding
+# stdout open can't keep a $(…) waiting.
+bounded() {
+  perl -e '$t = shift; $p = fork // exit 125;
+    if (!$p) { setpgrp(0, 0); exec @ARGV or exit 127 }
+    setpgrp($p, $p); $SIG{ALRM} = sub { kill "KILL", -$p; exit 124 };
+    alarm $t; waitpid $p, 0; exit($? >> 8)' "$@"
+}
 serial() { adb devices | awk 'NR>1 && $2=="device"{print $1}'; }
 
 # Approved test phones, keyed by ro.serialno; host-independent.
@@ -35,7 +44,9 @@ pick_serial() {
   [ -f "$DEVICES" ] || { echo "doctor: device registry missing: $DEVICES" >&2; exit 1; }
   local t hw pairs="" seen="" want="${VERIFY_SERIAL:-}"
   for t in $(serial); do
-    hw=$(adb -s "$t" shell getprop ro.serialno 2>/dev/null | tr -d '\r')
+    # A stale or dropped transport (e.g. a tls entry after Wi-Fi loss) must
+    # not abort or hang the run; a failed lookup is just an unapproved t(?).
+    hw=$(bounded 5 adb -s "$t" shell getprop ro.serialno 2>/dev/null | tr -d '\r' || true)
     seen="$seen $t(${hw:-?})"
     approved_model "$hw" >/dev/null && pairs="$pairs$hw $t"$'\n'
   done
