@@ -189,3 +189,24 @@ widget onto the home screen; the setup screen was opened for id 14 through
   updates it (Android disables a force-stopped app's receivers); opening
   the app restores it. Verifier recipes for widgets must not force-stop
   before a header tap.
+
+## Review round 5 (source identity git:51106f075a6eb8aa8d5443962dcef14b3b8de3bf, PR #21)
+
+- OpenClaw `req-20260919T040556Z-16282514003`: correct (0.99), 0 findings.
+- ClawSweeper: round-4 routing item cleared; one late P1 / security-high
+  accepted as `required_fix`: session clear removed pins, catalog names
+  and rows but left widget configurations and the live snapshot counts,
+  so a placed widget could keep showing a private repository name and
+  cached counts after Disconnect GitHub (PR #21 comment 5738925554).
+
+### Repair
+
+- `clearSessionAndTileRecord` now also clears `LiveSnapshotStore` and
+  every widget configuration (`RepoWidgetConfigStore.clearAll`) before
+  the token, then calls `WidgetRefresh.updateAll` so placed widgets
+  re-render as unconfigured immediately. All four session-clear paths go
+  through it.
+- `LatestPushRecordTest` asserts each store clear precedes the token
+  clear and that the widget refresh is called. Feature map gotcha
+  updated. `./gradlew check` green; installed on the Fold.
+- Not device-proven: Disconnect GitHub is the maintainer's gated action.

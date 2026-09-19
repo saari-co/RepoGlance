@@ -30,6 +30,7 @@ import co.saari.repoglance.state.LatestPushStore
 import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.latestPushRecordFor
+import co.saari.repoglance.widget.RepoWidgetConfigStore
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -311,12 +312,16 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         clearSessionAndTileRecord()
     }
 
-    private fun clearSessionAndTileRecord() {
-        LatestPushStore.clear(getApplication())
-        AppPrefs.clearLivePins(getApplication())
-        CatalogNamesStore.clear(getApplication())
-        LiveRowsStore.clear(getApplication())
+    private suspend fun clearSessionAndTileRecord() {
+        val context = getApplication<Application>()
+        LatestPushStore.clear(context)
+        AppPrefs.clearLivePins(context)
+        CatalogNamesStore.clear(context)
+        LiveRowsStore.clear(context)
+        LiveSnapshotStore.clear(context)
+        RepoWidgetConfigStore.clearAll(context)
         session.signOut()
+        WidgetRefresh.updateAll(context)
     }
 
     override fun onCleared() {

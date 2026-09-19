@@ -29,6 +29,6 @@ Preconditions:
 
 ## Gotchas
 
-- The list is empty until the app has loaded a catalog at least once; sign-out clears it.
+- The list is empty until the app has loaded a catalog at least once. Disconnect GitHub clears it together with pins, saved counts, rows and every widget's configuration, and placed widgets re-render as unconfigured.
 - Rows and counts are only as fresh as the last in-app open; the ages say so and a stale header reads `last good`.
 - Fixture scenarios do not feed live widgets; the GrillTrack widget picker still renders the compact widget from fixtures for proof.
