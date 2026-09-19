@@ -20,6 +20,7 @@ import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
+import co.saari.repoglance.data.findRepositoryByName
 import co.saari.repoglance.data.orderRepositories
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.model.RateLimitBucket
@@ -48,6 +49,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     val liveState = mutableStateOf<LiveUiState>(LiveUiState.Checking)
     val selectedRepository = mutableStateOf<LiveRepository?>(null)
     val repositoryContent = mutableStateOf<ContentUiState>(ContentUiState.Idle)
+    private var pendingRepositoryFull: String? = null
 
     private val authConfig = GitHubAuthConfig(
         clientId = BuildConfig.GITHUB_APP_CLIENT_ID,
@@ -163,6 +165,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                         rateLimit = result.rateLimit,
                     )
                     recordLatestPush(result.value.repositories, result.observedAt)
+                    openPendingRepository(result.value.repositories)
                 }
                 is GitHubApiResult.Failure -> {
                     if (result.needsNewSignIn) {
@@ -182,6 +185,17 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     fun selectRepository(repository: LiveRepository) {
         selectedRepository.value = repository
         refreshSelectedRepository()
+    }
+
+    fun openRepositoryByName(full: String) {
+        pendingRepositoryFull = full
+        (liveState.value as? LiveUiState.Ready)?.let { openPendingRepository(it.catalog.repositories) }
+    }
+
+    private fun openPendingRepository(repositories: List<LiveRepository>) {
+        val full = pendingRepositoryFull ?: return
+        pendingRepositoryFull = null
+        findRepositoryByName(repositories, full)?.let(::selectRepository)
     }
 
     fun refreshSelectedRepository() {

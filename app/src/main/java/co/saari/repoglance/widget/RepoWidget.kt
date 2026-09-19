@@ -88,14 +88,14 @@ class RepoWidget : GlanceAppWidget() {
 
 private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent =
     Intent(context, MainActivity::class.java).apply {
+        action = Intent.ACTION_VIEW
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         data = Uri.Builder()
             .scheme("repoglance")
-            .authority("navigator")
+            .authority("live")
             .appendPath(config.repo.full)
-            .appendQueryParameter("mode", config.mode.name)
             .build()
-        putExtra(EXTRA_REPO_FULL, config.repo.full)
-        putExtra(EXTRA_NAVIGATOR_MODE, config.mode.name)
+        putExtra(EXTRA_LIVE_REPO_FULL, config.repo.full)
     }
 
 private fun githubIntent(row: WidgetRow): Intent =

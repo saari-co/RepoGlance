@@ -39,6 +39,7 @@ import co.saari.repoglance.ui.HomeScreen
 import co.saari.repoglance.ui.LiveRepoGlanceScreen
 import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
+import co.saari.repoglance.widget.EXTRA_LIVE_REPO_FULL
 import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
 import co.saari.repoglance.widget.WidgetRefresh
@@ -67,6 +68,7 @@ class MainActivity : ComponentActivity() {
 
         fixtureNavigatorScope.value = resolveFixtureScopeFromIntent(intent)
         fixtureNavigatorMode.value = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
+        handleLiveIntent(intent)
 
         setContent {
             RepoGlanceTheme {
@@ -108,6 +110,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleFixtureIntent(intent)
+        handleLiveIntent(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -160,6 +163,12 @@ class MainActivity : ComponentActivity() {
             ?.getStringExtra(EXTRA_REPO_FULL)
             ?.let { NavigatorScopeCodec.decode("REPO", it) }
             ?.takeIf { it is NavigatorScope.Repo } as? NavigatorScope.Repo
+    }
+
+    private fun handleLiveIntent(intent: Intent?) {
+        val full = intent?.getStringExtra(EXTRA_LIVE_REPO_FULL) ?: return
+        fixtureNavigatorScope.value = null
+        liveModel.openRepositoryByName(full)
     }
 
     private fun handleFixtureIntent(intent: Intent) {

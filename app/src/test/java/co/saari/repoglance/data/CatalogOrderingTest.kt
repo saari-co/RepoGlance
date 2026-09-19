@@ -52,6 +52,12 @@ class CatalogOrderingTest {
     }
 
     @Test
+    fun findRepositoryByNameIgnoresCaseAndMissesHonestly() {
+        assertEquals(3L, findRepositoryByName(repos, "MID/NEWEST")?.id)
+        assertNull(findRepositoryByName(repos, "nope/nothing"))
+    }
+
+    @Test
     fun mostRecentlyPushedSkipsUnknownAndIsNullWhenNothingHasAPushTime() {
         assertEquals("mid/newest", mostRecentlyPushed(repos)?.ref?.full)
         assertNull(mostRecentlyPushed(listOf(repo("a/b", 9, null))))

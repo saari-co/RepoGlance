@@ -12,7 +12,7 @@ Adding the compact/tall RepoGlance widget opens a setup screen listing the repos
 ## How to get to it (user POV)
 
 - Long-press the home screen, Widgets, RepoGlance, drag the compact widget out; the setup screen opens.
-- Tap a placed widget's header to open the repository in the app; tap a row to open it on GitHub.
+- Tap a placed widget's header to open that repository's live view in the app (issues and PRs with the `LIVE` chip); tap a row to open it on GitHub.
 
 ## Driving it with verify-repoglance
 
@@ -24,6 +24,7 @@ Preconditions:
 - **Setup list.** Open the setup screen for a new widget, then `dump widget-setup`. The `Repository` field shows the first pinned repository, and the note reads `Saving pins this repository in RepoGlance`.
 - **Pin on save.** Save the widget for `saari-co/RepoGlance`, then `bin/verify-repoglance launch MIXED live`, filter to `saari-co/RepoGlance`, `dump after-widget`: the row control reads `Unpin saari-co/RepoGlance`.
 - **Rows.** Open the repository in the app once, return to the home screen, `dump widget-tall`: the widget header contains `as of` and at least one `ISSUE #` or `PR #` row with an age; capture only with private rows out of frame or redacted.
+- **Header tap.** With the app closed, tap the widget header text `saari-co/RepoGlance` on the home screen, wait, then `dump after-header-tap`: the top activity is `co.saari.repoglance/.MainActivity`, the dump contains `repoglance:live-home` (the live repository view's back control) and `saari-co/RepoGlance`, and no `repoglance:fixture-home`.
 - **Unpin on delete.** Delete the widget, launch the live catalog again, filter, `dump after-delete`: the control reads `Pin saari-co/RepoGlance`.
 
 ## Gotchas

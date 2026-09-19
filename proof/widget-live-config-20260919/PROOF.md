@@ -156,3 +156,36 @@ widget onto the home screen; the setup screen was opened for id 14 through
 - Honest limit: `saari-co/RepoGlance` has no open PRs, so the device run
   shows the ISSUES header and issue rows but does not exercise PR rows
   being filtered out; that case is the unit test.
+
+## Review round 4 (source identity git:745d030ccc0e6f94bc97c4cc39b0a525622f6f60, PR #21)
+
+- OpenClaw `req-20260919T035030Z-159645024328`: correct (0.98), 0 findings.
+- ClawSweeper: gold shrimp; round-3 items cleared; one late P2 accepted as
+  `required_fix`: the widget header still sent the fixture navigator
+  extras, so a live widget opened fixture data for the repository
+  (PR #21 comment 5738925554).
+
+### Repair
+
+- The header intent now carries `EXTRA_LIVE_REPO_FULL` (and a
+  `repoglance://live/<owner/name>` data URI) and no fixture extras.
+  `MainActivity.handleLiveIntent` clears any fixture scope and calls
+  `RepoGlanceViewModel.openRepositoryByName`, which selects the repository
+  once the catalog is Ready (pending until the load completes;
+  `findRepositoryByName` matches case-insensitively).
+- Tests: `CatalogOrderingTest.findRepositoryByNameIgnoresCaseAndMissesHonestly`;
+  `WidgetPinsTest.widgetHeaderRoutesToTheLiveRepositoryNotTheFixtureNavigator`
+  (source-level: header intent uses the live extra and no fixture extras;
+  the activity handles it). Feature map: header-tap drive step.
+- Device proof (Fold, run `runs/verify-repoglance-runs/widget-header-tap`):
+  with the app in the background, tapping the widget header
+  `saari-co/RepoGlance` on the home screen resumes `MainActivity`; the
+  `after-header-tap` dump holds `repoglance:live-home` and
+  `saari-co/RepoGlance` and no `repoglance:fixture-home` or `FIXTURE`.
+  Capture after-header-tap
+  `552f06fa1e49d395145f499577f8d499a721b39a410049a7eeb0da5aebe73e9a`.
+- Observation, not a defect of this PR: after `am force-stop` the Pixel
+  launcher shows the widget's error placeholder until the app next
+  updates it (Android disables a force-stopped app's receivers); opening
+  the app restores it. Verifier recipes for widgets must not force-stop
+  before a header tap.
