@@ -21,12 +21,6 @@ object SnapshotStore {
         return pinned + rest
     }
 
-    fun stackWidgetRepos(scenario: FixtureScenario, pins: Set<String>, now: Instant): List<RepoSnapshot> {
-        val all = Fixtures.snapshots(scenario, now)
-        val pinned = all.filter { it.repo.full in pins }
-        return pinned.ifEmpty { all }
-    }
-
     fun search(rows: NavigatorRows, query: String): NavigatorRows {
         if (query.isBlank()) return rows
         val needle = query.trim().lowercase()

@@ -39,6 +39,7 @@ import co.saari.repoglance.ui.HomeScreen
 import co.saari.repoglance.ui.LiveRepoGlanceScreen
 import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
+import co.saari.repoglance.widget.EXTRA_LIVE_CATALOG
 import co.saari.repoglance.widget.EXTRA_LIVE_REPO_FULL
 import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
@@ -166,6 +167,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleLiveIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_LIVE_CATALOG, false) == true) {
+            fixtureNavigatorScope.value = null
+            liveModel.backToRepositories()
+            return
+        }
         val full = intent?.getStringExtra(EXTRA_LIVE_REPO_FULL) ?: return
         fixtureNavigatorScope.value = null
         liveModel.openRepositoryByName(full)

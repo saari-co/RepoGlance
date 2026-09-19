@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T05:07:42+00:00",
-    "domain": "Background refresh of the pinned live set (frontier node 3 of the live-widgets map): trigger and cadence, rate-limit budget and back-off, and what widgets show between and during refreshes",
-    "started_at": "2026-09-19T04:46:02+00:00",
-    "status": "inspected",
-    "summary": "widget-background-refresh-023: WorkManager periodic 30 min (CONNECTED) plus one-time run on widget save; run refreshes live pins least-recently-observed first capped at 20; LOW refreshes only widget-configured pins; EXHAUSTED stops and persists reset time; widgets show 'as of HH:MM' / 'as of <weekday> HH:MM' clock label with 'last good \u00b7' and 'rate limited \u00b7 resets HH:MM'; redraw only at run end; viewer login and rate-limit store cleared with session and work cancelled; shared refresh function for app and worker; feature map updated; proof: unit tests, gradlew check, adb-forced worker run on the Fold."
+    "confirmed_at": "2026-09-19T12:16:40+00:00",
+    "domain": "Stack widget over the live pinned set (frontier node 4 of the live-widgets map): which repositories, row content and data age, taps, and how it interacts with the LOW refresh budget",
+    "started_at": "2026-09-19T12:14:11+00:00",
+    "status": "confirmed",
+    "summary": "stack-widget-live-024: stack lists all live pins recent-push first, no setup, empty state opens app; rows name + issues/PRs/review + per-row clock (023 label rules), no CI; header 'Pinned \u00b7 N' + rate-limit note; row tap -> live repo view, header -> live catalog; LOW budget unchanged (repo widgets only); fixtures no longer feed the placed stack; stale catalog footer removed; stack redraw fix; feature map entry; proof: unit tests, gradlew check, Fold dumps of the placed stack, row and header taps."
   },
   "decisions": [
     {
@@ -2629,7 +2629,7 @@
       "context_ref": "file:.grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T05:04:21+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#22 merged as b9b2d988f41602e91a095d0a81b25704ba303203",
       "dependencies": [
         "widget-live-config-022",
         "live-pins-021"
@@ -2762,8 +2762,81 @@
       "review_source_identity": "git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T06:53:53+00:00",
+      "updated_at": "2026-09-19T12:14:01+00:00",
       "verification_ref": "test:GitHubSessionTest,LiveRowsStoreTest,LatestPushRecordTest; gradlew check green"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+      "context_ref": "file:.grilltrack/maps/live-widgets.md",
+      "created_at": "2026-09-19T12:14:11+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widget-live-config-022",
+        "widget-background-refresh-023",
+        "live-pins-021"
+      ],
+      "domain": "Stack widget over the live pinned set (frontier node 4 of the live-widgets map): which repositories, row content and data age, taps, and how it interacts with the LOW refresh budget",
+      "history": [
+        {
+          "at": "2026-09-19T12:14:11+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T12:28:05+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T12:28:05+00:00",
+          "choice": "Set: every live pin, most recent push first (the catalog's pinned-group order), no setup screen; with no pins it reads 'Pin repositories in RepoGlance' and opens the app. Rows: repository name, 'issues N \u00b7 PRs N \u00b7 review N' and a per-row clock time with 023's label rules (last good, no data, never zero); no CI column (live CI is not fetched). Header: 'Pinned \u00b7 N' plus 'rate limited \u00b7 resets HH:MM' while backing off. Taps: a row opens that repository's live view in the app; the header opens the live catalog. Budget: 023 unchanged; at LOW only repos with their own repo widget refresh, other stack rows keep their numbers with their older clock time. Fixture data no longer feeds the placed stack; the stale catalog footer is removed; the stack gets the redraw fix.",
+          "from": "implemented",
+          "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#implementation",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "stack-widget-live-024",
+      "implementation_ref": "file:proof/stack-widget-live-20260919/PROOF.md#implementation",
+      "question": "What does the stack widget show over the live pinned set, how is its age shown, where do taps go, and does it change the LOW refresh budget?",
+      "rationale": "Sequential grill: Q1-Q3 recommended options chosen; Q4 restated with a 12-pin example after the first phrasing was unclear, then repo-widget-only chosen to keep 023's LOW guard meaningful.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T12:28:05+00:00",
+      "verification_ref": "file:proof/stack-widget-live-20260919/PROOF.md#device-proof"
     }
   ],
   "last_activation": {
@@ -2794,5 +2867,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T06:54:01+00:00"
+  "updated_at": "2026-09-19T12:28:05+00:00"
 }

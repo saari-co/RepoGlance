@@ -59,6 +59,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,6 +85,8 @@ import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.ui.brand.CheckingMark
+import co.saari.repoglance.widget.WidgetRefresh
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 
@@ -347,6 +350,7 @@ private fun LiveRepositoryHome(
     var ownerMenuExpanded by remember { mutableStateOf(false) }
     val ownerOptions = remember(catalog.repositories) { availableRepositoryOwners(catalog.repositories) }
     val context = LocalContext.current
+    val widgetScope = rememberCoroutineScope()
     val sort by AppPrefs.rememberCatalogSort(context)
     val pins by AppPrefs.rememberLivePins(context)
     val matchingRepositories = remember(catalog.repositories, selectedOwner, query, sort, pins) {
@@ -552,7 +556,10 @@ private fun LiveRepositoryHome(
                                 PinToggle(
                                     repoFull = repository.ref.full,
                                     pinned = repository.ref.full in pins,
-                                    onToggle = { AppPrefs.toggleLivePin(context, repository.ref.full) },
+                                    onToggle = {
+                                        AppPrefs.toggleLivePin(context, repository.ref.full)
+                                        widgetScope.launch { WidgetRefresh.updateAll(context) }
+                                    },
                                 )
                             }
                             Text(
@@ -569,14 +576,6 @@ private fun LiveRepositoryHome(
                             )
                         }
                     }
-                }
-                item {
-                    Text(
-                        "Widgets still use preview data in this checkpoint.",
-                        modifier = Modifier.padding(12.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
             }
         }

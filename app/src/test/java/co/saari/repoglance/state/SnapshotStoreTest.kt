@@ -56,26 +56,6 @@ class SnapshotStoreTest {
         assertEquals(all.map { it.repo.full }, afterUnpin.map { it.repo.full })
     }
 
-    // ---- stackWidgetRepos: fallback --------------------------------------
-
-    @Test
-    fun stackWidgetReposReturnsAllWhenNoPins() {
-        val all = Fixtures.snapshots(FixtureScenario.MIXED, now)
-        val result = SnapshotStore.stackWidgetRepos(FixtureScenario.MIXED, emptySet(), now)
-        assertEquals(all.map { it.repo.full }, result.map { it.repo.full })
-    }
-
-    @Test
-    fun stackWidgetReposReturnsOnlyPinnedWhenPresent() {
-        val all = Fixtures.snapshots(FixtureScenario.EXACT, now)
-        val pinnedFull = all.first().repo.full
-        val result = SnapshotStore.stackWidgetRepos(FixtureScenario.EXACT, setOf(pinnedFull), now)
-        assertTrue(result.isNotEmpty())
-        assertTrue(result.all { it.repo.full == pinnedFull })
-    }
-
-    // ---- search -----------------------------------------------------------
-
     @Test
     fun searchWithBlankQueryReturnsAllRows() {
         val list = Fixtures.navigatorList(
