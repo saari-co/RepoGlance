@@ -4,8 +4,8 @@ The compact home-screen widget shows one repository's open issues, open PRs, and
 
 ## Sub-features
 
-- `compact-exact` renders live counts with their bare age (`2h`).
-- `compact-last-good` renders preserved counts with `last good <age>` in the error colour.
+- `compact-exact` renders live counts with the clock time they were observed (`17:00`, `Mon 19:00` from an earlier day).
+- `compact-last-good` renders preserved counts with `last good <time>` in the error colour; while the rate limit is exhausted the label reads `rate limited · <time>`.
 - `compact-no-data` renders `no data` and an em dash per count, never `0`.
 - `compact-sizes` keeps all rows legible at 120x64, 180x64, and 250x90dp; the `to review` row appears only at the wide size.
 
@@ -23,12 +23,14 @@ Preconditions:
 
 - **Open the picker.** Run `bin/verify-repoglance launch MIXED picker`. The resumed activity is `co.saari.repoglance/.devpicker.WidgetVariantPickerActivity`.
 - **Read the states.** Run `bin/verify-repoglance dump picker`. The text column contains `PRODUCTION — exact counts`, `PRODUCTION — last good, 3 days old`, `PRODUCTION — no observation yet`, and `PERSISTED — saari-co/RepoGlance live store, wall clock`.
-- **Assert exact.** In the dump, the exact row shows `x-api`, `2h`, `128`, `23`; the wide cell adds `to review` and `7`.
-- **Assert last-good.** The last-good row shows `last good 3d` beside `x-api` with the same counts.
+- **Assert exact.** In the dump, the exact row shows `x-api`, `17:00`, `128`, `23`; the wide cell adds `to review` and `7`.
+- **Assert last-good.** The last-good row shows `last good Mon 19:00` beside `x-api` with the same counts.
 - **Assert no-data.** The no-observation row shows `no data` and `—` for every count; the string `0` does not appear in that row.
 - **Proof.** Run `bin/verify-repoglance capture compact-states` twice and compare the SHA-256s; a differing pair means an overlay or clock tick, so capture again. Both show the four labelled rows.
 
 ## Gotchas
+
+- The picker's clock is fixed at 2026-09-17 23:00 UTC and rendered in the phone's zone in 24-hour form; the times above are for US Eastern time and shift with the zone.
 
 - The persisted row reflects whatever the live store holds from the last in-app visit to `saari-co/RepoGlance`; it can legitimately read `no data` on a fresh install or `last good <age>` after a failed refresh. Assert its shape, not its numbers.
 - Glance widget test tags (`ledger-label`, `ledger-value`, `ledger-freshness`) are visible to the JVM Glance tests, not to `uiautomator dump`; on device assert by visible text.

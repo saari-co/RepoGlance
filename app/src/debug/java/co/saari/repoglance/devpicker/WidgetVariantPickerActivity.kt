@@ -21,13 +21,17 @@ import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
+import co.saari.repoglance.render.ClockLabel
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.widget.CompactContent
 import co.saari.repoglance.widget.RepoWidgetConfig
+import co.saari.repoglance.widget.WidgetFreshness
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.time.ZoneId
+import java.util.Locale
 
 /**
  * GrillTrack live variant picker — development tooling, debug source set only.
@@ -77,22 +81,22 @@ class WidgetVariantPickerActivity : ComponentActivity() {
                 LiveSnapshotStore.load(this@WidgetVariantPickerActivity, persistedConfig.repo)
             }
             val candidates: List<Pair<String, @Composable (RepoSnapshot?, Instant) -> Unit>> = listOf(
-                "PRODUCTION — exact counts" to { s, n -> CompactContent(config, s, intent, n) },
+                "PRODUCTION — exact counts" to { s, n -> CompactContent(config, s, intent, freshness(n)) },
                 "PRODUCTION — last good, 3 days old" to { s, n ->
                     CompactContent(
                         config,
                         s?.copy(valueBasis = ValueBasis.LAST_GOOD, observedAt = n.minusSeconds(THREE_DAYS_SECONDS)),
                         intent,
-                        n,
+                        freshness(n),
                     )
                 },
-                "PRODUCTION — no observation yet" to { _, n -> CompactContent(config, null, intent, n) },
+                "PRODUCTION — no observation yet" to { _, n -> CompactContent(config, null, intent, freshness(n)) },
                 // The real persisted path: whatever LiveSnapshotStore holds for the
                 // public saari-co/RepoGlance repository right now, aged against the
                 // wall clock. Nothing is constructed; an absent record renders as
                 // "no data" through the same production composition.
                 "PERSISTED — saari-co/RepoGlance live store, wall clock" to { _, _ ->
-                    CompactContent(persistedConfig, persisted, intent, Instant.now())
+                    CompactContent(persistedConfig, persisted, intent, freshness(Instant.now()))
                 },
             )
             for ((label, content) in candidates) {
@@ -199,3 +203,9 @@ class WidgetVariantPickerActivity : ComponentActivity() {
         )
     }
 }
+
+private fun freshness(now: Instant): WidgetFreshness = WidgetFreshness(
+    now = now,
+    clock = ClockLabel(ZoneId.systemDefault(), is24Hour = true, locale = Locale.getDefault()),
+    rateLimitedUntil = null,
+)

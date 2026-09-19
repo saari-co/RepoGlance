@@ -235,6 +235,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
+    implementation(libs.work.runtime)
     debugImplementation(libs.compose.ui.tooling)
 
     // JVM-only Glance composable assertions: no device, no UI Automator.

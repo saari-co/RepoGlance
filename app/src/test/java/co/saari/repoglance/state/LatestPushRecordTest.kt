@@ -47,7 +47,16 @@ class LatestPushRecordTest {
         assertTrue("session clear must drop the tile record before the token", helper.contains("LatestPushStore.clear("))
         assertTrue(helper.indexOf("LatestPushStore.clear(") < helper.indexOf("session.signOut()"))
         assertTrue("session clear must drop live pins too", helper.contains("AppPrefs.clearLivePins("))
-        for (call in listOf("LiveSnapshotStore.clear(", "LiveRowsStore.clear(", "RepoWidgetConfigStore.clearAll(", "CatalogNamesStore.clear(")) {
+        for (
+            call in listOf(
+                "LiveSnapshotStore.clear(",
+                "LiveRowsStore.clear(",
+                "RepoWidgetConfigStore.clearAll(",
+                "CatalogNamesStore.clear(",
+                "RateLimitStore.clear(",
+                "BackgroundRefresh.cancel(",
+            )
+        ) {
             assertTrue("session clear must drop widget-visible data: $call", helper.contains(call))
             assertTrue(helper.indexOf(call) < helper.indexOf("session.signOut()"))
         }
