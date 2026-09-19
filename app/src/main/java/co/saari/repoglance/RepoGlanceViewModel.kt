@@ -243,7 +243,9 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                     ?: prSuccess?.rateLimit?.bucket
                     ?: RateLimitBucket.UNKNOWN,
             ).also { LiveSnapshotStore.save(context, it) }
-            LiveRowsStore.save(context, repository.ref, LiveRowsStore.rowsFrom(issues?.rows, prSuccess?.value?.rows))
+            LiveRowsStore.replacementRows(issues?.rows, prSuccess?.value?.rows)?.let { fresh ->
+                LiveRowsStore.save(context, repository.ref, fresh)
+            }
         }
         WidgetRefresh.updateAll(context)
     }

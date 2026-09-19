@@ -32,6 +32,28 @@ class LiveRowsStoreTest {
     }
 
     @Test
+    fun aPartialOrFailedFetchNeverReplacesSavedRows() {
+        assertNull(LiveRowsStore.replacementRows(null, listOf(pr(1, now))))
+        assertNull(LiveRowsStore.replacementRows(listOf(issue(1, now)), null))
+        assertNull(LiveRowsStore.replacementRows(null, null))
+        assertEquals(emptyList<WidgetRow>(), LiveRowsStore.replacementRows(emptyList(), emptyList()))
+    }
+
+    @Test
+    fun theViewModelOnlySavesRowsThroughReplacementRows() {
+        var dir: java.nio.file.Path? = java.nio.file.Paths.get("").toAbsolutePath()
+        while (dir != null && !java.nio.file.Files.exists(dir.resolve("settings.gradle.kts"))) dir = dir.parent
+        val source = String(
+            java.nio.file.Files.readAllBytes(
+                requireNotNull(dir).resolve("app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt"),
+            ),
+            Charsets.UTF_8,
+        )
+        assertEquals(1, Regex("LiveRowsStore\\.replacementRows\\(").findAll(source).count())
+        assertEquals(0, Regex("LiveRowsStore\\.rowsFrom\\(").findAll(source).count())
+    }
+
+    @Test
     fun unknownVersionDecodesToNothingRatherThanStaleRows() {
         assertNull(LiveRowsStore.decode("""{"version":99,"rows":[]}"""))
     }

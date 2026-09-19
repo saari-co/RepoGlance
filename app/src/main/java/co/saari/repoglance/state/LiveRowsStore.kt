@@ -30,6 +30,11 @@ object LiveRowsStore {
         prefs(context).edit().clear().apply()
     }
 
+    fun replacementRows(issues: List<LiveIssue>?, pullRequests: List<LivePullRequest>?): List<WidgetRow>? {
+        if (issues == null || pullRequests == null) return null
+        return rowsFrom(issues, pullRequests)
+    }
+
     fun rowsFrom(issues: List<LiveIssue>?, pullRequests: List<LivePullRequest>?): List<WidgetRow> {
         val issueRows = issues.orEmpty().map {
             WidgetRow(WidgetRowKind.ISSUE, it.number, it.title, it.updatedAt, it.htmlUrl)

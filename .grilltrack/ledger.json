@@ -2277,22 +2277,76 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "verified",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "openclaw req-20260919T031141Z-14753179313 correct 0.98; clawsweeper gold shrimp, P1 rows blanked on partial refresh (PR #21 comment 5738925554), accepted",
+          "review_result": "findings",
+          "review_source_identity": "git:2451aa9dc5dfe24e01b3e5eedfc4bc4e73ecda59",
+          "to": "implemented",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-19T03:20:32+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#replacementRows",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
         }
       ],
       "id": "widget-live-config-022",
-      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt#replacementRows",
       "question": "Which repositories can a home-screen widget be configured with, and what does it show before live data exists",
       "rationale": "Maintainer 2026-09-19: any repo configurable; pins and widgets are the same set (option 1 plus unpin on removal); tall size option 3 after mockups.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "openclaw req-20260919T031141Z-14753179313 correct 0.98; clawsweeper gold shrimp, P1 rows blanked on partial refresh (PR #21 comment 5738925554), accepted",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T03:20:32+00:00",
+          "source_identity": "git:2451aa9dc5dfe24e01b3e5eedfc4bc4e73ecda59"
+        }
+      ],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T03:06:36+00:00",
-      "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
+      "updated_at": "2026-09-19T03:20:32+00:00",
+      "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-1"
     }
   ],
   "last_activation": {
@@ -2322,5 +2376,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T03:06:36+00:00"
+  "updated_at": "2026-09-19T03:20:32+00:00"
 }

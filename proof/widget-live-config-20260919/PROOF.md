@@ -87,3 +87,25 @@ widget onto the home screen; the setup screen was opened for id 14 through
   PREVIEW`); it is map node 4.
 - Rows and counts refresh only on an in-app open until map node 3 adds
   background refresh; the widget's ages say so.
+
+## Review round 1 (source identity git:2451aa9dc5dfe24e01b3e5eedfc4bc4e73ecda59, PR #21)
+
+- OpenClaw `req-20260919T031141Z-14753179313`: correct (0.98), 0 findings.
+- ClawSweeper: gold shrimp 3/6, one P1 accepted as `required_fix`: a
+  transient issue or PR fetch failure after rows were saved replaced the
+  row cache with an empty list while counts stayed last-good, so the tall
+  widget could pair stale counts with a false "No saved rows"
+  (PR #21 comment 5738925554).
+
+### Repair
+
+- `LiveRowsStore.replacementRows(issues, pullRequests)` returns null unless
+  both pages loaded; the view model saves rows only through it, so a
+  partial or failed refresh keeps the previous rows beside the last-good
+  counts. An empty but complete result still clears the rows honestly.
+- `LiveRowsStoreTest`: partial/failed fetches never replace saved rows;
+  source check that the view model uses only `replacementRows`.
+- `./gradlew check` green; installed on the Fold and the live catalog still
+  loads (`runs/verify-repoglance-runs/widget-live-fix`). A device
+  reproduction of a transient fetch failure with a placed widget was not
+  run; the guard is a pure function covered by tests.
