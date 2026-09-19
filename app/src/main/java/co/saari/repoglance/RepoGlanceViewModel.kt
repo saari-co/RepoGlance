@@ -19,8 +19,11 @@ import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
+import co.saari.repoglance.data.mostRecentlyPushed
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.state.LatestPushRecord
+import co.saari.repoglance.state.LatestPushStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
@@ -149,11 +152,14 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             val result = withContext(Dispatchers.IO) { apiClient.loadCatalog() }
             if (requestGeneration != catalogGeneration.get()) return@launch
             when (result) {
-                is GitHubApiResult.Success -> liveState.value = LiveUiState.Ready(
-                    catalog = result.value,
-                    observedAt = result.observedAt,
-                    rateLimit = result.rateLimit,
-                )
+                is GitHubApiResult.Success -> {
+                    liveState.value = LiveUiState.Ready(
+                        catalog = result.value,
+                        observedAt = result.observedAt,
+                        rateLimit = result.rateLimit,
+                    )
+                    recordLatestPush(result.value.repositories, result.observedAt)
+                }
                 is GitHubApiResult.Failure -> {
                     if (result.needsNewSignIn) {
                         clearSavedSessionNow()
@@ -245,6 +251,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun signOut() {
+        viewModelScope.launch(sessionDispatcher + NonCancellable) { LatestPushStore.clear(getApplication()) }
         bootstrapJob?.cancel()
         authorizationJob?.cancel()
         authorizationJob = null
@@ -253,6 +260,14 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         catalogGeneration.incrementAndGet()
         backToRepositories()
         liveState.value = LiveUiState.SignedOut
+    }
+
+    private fun recordLatestPush(repositories: List<LiveRepository>, observedAt: Instant) {
+        val top = mostRecentlyPushed(repositories) ?: return
+        val pushedAt = top.pushedAt ?: return
+        viewModelScope.launch(sessionDispatcher) {
+            LatestPushStore.save(getApplication(), LatestPushRecord(top.ref.full, pushedAt, observedAt))
+        }
     }
 
     private fun bootstrapSessionState() {
