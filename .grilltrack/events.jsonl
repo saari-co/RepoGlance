@@ -139,3 +139,6 @@
 {"action": "decision_implemented", "at": "2026-09-19T00:15:36+00:00", "data": {"decision_id": "quick-settings-tile-019"}, "event_id": "be0b2ce5-87ca-4be0-94bd-4458d36f999c"}
 {"action": "decision_verified", "at": "2026-09-19T00:15:36+00:00", "data": {"decision_id": "catalog-sort-020"}, "event_id": "2774286d-656b-4ef0-8359-3fd69cccffe5"}
 {"action": "decision_verified", "at": "2026-09-19T00:15:36+00:00", "data": {"decision_id": "quick-settings-tile-019"}, "event_id": "bd1883c0-203d-43f8-882d-8b393ef0b2f8"}
+{"action": "decision_reviewed", "at": "2026-09-19T00:30:27+00:00", "data": {"classifications": ["required_fix"], "decision_id": "quick-settings-tile-019", "ref": "openclaw req-20260919T002048Z-110778117861 correct 0.98; clawsweeper gold shrimp 3/6, two findings on stale LatestPushStore, both accepted (PR #19 comment 5737818227)", "result": "findings", "reviewed_at": "2026-09-19T00:30:27+00:00", "source_identity": "git:a3d9b3cb408f6a4ab8a5679edbf1013535474509"}, "event_id": "5224e8e1-7f62-4f25-ac09-6e80c551bd7f"}
+{"action": "decision_implemented", "at": "2026-09-19T00:30:27+00:00", "data": {"decision_id": "quick-settings-tile-019"}, "event_id": "e2c3da95-d93c-458b-a5b0-c6a4e57ab710"}
+{"action": "decision_verified", "at": "2026-09-19T00:30:27+00:00", "data": {"decision_id": "quick-settings-tile-019"}, "event_id": "03ce2cc3-6bc3-40c8-a7c1-226b8dbede5d"}
