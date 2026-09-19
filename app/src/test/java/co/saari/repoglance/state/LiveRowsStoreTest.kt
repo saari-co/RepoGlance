@@ -6,6 +6,7 @@ import co.saari.repoglance.widget.WidgetRow
 import co.saari.repoglance.widget.WidgetRowKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Instant
 
@@ -49,17 +50,26 @@ class LiveRowsStoreTest {
     }
 
     @Test
-    fun theViewModelOnlySavesRowsThroughReplacementRows() {
+    fun liveDataIsPersistedOnlyThroughTheSharedRefreshPath() {
         var dir: java.nio.file.Path? = java.nio.file.Paths.get("").toAbsolutePath()
         while (dir != null && !java.nio.file.Files.exists(dir.resolve("settings.gradle.kts"))) dir = dir.parent
-        val source = String(
-            java.nio.file.Files.readAllBytes(
-                requireNotNull(dir).resolve("app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt"),
-            ),
-            Charsets.UTF_8,
-        )
-        assertEquals(1, Regex("LiveRowsStore\\.replacementRows\\(").findAll(source).count())
-        assertEquals(0, Regex("LiveRowsStore\\.rowsFrom\\(").findAll(source).count())
+        val root = requireNotNull(dir).resolve("app/src/main/java/co/saari/repoglance")
+        fun source(path: String) = String(java.nio.file.Files.readAllBytes(root.resolve(path)), Charsets.UTF_8)
+        val shared = source("data/LiveRefresh.kt")
+        assertEquals(1, Regex("LiveRowsStore\\.replacementRows\\(").findAll(shared).count())
+        assertEquals(0, Regex("LiveRowsStore\\.rowsFrom\\(").findAll(shared).count())
+        val committed = shared.substringAfter("services.session.commitIfCurrent(sessionGeneration) {").substringBefore("\n        }\n")
+        for (write in listOf("LiveSnapshotStore.save(", "LiveRowsStore.save(", "RateLimitStore.record(")) {
+            assertEquals("$write must happen only inside the session commit", 1, shared.split(write).size - 1)
+            assertTrue("$write must happen only inside the session commit", committed.contains(write))
+        }
+        for (caller in listOf("RepoGlanceViewModel.kt", "refresh/PinnedRefreshWorker.kt")) {
+            val text = source(caller)
+            assertEquals("$caller must persist through LiveRefresh", 1, Regex("LiveRefresh\\.persist\\(").findAll(text).count())
+            for (bypass in listOf("LiveRowsStore.save(", "LiveSnapshotStore.save(", "LiveRowsStore.replacementRows(")) {
+                assertEquals("$caller bypasses the shared path: $bypass", -1, text.indexOf(bypass))
+            }
+        }
     }
 
     @Test

@@ -3,7 +3,9 @@ package co.saari.repoglance.widget
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,6 +21,7 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -40,10 +43,14 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
 import co.saari.repoglance.render.Ages
+import co.saari.repoglance.render.ClockLabel
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
+import co.saari.repoglance.state.RateLimitStore
 import java.time.Instant
+import java.time.ZoneId
+import java.util.Locale
 
 class RepoWidget : GlanceAppWidget() {
 
@@ -55,24 +62,29 @@ class RepoWidget : GlanceAppWidget() {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
         provideContent {
-            val config = RepoWidgetConfigStore.load(context, appWidgetId)
-            val now = Instant.now()
+            key(currentState(WidgetRefresh.REDRAW_KEY)) {
+                val config = RepoWidgetConfigStore.load(context, appWidgetId)
+                val now = Instant.now()
+                val clock = widgetClock(context)
+                val rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now)
+                val freshness = WidgetFreshness(now, clock, rateLimitedUntil)
 
-            val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
-            val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
-            val appIntent = config?.let { navigatorIntent(context, it) }
+                val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
+                val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
+                val appIntent = config?.let { navigatorIntent(context, it) }
 
-            GlanceTheme {
-                val isTall = LocalSize.current.height >= TALL_BREAKPOINT
-                Box(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .background(GlanceTheme.colors.background),
-                ) {
-                    when {
-                        config == null || appIntent == null -> UnconfiguredContent()
-                        isTall -> TallContent(config, liveSnapshot, rows, now, appIntent)
-                        else -> CompactContent(config, liveSnapshot, appIntent, now)
+                GlanceTheme {
+                    val isTall = LocalSize.current.height >= TALL_BREAKPOINT
+                    Box(
+                        modifier = GlanceModifier
+                            .fillMaxSize()
+                            .background(GlanceTheme.colors.background),
+                    ) {
+                        when {
+                            config == null || appIntent == null -> UnconfiguredContent()
+                            isTall -> TallContent(config, liveSnapshot, rows, freshness, appIntent)
+                            else -> CompactContent(config, liveSnapshot, appIntent, freshness)
+                        }
                     }
                 }
             }
@@ -98,6 +110,18 @@ private fun navigatorIntent(context: Context, config: RepoWidgetConfig): Intent 
             .build()
         putExtra(EXTRA_LIVE_REPO_FULL, config.repo.full)
     }
+
+internal data class WidgetFreshness(
+    val now: Instant,
+    val clock: ClockLabel,
+    val rateLimitedUntil: Instant?,
+)
+
+private fun widgetClock(context: Context): ClockLabel = ClockLabel(
+    zone = ZoneId.systemDefault(),
+    is24Hour = DateFormat.is24HourFormat(context),
+    locale = Locale.getDefault(),
+)
 
 private fun githubIntent(row: WidgetRow): Intent = GitHubAppLauncher.intent(row.url, adjacent = false)
 
@@ -131,22 +155,24 @@ private fun UnconfiguredContent() {
     }
 }
 
-internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, now: Instant): String {
+internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, freshness: WidgetFreshness): String {
     val observedAt = snapshot?.observedAt
+    if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
+    val clock = freshness.clock.format(observedAt, freshness.now)
     return when {
-        snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN -> "no data"
-        snapshot.valueBasis == ValueBasis.LAST_GOOD -> "last good " + Ages.format(observedAt, now)
-        else -> Ages.format(observedAt, now)
+        freshness.rateLimitedUntil != null -> "rate limited · $clock"
+        snapshot.valueBasis == ValueBasis.LAST_GOOD -> "last good $clock"
+        else -> clock
     }
 }
 
 internal const val LEDGER_FRESHNESS_TAG = "ledger-freshness"
 
 @Composable
-internal fun CompactFreshness(snapshot: RepoSnapshot?, now: Instant) {
-    val stale = snapshot?.valueBasis != ValueBasis.EXACT
+internal fun CompactFreshness(snapshot: RepoSnapshot?, freshness: WidgetFreshness) {
+    val stale = snapshot?.valueBasis != ValueBasis.EXACT || freshness.rateLimitedUntil != null
     Text(
-        compactFreshnessLabel(snapshot, now),
+        compactFreshnessLabel(snapshot, freshness),
         maxLines = 1,
         style = TextStyle(
             color = if (stale) GlanceTheme.colors.error else GlanceTheme.colors.onSurfaceVariant,
@@ -162,7 +188,7 @@ internal fun CompactContent(
     config: RepoWidgetConfig,
     snapshot: RepoSnapshot?,
     appIntent: Intent,
-    now: Instant,
+    freshness: WidgetFreshness,
 ) {
     val basis = snapshot?.valueBasis ?: ValueBasis.UNKNOWN
 
@@ -186,7 +212,7 @@ internal fun CompactContent(
                 modifier = GlanceModifier.defaultWeight(),
             )
             Spacer(modifier = GlanceModifier.width(4.dp))
-            CompactFreshness(snapshot, now)
+            CompactFreshness(snapshot, freshness)
         }
         LedgerRow("issues", SnapshotRendering.countText(snapshot?.openIssues, basis))
         LedgerRow("PRs", SnapshotRendering.countText(snapshot?.openPrs, basis))
@@ -237,7 +263,7 @@ private fun TallContent(
     config: RepoWidgetConfig,
     snapshot: RepoSnapshot?,
     rows: List<WidgetRow>,
-    now: Instant,
+    freshness: WidgetFreshness,
     appIntent: Intent,
 ) {
     Column(modifier = GlanceModifier.fillMaxSize()) {
@@ -254,7 +280,7 @@ private fun TallContent(
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
             )
             Text(
-                tallHeaderLabel(snapshot, config.mode, now),
+                tallHeaderLabel(snapshot, config.mode, freshness),
                 maxLines = 1,
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
                 modifier = GlanceModifier.semantics { testTag = TALL_HEADER_TAG },
@@ -271,7 +297,7 @@ private fun TallContent(
                 }
             } else {
                 items(rows.take(MAX_WIDGET_ROWS).size) { index ->
-                    WidgetFeedRow(rows[index], now)
+                    WidgetFeedRow(rows[index], freshness.now)
                 }
             }
         }
@@ -282,10 +308,17 @@ private const val MAX_WIDGET_ROWS = 10
 internal const val TALL_HEADER_TAG = "tall-header"
 internal const val NO_ROWS_LABEL = "No saved rows · open RepoGlance to load"
 
-internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, now: Instant): String {
-    if (snapshot == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data · open RepoGlance to load"
+internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, freshness: WidgetFreshness): String {
+    val observedAt = snapshot?.observedAt
+    if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) {
+        return "no data · open RepoGlance to load"
+    }
+    val limited = freshness.rateLimitedUntil
+        ?.let { "rate limited · resets " + freshness.clock.time(it) + " · " }
+        .orEmpty()
     val basis = if (snapshot.valueBasis == ValueBasis.LAST_GOOD) "last good · " else ""
-    return basis + widgetCountSummary(snapshot, mode) + " · as of " + Ages.format(snapshot.observedAt ?: now, now)
+    val age = " · as of " + freshness.clock.format(observedAt, freshness.now)
+    return limited + basis + widgetCountSummary(snapshot, mode) + age
 }
 
 @Composable

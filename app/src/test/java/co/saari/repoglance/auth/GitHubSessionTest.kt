@@ -63,6 +63,61 @@ class GitHubSessionTest {
     }
 
     @Test
+    fun writesStartedBeforeSignOutAreDroppedAfterIt() {
+        val store = FakeTokenStore(token("current", null, null, null))
+        val session = session(store, HttpTransport { error("unused") })
+        val started = session.generation()
+        var written = false
+        var clearedLocalData = false
+
+        session.signOut { clearedLocalData = true }
+
+        assertTrue(clearedLocalData)
+        assertNull(session.commitIfCurrent(started) { written = true })
+        assertFalse(written)
+    }
+
+    @Test
+    fun writesStartedUnderAnEarlierSignInAreDroppedAfterANewOne() {
+        val store = FakeTokenStore(token("first", null, null, null))
+        val session = session(store, HttpTransport { error("unused") })
+        val started = session.generation()
+
+        session.acceptDeviceToken(token("second", null, null, null))
+
+        assertNull(session.commitIfCurrent(started) { "stale" })
+        assertEquals("fresh", session.commitIfCurrent(session.generation()) { "fresh" })
+    }
+
+    @Test
+    fun aWriteRacingSignOutWaitsForTheClearAndIsThenDropped() {
+        val store = FakeTokenStore(token("current", null, null, null))
+        val session = session(store, HttpTransport { error("unused") })
+        val started = session.generation()
+        val clearing = java.util.concurrent.CountDownLatch(1)
+        val release = java.util.concurrent.CountDownLatch(1)
+        val signOut = Thread {
+            session.signOut {
+                clearing.countDown()
+                release.await()
+            }
+        }
+        signOut.start()
+        clearing.await()
+        var result: String? = "not run"
+        val writer = Thread { result = session.commitIfCurrent(started) { "written after clear" } }
+        writer.start()
+        writer.join(200)
+        assertTrue("the write must wait for the clear to finish", writer.isAlive)
+        release.countDown()
+        signOut.join()
+        writer.join()
+
+        assertNull(result)
+        assertNull(store.value)
+    }
+
+    @Test
     fun deviceTokenPersistenceFailureIsClearedAndReportedWithoutRawDetail() {
         val store = FailingWriteTokenStore()
 

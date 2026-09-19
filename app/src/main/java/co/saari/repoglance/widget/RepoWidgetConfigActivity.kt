@@ -47,6 +47,7 @@ import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
+import co.saari.repoglance.refresh.BackgroundRefresh
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
@@ -113,8 +114,9 @@ class RepoWidgetConfigActivity : ComponentActivity() {
                 WidgetPins.releasedRepositories(listOf(previousRepo), RepoWidgetConfigStore.configuredRepos(this)),
             )
         }
+        BackgroundRefresh.refreshNow(this)
         lifecycleScope.launch {
-            RepoWidget().update(this@RepoWidgetConfigActivity, glanceId)
+            WidgetRefresh.redraw(this@RepoWidgetConfigActivity, glanceId)
             setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
             finish()
         }
@@ -220,7 +222,8 @@ private fun RepoWidgetConfigScreen(
                 }
                 Text(
                     "Saving pins this repository in RepoGlance; removing the widget unpins it. " +
-                        "Counts and rows come from the last time the repository was opened in the app.",
+                        "Counts and rows refresh in the background about every 30 minutes " +
+                        "and whenever you open the repository in the app.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

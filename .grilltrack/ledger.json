@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T02:30:55+00:00",
-    "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
-    "started_at": "2026-09-19T01:43:33+00:00",
+    "confirmed_at": "2026-09-19T05:07:42+00:00",
+    "domain": "Background refresh of the pinned live set (frontier node 3 of the live-widgets map): trigger and cadence, rate-limit budget and back-off, and what widgets show between and during refreshes",
+    "started_at": "2026-09-19T04:46:02+00:00",
     "status": "inspected",
-    "summary": "widget-live-config-022: setup lists the saved catalog names pinned first; save pins, delete/reconfigure unpins when no widget holds the repo; compact live counts or no data; tall shows rows saved on the last in-app open with ages; snapshot store v3 with rows; fixture picker untouched; proof on the Fold via adb-placed widget."
+    "summary": "widget-background-refresh-023: WorkManager periodic 30 min (CONNECTED) plus one-time run on widget save; run refreshes live pins least-recently-observed first capped at 20; LOW refreshes only widget-configured pins; EXHAUSTED stops and persists reset time; widgets show 'as of HH:MM' / 'as of <weekday> HH:MM' clock label with 'last good \u00b7' and 'rate limited \u00b7 resets HH:MM'; redraw only at run end; viewer login and rate-limit store cleared with session and work cancelled; shared refresh function for app and worker; feature map updated; proof: unit tests, gradlew check, adb-forced worker run on the Fold."
   },
   "decisions": [
     {
@@ -2229,7 +2229,7 @@
       "context_ref": ".grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T01:43:33+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#21 merged as 06cd6cf237d84a924ecf5b9edbac75b1cacf35b0",
       "dependencies": [
         "live-pins-021",
         "widget-content-priority-008"
@@ -2617,36 +2617,182 @@
       "review_source_identity": "git:a7d9cea844299eb938a5ec121d4441b11e2cb4d5",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T04:35:42+00:00",
+      "updated_at": "2026-09-19T04:41:45+00:00",
       "verification_ref": "proof/widget-live-config-20260919/PROOF.md#review-round-6"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [
+        "artifact:https://claude.ai/artifact/Q2GNAJzeimKDHxrmkqi2PZ"
+      ],
+      "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+      "context_ref": "file:.grilltrack/maps/live-widgets.md",
+      "created_at": "2026-09-19T05:04:21+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widget-live-config-022",
+        "live-pins-021"
+      ],
+      "domain": "Background refresh of the pinned live set (frontier node 3 of the live-widgets map): trigger and cadence, rate-limit budget and back-off, and what widgets show between and during refreshes",
+      "history": [
+        {
+          "at": "2026-09-19T05:04:21+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T05:36:15+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T05:36:15+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "implemented",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T06:10:07+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "verified",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T06:13:30+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936; openclaw req-20260919T053708Z-183956310196",
+          "review_result": "findings",
+          "review_source_identity": "git:728d09641883e9211aa2f4741bed54ec073b989d",
+          "to": "implemented",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T06:13:30+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "implemented",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#review-round-1",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+        }
+      ],
+      "id": "widget-background-refresh-023",
+      "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#review-round-1",
+      "question": "How is the pinned live set refreshed in the background: trigger and cadence, rate-limit budget and back-off, and what the widget shows between and during refreshes?",
+      "rationale": "Q1 maintainer picked the recommended 30-minute periodic (about 72 calls/h at 12 pins). Q2 after a plain-language restatement of run and budget, picked widget repos only at LOW. Q3 after the interactive age-label picker (artifact Q2GNAJzeimKDHxrmkqi2PZ) picked A: a frozen relative age understates the age between runs, and a refreshing state can stick if the job is killed.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936; openclaw req-20260919T053708Z-183956310196",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T06:10:07+00:00",
+          "source_identity": "git:728d09641883e9211aa2f4741bed54ec073b989d"
+        },
+        {
+          "classifications": [
+            "human_gate",
+            "defer"
+          ],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 2, gold shrimp 3/6); openclaw req-20260919T061403Z-19305683503",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T06:19:48+00:00",
+          "source_identity": "git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b"
+        },
+        {
+          "classifications": [],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 3, platinum hermit 4/6, no findings); openclaw req-20260919T064635Z-198656624933",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T06:53:53+00:00",
+          "source_identity": "git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3"
+        }
+      ],
+      "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 3, platinum hermit 4/6, no findings); openclaw req-20260919T064635Z-198656624933",
+      "review_result": "clean",
+      "review_source_identity": "git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T06:53:53+00:00",
+      "verification_ref": "test:GitHubSessionTest,LiveRowsStoreTest,LatestPushRecordTest; gradlew check green"
     }
   ],
   "last_activation": {
-    "at": "2026-09-18T22:24:04+00:00",
+    "at": "2026-09-19T04:46:02+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
     "artifact_refs": [
-      "proof/session-bootstrap-20260918/PROOF.md"
+      ".grilltrack/maps/live-widgets.md",
+      "proof/widget-live-config-20260919/PROOF.md"
     ],
-    "next_safe_action": "When the phone is back, awake and unlocked: bin/verify-repoglance doctor, launch MIXED live and MIXED picker, capture filtered StrictMode logcat, finish proof/session-bootstrap-20260918/PROOF.md, verify in ledger",
-    "paused_at": "2026-09-18T19:03:23+00:00",
-    "reason": "Registered Fold dropped off adb (no USB serial, no mdns entry) before the cold-start logcat proof",
-    "resumed_at": "2026-09-18T19:14:08+00:00"
+    "next_safe_action": "In the new session: check out claude/widget-background-refresh-023 (holds the PR #21 delivery record and this pause), resume the ledger, focus map node 3, discover facts (no WorkManager dependency yet; GitHubApiClient rate-limit handling; pinned set from AppPrefs.livePins), then grill sequentially: trigger and cadence, rate-limit budget and back-off, age label between refreshes",
+    "paused_at": "2026-09-19T04:42:02+00:00",
+    "reason": "Maintainer asked for the next grill (widget-background-refresh-023, live-widgets map node 3) to run in a new session",
+    "resumed_at": "2026-09-19T04:46:02+00:00"
   },
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "stack-widget-live-024: the stack widget over the live pinned set (map node 4)",
-      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread"
+      "compact-floor-fit: at 120dp a last-good label from an earlier day ('last good Mon 19:00') squeezes the repository name to an ellipsis; decide a compact-only short form",
+      "rate-limit-device-proof: exercise LOW/EXHAUSTED end to end (ClawSweeper owner-risk item) without burning real quota, e.g. a debug transport fault"
     ],
-    "reason": "widget-live-config-022 is verified on the Fold; widgets now show live data but only refresh on an in-app open, which node 3 resolves",
-    "recommended": "widget-background-refresh-023: trigger and cadence for refreshing the pinned set in the background (WorkManager periodic vs on-unlock), rate-limit budget, back-off, and the age label between refreshes (map node 3)",
-    "recorded_at": "2026-09-19T03:06:36+00:00"
+    "reason": "023 verified and reviewed clean at platinum hermit; node 4 is the last frontier node of the live-widgets map",
+    "recommended": "stack-widget-live-024: the stack widget over the live pinned set (map node 4, now unblocked by 022 and 023), including the stale catalog footer 'Widgets still use preview data'",
+    "recorded_at": "2026-09-19T06:54:01+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T04:35:42+00:00"
+  "updated_at": "2026-09-19T06:54:01+00:00"
 }
