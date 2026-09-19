@@ -43,7 +43,7 @@ class LatestPushRecordTest {
     @Test
     fun everySessionClearPathAlsoClearsTheTileRecord() {
         val source = readText(repositoryRoot().resolve("app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt"))
-        val helper = source.substringAfter("private fun clearSessionAndTileRecord()").substringBefore("}")
+        val helper = source.substringAfter("private fun clearSessionAndTileRecord()").substringBefore("\n    }\n")
         assertTrue("session clear must drop the tile record before the token", helper.contains("LatestPushStore.clear("))
         assertTrue(helper.indexOf("LatestPushStore.clear(") < helper.indexOf("session.signOut()"))
         assertTrue("session clear must drop live pins too", helper.contains("AppPrefs.clearLivePins("))
@@ -52,7 +52,7 @@ class LatestPushRecordTest {
             "no session-clear path may bypass the shared helper",
             Regex("session\\.signOut\\(\\)").findAll(source).count() == 1,
         )
-        val storeReplace = source.substringAfter("private fun recordLatestPush(").substringBefore("}")
+        val storeReplace = source.substringAfter("private fun recordLatestPush(").substringBefore("\n    }\n")
         assertTrue("a catalog with no push record must clear, not keep, the tile record", storeReplace.contains("LatestPushStore.replace("))
     }
 

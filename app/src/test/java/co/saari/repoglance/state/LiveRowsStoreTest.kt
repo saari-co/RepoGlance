@@ -1,0 +1,48 @@
+package co.saari.repoglance.state
+
+import co.saari.repoglance.data.LiveIssue
+import co.saari.repoglance.data.LivePullRequest
+import co.saari.repoglance.widget.WidgetRow
+import co.saari.repoglance.widget.WidgetRowKind
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import java.time.Instant
+
+class LiveRowsStoreTest {
+    private val now = Instant.parse("2026-09-19T00:00:00Z")
+
+    @Test
+    fun rowsRoundTripThroughTheStoreFormat() {
+        val rows = listOf(
+            WidgetRow(WidgetRowKind.ISSUE, 41, "Widget shows stale counts", now.minusSeconds(60), "https://example/41"),
+            WidgetRow(WidgetRowKind.PR, 39, "Add tile lock guard", now.minusSeconds(120), "https://example/39"),
+        )
+        assertEquals(rows, LiveRowsStore.decode(LiveRowsStore.encode(rows)))
+    }
+
+    @Test
+    fun rowsFromMergesIssuesAndPullRequestsNewestFirstAndCaps() {
+        val issues = (1..8).map { issue(it, now.minusSeconds(it * 10L)) }
+        val prs = (1..8).map { pr(100 + it, now.minusSeconds(it * 10L + 5)) }
+        val rows = LiveRowsStore.rowsFrom(issues, prs)
+        assertEquals(LiveRowsStore.MAX_ROWS, rows.size)
+        assertEquals(listOf(1, 101, 2, 102, 3), rows.take(5).map { it.number })
+        assertEquals(WidgetRowKind.PR, rows[1].kind)
+    }
+
+    @Test
+    fun unknownVersionDecodesToNothingRatherThanStaleRows() {
+        assertNull(LiveRowsStore.decode("""{"version":99,"rows":[]}"""))
+    }
+
+    private fun issue(number: Int, updatedAt: Instant) = LiveIssue(
+        number = number, title = "Issue $number", author = "bobby", assignee = null, labels = emptyList(),
+        commentCount = 0, updatedAt = updatedAt, htmlUrl = "https://example/i/$number",
+    )
+
+    private fun pr(number: Int, updatedAt: Instant) = LivePullRequest(
+        number = number, title = "PR $number", author = "bobby", assignee = null, labels = emptyList(),
+        isDraft = false, reviewRequestedFromViewer = false, updatedAt = updatedAt, htmlUrl = "https://example/p/$number",
+    )
+}

@@ -66,6 +66,8 @@ required state, commands, and observable proof.
   filter and repository search, including the source-blind guard.
 - [Sign in with GitHub](./sign-in.md) covers the device-flow sign-in screen and
   the human-gated live session.
+- [Widget setup](./widget-setup.md) covers configuring a widget from the live
+  catalog, pin-on-save, unpin-on-delete, and the tall size's saved rows.
 - [Quick Settings tile](./quick-settings-tile.md) covers the shade tile: label,
   latest-push subtitle, and the tap that opens the live catalog.
 - [Refresh and freshness](./refresh-freshness.md) covers refresh controls,

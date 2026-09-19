@@ -3,11 +3,12 @@
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
     "cadence": "sequential",
-    "confirmed": false,
+    "confirmed": true,
+    "confirmed_at": "2026-09-19T02:30:55+00:00",
     "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
     "started_at": "2026-09-19T01:43:33+00:00",
-    "status": "grilling",
-    "summary": "Sequential: configuration source first, then the empty/no-data story, then the tall size"
+    "status": "inspected",
+    "summary": "widget-live-config-022: setup lists the saved catalog names pinned first; save pins, delete/reconfigure unpins when no widget holds the repo; compact live counts or no data; tall shows rows saved on the last in-app open with ages; snapshot store v3 with rows; fixture picker untouched; proof on the Fold via adb-placed widget."
   },
   "decisions": [
     {
@@ -2224,7 +2225,7 @@
     {
       "baseline_ref": null,
       "candidate_refs": [],
-      "choice": "proposed: the configuration list is the pinned live set; compact shows the live snapshot or 'no data'",
+      "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
       "context_ref": ".grilltrack/maps/live-widgets.md",
       "created_at": "2026-09-19T01:43:33+00:00",
       "deferred_reason": null,
@@ -2234,21 +2235,64 @@
         "widget-content-priority-008"
       ],
       "domain": "Widget configuration from the pinned live set (frontier node 2 of the live-widgets map): which repositories a widget can be configured with, what it shows before live data exists, and what the tall size does without live rows",
-      "history": [],
+      "history": [
+        {
+          "at": "2026-09-19T02:24:40+00:00",
+          "choice": "proposed: the configuration list is the pinned live set; compact shows the live snapshot or 'no data'",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T02:49:46+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T03:06:36+00:00",
+          "choice": "Widget configuration lists any repository from the last catalog load, pinned ones first (a persisted name list written on catalog load, cleared with the session). Choosing a repository for a widget pins it; when no widget uses a repository any more (deleted or reconfigured) it is unpinned, even if pinned by hand. Compact shows the live snapshot or 'no data'. Tall sizes show the issue/PR rows saved the last time the repository was opened in the app, each with its age and the snapshot's 'as of' age; no fixture rows on live widgets.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
       "id": "widget-live-config-022",
-      "implementation_ref": null,
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/state/LiveRowsStore.kt,file:app/src/main/java/co/saari/repoglance/state/CatalogNamesStore.kt,file:app/src/main/java/co/saari/repoglance/widget/WidgetPins.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidgetConfigActivity.kt,file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt#TallContent",
       "question": "Which repositories can a home-screen widget be configured with, and what does it show before live data exists",
-      "rationale": "RepoWidgetConfigActivity lists fixture repositories only; the compact widget already reads LiveSnapshotStore for its configured repo but that store is written only when the repo is opened in the app; the tall size renders fixture rows",
+      "rationale": "Maintainer 2026-09-19: any repo configurable; pins and widgets are the same set (option 1 plus unpin on removal); tall size option 3 after mockups.",
       "repair_required": false,
       "review_classifications": [],
       "review_history": [],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "proposed",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T01:43:33+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-19T03:06:36+00:00",
+      "verification_ref": "proof/widget-live-config-20260919/PROOF.md"
     }
   ],
   "last_activation": {
@@ -2267,16 +2311,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread",
-      "row-copy: the catalog row says 'Updated Nm ago' for what is the push time; rename to Pushed"
+      "stack-widget-live-024: the stack widget over the live pinned set (map node 4)",
+      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread"
     ],
-    "reason": "live-pins-021 is verified and reviewed clean; the live-widgets map names widget configuration as the next dependent node",
-    "recommended": "widget-live-config-022: widget configuration picks from the pinned live set and the compact widget shows the live snapshot or no data (map node 2)",
-    "recorded_at": "2026-09-19T01:36:36+00:00"
+    "reason": "widget-live-config-022 is verified on the Fold; widgets now show live data but only refresh on an in-app open, which node 3 resolves",
+    "recommended": "widget-background-refresh-023: trigger and cadence for refreshing the pinned set in the background (WorkManager periodic vs on-unlock), rate-limit budget, back-off, and the age label between refreshes (map node 3)",
+    "recorded_at": "2026-09-19T03:06:36+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T01:43:33+00:00"
+  "updated_at": "2026-09-19T03:06:36+00:00"
 }

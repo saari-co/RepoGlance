@@ -12,6 +12,7 @@ import co.saari.repoglance.auth.GitHubDeviceFlowClient
 import co.saari.repoglance.auth.GitHubDeviceFlowPoller
 import co.saari.repoglance.auth.GitHubSession
 import co.saari.repoglance.auth.SecureTokenStore
+import co.saari.repoglance.data.CatalogSort
 import co.saari.repoglance.data.GitHubApiClient
 import co.saari.repoglance.data.GitHubApiResult
 import co.saari.repoglance.data.LiveRepository
@@ -19,10 +20,13 @@ import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
+import co.saari.repoglance.data.orderRepositories
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.state.LatestPushStore
+import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.latestPushRecordFor
 import co.saari.repoglance.widget.WidgetRefresh
@@ -239,6 +243,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                     ?: prSuccess?.rateLimit?.bucket
                     ?: RateLimitBucket.UNKNOWN,
             ).also { LiveSnapshotStore.save(context, it) }
+            LiveRowsStore.save(context, repository.ref, LiveRowsStore.rowsFrom(issues?.rows, prSuccess?.value?.rows))
         }
         WidgetRefresh.updateAll(context)
     }
@@ -263,7 +268,11 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun recordLatestPush(repositories: List<LiveRepository>, observedAt: Instant) {
         val record = latestPushRecordFor(repositories, observedAt)
-        viewModelScope.launch(sessionDispatcher) { LatestPushStore.replace(getApplication(), record) }
+        val names = orderRepositories(repositories, CatalogSort.RECENT).map { it.ref.full }
+        viewModelScope.launch(sessionDispatcher) {
+            LatestPushStore.replace(getApplication(), record)
+            CatalogNamesStore.save(getApplication(), names)
+        }
     }
 
     private fun bootstrapSessionState() {
@@ -289,6 +298,8 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private fun clearSessionAndTileRecord() {
         LatestPushStore.clear(getApplication())
         AppPrefs.clearLivePins(getApplication())
+        CatalogNamesStore.clear(getApplication())
+        LiveRowsStore.clear(getApplication())
         session.signOut()
     }
 

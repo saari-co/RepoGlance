@@ -47,6 +47,15 @@ object AppPrefs {
         prefs(context).edit().putStringSet(KEY_LIVE_PINS, next).apply()
     }
 
+    fun addLivePin(context: Context, repoFull: String) {
+        prefs(context).edit().putStringSet(KEY_LIVE_PINS, livePins(context) + repoFull).apply()
+    }
+
+    fun removeLivePins(context: Context, repoFulls: Collection<String>) {
+        if (repoFulls.isEmpty()) return
+        prefs(context).edit().putStringSet(KEY_LIVE_PINS, livePins(context) - repoFulls.toSet()).apply()
+    }
+
     fun clearLivePins(context: Context) {
         prefs(context).edit().remove(KEY_LIVE_PINS).apply()
     }
