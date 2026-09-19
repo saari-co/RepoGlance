@@ -2962,13 +2962,21 @@
       "rationale": "Maintainer chose app update only over also redrawing on time/zone/locale changes or boot.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": "file:proof/widget-update-redraw-20260919/PROOF.md#review-round-1",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T13:57:12+00:00",
+          "source_identity": "git:84a8665e27c2ab1f87f6a2cdbfc662d131b78970"
+        }
+      ],
+      "review_ref": "file:proof/widget-update-redraw-20260919/PROOF.md#review-round-1",
+      "review_result": "clean",
+      "review_source_identity": "git:84a8665e27c2ab1f87f6a2cdbfc662d131b78970",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T13:43:01+00:00",
+      "updated_at": "2026-09-19T13:57:12+00:00",
       "verification_ref": "file:proof/widget-update-redraw-20260919/PROOF.md"
     }
   ],
@@ -3000,5 +3008,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T13:43:01+00:00"
+  "updated_at": "2026-09-19T13:57:12+00:00"
 }

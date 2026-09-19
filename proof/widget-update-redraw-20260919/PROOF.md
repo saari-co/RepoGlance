@@ -117,3 +117,18 @@ Run artifacts (local, ignored): `runs/verify-repoglance-runs/20260919T134018Z/`
   was `OPENED` (`cmd device_state state`).
 - Earlier follow-ups stay open: compact 120dp last-good label fit,
   LOW/EXHAUSTED device proof, new pins read `no data` until refreshed.
+
+## Review round 1 (source identity git:84a8665e27c2ab1f87f6a2cdbfc662d131b78970, PR #24)
+
+- OpenClaw `req-20260919T135054Z-278029219180` (worktree materialized on
+  spark-2): correct (0.98), 0 findings.
+- ClawSweeper: diamond lobster 5/6 (proof diamond lobster 5/6, patch
+  quality diamond lobster 5/6), no findings, no security findings, `proof:
+  sufficient`, `status: ready for maintainer look` (PR #24 comment
+  5742440743). Its two "before merge" merge-risk items restate the gaps
+  above: the one-provider install case wasn't recreated (the evidence is
+  broadcast delivery plus the redraw counters), and StrictMode logs disk
+  reads from the existing redraw path. Both classified `defer`: they were
+  disclosed before review, and the StrictMode work is a separate follow-up
+  task. No repair round needed. Only the owner's merge authority remains.
+  Recorded clean in the ledger.

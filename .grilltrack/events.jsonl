@@ -223,3 +223,4 @@
 {"action": "track_resumed", "at": "2026-09-19T13:32:46+00:00", "data": {"activation": "implicit"}, "event_id": "46972889-a793-4d41-8426-7ba60a81358f"}
 {"action": "decision_implemented", "at": "2026-09-19T13:38:07+00:00", "data": {"decision_id": "widget-update-redraw-025"}, "event_id": "80f1258d-c21a-4c17-8f40-6f27bdffe3a6"}
 {"action": "decision_verified", "at": "2026-09-19T13:43:01+00:00", "data": {"decision_id": "widget-update-redraw-025"}, "event_id": "9215f02d-1a1a-47ff-9870-593d2d4d11d8"}
+{"action": "decision_reviewed", "at": "2026-09-19T13:57:12+00:00", "data": {"classifications": [], "decision_id": "widget-update-redraw-025", "ref": "file:proof/widget-update-redraw-20260919/PROOF.md#review-round-1", "result": "clean", "reviewed_at": "2026-09-19T13:57:12+00:00", "source_identity": "git:84a8665e27c2ab1f87f6a2cdbfc662d131b78970"}, "event_id": "78b12d9d-5819-4fef-804f-65ebffe074b1"}
