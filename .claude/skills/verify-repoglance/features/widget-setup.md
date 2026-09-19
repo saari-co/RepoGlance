@@ -32,6 +32,7 @@ Preconditions:
 ## Gotchas
 
 - The list is empty until the app has loaded a catalog at least once. Disconnect GitHub clears it together with pins, saved counts, rows and every widget's configuration, and placed widgets re-render as unconfigured.
+- After an app update both widgets (repo and stack) redraw from saved data without the app being opened; no GitHub call is made, so the numbers and their time are whatever was last saved.
 - The `as of` time is a clock time on purpose: the widget picture is frozen between redraws, so a relative age would understate it. A stale header reads `last good`.
 - `adb shell cmd jobscheduler run -f` on the periodic job does not refresh anything: WorkManager reschedules a periodic worker that fires before its period is due. Use the widget save (one-time run) or wait for the period.
 - Do not `launch` or `cleanup` while waiting for a periodic run: both force-stop the app, which cancels its scheduled jobs until the app starts again.
