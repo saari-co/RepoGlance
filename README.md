@@ -30,10 +30,17 @@ The live repository home can filter visible repositories by account or
 organization before applying repository search. GitHub App installation and
 repository-sharing controls live under **Manage GitHub access** in the header
 menu rather than occupying the permanent navigation surface.
-Widgets remain fixture-backed and visibly say
-`FIXTURE PREVIEW`; background refresh, live widget content, CI/release
-pressure, signing, release, general distribution, and revocation of the earlier
-prototype client secret remain maintainer-gated or planned.
+Live widgets are available and physical-Fold verified: repositories are
+pinned in place from the live catalog; a per-repo widget is configured from
+the last catalog load and shows that repository's saved counts with their
+`as of` time (`last good` when stale, `no data` never shown as zero); the
+stack widget lists every live pin, most recent push first. Pinned
+repositories refresh in the background every 30 minutes on a network
+connection (WorkManager, no wakelock or foreground service) within a visible
+rate-limit budget, and both widgets redraw from saved data after an app
+update. Live CI is not fetched, so the widgets have no CI column. CI/release
+pressure, signing, release, general distribution, and revocation of the
+earlier prototype client secret remain maintainer-gated or planned.
 
 ## Planned
 
