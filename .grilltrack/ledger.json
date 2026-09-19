@@ -1831,7 +1831,7 @@
       "context_ref": null,
       "created_at": "2026-09-18T23:17:10+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#19 merged as 3c651701cf39366c8a8d2861fbd7ef49e2ec4192",
       "dependencies": [
         "checking-splash-018",
         "pin-model-010"
@@ -2060,7 +2060,7 @@
       "review_source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T00:54:51+00:00",
+      "updated_at": "2026-09-19T00:58:36+00:00",
       "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md#review-round-3"
     },
     {
@@ -2070,7 +2070,7 @@
       "context_ref": null,
       "created_at": "2026-09-18T23:24:41+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#19 merged as 3c651701cf39366c8a8d2861fbd7ef49e2ec4192",
       "dependencies": [
         "access-model-004"
       ],
@@ -2139,7 +2139,7 @@
       "review_source_identity": "git:acf9c9c1bd36ed33213b0bdb4d1dbeed5cb39f47",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T00:54:51+00:00",
+      "updated_at": "2026-09-19T00:58:36+00:00",
       "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
     }
   ],
@@ -2170,5 +2170,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T00:54:51+00:00"
+  "updated_at": "2026-09-19T00:58:36+00:00"
 }
