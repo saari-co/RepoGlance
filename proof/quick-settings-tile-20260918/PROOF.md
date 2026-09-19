@@ -83,3 +83,33 @@ Tile (maintainer approved adding it over adb in the confirmed plan):
   wanted.
 - Feature map: `find-repository.md` gained `find-sort`; new
   `quick-settings-tile.md`; README indexed.
+
+## Review round 1 (source identity git:a3d9b3cb408f6a4ab8a5679edbf1013535474509, PR #19)
+
+- OpenClaw `req-20260919T002048Z-110778117861`: correct (0.98), 0 findings.
+- ClawSweeper: gold shrimp 3/6, patch incorrect (0.86), needs-human
+  (PR #19 comment 5737818227). Findings, both accepted as `required_fix`:
+  1. P2: a successful catalog with no pushed repository left the previous
+     latest-push record in place, so the tile could name a repository no
+     longer in the catalog.
+  2. Security, medium: a 401 that invalidates the session cleared only the
+     token, not the tile record, so the shade could keep showing a
+     repository name after the session was gone.
+
+### Repair
+
+- `latestPushRecordFor(repositories, observedAt)` is a pure function; the
+  view model now calls `LatestPushStore.replace(record)`, which clears the
+  store when the record is null (empty or unknown-only catalog).
+- Every session-clear path (`clearSavedSession`, `clearSavedSessionNow`,
+  used by cancel, sign-out, catalog 401 and content 401) goes through one
+  helper that clears the tile record before the token. The separate
+  sign-out clear was removed so there is exactly one path.
+- Regression: `LatestPushRecordTest` (empty and unknown-only catalogs yield
+  no record; newest repository wins; a source-structure check that the
+  single `session.signOut()` call site clears the tile record first and
+  that the catalog path uses `replace`). `./gradlew check` green.
+- Device re-check on the Fold (run `runs/verify-repoglance-runs/tile-sort-fix`,
+  registered serial pinned because a second device was on adb): catalog
+  loads with the sort chips, shade dump still carries
+  `RepoGlance, latest push to saari-co/swarm-intercom updated 1m ago`.

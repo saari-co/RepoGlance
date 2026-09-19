@@ -19,12 +19,11 @@ import co.saari.repoglance.data.LiveRepositoryCatalog
 import co.saari.repoglance.data.LiveRepositoryContent
 import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
-import co.saari.repoglance.data.mostRecentlyPushed
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.model.RateLimitBucket
-import co.saari.repoglance.state.LatestPushRecord
 import co.saari.repoglance.state.LatestPushStore
 import co.saari.repoglance.state.LiveSnapshotStore
+import co.saari.repoglance.state.latestPushRecordFor
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -251,7 +250,6 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun signOut() {
-        viewModelScope.launch(sessionDispatcher + NonCancellable) { LatestPushStore.clear(getApplication()) }
         bootstrapJob?.cancel()
         authorizationJob?.cancel()
         authorizationJob = null
@@ -263,11 +261,8 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun recordLatestPush(repositories: List<LiveRepository>, observedAt: Instant) {
-        val top = mostRecentlyPushed(repositories) ?: return
-        val pushedAt = top.pushedAt ?: return
-        viewModelScope.launch(sessionDispatcher) {
-            LatestPushStore.save(getApplication(), LatestPushRecord(top.ref.full, pushedAt, observedAt))
-        }
+        val record = latestPushRecordFor(repositories, observedAt)
+        viewModelScope.launch(sessionDispatcher) { LatestPushStore.replace(getApplication(), record) }
     }
 
     private fun bootstrapSessionState() {
@@ -283,10 +278,17 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private suspend fun hasSavedSession(): Boolean = withContext(sessionDispatcher) { session.hasSavedSession() }
 
     private fun clearSavedSession() {
-        viewModelScope.launch(sessionDispatcher + NonCancellable) { session.signOut() }
+        viewModelScope.launch(sessionDispatcher + NonCancellable) { clearSessionAndTileRecord() }
     }
 
-    private suspend fun clearSavedSessionNow() = withContext(sessionDispatcher + NonCancellable) { session.signOut() }
+    private suspend fun clearSavedSessionNow() = withContext(sessionDispatcher + NonCancellable) {
+        clearSessionAndTileRecord()
+    }
+
+    private fun clearSessionAndTileRecord() {
+        LatestPushStore.clear(getApplication())
+        session.signOut()
+    }
 
     override fun onCleared() {
         super.onCleared()
