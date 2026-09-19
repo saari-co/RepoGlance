@@ -55,29 +55,47 @@ violations.
   `remember` + `LaunchedEffect`).
 - Debug APK SHA-256 `978cc2484d417181907cf5d57f403fa7c5a674de9265ce3304a16398635930fb`.
 
-## Device proof: BLOCKED
+## Device proof (Pixel 11 Pro Fold 66261FDDJ002J5, cover display)
 
-- The registered phone (Pixel 11 Pro Fold `66261FDDJ002J5`) was not
-  attached: `adb devices` listed only `59151FDCG000JA` (Pixel 10 Pro Fold)
-  and `adb mdns services` was empty.
-- Before checking the serial against the registered one, this session ran
-  `adb install -r` of the debug APK on `59151FDCG000JA`. That was a fresh
-  install (`firstInstallTime=lastUpdateTime=2026-09-19 09:57:16`, never
-  launched, no RepoGlance widget placed). It is not the registered phone,
-  so it was not driven further, and it is not evidence. `doctor` on it
-  reported `scenario_launcher_present=no` for a debuggable build whose
-  manifest declares `devlaunch.ScenarioLaunchActivity`. The install is
-  still on that phone and is left for the maintainer to keep or uninstall.
-- Remaining acceptance step, on the registered phone with a placed repo
-  widget and stack widget: `bin/verify-repoglance doctor`, then
-  `adb logcat -c`, `adb install -r app/build/outputs/apk/debug/app-debug.apk`
-  (or a pin toggle / refresh, which bumps `REDRAW_KEY`), wait ~10 s, and
-  `adb logcat -d | grep -A12 'StrictMode policy violation'` must show no
-  block with frames in `co.saari.repoglance.widget`.
+Both Folds were attached over USB; every adb call and helper ran with
+`ANDROID_SERIAL=VERIFY_SERIAL=66261FDDJ002J5`. The stack widget and a repo
+widget are placed on the Nexus launcher (`dumpsys appwidget`); the stack is on
+home page 4. The redraw trigger is the live-catalog thumbtack, which calls
+`WidgetRefresh.updateAll` and bumps `REDRAW_KEY` on every placed widget. Each
+toggle pair returns the pin to its starting state (`Unpin saari-co/RepoGlance`,
+i.e. pinned).
+
+| Run | Build | Trigger | StrictMode total / DiskRead | Violation frames in `co.saari.repoglance.widget` | logcat SHA-256 |
+|---|---|---|---|---|---|
+| before | previously installed (`37e8853d…`, pre-fix widget code) | unpin + re-pin | 14 / 13 | 22 (`RepoWidget$provideGlance$2.invoke` 16, `StackWidget$provideGlance$2.invoke` 4, via `RepoWidgetConfigStore`, `RateLimitStore`, `LiveSnapshotStore`, `LiveRowsStore`, `CatalogNamesStore.pushedAt`, `AppPrefs`) | `14d133c8…6a39fa` |
+| install | this branch (`978cc248…`) | `adb install -r`, 15 s | 0 / 0 | 0 | not retained |
+| after | this branch | unpin + re-pin | 4 / 3 | 0 | `0e273033…189a0` |
+| redraw | this branch | unpin, dump home, re-pin, dump home | 4 / 3 | 0 | `aece0139…96dd01` |
+
+- `doctor` passed on the new build: `apk_local=apk_device=978cc248…30fb`,
+  `scenario_launcher_present=yes`, awake and unlocked.
+- The redraw re-reads the stores off the main thread. The home dump after the
+  unpin read `Pinned · 0 ; Pin repositories in RepoGlance`. After the
+  re-pin it read `Pinned · 1 ; saari-co/RepoGlance ; issues 2 · PRs 1 · review 0`.
+  Capture `home-stack-repinned.png` sha256
+  `e30d5a0fdcf330dcced66731836d836fb9b87ad85bc2bc0a0fc97ba01e376bfd` (local
+  only: it shows the maintainer's home screen).
+- The remaining violations after the fix are the known debug-launcher
+  reads (`ScenarioLaunchActivity.onCreate` → `AppPrefs.setSelectedScenario`,
+  3 `DiskReadViolation`s) and one `UntaggedSocketViolation` from
+  `UrlConnectionTransport.execute` on an IO thread. Neither is widget code,
+  and both appear in the before run too.
+- `bin/verify-repoglance cleanup` ran afterwards (scenario `MIXED`, airplane
+  mode off).
+- Earlier in the session, before the Pixel 11 was attached, this debug APK
+  was installed by mistake on the unregistered Pixel 10 Pro Fold
+  `59151FDCG000JA`. It was a fresh install and was never driven. That phone
+  is not evidence.
 
 ## Gaps and risk
 
-- On-device StrictMode absence is unproven until the step above runs.
+- The repo widget's page was not dumped. Its absence of StrictMode frames is shown by logcat, not by a visible redraw. Its pre-fix frames (16) came from the same trigger.
+- The widget pages were on the cover display (posture closed); the inner display was not exercised.
 - On main, a redraw after `adb install -r` depends on the system's
   `APPWIDGET_UPDATE`; the `AppUpdateReceiver` from 025 is not merged here.
   A pin toggle in the live catalog is the reliable `REDRAW_KEY` trigger.
