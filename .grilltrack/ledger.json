@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-19T12:16:40+00:00",
     "domain": "Stack widget over the live pinned set (frontier node 4 of the live-widgets map): which repositories, row content and data age, taps, and how it interacts with the LOW refresh budget",
     "started_at": "2026-09-19T12:14:11+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "stack-widget-live-024: stack lists all live pins recent-push first, no setup, empty state opens app; rows name + issues/PRs/review + per-row clock (023 label rules), no CI; header 'Pinned \u00b7 N' + rate-limit note; row tap -> live repo view, header -> live catalog; LOW budget unchanged (repo widgets only); fixtures no longer feed the placed stack; stale catalog footer removed; stack redraw fix; feature map entry; proof: unit tests, gradlew check, Fold dumps of the placed stack, row and header taps."
   },
   "decisions": [
@@ -2882,14 +2882,21 @@
           "result": "findings",
           "reviewed_at": "2026-09-19T12:38:24+00:00",
           "source_identity": "git:a4d2639a5091035de125c13aad7fc53ac61677e3"
+        },
+        {
+          "classifications": [],
+          "ref": "github:saari-co/RepoGlance#23 comment 5741923103 (round 2, platinum hermit 4/6, no findings); openclaw req-20260919T125415Z-26622407863",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T12:59:49+00:00",
+          "source_identity": "git:d1c5d5f654bdaba579c6843bc7651edd78673e08"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "github:saari-co/RepoGlance#23 comment 5741923103 (round 2, platinum hermit 4/6, no findings); openclaw req-20260919T125415Z-26622407863",
+      "review_result": "clean",
+      "review_source_identity": "git:d1c5d5f654bdaba579c6843bc7651edd78673e08",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T12:53:46+00:00",
+      "updated_at": "2026-09-19T12:59:49+00:00",
       "verification_ref": "test:StackWidgetTest,CatalogNamesStoreTest; gradlew check; Fold stack-order dump"
     }
   ],
@@ -2910,16 +2917,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "compact-floor-fit: at 120dp a last-good label from an earlier day ('last good Mon 19:00') squeezes the repository name to an ellipsis; decide a compact-only short form",
-      "rate-limit-device-proof: exercise LOW/EXHAUSTED end to end (ClawSweeper owner-risk item) without burning real quota, e.g. a debug transport fault"
+      "compact-floor-fit: short compact-only last-good label so the repository name survives at 120dp",
+      "rate-limit-device-proof: exercise LOW/EXHAUSTED end to end with a debug-only transport fault"
     ],
-    "reason": "023 verified and reviewed clean at platinum hermit; node 4 is the last frontier node of the live-widgets map",
-    "recommended": "stack-widget-live-024: the stack widget over the live pinned set (map node 4, now unblocked by 022 and 023), including the stale catalog footer 'Widgets still use preview data'",
-    "recorded_at": "2026-09-19T06:54:01+00:00"
+    "reason": "stack-widget-live-024 verified and reviewed clean at platinum hermit; it was the last node of .grilltrack/maps/live-widgets.md",
+    "recommended": "closeout of the live-widgets map (all four frontier nodes verified and reviewed clean), with a small follow-up: redraw both widgets after an app update so the stack never sits on the launcher's loading placeholder",
+    "recorded_at": "2026-09-19T12:59:49+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T12:53:46+00:00"
+  "updated_at": "2026-09-19T12:59:49+00:00"
 }
