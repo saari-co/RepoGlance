@@ -13,5 +13,14 @@ fun orderRepositories(repositories: List<LiveRepository>, sort: CatalogSort): Li
     )
 }
 
+fun orderCatalog(
+    repositories: List<LiveRepository>,
+    sort: CatalogSort,
+    pinned: Set<String>,
+): List<LiveRepository> {
+    val (pins, rest) = repositories.partition { it.ref.full in pinned }
+    return orderRepositories(pins, CatalogSort.RECENT) + orderRepositories(rest, sort)
+}
+
 fun mostRecentlyPushed(repositories: List<LiveRepository>): LiveRepository? =
     orderRepositories(repositories, CatalogSort.RECENT).firstOrNull { it.pushedAt != null }

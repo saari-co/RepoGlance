@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T00:07:03+00:00",
-    "domain": "Quick Settings tile: what a RepoGlance tile in the swipe-down shade does, shows, and how it is added",
-    "started_at": "2026-09-18T23:17:10+00:00",
+    "confirmed_at": "2026-09-19T01:19:22+00:00",
+    "domain": "Live pins: pinning repositories on the live catalog as the widget and background-refresh set (frontier node 1 of the live-widgets map)",
+    "started_at": "2026-09-19T00:59:32+00:00",
     "status": "confirmed",
-    "summary": "catalog-sort-020: recency default (pushed_at desc, unknown last, labelled) with a remembered alphabetical toggle. quick-settings-tile-019: TileService launcher into the catalog, label RepoGlance, commit-eye icon, subtitle from a persisted latest-push record with push age, 'open to refresh' past 24h, 'Open to connect' inactive when no record; cleared on sign-out; no network, no polling. Proof: JVM tests, gradlew check, Fold verifier for sort and tile."
+    "summary": "live-pins-021: thumbtack toggle per live catalog row; pinned group first ordered by recency, rest by the active sort; live pins persisted under their own AppPrefs key; cleared on every session-clear path via the shared helper; widget config untouched (map node 2). Proof: JVM tests, gradlew check, Fold pin/unpin with guarded capture."
   },
   "decisions": [
     {
@@ -2141,6 +2141,78 @@
       "superseded_by": null,
       "updated_at": "2026-09-19T00:58:36+00:00",
       "verification_ref": "proof/quick-settings-tile-20260918/PROOF.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Each live catalog row has an in-place thumbtack toggle. Pinned repositories always form the top group, ordered by most recent push within the group; the rest follow the active sort (recency default or A to Z). Pins persist on the device for the live catalog (own key, separate from the fixture home's pins) and clear on every session-clear path: Disconnect GitHub, cancelled sign-in, catalog 401, content 401.",
+      "context_ref": ".grilltrack/maps/live-widgets.md",
+      "created_at": "2026-09-19T00:59:32+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "pin-model-010",
+        "catalog-sort-020"
+      ],
+      "domain": "Live pins: pinning repositories on the live catalog as the widget and background-refresh set (frontier node 1 of the live-widgets map)",
+      "history": [
+        {
+          "at": "2026-09-19T01:18:29+00:00",
+          "choice": "proposed: in-place pin toggle on each catalog row (pin-model-010 interaction), pinned rows grouped first within the chosen sort",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T01:23:28+00:00",
+          "choice": "Each live catalog row has an in-place thumbtack toggle. Pinned repositories always form the top group, ordered by most recent push within the group; the rest follow the active sort (recency default or A to Z). Pins persist on the device for the live catalog (own key, separate from the fixture home's pins) and clear on every session-clear path: Disconnect GitHub, cancelled sign-in, catalog 401, content 401.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T01:23:28+00:00",
+          "choice": "Each live catalog row has an in-place thumbtack toggle. Pinned repositories always form the top group, ordered by most recent push within the group; the rest follow the active sort (recency default or A to Z). Pins persist on the device for the live catalog (own key, separate from the fixture home's pins) and clear on every session-clear path: Disconnect GitHub, cancelled sign-in, catalog 401, content 401.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/data/CatalogSort.kt#orderCatalog,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#PinToggle,file:app/src/main/java/co/saari/repoglance/state/AppPrefs.kt#livePins",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "live-pins-021",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/data/CatalogSort.kt#orderCatalog,file:app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt#PinToggle,file:app/src/main/java/co/saari/repoglance/state/AppPrefs.kt#livePins",
+      "question": "How does a user pin a repository on the live catalog, and how do pins sit beside the recency sort",
+      "rationale": "Maintainer 2026-09-19: a pinned repo always stays at the top with a thumbtack and takes priority over the recency sort; pins clear with the session like every other saved repository name (option 1).",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T01:23:28+00:00",
+      "verification_ref": "proof/live-pins-20260919/PROOF.md"
     }
   ],
   "last_activation": {
@@ -2170,5 +2242,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T00:58:36+00:00"
+  "updated_at": "2026-09-19T01:23:28+00:00"
 }

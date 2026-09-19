@@ -46,6 +46,8 @@ class LatestPushRecordTest {
         val helper = source.substringAfter("private fun clearSessionAndTileRecord()").substringBefore("}")
         assertTrue("session clear must drop the tile record before the token", helper.contains("LatestPushStore.clear("))
         assertTrue(helper.indexOf("LatestPushStore.clear(") < helper.indexOf("session.signOut()"))
+        assertTrue("session clear must drop live pins too", helper.contains("AppPrefs.clearLivePins("))
+        assertTrue(helper.indexOf("AppPrefs.clearLivePins(") < helper.indexOf("session.signOut()"))
         assertTrue(
             "no session-clear path may bypass the shared helper",
             Regex("session\\.signOut\\(\\)").findAll(source).count() == 1,

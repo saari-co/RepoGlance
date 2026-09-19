@@ -21,6 +21,7 @@ import co.saari.repoglance.data.LiveSnapshotFactory
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.model.RateLimitBucket
+import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.LatestPushStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.latestPushRecordFor
@@ -287,6 +288,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun clearSessionAndTileRecord() {
         LatestPushStore.clear(getApplication())
+        AppPrefs.clearLivePins(getApplication())
         session.signOut()
     }
 
