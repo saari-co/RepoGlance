@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-19T05:07:42+00:00",
     "domain": "Background refresh of the pinned live set (frontier node 3 of the live-widgets map): trigger and cadence, rate-limit budget and back-off, and what widgets show between and during refreshes",
     "started_at": "2026-09-19T04:46:02+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "widget-background-refresh-023: WorkManager periodic 30 min (CONNECTED) plus one-time run on widget save; run refreshes live pins least-recently-observed first capped at 20; LOW refreshes only widget-configured pins; EXHAUSTED stops and persists reset time; widgets show 'as of HH:MM' / 'as of <weekday> HH:MM' clock label with 'last good \u00b7' and 'rate limited \u00b7 resets HH:MM'; redraw only at run end; viewer login and rate-limit store cleared with session and work cancelled; shared refresh function for app and worker; feature map updated; proof: unit tests, gradlew check, adb-forced worker run on the Fold."
   },
   "decisions": [
@@ -2728,10 +2728,7 @@
       "question": "How is the pinned live set refreshed in the background: trigger and cadence, rate-limit budget and back-off, and what the widget shows between and during refreshes?",
       "rationale": "Q1 maintainer picked the recommended 30-minute periodic (about 72 calls/h at 12 pins). Q2 after a plain-language restatement of run and budget, picked widget repos only at LOW. Q3 after the interactive age-label picker (artifact Q2GNAJzeimKDHxrmkqi2PZ) picked A: a frozen relative age understates the age between runs, and a refreshing state can stick if the job is killed.",
       "repair_required": false,
-      "review_classifications": [
-        "human_gate",
-        "defer"
-      ],
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -2751,14 +2748,21 @@
           "result": "findings",
           "reviewed_at": "2026-09-19T06:19:48+00:00",
           "source_identity": "git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b"
+        },
+        {
+          "classifications": [],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 3, platinum hermit 4/6, no findings); openclaw req-20260919T064635Z-198656624933",
+          "result": "clean",
+          "reviewed_at": "2026-09-19T06:53:53+00:00",
+          "source_identity": "git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3"
         }
       ],
-      "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 2, gold shrimp 3/6); openclaw req-20260919T061403Z-19305683503",
-      "review_result": "findings",
-      "review_source_identity": "git:e6ed55a916d0d31cb2a1ded02badb4417a302c5b",
+      "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936 (round 3, platinum hermit 4/6, no findings); openclaw req-20260919T064635Z-198656624933",
+      "review_result": "clean",
+      "review_source_identity": "git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T06:19:48+00:00",
+      "updated_at": "2026-09-19T06:53:53+00:00",
       "verification_ref": "test:GitHubSessionTest,LiveRowsStoreTest,LatestPushRecordTest; gradlew check green"
     }
   ],
@@ -2779,16 +2783,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "stack-widget-live-024: the stack widget over the live pinned set (map node 4)",
-      "launcher-prefs: move the debug ScenarioLaunchActivity AppPrefs write off the main thread"
+      "compact-floor-fit: at 120dp a last-good label from an earlier day ('last good Mon 19:00') squeezes the repository name to an ellipsis; decide a compact-only short form",
+      "rate-limit-device-proof: exercise LOW/EXHAUSTED end to end (ClawSweeper owner-risk item) without burning real quota, e.g. a debug transport fault"
     ],
-    "reason": "widget-live-config-022 is verified on the Fold; widgets now show live data but only refresh on an in-app open, which node 3 resolves",
-    "recommended": "widget-background-refresh-023: trigger and cadence for refreshing the pinned set in the background (WorkManager periodic vs on-unlock), rate-limit budget, back-off, and the age label between refreshes (map node 3)",
-    "recorded_at": "2026-09-19T03:06:36+00:00"
+    "reason": "023 verified and reviewed clean at platinum hermit; node 4 is the last frontier node of the live-widgets map",
+    "recommended": "stack-widget-live-024: the stack widget over the live pinned set (map node 4, now unblocked by 022 and 023), including the stale catalog footer 'Widgets still use preview data'",
+    "recorded_at": "2026-09-19T06:54:01+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T06:19:48+00:00"
+  "updated_at": "2026-09-19T06:54:01+00:00"
 }

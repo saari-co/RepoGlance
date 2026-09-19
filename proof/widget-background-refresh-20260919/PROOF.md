@@ -201,3 +201,14 @@ awake, unlocked). The maintainer's ISSUES widget (id 18,
   `e5ff5ba7ae061cb04a0a05bbf32cfc6320b2c2c25d5dd4b7cf0658bf977a58f0`.
   The maintainer then signed in again himself; the device-code screen was
   never dumped or captured.
+
+## Review round 3 (source identity git:b7d1f699f1166fdbbcc5b957c1c548f1a84047e3, PR #22)
+
+- OpenClaw `req-20260919T064635Z-198656624933`: correct (0.96), 0 findings.
+- ClawSweeper: platinum hermit 4/6 (proof diamond lobster 5/6, patch
+  platinum hermit 4/6), no patch or security findings; the round-2
+  final-effect finding is closed (`proof: sufficient`). Two owner-authority
+  merge-risk notes remain, not defects: the change touches an auth-coupled
+  background write path (merge is the maintainer's), and LOW/EXHAUSTED are
+  unit-tested rather than device-run (recorded gap). Recorded clean in the
+  ledger.
