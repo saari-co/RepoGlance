@@ -109,3 +109,20 @@ widget onto the home screen; the setup screen was opened for id 14 through
   loads (`runs/verify-repoglance-runs/widget-live-fix`). A device
   reproduction of a transient fetch failure with a placed widget was not
   run; the guard is a pure function covered by tests.
+
+## Review round 2 (source identity git:0e5a1e731b9b31357713af442905cef5bbc08156, PR #21)
+
+- OpenClaw `req-20260919T032129Z-14992405731`: correct (0.98), 0 findings.
+- ClawSweeper: round-1 blocker confirmed repaired; one late P1 accepted as
+  `required_fix`: the tall widget rendered the mixed row cache without
+  applying the widget's feed mode, so an ISSUES widget could list PR rows
+  under an ISSUES header (PR #21 comment 5738925554).
+
+### Repair
+
+- `rowsForMode(rows, mode)` filters saved rows by kind (ISSUES, PRS, BOTH)
+  and `RepoWidget` applies it before rendering.
+- `WidgetPinsTest.savedRowsAreFilteredByTheWidgetFeedMode`. `./gradlew
+  check` green; build installed on the Fold. The maintainer's placed
+  widget was BOTH, so the mode filter is covered by the pure function and
+  its test, not a device run.

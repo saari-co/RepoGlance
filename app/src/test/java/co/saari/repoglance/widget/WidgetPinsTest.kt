@@ -1,7 +1,9 @@
 package co.saari.repoglance.widget
 
+import co.saari.repoglance.model.NavigatorMode
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.time.Instant
 
 class WidgetPinsTest {
     @Test
@@ -14,6 +16,18 @@ class WidgetPinsTest {
     @Test
     fun configurationListDropsMalformedNames() {
         assertEquals(emptyList<String>(), WidgetPins.configurationList(listOf("not-a-repo"), emptySet()).map { it.full })
+    }
+
+    @Test
+    fun savedRowsAreFilteredByTheWidgetFeedMode() {
+        val now = Instant.parse("2026-09-19T00:00:00Z")
+        val rows = listOf(
+            WidgetRow(WidgetRowKind.ISSUE, 1, "issue", now, "https://example/1"),
+            WidgetRow(WidgetRowKind.PR, 2, "pr", now, "https://example/2"),
+        )
+        assertEquals(listOf(1), rowsForMode(rows, NavigatorMode.ISSUES).map { it.number })
+        assertEquals(listOf(2), rowsForMode(rows, NavigatorMode.PRS).map { it.number })
+        assertEquals(listOf(1, 2), rowsForMode(rows, NavigatorMode.BOTH).map { it.number })
     }
 
     @Test

@@ -58,7 +58,7 @@ class RepoWidget : GlanceAppWidget() {
             val now = Instant.now()
 
             val liveSnapshot = config?.let { LiveSnapshotStore.load(context, it.repo) }
-            val rows = config?.let { LiveRowsStore.load(context, it.repo) }.orEmpty()
+            val rows = config?.let { rowsForMode(LiveRowsStore.load(context, it.repo), it.mode) }.orEmpty()
             val appIntent = config?.let { navigatorIntent(context, it) }
 
             GlanceTheme {

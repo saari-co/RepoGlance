@@ -1,6 +1,13 @@
 package co.saari.repoglance.widget
 
+import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
+
+fun rowsForMode(rows: List<WidgetRow>, mode: NavigatorMode): List<WidgetRow> = when (mode) {
+    NavigatorMode.ISSUES -> rows.filter { it.kind == WidgetRowKind.ISSUE }
+    NavigatorMode.PRS -> rows.filter { it.kind == WidgetRowKind.PR }
+    NavigatorMode.BOTH -> rows
+}
 
 object WidgetPins {
     fun configurationList(catalogNames: List<String>, pins: Set<String>): List<RepoRef> {
