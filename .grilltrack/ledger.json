@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T13:19:36+00:00",
-    "domain": "Widget redraw after an app update (follow-up to the live-widgets map: the stack sat on the launcher's loading placeholder after an install)",
-    "started_at": "2026-09-19T13:08:25+00:00",
+    "confirmed_at": "2026-09-19T15:49:56+00:00",
+    "domain": "Rate-limit device proof: drive LOW and EXHAUSTED end to end on the Pixel 11 Pro Fold with a debug-only transport fault, proving truth rule 4 on the placed repo and stack widgets (023/024 locks unchanged)",
+    "started_at": "2026-09-19T15:39:09+00:00",
     "status": "inspected",
-    "summary": "widget-update-redraw-025: manifest receiver for ACTION_MY_PACKAGE_REPLACED redraws both widget kinds via WidgetRefresh.updateAll from saved data (goAsync, no network, nothing long-running); no time/zone/locale/boot triggers; feature map gotcha lines for stack and setup; proof: receiver test, gradlew check, Fold install then home dump without opening the app shows both widgets with data instead of the loading placeholder."
+    "summary": "rate-limit-device-proof-026: debug-only hooks.TransportFault (release twin identity) wraps UrlConnectionTransport, armed via ScenarioLaunchActivity rateFault LOW|EXHAUSTED persisted in debug prefs until reset; LOW rewrites remaining on real calls, EXHAUSTED synthetic 403 ~3 min reset; debug refreshNow trigger; prove stack, repo widget both layouts (maintainer resize), catalog line, per 023/024 locks; recovery = post-reset dump then one run clears rate-limited; LOW skip stays unit-only; feature-map gotcha updated; strike StrictMode and posture-C items from live-widgets map; proof/rate-limit-device-proof-20260919/PROOF.md."
   },
   "decisions": [
     {
@@ -2978,6 +2978,92 @@
       "superseded_by": null,
       "updated_at": "2026-09-19T15:02:48+00:00",
       "verification_ref": "file:proof/widget-update-redraw-20260919/PROOF.md"
+    },
+    {
+      "baseline_ref": "git:948c159343f884c45eaa921c651d9b9b2432657f",
+      "candidate_refs": [],
+      "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+      "context_ref": null,
+      "created_at": "2026-09-19T15:49:18+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widget-background-refresh-023",
+        "stack-widget-live-024"
+      ],
+      "domain": "Rate-limit device proof: drive LOW and EXHAUSTED end to end on the Pixel 11 Pro Fold with a debug-only transport fault, proving truth rule 4 on the placed repo and stack widgets (023/024 locks unchanged)",
+      "history": [
+        {
+          "at": "2026-09-19T15:49:18+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T16:23:26+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T16:23:26+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "implemented",
+          "implementation_ref": "git:c5cf58bdb11b9520a4e2a698b94e1d1276461b5b",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "rate-limit-device-proof-026",
+      "implementation_ref": "git:c5cf58bdb11b9520a4e2a698b94e1d1276461b5b",
+      "question": "How are LOW and EXHAUSTED proven end to end on the Fold's placed repo and stack widgets (truth rule 4), without changing the 023/024 locks?",
+      "rationale": "Q1 header rewrite on real calls (real data for LOW, no quota spent for EXHAUSTED); Q2 both repo layouts via a maintainer resize; Q3 prove the locks as-is, and a visible LOW marker is a possible next grill; Q4 the LOW skip isn't device-proven because the Fold has one pin that has a repo widget; Q5 a debug refreshNow trigger with a short reset window.",
+      "repair_required": false,
+      "review_classifications": [
+        "defer",
+        "reject_false_positive"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T16:24:59+00:00",
+          "source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6"
+        }
+      ],
+      "review_ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
+      "review_result": "findings",
+      "review_source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-19T16:24:59+00:00",
+      "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
     }
   ],
   "last_activation": {
@@ -2997,16 +3083,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "compact-floor-fit: short compact-only last-good label so the repository name survives at 120dp",
-      "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes"
+      "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes",
+      "low-visible-marker: whether LOW should show on the widgets at all (026 Q3 kept the 023/024 lock; truth rule 4 says back off visibly)"
     ],
-    "reason": "live-widgets map closed at the maintainer's request: nodes 021-024 and follow-up 025 verified, reviewed clean and merged (PR #24 a21fb7e2); the rate-limit states are the only truth-rule surface of the map still without device proof",
-    "recommended": "rate-limit-device-proof: drive LOW and EXHAUSTED end to end on the Fold with a debug-only transport fault, so truth rule 4 is proven on the placed repo and stack widgets rather than only unit-tested",
-    "recorded_at": "2026-09-19T15:03:05+00:00"
+    "reason": "026 device proof verified LOW, EXHAUSTED and recovery on tall, compact, stack and catalog, and found the rate-limited headers truncating the truth-bearing text on screen",
+    "recommended": "rate-limited-header-fit: while rate limited, the one-line tall header shows only 'rate limited \u00b7 resets HH:MM P\u2026' (counts, last good and 'as of' hidden) and the stack header cuts the reset time; decide what each header keeps visible so truth rule 3 holds on screen, not only in the dump (compact-floor-fit could fold in, same fit problem)",
+    "recorded_at": "2026-09-19T16:25:06+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T15:03:05+00:00"
+  "updated_at": "2026-09-19T16:25:06+00:00"
 }

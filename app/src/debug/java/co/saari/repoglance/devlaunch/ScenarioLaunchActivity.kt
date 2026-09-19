@@ -10,6 +10,8 @@ import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.hooks.RefreshProbe
+import co.saari.repoglance.hooks.TransportFault
+import co.saari.repoglance.refresh.BackgroundRefresh
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
 import co.saari.repoglance.widget.EXTRA_REPO_FULL
@@ -25,7 +27,12 @@ import co.saari.repoglance.widget.EXTRA_REPO_FULL
 // screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | checking (the production Checking screen held open)
+//         | none (apply the extras below and stay on the current screen)
 // probeCommitDelaySeconds (long, optional): arms hooks.RefreshProbe once.
+// rateFault (LOW | EXHAUSTED | OFF, optional) with rateFaultResetSeconds (long,
+//   default 180): arms or clears hooks.TransportFault until that reset time.
+// refreshNow (boolean, optional): enqueues the production one-time pinned
+//   refresh (BackgroundRefresh.refreshNow), as a widget save does.
 @SuppressLint("CustomSplashScreen")
 class ScenarioLaunchActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +46,22 @@ class ScenarioLaunchActivity : Activity() {
         intent.getLongExtra(EXTRA_PROBE_COMMIT_DELAY, 0L).takeIf { it > 0L }?.let { seconds ->
             RefreshProbe.arm(this, seconds)
         }
-        val next = nextIntent(intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE)
+        intent.getStringExtra(EXTRA_RATE_FAULT)?.let { name ->
+            val kind = TransportFault.Kind.entries.firstOrNull { it.name == name }
+            if (kind != null || name == RATE_FAULT_OFF) {
+                val resetSeconds = intent.getLongExtra(EXTRA_RATE_FAULT_RESET_SECONDS, DEFAULT_RATE_FAULT_RESET_SECONDS)
+                TransportFault.arm(this, kind, resetSeconds)
+            }
+        }
+        if (intent.getBooleanExtra(EXTRA_REFRESH_NOW, false)) {
+            BackgroundRefresh.refreshNow(this)
+        }
+        val screen = intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_LIVE
+        if (screen == SCREEN_NONE) {
+            finish()
+            return
+        }
+        val next = nextIntent(screen)
         next.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(next)
         finish()
@@ -73,6 +95,11 @@ class ScenarioLaunchActivity : Activity() {
         const val EXTRA_SCENARIO = "scenario"
         const val EXTRA_SCREEN = "screen"
         const val EXTRA_PROBE_COMMIT_DELAY = "probeCommitDelaySeconds"
+        const val EXTRA_RATE_FAULT = "rateFault"
+        const val EXTRA_RATE_FAULT_RESET_SECONDS = "rateFaultResetSeconds"
+        const val EXTRA_REFRESH_NOW = "refreshNow"
+        const val RATE_FAULT_OFF = "OFF"
+        const val DEFAULT_RATE_FAULT_RESET_SECONDS = 180L
         const val EXTRA_REPO = "repo"
         const val EXTRA_MODE = "mode"
         const val SCREEN_LIVE = "live"
@@ -81,6 +108,7 @@ class ScenarioLaunchActivity : Activity() {
         const val SCREEN_NAVIGATOR_PICKER = "navigator-picker"
         const val SCREEN_SPLASH_PICKER = "splash-picker"
         const val SCREEN_CHECKING = "checking"
+        const val SCREEN_NONE = "none"
         const val EXTRA_SLOT = "slot"
         const val EXTRA_CANDIDATE = "candidate"
         const val EXTRA_HYBRID = "hybrid"
