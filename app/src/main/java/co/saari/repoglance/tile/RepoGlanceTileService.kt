@@ -22,7 +22,7 @@ class RepoGlanceTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
-        val locked = isSecure
+        val locked = isLocked
         io.execute {
             val text = TileTexts.of(LatestPushStore.load(this), Instant.now(), locked = locked)
             main.post { render(text) }

@@ -46,6 +46,25 @@ class TileTextTest {
     }
 
     @Test
+    fun serviceRedactsOnTheLockScreenItselfNotOnlyASecureOne() {
+        val source = String(
+            java.nio.file.Files.readAllBytes(
+                repositoryRoot().resolve("app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt"),
+            ),
+            Charsets.UTF_8,
+        )
+        val listening = source.substringAfter("override fun onStartListening()").substringBefore("override fun onClick()")
+        assertTrue("the display guard must be the lock screen showing state", listening.contains("isLocked"))
+        assertFalse("isSecure misses a locked phone without a secure method", listening.contains("isSecure"))
+    }
+
+    private fun repositoryRoot(): java.nio.file.Path {
+        var dir: java.nio.file.Path? = java.nio.file.Paths.get("").toAbsolutePath()
+        while (dir != null && !java.nio.file.Files.exists(dir.resolve("settings.gradle.kts"))) dir = dir.parent
+        return requireNotNull(dir)
+    }
+
+    @Test
     fun repositoryNameIsSanitised() {
         val record = LatestPushRecord("evil/‮name", now, now)
         assertFalse(TileTexts.of(record, now).subtitle.contains('‮'))

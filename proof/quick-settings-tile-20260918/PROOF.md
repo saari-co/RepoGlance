@@ -140,3 +140,25 @@ Tile (maintainer approved adding it over adb in the confirmed plan):
   "latest push to" nor any repository name. Raw `uiautomator dump` was used
   because the helper refuses a locked phone by design; no capture was
   taken. The maintainer unlocks afterwards.
+
+## Review round 3 (source identity git:7fba904ac45648c35170421d76127965f27e14ab, PR #19)
+
+- OpenClaw `req-20260919T004005Z-115855818912`: correct (0.99), 0 findings.
+- ClawSweeper: unranked krab; one P2/security-medium finding, accepted as
+  `required_fix`: `isSecure` covers only a secure keyguard, so a locked
+  phone without a secure method would still get the repository name.
+
+### Repair
+
+- The display guard is now `isLocked`, the same boundary the tap path uses.
+- `TileTextTest.serviceRedactsOnTheLockScreenItselfNotOnlyASecureOne`
+  asserts the listening path uses `isLocked` and never `isSecure`.
+- Device proof (Fold, serial pinned, run
+  `runs/verify-repoglance-runs/tile-locked-2`): unlocked shade node
+  `RepoGlance, latest push to saari-co/RepoGlance updated 16m ago`; after
+  `KEYCODE_SLEEP` + `KEYCODE_WAKEUP` (`deviceLocked=1`) the shade tree in
+  `locked-shade.xml` holds `RepoGlance, Unlock to see the latest push` with
+  no "latest push to" and no `saari-co/` anywhere. The registered Fold has
+  a secure lock, so the non-secure keyguard branch is covered by the
+  `isLocked` guard and its test, not by a device run; changing the phone's
+  lock method is the maintainer's call and was not done.
