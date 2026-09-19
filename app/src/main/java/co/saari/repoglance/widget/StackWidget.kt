@@ -3,7 +3,6 @@ package co.saari.repoglance.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -14,7 +13,6 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
@@ -42,36 +40,28 @@ import java.time.Instant
 class StackWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent {
-            key(currentState(WidgetRefresh.REDRAW_KEY)) {
-                val now = Instant.now()
-                val freshness = WidgetFreshness(
-                    now = now,
-                    clock = widgetClock(context),
-                    rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now),
-                )
-                val catalogPushedAt = CatalogNamesStore.pushedAt(context)
-                val entries = StackRows.order(
-                    pins = AppPrefs.livePins(context),
-                    catalogPushedAt = catalogPushedAt,
-                ) { LiveSnapshotStore.load(context, it) }
-                val catalogIntent = liveCatalogIntent(context)
+        val read = { readStackWidgetData(context) }
+        val initial = readWidgetStores(read)
 
-                GlanceTheme {
-                    Column(
-                        modifier = GlanceModifier
-                            .fillMaxSize()
-                            .background(GlanceTheme.colors.background),
-                    ) {
-                        StackHeader(stackHeaderLabel(entries.size, freshness), catalogIntent)
-                        LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
-                            if (entries.isEmpty()) {
-                                item { StackEmpty(catalogIntent) }
-                            } else {
-                                items(entries.size) { index ->
-                                    val entry = entries[index]
-                                    StackRow(liveRepositoryIntent(context, entry.repo), entry, freshness)
-                                }
+        provideContent {
+            val data = redrawnWidgetData(initial, read)
+            val entries = data.entries
+            val catalogIntent = liveCatalogIntent(context)
+
+            GlanceTheme {
+                Column(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .background(GlanceTheme.colors.background),
+                ) {
+                    StackHeader(stackHeaderLabel(entries.size, data.freshness), catalogIntent)
+                    LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+                        if (entries.isEmpty()) {
+                            item { StackEmpty(catalogIntent) }
+                        } else {
+                            items(entries.size) { index ->
+                                val entry = entries[index]
+                                StackRow(liveRepositoryIntent(context, entry.repo), entry, data.freshness)
                             }
                         }
                     }
@@ -79,6 +69,26 @@ class StackWidget : GlanceAppWidget() {
             }
         }
     }
+}
+
+internal data class StackWidgetData(
+    val entries: List<StackEntry>,
+    val freshness: WidgetFreshness,
+)
+
+internal fun readStackWidgetData(context: Context): StackWidgetData {
+    val now = Instant.now()
+    return StackWidgetData(
+        entries = StackRows.order(
+            pins = AppPrefs.livePins(context),
+            catalogPushedAt = CatalogNamesStore.pushedAt(context),
+        ) { LiveSnapshotStore.load(context, it) },
+        freshness = WidgetFreshness(
+            now = now,
+            clock = widgetClock(context),
+            rateLimitedUntil = RateLimitStore.exhaustedUntil(RateLimitStore.load(context), now),
+        ),
+    )
 }
 
 data class StackEntry(

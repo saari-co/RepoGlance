@@ -120,7 +120,13 @@ class StackWidgetTest {
             val used = Regex("(?<![A-Za-z])" + Regex.escape(fixture)).containsMatchIn(source)
             assertFalse("the placed stack must not read fixture data: $fixture", used)
         }
-        assertTrue("the stack redraws on the shared redraw counter", source.contains("currentState(WidgetRefresh.REDRAW_KEY)"))
+        assertTrue("the stack redraws on the shared redraw counter", source.contains("redrawnWidgetData("))
+    }
+
+    @Test
+    fun theStackReadsItsStoresOffTheMainThreadAndOutsideComposition() {
+        val source = String(Files.readAllBytes(root().resolve("app/src/main/java/co/saari/repoglance/widget/StackWidget.kt")), Charsets.UTF_8)
+        assertWidgetReadsStayOutOfComposition(source, "readStackWidgetData(")
     }
 
     @Test
