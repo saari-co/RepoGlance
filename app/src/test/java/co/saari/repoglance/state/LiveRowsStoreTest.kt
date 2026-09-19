@@ -22,13 +22,22 @@ class LiveRowsStoreTest {
     }
 
     @Test
-    fun rowsFromMergesIssuesAndPullRequestsNewestFirstAndCaps() {
-        val issues = (1..8).map { issue(it, now.minusSeconds(it * 10L)) }
-        val prs = (1..8).map { pr(100 + it, now.minusSeconds(it * 10L + 5)) }
+    fun rowsFromKeepsTheNewestTenOfEachKindNewestFirst() {
+        val issues = (1..12).map { issue(it, now.minusSeconds(it * 10L)) }
+        val prs = (1..12).map { pr(100 + it, now.minusSeconds(it * 10L + 5)) }
         val rows = LiveRowsStore.rowsFrom(issues, prs)
-        assertEquals(LiveRowsStore.MAX_ROWS, rows.size)
+        assertEquals(LiveRowsStore.MAX_ROWS_PER_KIND * 2, rows.size)
+        assertEquals(LiveRowsStore.MAX_ROWS_PER_KIND, rows.count { it.kind == WidgetRowKind.ISSUE })
         assertEquals(listOf(1, 101, 2, 102, 3), rows.take(5).map { it.number })
-        assertEquals(WidgetRowKind.PR, rows[1].kind)
+    }
+
+    @Test
+    fun aKindThatDominatesRecencyCannotStarveTheOtherKind() {
+        val prs = (1..10).map { pr(100 + it, now.minusSeconds(it.toLong())) }
+        val issues = (1..3).map { issue(it, now.minusSeconds(3600L + it)) }
+        val rows = LiveRowsStore.rowsFrom(issues, prs)
+        assertEquals(3, rows.count { it.kind == WidgetRowKind.ISSUE })
+        assertEquals(3, LiveRowsStore.decode(LiveRowsStore.encode(rows))!!.count { it.kind == WidgetRowKind.ISSUE })
     }
 
     @Test

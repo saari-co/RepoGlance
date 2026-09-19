@@ -15,6 +15,8 @@ object LiveRowsStore {
     private const val PREFS_NAME = "repoglance_live_rows"
     private const val VERSION = 1
     const val MAX_ROWS = 10
+    const val MAX_ROWS_PER_KIND = 10
+    private const val MAX_STORED_ROWS = MAX_ROWS_PER_KIND * 2
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -42,7 +44,9 @@ object LiveRowsStore {
         val prRows = pullRequests.orEmpty().map {
             WidgetRow(WidgetRowKind.PR, it.number, it.title, it.updatedAt, it.htmlUrl)
         }
-        return (issueRows + prRows).sortedByDescending { it.updatedAt }.take(MAX_ROWS)
+        val newestIssues = issueRows.sortedByDescending { it.updatedAt }.take(MAX_ROWS_PER_KIND)
+        val newestPrs = prRows.sortedByDescending { it.updatedAt }.take(MAX_ROWS_PER_KIND)
+        return (newestIssues + newestPrs).sortedByDescending { it.updatedAt }
     }
 
     internal fun encode(rows: List<WidgetRow>): String = JSONObject().apply {
@@ -50,7 +54,7 @@ object LiveRowsStore {
         put(
             "rows",
             JSONArray().apply {
-                rows.take(MAX_ROWS).forEach { row ->
+                rows.take(MAX_STORED_ROWS).forEach { row ->
                     put(
                         JSONObject().apply {
                             put("kind", row.kind.name)
