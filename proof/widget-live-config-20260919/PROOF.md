@@ -126,3 +126,33 @@ widget onto the home screen; the setup screen was opened for id 14 through
   check` green; build installed on the Fold. The maintainer's placed
   widget was BOTH, so the mode filter is covered by the pure function and
   its test, not a device run.
+
+## Review round 3 (source identity git:f1f3d7fb67da8494d1c6d6844286174404a8fdcd, PR #21)
+
+- OpenClaw `req-20260919T032922Z-151857110422`: correct (0.99), 0 findings.
+- ClawSweeper: silver shellfish; one P2 accepted as `required_fix`: the
+  mixed cache was capped at ten before the feed-mode filter, so ten newer
+  PRs could push every issue out of an ISSUES widget; it also asked for
+  real-device proof of a single-kind widget (PR #21 comment 5738925554).
+
+### Repair
+
+- `LiveRowsStore.rowsFrom` keeps the ten newest issues and the ten newest
+  PRs (store holds up to twenty); the widget still displays ten after the
+  mode filter. `LiveRowsStoreTest` covers the per-kind cap and a dominance
+  case (ten newer PRs, three older issues: all three issues survive the
+  round trip).
+- Device proof (Fold, run `runs/verify-repoglance-runs/widget-issues-mode`):
+  the maintainer placed the widget again (id 18); setup opened over adb,
+  repository `saari-co/RepoGlance`, feed `ISSUES` selected (capture
+  setup-issues `3384e6b6960e16f691d1657ab1b3815bed25e0577da855fa11d8108069c31e4a`),
+  saved; after the maintainer resized it tall, the home tree
+  (`home-issues-widget.xml`) holds `saari-co/RepoGlance`,
+  `ISSUES 2 · as of 1h`, `ISSUE #11 · 4w`, `ISSUE #7 · 5w` and no `PR #`
+  row; header is the ISSUES-only count summary. Capture home-issues-widget
+  `9eeb798baa3c3cb569f9be6651d4abc4032a33f8d472f5b4c49d5644228586ec`
+  (maintainer's home screen; local only). Pin on save re-proven:
+  filtered catalog control reads `Unpin saari-co/RepoGlance`.
+- Honest limit: `saari-co/RepoGlance` has no open PRs, so the device run
+  shows the ISSUES header and issue rows but does not exercise PR rows
+  being filtered out; that case is the unit test.
