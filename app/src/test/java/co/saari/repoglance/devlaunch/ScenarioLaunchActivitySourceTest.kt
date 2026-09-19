@@ -18,8 +18,15 @@ class ScenarioLaunchActivitySourceTest {
         val io = onCreate.substringAfter("withContext(Dispatchers.IO) {").substringBefore("\n            }\n")
         assertTrue("the scenario write runs on Dispatchers.IO", io.contains("AppPrefs.setSelectedScenario("))
         assertTrue("the probe write runs on Dispatchers.IO", io.contains("RefreshProbe.arm("))
+        assertTrue("the rate-limit fault arm runs on Dispatchers.IO", io.contains("TransportFault.arm("))
+        assertTrue("the one-time refresh is enqueued on Dispatchers.IO", io.contains("BackgroundRefresh.refreshNow("))
         val outsideIo = onCreate.replace(io, "")
-        assertTrue(!outsideIo.contains("AppPrefs.") && !outsideIo.contains("RefreshProbe."))
+        assertTrue(
+            !outsideIo.contains("AppPrefs.") &&
+                !outsideIo.contains("RefreshProbe.") &&
+                !outsideIo.contains("TransportFault.arm(") &&
+                !outsideIo.contains("BackgroundRefresh."),
+        )
         val afterIo = onCreate.substringAfter("withContext(Dispatchers.IO) {").substringAfter("\n            }\n")
         assertTrue("the next screen starts after the writes", afterIo.contains("startActivity(next)"))
     }
