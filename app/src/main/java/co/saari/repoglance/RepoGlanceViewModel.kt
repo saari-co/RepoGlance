@@ -197,6 +197,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
         val catalog = (liveState.value as? LiveUiState.Ready)?.catalog ?: return
         repositoryContent.value = ContentUiState.Loading
         val requestGeneration = repositoryContentGeneration.incrementAndGet()
+        val sessionGeneration = session.generation()
         repositoryContentLoadJob?.cancel()
         repositoryContentLoadJob = viewModelScope.launch {
             val content = withContext(Dispatchers.IO) {
@@ -220,18 +221,19 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
             } else {
                 repositoryContent.value = ContentUiState.Ready(content)
-                persistLiveSnapshot(repository, content)
+                persistLiveSnapshot(sessionGeneration, repository, content)
             }
         }
     }
 
     private suspend fun persistLiveSnapshot(
+        sessionGeneration: Long,
         repository: LiveRepository,
         content: LiveRepositoryContent,
     ) {
         val context = getApplication<Application>()
         withContext(Dispatchers.IO) {
-            LiveRefresh.persist(context, apiClient, repository, content)
+            LiveRefresh.persist(context, services, sessionGeneration, repository, content)
         }
         WidgetRefresh.updateAll(context)
     }
@@ -286,15 +288,16 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun clearSessionAndTileRecord() {
         val context = getApplication<Application>()
-        LatestPushStore.clear(context)
-        AppPrefs.clearLivePins(context)
-        CatalogNamesStore.clear(context)
-        LiveRowsStore.clear(context)
-        LiveSnapshotStore.clear(context)
-        RateLimitStore.clear(context)
-        RepoWidgetConfigStore.clearAll(context)
-        BackgroundRefresh.cancel(context)
-        session.signOut()
+        session.signOut {
+            BackgroundRefresh.cancel(context)
+            LatestPushStore.clear(context)
+            AppPrefs.clearLivePins(context)
+            CatalogNamesStore.clear(context)
+            LiveRowsStore.clear(context)
+            LiveSnapshotStore.clear(context)
+            RateLimitStore.clear(context)
+            RepoWidgetConfigStore.clearAll(context)
+        }
         WidgetRefresh.updateAll(context)
     }
 

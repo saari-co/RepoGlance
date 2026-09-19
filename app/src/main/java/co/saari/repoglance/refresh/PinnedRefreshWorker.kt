@@ -34,17 +34,23 @@ class PinnedRefreshWorker(
     private fun refreshPinnedSet(context: Context): Boolean {
         val services = LiveGitHub.services(context)
         val viewerLogin = CatalogNamesStore.viewerLogin(context)
+        val sessionGeneration = services.session.generation()
         if (viewerLogin == null || !services.session.hasSavedSession()) return false
         val ordered = RefreshPlan.order(AppPrefs.livePins(context)) { LiveSnapshotStore.load(context, it)?.observedAt }
         RefreshPlan.execute(
             ordered = ordered,
             widgetRepos = RepoWidgetConfigStore.configuredRepos(context).toSet(),
             initialBucket = RateLimitStore.effectiveBucket(RateLimitStore.load(context), Instant.now()),
-        ) { ref -> refreshOne(context, ref, viewerLogin) }
+        ) { ref -> refreshOne(context, ref, viewerLogin, sessionGeneration) }
         return true
     }
 
-    private fun refreshOne(context: Context, ref: RepoRef, viewerLogin: String): RefreshStep {
+    private fun refreshOne(
+        context: Context,
+        ref: RepoRef,
+        viewerLogin: String,
+        sessionGeneration: Long,
+    ): RefreshStep {
         val services = LiveGitHub.services(context)
         val repository = LiveRepository(
             id = 0L,
@@ -54,11 +60,12 @@ class PinnedRefreshWorker(
             pushedAt = LiveSnapshotStore.load(context, ref)?.pushedAt,
         )
         val content = services.apiClient.loadRepositoryContent(repository, viewerLogin)
-        if (isStopped || content.sessionInvalidationFailure() != null || !services.session.hasSavedSession()) {
+        if (isStopped || content.sessionInvalidationFailure() != null) {
             return RefreshStep(RateLimitBucket.UNKNOWN, stop = true)
         }
-        val bucket = LiveRefresh.persist(context, services.apiClient, repository, content)?.bucket
-            ?: RateLimitBucket.UNKNOWN
+        val persisted = LiveRefresh.persist(context, services, sessionGeneration, repository, content)
+            ?: return RefreshStep(RateLimitBucket.UNKNOWN, stop = true)
+        val bucket = persisted.rateLimit?.bucket ?: RateLimitBucket.UNKNOWN
         return RefreshStep(bucket, stop = bucket == RateLimitBucket.EXHAUSTED)
     }
 }

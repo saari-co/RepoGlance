@@ -6,6 +6,7 @@ import co.saari.repoglance.widget.WidgetRow
 import co.saari.repoglance.widget.WidgetRowKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Instant
 
@@ -57,6 +58,11 @@ class LiveRowsStoreTest {
         val shared = source("data/LiveRefresh.kt")
         assertEquals(1, Regex("LiveRowsStore\\.replacementRows\\(").findAll(shared).count())
         assertEquals(0, Regex("LiveRowsStore\\.rowsFrom\\(").findAll(shared).count())
+        val committed = shared.substringAfter("services.session.commitIfCurrent(sessionGeneration) {").substringBefore("\n        }\n")
+        for (write in listOf("LiveSnapshotStore.save(", "LiveRowsStore.save(", "RateLimitStore.record(")) {
+            assertEquals("$write must happen only inside the session commit", 1, shared.split(write).size - 1)
+            assertTrue("$write must happen only inside the session commit", committed.contains(write))
+        }
         for (caller in listOf("RepoGlanceViewModel.kt", "refresh/PinnedRefreshWorker.kt")) {
             val text = source(caller)
             assertEquals("$caller must persist through LiveRefresh", 1, Regex("LiveRefresh\\.persist\\(").findAll(text).count())

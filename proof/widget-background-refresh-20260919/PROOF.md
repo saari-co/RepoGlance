@@ -98,7 +98,18 @@ awake, unlocked). The maintainer's ISSUES widget (id 18,
   `ISSUE #11 · 4w`, `ISSUE #7 · 5w`. Capture home-widget-after-save
   `e20be30ac32610afcc99951af36f02bc1336a64d17f29d5b291da183aa7049ce`
   (the maintainer's home screen; local only, hash cited).
-- Natural 30-minute run: PENDING.
+- Natural 30-minute run (read-only observation; another agent held the
+  phone at the time, so no widget dump): `dumpsys jobscheduler` history shows
+  the periodic job `#u0a383/45` (queued at 01:31 with a 30-minute latency)
+  `STOP … app called jobFinished` at about 01:57:58, followed by the Glance
+  session workers that redraw the widget; the stored `saari-co/RepoGlance`
+  snapshot reads `observedAt 2026-09-19T05:57:54Z`; the next periodic job
+  `#54` is queued with `Minimum latency: +29m59s948ms`. The only live pin is
+  `saari-co/RepoGlance`; the other stored snapshot (`dinkuskit/.github`,
+  2026-09-18) is unpinned and correctly not refreshed. The watcher missed the
+  `WorkerWrapper` log line because the log buffer no longer held any
+  RepoGlance lines. It cannot be excluded that the other agent opened
+  RepoGlance near 01:57.
 
 ## Gaps
 
@@ -106,11 +117,40 @@ awake, unlocked). The maintainer's ISSUES widget (id 18,
   real quota; they are covered by `RefreshPlanTest`, `RateLimitStoreTest`
   and the label tests only.
 - Doze stretching the interval is expected and not measured.
-- A session clear during a run: the worker checks for a saved session after
-  each fetch and stops, but a save racing the clear by milliseconds is not
-  excluded.
 - The live catalog footer still says "Widgets still use preview data in
   this checkpoint", which has been partly false since node 2 (only the stack
   widget is still fixture data). Left for map node 4.
 - StrictMode `UntaggedSocketViolation` lines appear for the worker's
   requests, as for every in-app request; they are not main-thread I/O.
+
+## Review round 1 (source identity git:728d09641883e9211aa2f4741bed54ec073b989d, PR #22)
+
+- OpenClaw `req-20260919T053708Z-183956310196`: correct (0.97), 0 findings.
+- ClawSweeper: unranked krab 1/6 (proof gold shrimp 3/6), one P1 plus a
+  matching medium security note, accepted as `required_fix`: the worker's
+  saved-session check was not atomic with `LiveRefresh.persist`, so a
+  disconnect landing in between could leave repository data on the device
+  after sign-out (PR #22 comment 5739724936).
+
+### Repair
+
+- `GitHubSession` keeps a session generation, bumped on every sign-in and
+  sign-out. `commitIfCurrent(generation) { … }` runs a write only while that
+  generation is current and a token exists, under the session lock.
+  `signOut { … }` bumps the generation and clears local data under the same
+  lock before dropping the token.
+- `LiveRefresh.persist` does its network and build work first, then writes
+  the snapshot, rows and rate limit only inside `commitIfCurrent`. The view
+  model captures the generation before loading a repository; the worker
+  captures it at run start and stops the run when a commit is refused.
+- `clearSessionAndTileRecord` performs every local clear (and cancels the
+  work) inside `session.signOut { … }`.
+- Tests: `GitHubSessionTest` (a write started before sign-out, or under an
+  earlier sign-in, is dropped; a write racing a sign-out blocks until the
+  clear finishes and is then dropped), `LiveRowsStoreTest` (every store
+  write in `LiveRefresh` sits inside the session commit),
+  `LatestPushRecordTest` (all clears inside the `signOut` block). `./gradlew
+  check` green.
+- The final-effect proof ClawSweeper asked for (disconnect while a worker is
+  in flight on the phone) needs a sign-out, which is the maintainer's gated
+  action; the race is covered by the concurrent unit test instead.

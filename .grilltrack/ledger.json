@@ -2677,22 +2677,76 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-19T06:10:07+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "verified",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T06:13:30+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "github:saari-co/RepoGlance#22 comment 5739724936; openclaw req-20260919T053708Z-183956310196",
+          "review_result": "findings",
+          "review_source_identity": "git:728d09641883e9211aa2f4741bed54ec073b989d",
+          "to": "implemented",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+        },
+        {
+          "at": "2026-09-19T06:13:30+00:00",
+          "choice": "Trigger: WorkManager unique periodic work every 30 minutes with a CONNECTED network constraint, plus one immediate one-time run when a widget is saved; no wakelock, no foreground service, no on-unlock. Budget: a run refreshes live pins least-recently-observed first, capped at 20; at LOW only pins that have a placed widget are refreshed; at EXHAUSTED the run stops, no counts are overwritten, and the reset time is persisted so widgets show 'rate limited \u00b7 resets HH:MM'. Label: widgets show clock time 'as of HH:MM' ('as of <weekday> HH:MM' when not today) instead of a relative age, with 'last good \u00b7' after a failed fetch; the widget is redrawn only when a run finishes, with no in-progress state.",
+          "from": "implemented",
+          "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#review-round-1",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
         }
       ],
       "id": "widget-background-refresh-023",
-      "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#implementation",
+      "implementation_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#review-round-1",
       "question": "How is the pinned live set refreshed in the background: trigger and cadence, rate-limit budget and back-off, and what the widget shows between and during refreshes?",
       "rationale": "Q1 maintainer picked the recommended 30-minute periodic (about 72 calls/h at 12 pins). Q2 after a plain-language restatement of run and budget, picked widget repos only at LOW. Q3 after the interactive age-label picker (artifact Q2GNAJzeimKDHxrmkqi2PZ) picked A: a frozen relative age understates the age between runs, and a refreshing state can stick if the job is killed.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "github:saari-co/RepoGlance#22 comment 5739724936; openclaw req-20260919T053708Z-183956310196",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T06:10:07+00:00",
+          "source_identity": "git:728d09641883e9211aa2f4741bed54ec073b989d"
+        }
+      ],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T05:36:15+00:00",
-      "verification_ref": "file:proof/widget-background-refresh-20260919/PROOF.md#device-proof"
+      "updated_at": "2026-09-19T06:13:30+00:00",
+      "verification_ref": "test:GitHubSessionTest,LiveRowsStoreTest,LatestPushRecordTest; gradlew check green"
     }
   ],
   "last_activation": {
@@ -2723,5 +2777,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T05:36:15+00:00"
+  "updated_at": "2026-09-19T06:13:30+00:00"
 }

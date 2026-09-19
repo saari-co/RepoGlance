@@ -308,11 +308,21 @@ class GitHubSession(
     private val deviceFlowClient: GitHubDeviceFlowClient,
     private val clock: Clock = Clock.systemUTC(),
 ) {
+    @Volatile
+    private var generation = 0L
+
+    fun generation(): Long = generation
+
     @Synchronized
     fun hasSavedSession(): Boolean = tokenStore.read() != null
 
     @Synchronized
+    fun <T> commitIfCurrent(expectedGeneration: Long, write: () -> T): T? =
+        if (generation == expectedGeneration && tokenStore.read() != null) write() else null
+
+    @Synchronized
     fun acceptDeviceToken(token: GitHubUserToken) {
+        generation += 1L
         try {
             tokenStore.write(token)
         } catch (_: Exception) {
@@ -344,7 +354,9 @@ class GitHubSession(
     }
 
     @Synchronized
-    fun signOut() {
+    fun signOut(clearLocalData: () -> Unit = {}) {
+        generation += 1L
+        clearLocalData()
         tokenStore.clear()
     }
 

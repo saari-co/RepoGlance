@@ -9,21 +9,24 @@ import java.time.Instant
 
 object LiveRefresh {
 
+    data class Persisted(val rateLimit: RateLimitSnapshot?)
+
     fun persist(
         context: Context,
-        apiClient: GitHubApiClient,
+        services: LiveGitHub.Services,
+        sessionGeneration: Long,
         repository: LiveRepository,
         content: LiveRepositoryContent,
-    ): RateLimitSnapshot? {
+    ): Persisted? {
         val issues = (content.issues as? GitHubApiResult.Success)?.value
         val prSuccess = content.pullRequests as? GitHubApiResult.Success
         val metadataResult = if (LiveSnapshotFactory.needsRepositoryMetadata(issues, prSuccess?.value)) {
-            apiClient.loadRepositoryMetadata(repository)
+            services.apiClient.loadRepositoryMetadata(repository)
         } else {
             null
         }
         val metadata = metadataResult as? GitHubApiResult.Success
-        LiveSnapshotFactory.build(
+        val snapshot = LiveSnapshotFactory.build(
             repository = repository,
             metadata = metadata?.value,
             issues = issues,
@@ -33,12 +36,15 @@ object LiveRefresh {
             rateLimit = metadata?.rateLimit?.bucket
                 ?: prSuccess?.rateLimit?.bucket
                 ?: RateLimitBucket.UNKNOWN,
-        ).also { LiveSnapshotStore.save(context, it) }
-        LiveRowsStore.replacementRows(issues?.rows, prSuccess?.value?.rows)?.let { fresh ->
-            LiveRowsStore.save(context, repository.ref, fresh)
+        )
+        val rows = LiveRowsStore.replacementRows(issues?.rows, prSuccess?.value?.rows)
+        val rateLimit = latestRateLimit(listOfNotNull(content.issues, content.pullRequests, metadataResult))
+        return services.session.commitIfCurrent(sessionGeneration) {
+            LiveSnapshotStore.save(context, snapshot)
+            rows?.let { LiveRowsStore.save(context, repository.ref, it) }
+            rateLimit?.let { RateLimitStore.record(context, it, Instant.now()) }
+            Persisted(rateLimit)
         }
-        return latestRateLimit(listOfNotNull(content.issues, content.pullRequests, metadataResult))
-            ?.also { RateLimitStore.record(context, it, Instant.now()) }
     }
 
     internal fun latestRateLimit(results: List<GitHubApiResult<*>>): RateLimitSnapshot? = results

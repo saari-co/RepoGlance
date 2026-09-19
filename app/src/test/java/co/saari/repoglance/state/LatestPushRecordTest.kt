@@ -44,11 +44,12 @@ class LatestPushRecordTest {
     fun everySessionClearPathAlsoClearsTheTileRecord() {
         val source = readText(repositoryRoot().resolve("app/src/main/java/co/saari/repoglance/RepoGlanceViewModel.kt"))
         val helper = source.substringAfter("fun clearSessionAndTileRecord()").substringBefore("\n    }\n")
-        assertTrue("session clear must drop the tile record before the token", helper.contains("LatestPushStore.clear("))
-        assertTrue(helper.indexOf("LatestPushStore.clear(") < helper.indexOf("session.signOut()"))
-        assertTrue("session clear must drop live pins too", helper.contains("AppPrefs.clearLivePins("))
+        val underSessionLock = helper.substringAfter("session.signOut {").substringBefore("\n        }\n")
+        assertTrue("local data must be cleared inside the session lock, before the token", helper.contains("session.signOut {"))
         for (
             call in listOf(
+                "LatestPushStore.clear(",
+                "AppPrefs.clearLivePins(",
                 "LiveSnapshotStore.clear(",
                 "LiveRowsStore.clear(",
                 "RepoWidgetConfigStore.clearAll(",
@@ -57,14 +58,12 @@ class LatestPushRecordTest {
                 "BackgroundRefresh.cancel(",
             )
         ) {
-            assertTrue("session clear must drop widget-visible data: $call", helper.contains(call))
-            assertTrue(helper.indexOf(call) < helper.indexOf("session.signOut()"))
+            assertTrue("session clear must drop widget-visible data under the session lock: $call", underSessionLock.contains(call))
         }
         assertTrue("placed widgets must re-render after the clear", helper.contains("WidgetRefresh.updateAll("))
-        assertTrue(helper.indexOf("AppPrefs.clearLivePins(") < helper.indexOf("session.signOut()"))
         assertTrue(
             "no session-clear path may bypass the shared helper",
-            Regex("session\\.signOut\\(\\)").findAll(source).count() == 1,
+            Regex("session\\.signOut\\b").findAll(source).count() == 1,
         )
         val storeReplace = source.substringAfter("private fun recordLatestPush(").substringBefore("\n    }\n")
         assertTrue("a catalog with no push record must clear, not keep, the tile record", storeReplace.contains("LatestPushStore.replace("))
