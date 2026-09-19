@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-19T15:49:56+00:00",
     "domain": "Rate-limit device proof: drive LOW and EXHAUSTED end to end on the Pixel 11 Pro Fold with a debug-only transport fault, proving truth rule 4 on the placed repo and stack widgets (023/024 locks unchanged)",
     "started_at": "2026-09-19T15:39:09+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "rate-limit-device-proof-026: debug-only hooks.TransportFault (release twin identity) wraps UrlConnectionTransport, armed via ScenarioLaunchActivity rateFault LOW|EXHAUSTED persisted in debug prefs until reset; LOW rewrites remaining on real calls, EXHAUSTED synthetic 403 ~3 min reset; debug refreshNow trigger; prove stack, repo widget both layouts (maintainer resize), catalog line, per 023/024 locks; recovery = post-reset dump then one run clears rate-limited; LOW skip stays unit-only; feature-map gotcha updated; strike StrictMode and posture-C items from live-widgets map; proof/rate-limit-device-proof-20260919/PROOF.md."
   },
   "decisions": [
@@ -3041,14 +3041,28 @@
       "question": "How are LOW and EXHAUSTED proven end to end on the Fold's placed repo and stack widgets (truth rule 4), without changing the 023/024 locks?",
       "rationale": "Q1 header rewrite on real calls (real data for LOW, no quota spent for EXHAUSTED); Q2 both repo layouts via a maintainer resize; Q3 prove the locks as-is, and a visible LOW marker is a possible next grill; Q4 the LOW skip isn't device-proven because the Fold has one pin that has a repo widget; Q5 a debug refreshNow trigger with a short reset window.",
       "repair_required": false,
-      "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_classifications": [
+        "defer",
+        "reject_false_positive"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
+          "result": "findings",
+          "reviewed_at": "2026-09-19T16:24:59+00:00",
+          "source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6"
+        }
+      ],
+      "review_ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
+      "review_result": "findings",
+      "review_source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T16:23:26+00:00",
+      "updated_at": "2026-09-19T16:24:59+00:00",
       "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
     }
   ],
@@ -3069,16 +3083,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "compact-floor-fit: short compact-only last-good label so the repository name survives at 120dp",
-      "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes"
+      "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes",
+      "low-visible-marker: whether LOW should show on the widgets at all (026 Q3 kept the 023/024 lock; truth rule 4 says back off visibly)"
     ],
-    "reason": "live-widgets map closed at the maintainer's request: nodes 021-024 and follow-up 025 verified, reviewed clean and merged (PR #24 a21fb7e2); the rate-limit states are the only truth-rule surface of the map still without device proof",
-    "recommended": "rate-limit-device-proof: drive LOW and EXHAUSTED end to end on the Fold with a debug-only transport fault, so truth rule 4 is proven on the placed repo and stack widgets rather than only unit-tested",
-    "recorded_at": "2026-09-19T15:03:05+00:00"
+    "reason": "026 device proof verified LOW, EXHAUSTED and recovery on tall, compact, stack and catalog, and found the rate-limited headers truncating the truth-bearing text on screen",
+    "recommended": "rate-limited-header-fit: while rate limited, the one-line tall header shows only 'rate limited \u00b7 resets HH:MM P\u2026' (counts, last good and 'as of' hidden) and the stack header cuts the reset time; decide what each header keeps visible so truth rule 3 holds on screen, not only in the dump (compact-floor-fit could fold in, same fit problem)",
+    "recorded_at": "2026-09-19T16:25:06+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T16:23:26+00:00"
+  "updated_at": "2026-09-19T16:25:06+00:00"
 }
