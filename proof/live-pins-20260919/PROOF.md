@@ -54,3 +54,10 @@ active sort (both sorts); no pins leaves the sort untouched.
   gated action.
 - The fixture home keeps its own star pins; the two pin sets are separate
   by design until widget configuration moves to the live set (map node 2).
+
+## Review (source identity git:93f53cd9a7c980579e9401774e5329142dab24fe, PR #20)
+
+- OpenClaw `req-20260919T013033Z-128441618462`: correct (0.99), 0 findings.
+- ClawSweeper: platinum hermit overall, proof and patch; no findings, no
+  security items, no maintainer decision required beyond merge authority
+  (PR #20 comment 5738298240). Clean at the target. Merge is the maintainer's.
