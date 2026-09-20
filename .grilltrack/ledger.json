@@ -3034,17 +3034,62 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-20T13:41:07+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "verified",
+          "implementation_ref": "git:c5cf58bdb11b9520a4e2a698b94e1d1276461b5b",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [
+            "defer",
+            "reject_false_positive"
+          ],
+          "review_ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
+          "review_result": "findings",
+          "review_source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6",
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-20T13:41:07+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:c5cf58bdb11b9520a4e2a698b94e1d1276461b5b",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "github:saari-co/RepoGlance#29 (ClawSweeper 2026-09-19T16:57Z)",
+          "review_result": "findings",
+          "review_source_identity": "git:6bdf756fd2932059339f89ce3a5795f3e1fa64bc",
+          "to": "implemented",
+          "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
+        },
+        {
+          "at": "2026-09-20T13:41:07+00:00",
+          "choice": "Fault: debug-only hooks.TransportFault (debug source set; release twin returns the transport unchanged) wraps UrlConnectionTransport, armed from ScenarioLaunchActivity (--es rateFault LOW|EXHAUSTED, reset seconds) and persisted in debug prefs until its reset time. LOW makes the real GitHub call and rewrites X-RateLimit-Remaining to <=10% of the limit with a future reset; EXHAUSTED short-circuits to a synthetic 403 (remaining 0, reset about 3 minutes out) with no GitHub call. Trigger: debug-only --ez refreshNow true calls the production BackgroundRefresh.refreshNow. Surfaces: stack header and rows, the repo widget in both layouts (the maintainer resizes it mid-proof and back), and the in-app catalog rate-limit line. Assertions per the 023/024 locks, unchanged: LOW (second run) the widget repo gets a new clock time and no widget shows rate-limited text, and the catalog reads 'GitHub rate limit is low'; EXHAUSTED compact 'rate limited \u00b7 HH:MM', tall 'rate limited \u00b7 resets HH:MM \u00b7 \u2026', stack 'Pinned \u00b7 N \u00b7 rate limited \u00b7 resets HH:MM', counts unchanged and never zero. Recovery: a dump after the reset time records the locked still-limited-until-next-run state, then one triggered run clears rate-limited text with advanced times and real counts. The LOW skip of non-widget pins stays unit-tested only (one pin on the Fold; pins untouched). StrictMode logcat collected; a new co.saari.repoglance.widget violation is a regression.",
+          "from": "implemented",
+          "implementation_ref": "git:dace429a56b6307d2fcf4771099aedb3963263a4",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
         }
       ],
       "id": "rate-limit-device-proof-026",
-      "implementation_ref": "git:c5cf58bdb11b9520a4e2a698b94e1d1276461b5b",
+      "implementation_ref": "git:dace429a56b6307d2fcf4771099aedb3963263a4",
       "question": "How are LOW and EXHAUSTED proven end to end on the Fold's placed repo and stack widgets (truth rule 4), without changing the 023/024 locks?",
       "rationale": "Q1 header rewrite on real calls (real data for LOW, no quota spent for EXHAUSTED); Q2 both repo layouts via a maintainer resize; Q3 prove the locks as-is, and a visible LOW marker is a possible next grill; Q4 the LOW skip isn't device-proven because the Fold has one pin that has a repo widget; Q5 a debug refreshNow trigger with a short reset window.",
       "repair_required": false,
-      "review_classifications": [
-        "defer",
-        "reject_false_positive"
-      ],
+      "review_classifications": [],
       "review_history": [
         {
           "classifications": [
@@ -3055,15 +3100,25 @@
           "result": "findings",
           "reviewed_at": "2026-09-19T16:24:59+00:00",
           "source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6"
+        },
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "github:saari-co/RepoGlance#29 (ClawSweeper 2026-09-19T16:57Z)",
+          "result": "findings",
+          "reviewed_at": "2026-09-20T13:41:07+00:00",
+          "source_identity": "git:6bdf756fd2932059339f89ce3a5795f3e1fa64bc"
         }
       ],
-      "review_ref": "file:proof/rate-limit-device-proof-20260919/REVIEW.md",
-      "review_result": "findings",
-      "review_source_identity": "git:c52e4e3a75052196f957bd5d94a5a00763d548a6",
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-19T16:24:59+00:00",
-      "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md"
+      "updated_at": "2026-09-20T13:41:07+00:00",
+      "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md#repair-round"
     }
   ],
   "last_activation": {
@@ -3094,5 +3149,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-19T16:25:06+00:00"
+  "updated_at": "2026-09-20T13:41:07+00:00"
 }
