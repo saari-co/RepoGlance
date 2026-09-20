@@ -159,6 +159,67 @@ their app frames (`strictmode-callers.txt` `29778029…81d44d0`):
   stranded the resized widgets. The scenario was already `MIXED` from this
   run's last `launch`, and airplane mode was never used.
 
+## Repair round and re-proof (2026-09-20)
+
+ClawSweeper on `6bdf756` returned **blocked before merge** (platinum hermit
+4/6, proof diamond lobster 5/6, no security findings): a P1 merge risk
+because PR #28 landed on `main` while this branch was open, and a P3 finding
+that `TransportFault.arm` wrote preferences straight from the launcher's
+`onCreate` while current `main` had moved those writes to `Dispatchers.IO`.
+Both accepted as `required_fix`. Its third item, that the LOW skip and the
+in-app section lines sit outside this proof's scope, is the gap declared
+above and stays `defer`.
+
+Repair, rebased onto `main` `3c856d2`:
+
+- `ScenarioLaunchActivity` now parses the extras on the main thread and does
+  every write — scenario, probe, `TransportFault.arm` and
+  `BackgroundRefresh.refreshNow` — inside main's `Dispatchers.IO` block,
+  before the next screen starts. `screen=none` skips the next screen and
+  still runs the writes.
+- `ScenarioLaunchActivitySourceTest` (added by #28) is extended to assert
+  that the fault arm and the one-time refresh are inside that block and not
+  outside it, so this cannot regress.
+- `./gradlew check assembleDebug` green; baselines unchanged; 6/6
+  `TransportFaultTest`.
+
+Re-proof on the same phone, debug APK SHA-256
+`7692f3f96cfb30e15d2767f81521e7fc67139c26d7fd4f27d41454062f7f00e2`,
+run directory `runs/verify-repoglance-runs/rl026b-20260920/`. The phone had
+been reinstalled from scratch at 07:44 by something outside this run, which
+removed the session, the pins and both placed widgets. The maintainer signed
+in again; this run then pinned `saari-co/RepoGlance` with the in-app
+thumbtack and placed the widgets itself (see the placement note below):
+stack `appWidgetId 22` and repo widget `appWidgetId 23`
+(`saari-co/RepoGlance`, ISSUES), both on the inner-display home page.
+
+| Phase | Observed | Capture SHA-256 |
+| --- | --- | --- |
+| baseline | stack `Pinned · 1`, row `9:35 AM`, `issues 2 · PRs 2 · review 0` | — |
+| EXHAUSTED (13:35:23Z, reset 13:38:25Z) | stack `Pinned · 1 · rate limited · resets 9:38 AM`; compact `rate limited · 9:35 AM` with counts kept; one synthetic 403, no GitHub call | `ed926a88…8ea6ef` |
+| after the reset, before a run | both still read `rate limited` (locked 023) | — |
+| recovery run | stack `Pinned · 1`, row `9:38 AM`, real counts; compact `9:38 AM`; no `rate limited` anywhere; `bucket=OK`; no fault served | `243f5d89…a182d69c` |
+
+StrictMode for this run (`logcat-run2.txt` `506981dc…2dc751f3`,
+attribution in `strictmode-callers.txt`): **zero** violations with a
+`co.saari.repoglance.widget` frame and **zero** with a
+`ScenarioLaunchActivity` frame — the launcher main-thread disk reads
+recorded in the first run are gone. The only remaining app violations are 2
+`UntaggedSocketViolation`s from real calls in `UrlConnectionTransport`, off
+the main thread.
+
+## Widget placement (rule changed 2026-09-20)
+
+The verify skill used to say widget placement was human-gated. That was a
+convention an agent wrote into `widget-setup.md` (`2451aa9`) and
+`stack-widget.md` (`a4d2639`); it is not in `AGENTS.md`'s Hard Gates. Asked
+about it, the maintainer changed the rule: an agent may place widgets
+itself, should prefer an empty home page, and must report where they landed.
+The feature files now say that. This run placed both widgets that way. The
+inner home screen has a single page and a drag to the right edge did not
+create a new one, so both went onto the free right-hand area of that page;
+no icons were removed, and the maintainer was told.
+
 ## Gaps
 
 - LOW's skip of pins without a repo widget is unit-tested only (one pin on

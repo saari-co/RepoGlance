@@ -20,7 +20,7 @@ The large RepoGlance stack widget lists every pinned repository from the live ca
 Preconditions:
 
 - `bin/verify-repoglance doctor` passes and the maintainer's live session exists with at least one pin.
-- **Human-gated placement.** Placing the stack changes the home screen; the maintainer drags it out or keeps an existing one.
+- **Placement.** An agent may place the stack itself (long-press the home screen, Widgets, search RepoGlance, drag the 4 x 3 out), preferring an empty home page and reporting where it landed. The maintainer may also drag it out, or an existing one can be reused.
 
 - **Read the stack.** Go to the home page holding the stack, `dump stack`: the tree contains `Pinned · <N>` and one row per pin with its repository name and a clock time or `no data`; no `FIXTURE PREVIEW` text.
 - **Pin change.** `launch MIXED live`, filter to `saari-co/RepoGlance`, tap its thumbtack, go home, `dump stack-after-pin`: the `Pinned · <N>` count and the rows changed accordingly. Restore the pin afterwards.

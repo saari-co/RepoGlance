@@ -44,6 +44,7 @@ Preconditions:
 - The catalog refresh control lives beside `LIVE`; the repository refresh control is a different control with its own id. Tapping the wrong one refreshes the wrong thing and still succeeds.
 - A failed refresh keeps the previous rows on screen by design; the failure text sits in the section header, not in a dialog.
 - Force `LOW`/`EXHAUSTED` with the debug fault above, never by burning real quota. It is debug-only; a release build ignores it. The fixture navigator's `RATE_LIMITED` scenario still covers the fixture screens.
+- The launcher applies the extras on `Dispatchers.IO` before it starts the next screen, so give it a couple of seconds before reading `repoglance_debug_fault.xml`.
 - Every debug launcher call for the fault needs `--activity-clear-task`: without it, Android brings the existing RepoGlance task forward and the launcher never reads its extras (`result code=2` or `3` in logcat, no `repoglance_debug_fault.xml`).
 - Don't run `cleanup` (it force-stops the app) while the maintainer resizes widgets. A force-stopped app misses the resize, and the widgets sit on the launcher's loading placeholder until the next refresh redraws them.
 - The tall header and the stack header are one line: at the rate-limited state the dump holds the full text, but on screen the tall header cuts off after the reset time (counts and `as of` hidden) and the stack header cuts the reset time itself. Assert the render from a capture, not only the dump.
