@@ -28,7 +28,7 @@ Implementation `git:e5ec96365107e03130b9061d3ca5222ed1000eae` on branch
 | Rings keep running across the message change | **verified (device)** | screen recording + contact sheets below |
 | Plain catalog refresh keeps its spinner | **verified (guard) only** | device path needs a signed-in session; this phone is signed out |
 | Code-screen instruction line | **verified (guard) only** | redact guard forbids dumping the code screen, and reaching it starts a sign-in |
-| Real end-to-end auto-return during a sign-in | **not yet run — human-gated** | needs Bobby to sign in; see Open |
+| Real end-to-end auto-return during a sign-in | **verified (device, maintainer-driven)** | see End-to-end run |
 
 ## Commands and results
 
@@ -99,6 +99,28 @@ to the lens edge at full alpha and drop the other. From 3.5 s to 7 s every
 first frames after the tap is the debug holder's click ripple; production has
 no clickable surface there.
 
+## End-to-end run (2026-09-21, maintainer-driven)
+
+Bobby signed in on the Pixel 10 Pro Fold running `e5ec963`: Connect GitHub,
+Copy code & open GitHub, authorized on GitHub, left the tab alone. He
+reported that RepoGlance came back on its own. The agent ran nothing while
+the code was on screen and did not use `launch`; afterwards, without
+relaunching:
+
+```
+adb shell dumpsys activity activities | grep topResumedActivity
+  topResumedActivity=ActivityRecord{... co.saari.repoglance/.MainActivity t235}
+bin/verify-repoglance dump after-signin
+  repoglance:live       |                                    | [588,396][753,513]
+  repoglance:rate-limit | GitHub rate limit: 4851 remaining  | [39,542][560,589]
+  no "Connect GitHub"
+task t235:  * Hist #0: co.saari.repoglance/.MainActivity   (no Custom Tab record)
+```
+
+The GitHub tab was cleared from the task, not left behind it, matching the
+probe. No capture was taken of the signed-in catalog (it would record
+unfiltered repository names).
+
 ## Artifacts
 
 Images and video stay in the gitignored run directories on Bobby's MacBook.
@@ -116,12 +138,6 @@ No artifact contains a device code, a token, or catalog data.
 
 ## Open
 
-- **Human-gated end-to-end run.** Bobby signs in on a phone running this build
-  (sign out first if already signed in), authorizes on GitHub, and leaves the
-  tab alone. Expected: RepoGlance comes back over the tab within about 5 s,
-  showing the mark, then the catalog with `LIVE`. The agent runs nothing while
-  the code is on screen and does not use `launch` during the sign-in; it dumps
-  `after-signin` once Bobby says it finished.
 - **Other phones and browsers.** The self-start is proven on one OS build with
   Chrome. Elsewhere it may be blocked; the instruction line is the fallback.
 - **Tab no longer in front.** If the user leaves the tab for another app before

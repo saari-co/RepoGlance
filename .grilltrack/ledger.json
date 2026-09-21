@@ -3162,6 +3162,20 @@
           "review_source_identity": null,
           "to": "implemented",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-21T12:19:58+00:00",
+          "choice": "Auto-return plus honest instruction: MainActivity self-starts when the token is committed, clearing the Custom Tab, and the code screen also says how to come back by hand. Post-token: ping-ring mark held continuously, no spinner, Finishing sign-in... then Loading your repositories..., then the catalog. Pending poll: code screen unchanged (candidate A). Failure and expiry screens unchanged. No polling change.",
+          "from": "implemented",
+          "implementation_ref": "git:e5ec96365107e03130b9061d3ca5222ed1000eae (MainActivity.kt, RepoGlanceViewModel.kt, ui/LiveRepoGlanceScreen.kt, debug SignInFinishingPreviewActivity, SignInReturnGuardTest, features/sign-in.md)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "signin-return-027",
@@ -3174,34 +3188,26 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "implemented",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T12:11:04+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-21T12:19:58+00:00",
+      "verification_ref": "file:proof/signin-return-20260921/PROOF.md (gradle check 265 tests; mutation-checked guards; Pixel 10 Pro Fold holder dumps/captures and ring-continuity recording; maintainer-driven end-to-end sign-in: app returned by itself, Custom Tab cleared from task t235, LIVE)"
     }
   ],
   "last_activation": {
-    "at": "2026-09-19T13:32:46+00:00",
+    "at": "2026-09-21T12:19:58+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
-    "artifact_refs": [
-      "proof/stack-widget-live-20260919/PROOF.md",
-      ".grilltrack/maps/live-widgets.md"
-    ],
-    "next_safe_action": "In a fresh isolated worktree: check out claude/widget-update-redraw-025, resume the ledger, implement the confirmed receiver (ACTION_MY_PACKAGE_REPLACED -> goAsync -> WidgetRefresh.updateAll), test, gradlew check, Fold proof (install, no app open, home dump shows both widgets with data), proof under proof/widget-update-redraw-20260919/PROOF.md; PR and review rails only when the maintainer asks",
-    "paused_at": "2026-09-19T13:19:36+00:00",
-    "reason": "Maintainer asked to implement widget-update-redraw-025 in a fresh session (Opus 5, high effort)",
-    "resumed_at": "2026-09-19T13:32:46+00:00"
-  },
-  "pause": {
     "artifact_refs": [
       "file:proof/signin-return-20260921/PROOF.md"
     ],
     "next_safe_action": "Bobby signs in on an approved phone running this build (disconnect first if signed in), authorizes, and leaves the GitHub tab alone; agent runs nothing while the code is up and never uses launch during it, then dumps after-signin, records verify for signin-return-027, and moves to exact-source review",
     "paused_at": "2026-09-21T12:15:18+00:00",
-    "reason": "waiting_for_human: signin-return-027 implemented at e5ec963 and verified by gradle check (265 tests), mutation-checked guards, and Pixel 10 Pro Fold holder dumps, captures and a continuity recording; the end-to-end auto-return needs a real GitHub sign-in, which only the maintainer may perform"
+    "reason": "waiting_for_human: signin-return-027 implemented at e5ec963 and verified by gradle check (265 tests), mutation-checked guards, and Pixel 10 Pro Fold holder dumps, captures and a continuity recording; the end-to-end auto-return needs a real GitHub sign-in, which only the maintainer may perform",
+    "resumed_at": "2026-09-21T12:19:58+00:00"
   },
+  "pause": null,
   "recommendation": {
     "alternatives": [
       "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes",
@@ -3212,8 +3218,8 @@
     "recorded_at": "2026-09-19T16:25:06+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "paused",
+  "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T12:15:18+00:00"
+  "updated_at": "2026-09-21T12:19:58+00:00"
 }
