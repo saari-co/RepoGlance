@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-19T15:49:56+00:00",
-    "domain": "Rate-limit device proof: drive LOW and EXHAUSTED end to end on the Pixel 11 Pro Fold with a debug-only transport fault, proving truth rule 4 on the placed repo and stack widgets (023/024 locks unchanged)",
-    "started_at": "2026-09-19T15:39:09+00:00",
-    "status": "inspected",
-    "summary": "rate-limit-device-proof-026: debug-only hooks.TransportFault (release twin identity) wraps UrlConnectionTransport, armed via ScenarioLaunchActivity rateFault LOW|EXHAUSTED persisted in debug prefs until reset; LOW rewrites remaining on real calls, EXHAUSTED synthetic 403 ~3 min reset; debug refreshNow trigger; prove stack, repo widget both layouts (maintainer resize), catalog line, per 023/024 locks; recovery = post-reset dump then one run clears rate-limited; LOW skip stays unit-only; feature-map gotcha updated; strike StrictMode and posture-C items from live-widgets map; proof/rate-limit-device-proof-20260919/PROOF.md."
+    "confirmed_at": "2026-09-21T12:04:02+00:00",
+    "domain": "GitHub device-flow sign-in return: what the user sees between authorizing on GitHub and the catalog, and whether the Custom Tab is dismissed",
+    "started_at": "2026-09-21T12:04:01+00:00",
+    "status": "confirmed",
+    "summary": "signin-return-027 confirmed by the maintainer (build it, 2026-09-21): auto-return on token commit plus a manual-return line on the code screen; mark held across Finishing sign-in then Loading your repositories, no spinner; code screen unchanged while pending; failure/expiry unchanged; no polling change; BalProbeActivity removed before delivery; proof: gradlew check, Fold debug holder dump+capture of the two post-token states, human-gated real sign-in for auto-return."
   },
   "decisions": [
     {
@@ -3119,6 +3119,65 @@
       "superseded_by": null,
       "updated_at": "2026-09-20T13:41:07+00:00",
       "verification_ref": "file:proof/rate-limit-device-proof-20260919/PROOF.md#repair-round"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [
+        "artifact:https://claude.ai/artifact/JgL6s5SB1eaXr6jrfg48TN"
+      ],
+      "choice": "Auto-return plus honest instruction: MainActivity self-starts when the token is committed, clearing the Custom Tab, and the code screen also says how to come back by hand. Post-token: ping-ring mark held continuously, no spinner, Finishing sign-in... then Loading your repositories..., then the catalog. Pending poll: code screen unchanged (candidate A). Failure and expiry screens unchanged. No polling change.",
+      "context_ref": "file:proof/signin-return-20260921/BAL_PROBE.md",
+      "created_at": "2026-09-21T12:04:01+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "checking-splash-018"
+      ],
+      "domain": "GitHub device-flow sign-in return: what the user sees between authorizing on GitHub and the catalog, and whether the Custom Tab is dismissed",
+      "history": [
+        {
+          "at": "2026-09-21T12:04:02+00:00",
+          "choice": "Auto-return plus honest instruction: MainActivity self-starts when the token is committed, clearing the Custom Tab, and the code screen also says how to come back by hand. Post-token: ping-ring mark held continuously, no spinner, Finishing sign-in... then Loading your repositories..., then the catalog. Pending poll: code screen unchanged (candidate A). Failure and expiry screens unchanged. No polling change.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-21T12:11:04+00:00",
+          "choice": "Auto-return plus honest instruction: MainActivity self-starts when the token is committed, clearing the Custom Tab, and the code screen also says how to come back by hand. Post-token: ping-ring mark held continuously, no spinner, Finishing sign-in... then Loading your repositories..., then the catalog. Pending poll: code screen unchanged (candidate A). Failure and expiry screens unchanged. No polling change.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        }
+      ],
+      "id": "signin-return-027",
+      "implementation_ref": "git:e5ec96365107e03130b9061d3ca5222ed1000eae (MainActivity.kt, RepoGlanceViewModel.kt, ui/LiveRepoGlanceScreen.kt, debug SignInFinishingPreviewActivity, SignInReturnGuardTest, features/sign-in.md)",
+      "question": "After authorizing on GitHub, what dismisses the Custom Tab; what fills the gap to the catalog; what shows while the poll is pending; what an expired code shows",
+      "rationale": "Self-start is the only lever (no redirect, no callback or server per AGENTS.md, no Custom Tabs close API) and was proved allowed on the Fold (Android 17/SDK 37): tab cleared from the task in 58ms, zero BAL blocks. Candidate A chosen from the live prototype because hiding the code strands a user who returned to retype it. A proposed slow_down fix was withdrawn: waitUntil deliberately re-loops after a resume wake so it can never poll early, and DeviceAuthorizationUiGuardTest asserts that. The up-to-5s window is inherent to GitHub's interval; auto-return removes the code flash by removing the manual mid-window return.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "implemented",
+      "superseded_by": null,
+      "updated_at": "2026-09-21T12:11:04+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -3135,7 +3194,14 @@
     "reason": "Maintainer asked to implement widget-update-redraw-025 in a fresh session (Opus 5, high effort)",
     "resumed_at": "2026-09-19T13:32:46+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      "file:proof/signin-return-20260921/PROOF.md"
+    ],
+    "next_safe_action": "Bobby signs in on an approved phone running this build (disconnect first if signed in), authorizes, and leaves the GitHub tab alone; agent runs nothing while the code is up and never uses launch during it, then dumps after-signin, records verify for signin-return-027, and moves to exact-source review",
+    "paused_at": "2026-09-21T12:15:18+00:00",
+    "reason": "waiting_for_human: signin-return-027 implemented at e5ec963 and verified by gradle check (265 tests), mutation-checked guards, and Pixel 10 Pro Fold holder dumps, captures and a continuity recording; the end-to-end auto-return needs a real GitHub sign-in, which only the maintainer may perform"
+  },
   "recommendation": {
     "alternatives": [
       "pin-refresh: pinning a repository triggers one refresh so a new pin doesn't read no data for up to 30 minutes",
@@ -3146,8 +3212,8 @@
     "recorded_at": "2026-09-19T16:25:06+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-20T13:41:07+00:00"
+  "updated_at": "2026-09-21T12:15:18+00:00"
 }
