@@ -6,6 +6,7 @@ import co.saari.repoglance.auth.GitHubAuthConfig
 import co.saari.repoglance.auth.GitHubDeviceFlowClient
 import co.saari.repoglance.auth.GitHubSession
 import co.saari.repoglance.auth.SecureTokenStore
+import co.saari.repoglance.hooks.TransportFault
 
 object LiveGitHub {
 
@@ -30,6 +31,7 @@ object LiveGitHub {
             tokenStore = SecureTokenStore(context),
             deviceFlowClient = deviceFlowClient,
         )
-        return Services(authConfig, deviceFlowClient, session, GitHubApiClient(session))
+        val apiClient = GitHubApiClient(session, TransportFault.wrap(context, UrlConnectionTransport()))
+        return Services(authConfig, deviceFlowClient, session, apiClient)
     }
 }

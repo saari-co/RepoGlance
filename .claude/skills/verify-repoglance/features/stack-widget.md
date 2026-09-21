@@ -20,7 +20,7 @@ The large RepoGlance stack widget lists every pinned repository from the live ca
 Preconditions:
 
 - `bin/verify-repoglance doctor` passes and the maintainer's live session exists with at least one pin.
-- **Human-gated placement.** Placing the stack changes the home screen; the maintainer drags it out or keeps an existing one.
+- **Placement.** An agent may place the stack itself (long-press the home screen, Widgets, search RepoGlance, drag the 4 x 3 out), preferring an empty home page and reporting where it landed. The maintainer may also drag it out, or an existing one can be reused.
 
 - **Read the stack.** Go to the home page holding the stack, `dump stack`: the tree contains `Pinned · <N>` and one row per pin with its repository name and a clock time or `no data`; no `FIXTURE PREVIEW` text.
 - **Pin change.** `launch MIXED live`, filter to `saari-co/RepoGlance`, tap its thumbtack, go home, `dump stack-after-pin`: the `Pinned · <N>` count and the rows changed accordingly. Restore the pin afterwards.
@@ -34,4 +34,5 @@ Preconditions:
 - At a low rate limit only repositories with their own repo widget refresh; other stack rows keep their numbers with an older clock time.
 - After an app update both widgets (repo and stack) redraw from saved data without the app being opened; no GitHub call is made, so the numbers and their time are whatever was last saved.
 - CI is not fetched on the live path, so the stack has no CI column.
+- While rate limited, the one-line header holds the full `rate limited · resets <time>` in the dump, but the screen cuts the time (`resets 12:0…`); assert it from a capture as well as the dump.
 - Glance test tags (`stack-header`, `stack-age`, `stack-counts`) are visible to the JVM Glance tests only; on device assert by visible text.

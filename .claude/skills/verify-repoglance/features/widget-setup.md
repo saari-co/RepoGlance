@@ -20,7 +20,7 @@ Adding the compact/tall RepoGlance widget opens a setup screen listing the repos
 Preconditions:
 
 - `bin/verify-repoglance doctor` passes and the maintainer's live session exists (the list comes from the last catalog load).
-- **Human-gated placement.** Placing a widget changes the home screen; the maintainer either drags it or approves an adb placement through the debug widget host used by the picker. Remove it afterwards unless asked to keep it.
+- **Placement.** An agent may place a widget itself: long-press the home screen, Widgets, search RepoGlance, then drag the size you need out. Prefer an empty home page and report where it landed. The maintainer can also drag it out. Leave a widget the maintainer already placed as it is.
 
 - **Setup list.** Open the setup screen for a new widget, then `dump widget-setup`. The `Repository` field shows the first pinned repository, and the note reads `Saving pins this repository in RepoGlance`.
 - **Pin on save.** Save the widget for `saari-co/RepoGlance`, then `bin/verify-repoglance launch MIXED live`, filter to `saari-co/RepoGlance`, `dump after-widget`: the row control reads `Unpin saari-co/RepoGlance`.
