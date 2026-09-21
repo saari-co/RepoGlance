@@ -24,6 +24,17 @@ device authorization flow, which needs only the app's public client ID:
    the app's no-backup directory. A persistence failure clears partial local
    state and becomes a fixed, phase-specific message; token values, response
    bodies, exception messages, classes, and causes are not exposed.
+5. Device flow has no redirect and RepoGlance has no callback, so the Custom
+   Tab would otherwise stay on GitHub's success page. Once the token is
+   committed, the activity that opened the tab starts itself with
+   `CLEAR_TOP|SINGLE_TOP`; as the `singleTask` root of its task this removes
+   the tab and brings RepoGlance forward. It does so once, only for a sign-in
+   whose tab it opened, and never when RepoGlance is already in front, so a
+   code entered on another device finishes in place. The code screen tells the
+   user to close the tab if the app does not come back. The launch is proven
+   allowed on a Pixel Fold (Android 17, Chrome Custom Tabs;
+   `proof/signin-return-20260921/`); other browsers and OS builds may block it,
+   which leaves the manual return.
 
 GitHub issues expiring user tokens by default. A device-flow token can be
 refreshed using the public client ID and refresh token without a confidential

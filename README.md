@@ -69,7 +69,11 @@ earlier prototype client secret remain maintainer-gated or planned.
 RepoGlance requests a short user code from its public GitHub App, keeps that
 code visible, and waits for an explicit **Copy code & open GitHub** tap. That
 action copies the code and opens GitHub's exact verification page in an Android
-Custom Tab; returning to RepoGlance leaves the code visible. GitHub currently
+Custom Tab. Once GitHub authorizes and the token is saved, RepoGlance brings
+itself back over the tab and shows its mark with "Finishing sign-in…" and
+"Loading your repositories…" until the catalog appears (proven on a Pixel
+Fold, Android 17; elsewhere the code screen tells the user to close the tab).
+Returning to RepoGlance by hand before that leaves the code visible. GitHub currently
 uses segmented one-character fields on Android, so normal clipboard paste may
 not fill the complete code and manual entry can still be required.
 Returning also wakes a paused pending check, which still rechecks GitHub's
