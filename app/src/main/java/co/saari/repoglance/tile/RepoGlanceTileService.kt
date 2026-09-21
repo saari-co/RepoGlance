@@ -42,7 +42,7 @@ class RepoGlanceTileService : TileService() {
     private fun render(text: TileText) {
         val tile = qsTile ?: return
         tile.label = TileTexts.LABEL
-        tile.icon = Icon.createWithResource(this, R.drawable.ic_repoglance_mark)
+        tile.icon = Icon.createWithResource(this, R.drawable.ic_repoglance_glyph)
         tile.subtitle = text.subtitle
         tile.contentDescription = text.contentDescription
         tile.state = if (text.active) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE

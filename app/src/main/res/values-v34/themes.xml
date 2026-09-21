@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 34+: Material 3 dynamic color draws the app on
+         system_background_light, so the start window uses the same color. -->
+    <style name="Theme.RepoGlance" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/system_background_light</item>
+    </style>
+</resources>
