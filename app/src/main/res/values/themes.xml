@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The start window and system splash take this background, so it
+         matches the app's own dynamic light background: no flash between
+         the splash and the first frame. -->
+    <style name="Theme.RepoGlance" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/system_neutral1_10</item>
+    </style>
+</resources>
