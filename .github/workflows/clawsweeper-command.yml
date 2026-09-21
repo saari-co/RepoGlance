@@ -37,8 +37,10 @@ on:
 
 permissions:
   contents: read
-  issues: write        # eyes reaction + not-enrolled / dispatch-failed comment
-  pull-requests: read  # resolve the PR head
+  issues: write        # not-enrolled / dispatch-failed comment
+  pull-requests: write # resolve the PR head + eyes reaction on a PR comment
+                       # (GITHUB_TOKEN maps PR-comment reactions to this scope;
+                       # `issues: write` alone 403s — proven on RepoGlance#34)
 
 jobs:
   relay:
