@@ -7,7 +7,7 @@
     "confirmed_at": "2026-09-21T16:52:43+00:00",
     "domain": "App start while signed in: what shows from launch to the catalog (system splash, window background, in-app loading)",
     "started_at": "2026-09-21T16:52:43+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "cold-start-icon-028 relocked with corrected wording (maintainer, 2026-09-21): seamless start claimed for API 34+ only; API 31-33 fallback approximate and unverified; implementation unchanged"
   },
   "decisions": [
@@ -3575,18 +3575,25 @@
     "reason": "waiting_for_human: cold-start-icon-028 option 2 implemented at a17450c, gradle check green; the Pixel 10 Pro Fold is mid system update (was Android 16 BD3A.250808.001, patch 2025-09-05), so the dark cold-start re-record cannot run yet",
     "resumed_at": "2026-09-21T15:51:19+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      "file:plans/family-look-handoff-20260921.md"
+    ],
+    "next_safe_action": "In the new session: read the ledger, resume, read plans/family-look-handoff-20260921.md, agree the grill's slot scope with the maintainer, then run five-candidate rounds on the real app",
+    "paused_at": "2026-09-21T23:17:52+00:00",
+    "reason": "session boundary: maintainer routed the family-look grill to a fresh session"
+  },
   "recommendation": {
     "alternatives": [
-      "family-look: a shared 'same dev crew' signature across RepoGlance and Swarm Intercom without copying night glass: keep Material 3 dynamic color as the base; candidates include shared state-colour semantics (emerald ok / amber working / sky active) harmonised with dynamic color, a shared label typeface, and the black/grey/white mark language (maintainer asked for it 2026-09-21)"
+      "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)"
     ],
-    "reason": "cold-start-icon-028 relocked with option 2 and implemented at a17450c; device re-verify waits on the Fold's system update. Maintainer asked for cross-app alignment that keeps each app unique",
-    "recommended": "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)",
-    "recorded_at": "2026-09-21T15:44:24+00:00"
+    "reason": "cold-start-icon-028 delivered as PR #34 (05c21fd); maintainer picked family-look next and routed it to a fresh session via plans/family-look-handoff-20260921.md",
+    "recommended": "family-look: a shared 'same dev crew' signature across RepoGlance and Swarm Intercom without copying night glass, keeping Material 3 dynamic color as the base (maintainer chose this grill 2026-09-21)",
+    "recorded_at": "2026-09-21T23:17:52+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T22:42:10+00:00"
+  "updated_at": "2026-09-21T23:17:52+00:00"
 }
