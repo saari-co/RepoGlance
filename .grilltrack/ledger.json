@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-21T15:44:14+00:00",
+    "confirmed_at": "2026-09-21T16:52:43+00:00",
     "domain": "App start while signed in: what shows from launch to the catalog (system splash, window background, in-app loading)",
-    "started_at": "2026-09-21T15:44:14+00:00",
-    "status": "inspected",
-    "summary": "cold-start-icon-028 relocked with option 2 by the maintainer (2026-09-21): icon, glyph and tile unchanged; start window on system_background_dark/light for API 34+ with the neutral1 fallback on 31-33"
+    "started_at": "2026-09-21T16:52:43+00:00",
+    "status": "confirmed",
+    "summary": "cold-start-icon-028 relocked with corrected wording (maintainer, 2026-09-21): seamless start claimed for API 34+ only; API 31-33 fallback approximate and unverified; implementation unchanged"
   },
   "decisions": [
     {
@@ -3259,7 +3259,7 @@
       "candidate_refs": [
         "file:runs/cold-start-icon-20260921/r3/splash-r3-white-vs-dark.png"
       ],
-      "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background: system_background_dark / system_background_light on API 34+, system_neutral1_900 / system_neutral1_10 on API 31-33 (closest resource; M3 computes that tone there), so the splash runs straight into the app with no flash or tone step. In-app loading spinner unchanged; refresh keeps its spinner.",
+      "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background on API 34+ (system_background_dark / system_background_light), so the splash runs straight into the app with no flash or tone step, proven on the Pixel 10 Pro Fold in dark and light mode. On API 31-33 it falls back to system_neutral1_900 / system_neutral1_10, an approximation: M3 computes that background tone with no system resource, so a small tone step is likely there and is unverified. In-app loading spinner unchanged; refresh keeps its spinner.",
       "context_ref": "file:.grilltrack/work/cold-start-icon/picker.json",
       "created_at": "2026-09-21T15:14:05+00:00",
       "deferred_reason": null,
@@ -3399,12 +3399,68 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md#re-verification-option-2-source-9d2940e; gradle check green; Fold dark cold start: splash and app share RGB (3,6,45) across frames 24-345, no flash"
+        },
+        {
+          "at": "2026-09-21T16:52:43+00:00",
+          "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background: system_background_dark / system_background_light on API 34+, system_neutral1_900 / system_neutral1_10 on API 31-33 (closest resource; M3 computes that tone there), so the splash runs straight into the app with no flash or tone step. In-app loading spinner unchanged; refresh keeps its spinner.",
+          "from": "verified",
+          "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (review R3/R4 repair: parent-theme guard, PROOF checks)",
+          "note": "ClawSweeper P2 on 3d2837e (PR #34) and internal review R1: the locked choice claimed no tone step on API 31-33, where the neutral1 fallback is approximate and unverified. Maintainer approved rewording 2026-09-21; implementation unchanged",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": "file:proof/cold-start-icon-20260921/REVIEW.md#re-review (R3/R4 fixed; lock wording on API 31-33 is a maintainer gate; light/themed/tile human checks pending before delivery)",
+          "review_result": "clean",
+          "review_source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7",
+          "to": "reopened",
+          "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (5 guard tests, 4 mutations each fail 1); device proof of the dark start at 9d2940e unchanged by this test/doc-only repair"
+        },
+        {
+          "at": "2026-09-21T16:52:43+00:00",
+          "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background: system_background_dark / system_background_light on API 34+, system_neutral1_900 / system_neutral1_10 on API 31-33 (closest resource; M3 computes that tone there), so the splash runs straight into the app with no flash or tone step. In-app loading spinner unchanged; refresh keeps its spinner.",
+          "from": "reopened",
+          "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (review R3/R4 repair: parent-theme guard, PROOF checks)",
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": "file:proof/cold-start-icon-20260921/REVIEW.md#re-review (R3/R4 fixed; lock wording on API 31-33 is a maintainer gate; light/themed/tile human checks pending before delivery)",
+          "review_result": "clean",
+          "review_source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7",
+          "to": "locked",
+          "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (5 guard tests, 4 mutations each fail 1); device proof of the dark start at 9d2940e unchanged by this test/doc-only repair"
+        },
+        {
+          "at": "2026-09-21T16:52:43+00:00",
+          "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background on API 34+ (system_background_dark / system_background_light), so the splash runs straight into the app with no flash or tone step, proven on the Pixel 10 Pro Fold in dark and light mode. On API 31-33 it falls back to system_neutral1_900 / system_neutral1_10, an approximation: M3 computes that background tone with no system resource, so a small tone step is likely there and is unverified. In-app loading spinner unchanged; refresh keeps its spinner.",
+          "from": "locked",
+          "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (review R3/R4 repair: parent-theme guard, PROOF checks)",
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": "file:proof/cold-start-icon-20260921/REVIEW.md#re-review (R3/R4 fixed; lock wording on API 31-33 is a maintainer gate; light/themed/tile human checks pending before delivery)",
+          "review_result": "clean",
+          "review_source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7",
+          "to": "implemented",
+          "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (5 guard tests, 4 mutations each fail 1); device proof of the dark start at 9d2940e unchanged by this test/doc-only repair"
+        },
+        {
+          "at": "2026-09-21T16:52:43+00:00",
+          "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background on API 34+ (system_background_dark / system_background_light), so the splash runs straight into the app with no flash or tone step, proven on the Pixel 10 Pro Fold in dark and light mode. On API 31-33 it falls back to system_neutral1_900 / system_neutral1_10, an approximation: M3 computes that background tone with no system resource, so a small tone step is likely there and is unverified. In-app loading spinner unchanged; refresh keeps its spinner.",
+          "from": "implemented",
+          "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (source unchanged by the wording relock)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (5 guard tests, 4 mutations each fail 1); device proof of the dark start at 9d2940e unchanged by this test/doc-only repair"
         }
       ],
       "id": "cold-start-icon-028",
-      "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (review R3/R4 repair: parent-theme guard, PROOF checks)",
+      "implementation_ref": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (source unchanged by the wording relock)",
       "question": "What icon does RepoGlance have (launcher, system splash, themed icon, Quick Settings tile), and what background does app start show?",
-      "rationale": "Round 3 B chosen over three rounds on the real Pixel launcher and system splash. F1 on device showed the neutral1_900 splash lighter than the app; maintainer chose option 2 (match the app on API 34+), which follows Google's SplashScreen guidance that the splash be a single colour matching the app's first frame. The tile change refines quick-settings-tile-019's icon at the maintainer's request.",
+      "rationale": "Round 3 B chosen over three rounds on the real Pixel launcher and system splash. F1 on device showed the neutral1_900 splash lighter than the app; maintainer chose option 2 (match the app on API 34+), which follows Google's SplashScreen guidance that the splash be a single colour matching the app's first frame. Wording limited to the proven API 34+ path after ClawSweeper P2 on PR #34 (maintainer-approved). The tile change refines quick-settings-tile-019's icon at the maintainer's request.",
       "repair_required": false,
       "review_classifications": [],
       "review_history": [
@@ -3428,17 +3484,17 @@
           "source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7"
         }
       ],
-      "review_ref": "file:proof/cold-start-icon-20260921/REVIEW.md#re-review (R3/R4 fixed; lock wording on API 31-33 is a maintainer gate; light/themed/tile human checks pending before delivery)",
-      "review_result": "clean",
-      "review_source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7",
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T15:55:19+00:00",
-      "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at cd8dbca77dc3a9f316dae4f0756eeef2934da0f7 (5 guard tests, 4 mutations each fail 1); device proof of the dark start at 9d2940e unchanged by this test/doc-only repair"
+      "updated_at": "2026-09-21T16:52:43+00:00",
+      "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md (dark+light on API 36, light on API 37 CP2A.260805.005; themed icon and QS tile checked); gradle check green at cd8dbca"
     }
   ],
   "last_activation": {
-    "at": "2026-09-21T15:51:19+00:00",
+    "at": "2026-09-21T16:52:43+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
@@ -3463,5 +3519,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T15:55:19+00:00"
+  "updated_at": "2026-09-21T16:52:43+00:00"
 }

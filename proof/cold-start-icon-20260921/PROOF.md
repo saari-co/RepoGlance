@@ -161,3 +161,25 @@ still reported build `BD3A.250808.001` (API 36), with the update downloading.
 
 The agent did not change any system setting. Switching dark mode and themed
 icons back is the maintainer's call.
+
+## Android 17 recheck (2026-09-21, after the Fold's system update)
+
+- The Fold now reports Android 17 (API 37), build `CP2A.260805.005`, patch
+  2026-08-05. The installed APK SHA-256 is unchanged (`89e0f09d…b0ca`),
+  `deviceLocked=0`, and the phone is still in light mode (no setting changed).
+- Light cold start: `LaunchState: COLD`, `TotalTime: 303`, 378 frames. The
+  RepoGlance window covers frames 23–375 without a break, all on RGB
+  (246,243,253) ±1 (video-encoding noise), from the splash through to the
+  app. Crop: `runs/cold-start-icon-028-runs/cold-start-light-api37-strip.png`.
+- Dark mode was not rechecked on API 37, because that would mean changing a
+  system setting. The API 34+ code path is the same one proven dark on
+  API 36.
+
+## Lock wording corrected (ClawSweeper P2 on `3d2837e`)
+
+ClawSweeper's review of `3d2837e` (PR #34) raised one P2 finding, the same as
+internal review R1. The locked choice said "no flash or tone step" across all
+supported API levels, but API 31–33 is an unverified approximation. With the
+maintainer's approval, 028 was reopened and relocked. The seamless claim now
+covers API 34+ only, and API 31–33 is recorded as approximate, likely to show
+a small tone step, and unverified. No source changed.
