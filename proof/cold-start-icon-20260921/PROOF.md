@@ -4,10 +4,9 @@ GrillTrack track `gt-20260728163459-227573`, decision `cold-start-icon-028`
 (locked 2026-09-21). Built from `plans/cold-start-icon-028-handoff-20260921.md`
 on branch `claude/cold-start-mark`.
 
-**Result:** implemented as locked. The first device run found F1: the dark
-start window was lighter than the app. The maintainer chose option 2, which is
-now built (see F1). Device re-verification waits for the Fold's system
-update to finish.
+**Result:** implemented and verified on the device. The first device run found
+F1: the dark start window was lighter than the app. The maintainer chose
+option 2. The rebuilt start is seamless in dark mode (see "Re-verification").
 
 ## What was built
 
@@ -93,10 +92,25 @@ frame, per a Developer Knowledge query). Built as `res/values-v34/themes.xml`
 background with no system resource there. `ColdStartIconGuardTest` asserts
 all four values. `./gradlew check` is green with unchanged baselines.
 
-**Pending:** re-record the dark cold start on the Fold after its update to
-confirm the splash and app colours match. At this run the Fold reported
-Android 16 (API 36), build `BD3A.250808.001`, patch 2025-09-05; the
-maintainer is updating it.
+### Re-verification (option 2, source `9d2940e`)
+
+- The Fold's system update was still downloading in the background. The phone
+  still reported Android 16 (API 36), build `BD3A.250808.001`, patch
+  2025-09-05. `deviceLocked=0`, awake, dark mode.
+- `adb install -r` the debug APK. Doctor passed with `apk_device` =
+  `89e0f09d0e856531e695d7661ca665cd39ce551272eabb86a6a51e503085b0ca`.
+  `aapt2 dump resources` shows `Theme.RepoGlance` in the default, `night`,
+  `v34` and `night-v34` configurations.
+- Cold start: `LaunchState: COLD`, `TotalTime: 443`. Recorded 347 frames
+  with the same fail-closed crop filter. The RepoGlance window covers frames
+  24–345 without a break. **Every one of those frames has the same
+  background, RGB (3,6,45)**, from the first splash frame through the
+  loading screen. The earlier (16,23,60) → (3,6,45) step is gone. Full-frame
+  mean brightness after the splash starts is at most 19.4/255: no flash.
+- Kept crop: `runs/cold-start-icon-028-runs/cold-start-dark-v34-strip-frames-26-39-69-89-114-204.png`
+  (local, ignored). It has six centre crops: splash, splash, fade, loading,
+  loading, loading. Full frames and the recording were deleted after
+  extraction.
 
 ## Launcher drawer shot: not captured (fail-closed)
 

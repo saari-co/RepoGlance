@@ -3338,6 +3338,20 @@
           "review_source_identity": null,
           "to": "implemented",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-21T15:51:19+00:00",
+          "choice": "Launcher icon = round 3 B: R2 A foreground (heavy white stroke commit-eye mark with two solid grey rings) on a vertical graphite-to-black gradient. Monochrome/themed glyph = round 2 A silhouette (mark with two solid rings); the Quick Settings tile switches to the same glyph. Start window background matches the app's Material 3 dynamic background: system_background_dark / system_background_light on API 34+, system_neutral1_900 / system_neutral1_10 on API 31-33 (closest resource; M3 computes that tone there), so the splash runs straight into the app with no flash or tone step. In-app loading spinner unchanged; refresh keeps its spinner.",
+          "from": "implemented",
+          "implementation_ref": "git:a17450cd41c21c41a23bf2c7ca1f554e03cec86b (a31db82 icon/glyph/tile/theme + values-v34/values-night-v34 start window; ColdStartIconGuardTest)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "cold-start-icon-028",
@@ -3350,34 +3364,26 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "implemented",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T15:44:14+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-21T15:51:19+00:00",
+      "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md#re-verification-option-2-source-9d2940e; gradle check green; Fold dark cold start: splash and app share RGB (3,6,45) across frames 24-345, no flash"
     }
   ],
   "last_activation": {
-    "at": "2026-09-21T15:44:14+00:00",
+    "at": "2026-09-21T15:51:19+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
-    "artifact_refs": [
-      "file:proof/cold-start-icon-20260921/PROOF.md",
-      "file:plans/cold-start-icon-028-handoff-20260921.md"
-    ],
-    "next_safe_action": "Maintainer picks F1 option 1 (accept as built -> record verify) or option 2 (values-v34/values-night-v34 on system_background_light/dark with the current values as the 31-33 fallback -> reimplement, re-record the Fold cold start); then run human checks (light start, themed icon, QS tile) and exact-source review",
-    "paused_at": "2026-09-21T15:35:12+00:00",
-    "reason": "waiting_for_human: cold-start-icon-028 implemented as locked at a31db82; gradle check green, guard mutation-checked, Fold dark cold start shows the round 3 B icon with no white flash, but the dark start window (system_neutral1_900, RGB 16,23,60) is lighter than the app's Material 3 dynamic background (system_background_dark on API 34+, RGB 3,6,45), a ~250 ms darkening (F1). The lock's premise that neutral1_900 is the app's background is false; the fix changes a locked value, so it is the maintainer's call",
-    "resumed_at": "2026-09-21T15:44:14+00:00"
-  },
-  "pause": {
     "artifact_refs": [
       "file:proof/cold-start-icon-20260921/PROOF.md"
     ],
     "next_safe_action": "When the Fold is back: record its new build/SDK, check dumpsys trust deviceLocked=0, VERIFY_SERIAL=59151FDCG000JA, install -r the a17450c debug APK, re-record the dark cold start (screenrecord --display-id 4619827677550801152, centre crops of RepoGlance-window frames only) and confirm splash and app background match; then record verify, run exact-source review; maintainer does light mode, themed icon and QS tile checks",
     "paused_at": "2026-09-21T15:44:24+00:00",
-    "reason": "waiting_for_human: cold-start-icon-028 option 2 implemented at a17450c, gradle check green; the Pixel 10 Pro Fold is mid system update (was Android 16 BD3A.250808.001, patch 2025-09-05), so the dark cold-start re-record cannot run yet"
+    "reason": "waiting_for_human: cold-start-icon-028 option 2 implemented at a17450c, gradle check green; the Pixel 10 Pro Fold is mid system update (was Android 16 BD3A.250808.001, patch 2025-09-05), so the dark cold-start re-record cannot run yet",
+    "resumed_at": "2026-09-21T15:51:19+00:00"
   },
+  "pause": null,
   "recommendation": {
     "alternatives": [
       "family-look: a shared 'same dev crew' signature across RepoGlance and Swarm Intercom without copying night glass: keep Material 3 dynamic color as the base; candidates include shared state-colour semantics (emerald ok / amber working / sky active) harmonised with dynamic color, a shared label typeface, and the black/grey/white mark language (maintainer asked for it 2026-09-21)"
@@ -3387,8 +3393,8 @@
     "recorded_at": "2026-09-21T15:44:24+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "paused",
+  "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T15:44:24+00:00"
+  "updated_at": "2026-09-21T15:51:19+00:00"
 }
