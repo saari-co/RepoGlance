@@ -1,0 +1,132 @@
+name: clawsweeper command
+
+# PUBLIC-REPO STUB — copy this file verbatim to
+# `.github/workflows/clawsweeper-command.yml` in a public saari-co repository
+# (e.g. saari-co/RepoGlance) to enrol it in the ClawSweeper command lane.
+# Source of truth: saari-co/spark-dgx lanes/clawsweeper-review/relay/ (#182).
+#
+# What it does: a trusted author (org OWNER or MEMBER) puts `@clawsweeper review`
+# (or `@clawsweeper re-review`) on its own line on a PR. This GitHub-hosted job
+# validates the standalone command, resolves the PR head, and sends
+# `repository_dispatch` (event `clawsweeper_command`) to the PRIVATE relay
+# workflow in saari-co/spark-dgx, which re-validates everything through the API
+# and runs the review on the spark-2 runner. The review comment is posted by the
+# saari-clawsweeper App.
+#
+# What it must never do: run on a self-hosted runner. This repo is public, so a
+# fork PR could otherwise reach the runner. Keep `runs-on: ubuntu-*`.
+#
+# Enrolment (one-time, human):
+#   1. Repository secret CLAWSWEEPER_DISPATCH_TOKEN — a fine-grained token whose
+#      ONLY permission is "Contents: Read and write" on saari-co/spark-dgx
+#      (that is what `POST /repos/{owner}/{repo}/dispatches` requires). Nothing
+#      on this repo.
+#   2. The saari-clawsweeper App installed on this repo (so spark-2 can post
+#      the review, the rocket ack and any failure comment).
+#   3. This repo listed with a `checkout_dir` in spark-dgx's
+#      lanes/clawsweeper-review/repository-profile-overlay.saari.json and a
+#      clean clone at ~/.cache/clawsweeper/targets/<checkout_dir> on spark-2.
+# Missing (1) makes this workflow post "not enrolled" on the PR instead of
+# failing silently. Missing (3) makes the private side post the same.
+#
+# `issue_comment` workflows always run the copy on the DEFAULT branch.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write        # eyes reaction + not-enrolled / dispatch-failed comment
+  pull-requests: read  # resolve the PR head
+
+jobs:
+  relay:
+    # Prefilter: PR comments only, trusted org author, not the bot itself, and
+    # the command mentioned somewhere. The first step then requires it on its
+    # own line. COLLABORATOR is deliberately not trusted on public repos.
+    if: >-
+      github.event.issue.pull_request != null &&
+      github.event.comment.user.type != 'Bot' &&
+      github.event.comment.user.login != 'saari-clawsweeper[bot]' &&
+      contains(fromJSON('["OWNER","MEMBER"]'), github.event.comment.author_association) &&
+      (
+        contains(github.event.comment.body, '@clawsweeper review') ||
+        contains(github.event.comment.body, '@clawsweeper re-review')
+      )
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.issue.number }}
+      COMMENT_ID: ${{ github.event.comment.id }}
+      RELAY_REPO: saari-co/spark-dgx
+      RELAY_EVENT: clawsweeper_command
+    steps:
+      - name: Validate standalone command
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          set -euo pipefail
+          BODY_FILE="$(mktemp)"
+          printf '%s\n' "$COMMENT_BODY" | tr '[:upper:]' '[:lower:]' > "$BODY_FILE"
+          if grep -qE '^[[:space:]]*@clawsweeper (re-)?review[[:space:]]*$' "$BODY_FILE"; then
+            echo "Standalone command found; relaying."
+            exit 0
+          fi
+          echo "No standalone '@clawsweeper review' / '@clawsweeper re-review' line; skipping."
+          echo "CLAWSWEEPER_SKIP=1" >> "$GITHUB_ENV"
+
+      - name: Fail loud when the relay secret is not provisioned
+        if: env.CLAWSWEEPER_SKIP != '1'
+        env:
+          HAS_DISPATCH_TOKEN: ${{ secrets.CLAWSWEEPER_DISPATCH_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          [ "$HAS_DISPATCH_TOKEN" = "true" ] && exit 0
+          gh pr comment "$PR" --repo "$REPO" --body "ClawSweeper command lane is not enrolled for this repository: the \`CLAWSWEEPER_DISPATCH_TOKEN\` secret is missing, so \`@clawsweeper review\` cannot reach spark-2. Enrolment steps: saari-co/spark-dgx \`lanes/clawsweeper-review/README.md\`. Manual fallback on spark-2: \`sweep.sh --target-repo $REPO --item-numbers $PR --advisory --source manual --notify\`." || true
+          echo "CLAWSWEEPER_NOT_ENROLLED=1" >> "$GITHUB_ENV"
+          echo "::error::CLAWSWEEPER_DISPATCH_TOKEN is not set; relay not enrolled"
+          exit 1
+
+      - name: Resolve open PR head
+        if: env.CLAWSWEEPER_SKIP != '1'
+        run: |
+          set -euo pipefail
+          state="$(gh api "repos/$REPO/pulls/$PR" --jq .state)"
+          [ "$state" = "open" ] || { echo "::error::PR #$PR is $state, not open"; exit 1; }
+          head="$(gh api "repos/$REPO/pulls/$PR" --jq .head.sha)"
+          printf '%s' "$head" | grep -qE '^[0-9a-f]{40}$' || { echo "::error::unexpected head sha"; exit 1; }
+          echo "REQUESTED_HEAD=$head" >> "$GITHUB_ENV"
+
+      - name: Dispatch to private relay
+        if: env.CLAWSWEEPER_SKIP != '1'
+        env:
+          GH_TOKEN: ${{ secrets.CLAWSWEEPER_DISPATCH_TOKEN }}
+          RELAY_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          payload="$(jq -n \
+            --arg event_type "$RELAY_EVENT" \
+            --arg target_repo "$REPO" \
+            --arg pr "$PR" \
+            --arg comment_id "$COMMENT_ID" \
+            --arg requested_head "$REQUESTED_HEAD" \
+            --arg relay_run_url "$RELAY_RUN_URL" \
+            '{event_type: $event_type, client_payload: {target_repo: $target_repo, pr: $pr, comment_id: $comment_id, requested_head: $requested_head, relay_run_url: $relay_run_url}}')"
+          printf '%s' "$payload" | gh api -X POST "repos/$RELAY_REPO/dispatches" --input -
+          echo "Dispatched $RELAY_EVENT for $REPO#$PR (comment $COMMENT_ID, head $REQUESTED_HEAD) to $RELAY_REPO."
+
+      - name: Acknowledge (eyes)
+        if: env.CLAWSWEEPER_SKIP != '1'
+        run: |
+          gh api -X POST \
+            "repos/$REPO/issues/comments/$COMMENT_ID/reactions" \
+            -f content=eyes >/dev/null || true
+
+      - name: Report relay failure
+        if: (failure() || cancelled()) && env.CLAWSWEEPER_SKIP != '1' && env.CLAWSWEEPER_NOT_ENROLLED != '1'
+        run: |
+          gh pr comment "$PR" --repo "$REPO" \
+            --body "ClawSweeper relay could not hand this command to spark-2 (workflow \`clawsweeper-command\`, run [#${GITHUB_RUN_ID}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})). The review did not start. Manual fallback on spark-2: \`sweep.sh --target-repo $REPO --item-numbers $PR --advisory --source manual --notify\`." || true
