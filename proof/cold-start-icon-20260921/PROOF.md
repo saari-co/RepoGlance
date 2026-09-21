@@ -15,7 +15,7 @@ option 2. The rebuilt start is seamless in dark mode (see "Re-verification").
 | Launcher icon round 3 B (gradient background, R2 A foreground) | `app/src/main/res/mipmap-anydpi/ic_launcher.xml`, `res/drawable/ic_launcher_background.xml`, `res/drawable/ic_launcher_foreground.xml` |
 | Monochrome / themed glyph (R2 A silhouette) | `res/drawable/ic_launcher_monochrome.xml` (adaptive icon `monochrome` layer) |
 | Quick Settings tile uses the glyph | `res/drawable/ic_repoglance_glyph.xml`; manifest `RepoGlanceTileService android:icon`; `RepoGlanceTileService.render` |
-| Start window follows the system | `res/values/themes.xml` (`system_neutral1_10`), `res/values-night/themes.xml` (`system_neutral1_900`); `<application android:theme="@style/Theme.RepoGlance">` |
+| Start window matches the app background | `res/values-v34` / `res/values-night-v34` (`system_background_light` / `_dark`), fallback `res/values` / `res/values-night` (`system_neutral1_10` / `_900`); `<application android:theme="@style/Theme.RepoGlance">` |
 | App icon wiring | `<application android:icon/roundIcon="@mipmap/ic_launcher">` |
 
 Artwork XML is taken verbatim from the handoff. The in-app mark
@@ -27,12 +27,25 @@ spinners are unchanged.
 - `./gradlew check`: BUILD SUCCESSFUL (lint, detekt, unit tests, verifier
   structure). `app/lint-baseline.xml` and `app/detekt-baseline-debug.xml`
   are unchanged.
-- `ColdStartIconGuardTest` (4 tests): manifest icon, roundIcon and theme;
-  adaptive icon has background, foreground and monochrome layers; the
-  window background is `system_neutral1_10` / `system_neutral1_900`; the tile
-  uses `ic_repoglance_glyph` in the manifest and the service.
-  Mutation check: setting `values-night` to `system_neutral1_10` fails
-  1 of 4 tests; the change was reverted.
+- `ColdStartIconGuardTest` (5 tests):
+  - the manifest's icon, roundIcon and theme;
+  - the adaptive icon has background, foreground and monochrome layers;
+  - the start-window colour in all four folders: `values` `system_neutral1_10`,
+    `values-night` `system_neutral1_900`, `values-v34` `system_background_light`,
+    `values-night-v34` `system_background_dark`;
+  - each folder uses the light or dark parent theme for its mode (added after
+    review R4);
+  - the tile uses `ic_repoglance_glyph` in the manifest and the service.
+- Mutation checks, each reverted afterwards:
+  - `values-night` set to `system_neutral1_10`;
+  - `values-v34` set to `system_neutral1_10`;
+  - `values-night-v34` set to `system_neutral1_900`;
+  - `values-v34` given the dark parent.
+
+  Each fails exactly one test.
+- API 31–33 is approximate and unverified (review R1). Material 3 draws the
+  app there on a computed neutral-variant tone 6, and no API 31–33 device was
+  run.
 
 ## Device (Pixel 10 Pro Fold `59151FDCG000JA`, `VERIFY_SERIAL` pinned)
 

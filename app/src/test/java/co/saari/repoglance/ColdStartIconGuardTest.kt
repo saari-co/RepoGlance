@@ -47,6 +47,16 @@ class ColdStartIconGuardTest {
     }
 
     @Test
+    fun eachStartWindowFolderUsesTheParentForItsMode() {
+        val light = "@android:style/Theme.Material.Light.NoActionBar"
+        val dark = "@android:style/Theme.Material.NoActionBar"
+        assertEquals(light, theme("values").getAttribute("parent"))
+        assertEquals(light, theme("values-v34").getAttribute("parent"))
+        assertEquals(dark, theme("values-night").getAttribute("parent"))
+        assertEquals(dark, theme("values-night-v34").getAttribute("parent"))
+    }
+
+    @Test
     fun quickSettingsTileUsesTheRingedGlyphInManifestAndService() {
         val nodes = manifest().getElementsByTagName("service")
         val tile = (0 until nodes.length).map { nodes.item(it) as Element }
@@ -57,11 +67,14 @@ class ColdStartIconGuardTest {
         assertTrue("the tile no longer uses the in-app mark", !service.contains("ic_repoglance_mark"))
     }
 
-    private fun windowBackground(folder: String): String {
+    private fun theme(folder: String): Element {
         val styles = parse("$res/$folder/themes.xml").getElementsByTagName("style")
-        val theme = (0 until styles.length).map { styles.item(it) as Element }
+        return (0 until styles.length).map { styles.item(it) as Element }
             .single { it.getAttribute("name") == "Theme.RepoGlance" }
-        val items = theme.getElementsByTagName("item")
+    }
+
+    private fun windowBackground(folder: String): String {
+        val items = theme(folder).getElementsByTagName("item")
         val background = (0 until items.length).map { items.item(it) as Element }
             .single { it.getAttribute("name") == "android:windowBackground" }
         return background.textContent.trim()
