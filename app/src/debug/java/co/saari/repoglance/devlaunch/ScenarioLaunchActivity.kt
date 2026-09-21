@@ -1,6 +1,7 @@
 package co.saari.repoglance.devlaunch
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 // screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | checking (the production Checking screen held open)
+//         | signin-finishing (the production post-token sign-in screens held open)
 //         | none (apply the extras below and stay on the current screen)
 // probeCommitDelaySeconds (long, optional): arms hooks.RefreshProbe once.
 // rateFault (LOW | EXHAUSTED | OFF, optional) with rateFaultResetSeconds (long,
@@ -78,8 +80,12 @@ class ScenarioLaunchActivity : ComponentActivity() {
         }
     }
 
-    private fun nextIntent(screen: String): Intent = when (screen) {
-        SCREEN_PICKER -> Intent(this, WidgetVariantPickerActivity::class.java)
+    private fun nextIntent(screen: String): Intent {
+        HOLDER_SCREENS[screen]?.let { return Intent(this, it) }
+        return extrasIntent(screen)
+    }
+
+    private fun extrasIntent(screen: String): Intent = when (screen) {
         SCREEN_NAVIGATOR_PICKER -> Intent(this, NavigatorVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_REPO_FULL, intent.getStringExtra(EXTRA_REPO) ?: DEFAULT_REPO)
             putExtra(EXTRA_NAVIGATOR_MODE, intent.getStringExtra(EXTRA_MODE) ?: DEFAULT_MODE)
@@ -87,7 +93,6 @@ class ScenarioLaunchActivity : ComponentActivity() {
             putExtra(EXTRA_CANDIDATE, candidate)
             putExtra(EXTRA_HYBRID, candidate?.endsWith(HYBRID_SUFFIX) == true)
         }
-        SCREEN_CHECKING -> Intent(this, CheckingPreviewActivity::class.java)
         SCREEN_SPLASH_PICKER -> Intent(this, SplashVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
             putExtra(EXTRA_SLOT, intent.getStringExtra(EXTRA_SLOT))
@@ -119,6 +124,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_NAVIGATOR_PICKER = "navigator-picker"
         const val SCREEN_SPLASH_PICKER = "splash-picker"
         const val SCREEN_CHECKING = "checking"
+        const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
         const val EXTRA_SLOT = "slot"
         const val EXTRA_CANDIDATE = "candidate"
@@ -126,5 +132,10 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val HYBRID_SUFFIX = "+sheet"
         const val DEFAULT_REPO = "acme/rocket"
         const val DEFAULT_MODE = "BOTH"
+        val HOLDER_SCREENS: Map<String, Class<out Activity>> = mapOf(
+            SCREEN_PICKER to WidgetVariantPickerActivity::class.java,
+            SCREEN_CHECKING to CheckingPreviewActivity::class.java,
+            SCREEN_SIGNIN_FINISHING to SignInFinishingPreviewActivity::class.java,
+        )
     }
 }

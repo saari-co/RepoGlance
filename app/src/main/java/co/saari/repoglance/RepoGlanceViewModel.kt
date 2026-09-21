@@ -34,8 +34,11 @@ import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -68,6 +71,9 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     private var authorizationJob: Job? = null
     private var catalogLoadJob: Job? = null
     private var repositoryContentLoadJob: Job? = null
+    private val deviceAuthorizationCommits = Channel<Unit>(Channel.CONFLATED)
+
+    val deviceAuthorizationCommitted: Flow<Unit> = deviceAuthorizationCommits.receiveAsFlow()
 
     val deviceFlowReady: Boolean
         get() = authConfig.isReady
@@ -100,12 +106,13 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                     deviceFlowPoller.awaitToken(authorization)
                 }
                 currentCoroutineContext().ensureActive()
+                liveState.value = LiveUiState.Connecting
                 val committed = withContext(sessionDispatcher) {
                     authorizationCommitGate.commit(requestGeneration) { session.acceptDeviceToken(token) }
                 }
                 if (!committed) return@launch
-                liveState.value = LiveUiState.Connecting
-                refreshCatalog()
+                deviceAuthorizationCommits.trySend(Unit)
+                loadCatalog(LiveUiState.LoadingCatalogAfterSignIn)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (failure: GitHubAuthException) {
@@ -145,7 +152,11 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun refreshCatalog() {
-        liveState.value = LiveUiState.LoadingRepositories
+        loadCatalog(LiveUiState.LoadingRepositories)
+    }
+
+    private fun loadCatalog(loadingState: LiveUiState) {
+        liveState.value = loadingState
         val requestGeneration = catalogGeneration.incrementAndGet()
         catalogLoadJob?.cancel()
         catalogLoadJob = viewModelScope.launch {
@@ -318,6 +329,7 @@ sealed interface LiveUiState {
         val expiresAt: Instant,
     ) : LiveUiState
     data object Connecting : LiveUiState
+    data object LoadingCatalogAfterSignIn : LiveUiState
     data object LoadingRepositories : LiveUiState
     data class Ready(
         val catalog: LiveRepositoryCatalog,

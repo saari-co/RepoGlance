@@ -66,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.ContentUiState
 import co.saari.repoglance.LiveUiState
@@ -128,7 +129,9 @@ fun LiveRepoGlanceScreen(
             onCopyCodeAndOpenGitHub = onCopyCodeAndOpenGitHub,
             onCancel = onCancelGitHubAuthorization,
         )
-        LiveUiState.Connecting -> CenteredStatus("Securing your GitHub session…", showProgress = true)
+        LiveUiState.Connecting, LiveUiState.LoadingCatalogAfterSignIn -> FinishingSignInScreen(
+            loadingRepositories = state == LiveUiState.LoadingCatalogAfterSignIn,
+        )
         LiveUiState.LoadingRepositories -> CenteredStatus("Loading your repositories…", showProgress = true)
         is LiveUiState.Failure -> FailureScreen(
             message = state.message,
@@ -205,7 +208,12 @@ private fun AwaitingGitHubScreen(
                 Text("Copy code & open GitHub")
             }
             Spacer(Modifier.height(8.dp))
-            Text("RepoGlance is waiting safely in this screen.", style = MaterialTheme.typography.bodySmall)
+            Text(
+                "After you authorize, RepoGlance comes back here on its own. If it doesn't, close the GitHub tab.",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.testTag(RETURN_INSTRUCTION_TEST_TAG),
+            )
             TextButton(onClick = onCancel) { Text("Cancel sign-in") }
         }
     }
@@ -256,17 +264,37 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
 
 @Composable
 internal fun CheckingScreen(modifier: Modifier = Modifier) {
+    MarkStatus(
+        message = "Checking your GitHub session…",
+        markTag = "repoglance:checking-mark",
+        messageTag = "repoglance:checking-message",
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun FinishingSignInScreen(loadingRepositories: Boolean, modifier: Modifier = Modifier) {
+    MarkStatus(
+        message = if (loadingRepositories) "Loading your repositories…" else "Finishing sign-in…",
+        markTag = SIGNIN_MARK_TEST_TAG,
+        messageTag = SIGNIN_MESSAGE_TEST_TAG,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun MarkStatus(message: String, markTag: String, messageTag: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CheckingMark(modifier = Modifier.size(96.dp).testTag("repoglance:checking-mark"))
+            CheckingMark(modifier = Modifier.size(96.dp).testTag(markTag))
             Spacer(Modifier.height(20.dp))
             Text(
-                "Checking your GitHub session…",
+                message,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.testTag("repoglance:checking-message"),
+                modifier = Modifier.testTag(messageTag),
             )
         }
     }
@@ -327,6 +355,9 @@ private fun FailureScreen(
 }
 
 internal const val REPO_SEARCH_TEST_TAG = "repoglance:repo-search"
+internal const val SIGNIN_MARK_TEST_TAG = "repoglance:signin-mark"
+internal const val SIGNIN_MESSAGE_TEST_TAG = "repoglance:signin-message"
+internal const val RETURN_INSTRUCTION_TEST_TAG = "repoglance:signin-return-instruction"
 
 internal const val OWNER_FILTER_TEST_TAG = "repoglance:owner-filter"
 internal const val CATALOG_SORT_RECENT_TEST_TAG = "repoglance:catalog-sort-recent"
