@@ -52,7 +52,10 @@ count as one phone, and USB is preferred. With exactly one approved phone
 attached, doctor uses it. With more than one, it refuses until
 `VERIFY_SERIAL` (a registry serial, or one of that phone's adb transports)
 chooses. An unregistered `VERIFY_SERIAL` is refused. Every run prints
-`serial= model= transport=` so proof names its device. It passes only when
+`serial= model= transport=` so proof names its device. When RepoGlance is
+not installed it prints `package=absent` and an empty `apk_device=`, and
+fails with `run 'launch' to install`; `launch` installs the local debug
+build whenever the phone's APK differs or is missing. It passes only when
 the installed APK's SHA-256 equals the local debug build's, the debug
 scenario launcher resolves (`cmd package resolve-activity --components`),
 and the phone is
@@ -134,6 +137,9 @@ survives cleanup, and the feature file names where it is.
 - `scripts/verify_redact_guard.py` — reads the streamed UI tree on stdin and
   emits it only when it shows no GitHub device-code screen; `dump` and
   `capture` write nothing until it has passed.
+- `scripts/check_verify_helper.py` — runs `bin/verify-repoglance` against a
+  scripted fake `adb` (`./gradlew check`, `checkVerifyHelper`): every failure
+  path, including a phone without RepoGlance installed, exits with a message.
 - `scripts/check_feature_map.py` — structural gate run by `./gradlew check`
   (`checkFeatureMap`): index vs files, the four fixed feature headings,
   helpers present and executable, the `.cursor` symlink intact.

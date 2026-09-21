@@ -211,8 +211,17 @@ val checkFeatureMap = tasks.register<Exec>("checkFeatureMap") {
     commandLine("python3", "scripts/check_feature_map.py")
 }
 
+// bin/verify-repoglance against a scripted fake adb: every failure path,
+// such as a phone without the package installed, must exit with a message.
+val checkVerifyHelper = tasks.register<Exec>("checkVerifyHelper") {
+    group = "verification"
+    description = "Runs bin/verify-repoglance against a fake adb"
+    workingDir = rootProject.projectDir
+    commandLine("python3", "scripts/check_verify_helper.py")
+}
+
 tasks.named("check") {
-    dependsOn("detektDebug", checkFeatureMap)
+    dependsOn("detektDebug", checkFeatureMap, checkVerifyHelper)
 }
 
 // Diagnostic task for release.yml and local verification:

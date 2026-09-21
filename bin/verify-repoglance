@@ -69,7 +69,10 @@ pick_serial() {
   [ -n "$ANDROID_SERIAL" ] || ANDROID_SERIAL=$(printf '%s' "$pairs" | awk 'NF {print $2; exit}')
   export ANDROID_SERIAL
 }
-pick_serial
+case "${1:-}" in
+  doctor|launch|dump|capture|tap|type|cleanup) need adb; pick_serial ;;
+  *) sed -n 2,12p "$0" >&2; exit 2 ;;
+esac
 
 # `Committed state: DeviceState{identifier=3, name='OPENED', …}` on newer
 # Android, `Committed state: OPENED (3)`-style on older; print the name.
@@ -79,32 +82,41 @@ parse_posture() {
   else printf '%s\n' "${line#*Committed state:}" | grep -oE "[A-Z][A-Z_]+" | head -1 || true; fi
 }
 
+# The installed base APK's device path, or empty when the package is absent
+# (`pm path` then exits 1, which must not end the run).
+device_apk_path() { adb shell pm path "$PKG" 2>/dev/null | head -1 | sed 's/^package://' | tr -d '\r' || true; }
+awake_state() { adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2 || true; }
+
 doctor() {
   need adb
   echo "serial=$DEVICE_SERIAL model=$DEVICE_MODEL transport=$ANDROID_SERIAL"
-  local model; model=$(adb shell getprop ro.product.model | tr -d '\r')
-  local ver; ver=$(adb shell dumpsys package "$PKG" | grep -m1 versionName | tr -d ' \r')
+  # Every lookup below may come back empty (package not installed, a dumpsys
+  # line missing); under pipefail that must print unknown/absent, not exit.
+  local model; model=$(adb shell getprop ro.product.model | tr -d '\r') \
+    || { echo "doctor: adb shell failed on $ANDROID_SERIAL; reconnect the phone" >&2; exit 1; }
   local apk="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
-  local local_sha="absent" dev_sha="absent"
+  local local_sha="absent" dev_sha="" ver="" path
   [ -f "$apk" ] && local_sha=$(shasum -a 256 "$apk" | cut -c1-64)
-  local path; path=$(adb shell pm path "$PKG" 2>/dev/null | head -1 | sed 's/^package://' | tr -d '\r')
+  path=$(device_apk_path)
   if [ -n "$path" ]; then
+    ver=$(adb shell dumpsys package "$PKG" | grep -m1 versionName | tr -d ' \r' || true)
     adb pull "$path" "$OUT/device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/device-base.apk" | cut -c1-64) && rm -f "$OUT/device-base.apk"
   fi
   # Resolve the explicit component: the launcher is exported with no intent
   # filter, so it never shows in pm dump's resolver tables on newer Android.
   local launcher; launcher=$(adb shell cmd package resolve-activity --components -n "$PKG/.devlaunch.ScenarioLaunchActivity" 2>/dev/null | tr -d '\r' | grep -c "^$PKG/.*devlaunch\.ScenarioLaunchActivity$" || true)
-  echo "device=$model package=$PKG $ver"
+  if [ -n "$path" ]; then echo "device=$model package=$PKG $ver"; else echo "device=$model package=absent"; fi
   echo "apk_local=$local_sha"
   echo "apk_device=$dev_sha"
   echo "scenario_launcher_present=$([ "${launcher:-0}" -gt 0 ] && echo yes || echo no)"
   local posture keyguard wake
-  posture=$(adb shell cmd device_state state 2>/dev/null | tr -d '\r' | parse_posture)
-  wake=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
-  keyguard=$(adb shell dumpsys trust 2>/dev/null | grep -m1 -oE "deviceLocked=[01]" | cut -d= -f2)
+  posture=$(adb shell cmd device_state state 2>/dev/null | tr -d '\r' | parse_posture || true)
+  wake=$(awake_state)
+  keyguard=$(adb shell dumpsys trust 2>/dev/null | grep -m1 -oE "deviceLocked=[01]" | cut -d= -f2 || true)
   echo "posture=${posture:-unknown} wakefulness=${wake:-unknown} device_locked=${keyguard:-unknown}"
   echo "run_dir=$OUT"
-  [ "$wake" = "Awake" ] && [ "${keyguard:-1}" = "0" ] || { echo "doctor: phone must be awake and unlocked; it is wakefulness=$wake device_locked=${keyguard:-unknown}" >&2; exit 1; }
+  [ -n "$path" ] || { echo "doctor: RepoGlance is not installed; run 'launch' to install" >&2; exit 1; }
+  [ "$wake" = "Awake" ] && [ "${keyguard:-1}" = "0" ] || { echo "doctor: phone must be awake and unlocked; it is wakefulness=${wake:-unknown} device_locked=${keyguard:-unknown}" >&2; exit 1; }
   [ "$local_sha" = "$dev_sha" ] || { echo "doctor: device APK does not match the local build; run 'launch' to install" >&2; exit 1; }
   [ "${launcher:-0}" -gt 0 ] || { echo "doctor: debug launcher missing; this is not a debug build" >&2; exit 1; }
 }
@@ -116,12 +128,14 @@ launch() {
   [ -f "$apk" ] || { echo "launch: build first: ./gradlew assembleDebug" >&2; exit 1; }
   local local_sha dev_sha path
   local_sha=$(shasum -a 256 "$apk" | cut -c1-64)
-  path=$(adb shell pm path "$PKG" 2>/dev/null | head -1 | sed 's/^package://' | tr -d '\r')
+  path=$(device_apk_path)
   dev_sha=""
   if [ -n "$path" ]; then
     adb pull "$path" "$OUT/.device-base.apk" >/dev/null 2>&1 && dev_sha=$(shasum -a 256 "$OUT/.device-base.apk" | cut -c1-64); rm -f "$OUT/.device-base.apk"
   fi
-  [ "$local_sha" = "$dev_sha" ] || adb install -r "$apk" >/dev/null
+  if [ "$local_sha" != "$dev_sha" ]; then
+    local out; out=$(adb install -r "$apk" 2>&1) || { echo "launch: install failed: $out" >&2; exit 1; }
+  fi
   local expect marker
   case "$screen" in
     picker) expect="devpicker.WidgetVariantPickerActivity"; marker="PRODUCTION" ;;
@@ -141,7 +155,7 @@ launch() {
     ok=""
     for _ in 1 2 3 4 5 6 7 8; do
       sleep 1
-      top=$(adb shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | sed -E 's/.*u0 //; s/ t[0-9]+}//')
+      top=$(adb shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | sed -E 's/.*u0 //; s/ t[0-9]+}//' || true)
       case "$top" in *"$expect"*) ;; *) continue ;; esac
       if [ -z "$marker" ]; then ok=1; break; fi
       adb shell uiautomator dump /sdcard/verify-ui.xml >/dev/null 2>&1 && adb shell cat /sdcard/verify-ui.xml 2>/dev/null | grep -qF "$marker" && { ok=1; break; }
@@ -156,17 +170,20 @@ launch() {
 # Stream the current UI tree from the device through the redaction guard in
 # memory (scripts/verify_redact_guard.py). No file exists on the phone or the
 # host until the guard has passed; on refusal nothing is written anywhere.
+# Returns the guard's code: 1 device-code screen, 2 no usable tree.
 pull_tree() {
   local dest="$1" tree
-  tree=$(adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py") || return 1
-  [ -n "$tree" ] || return 1
+  tree=$(adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py") || return
+  [ -n "$tree" ] || return 2
   printf '%s\n' "$tree" > "$dest"
 }
 
 dump() {
   need adb
   local label="${1:-screen}"
-  pull_tree "$OUT/$label.xml" || { echo "dump: refused; the device-code screen is visible" >&2; exit 1; }
+  local rc=0; pull_tree "$OUT/$label.xml" || rc=$?
+  [ "$rc" = 1 ] && { echo "dump: refused; the device-code screen is visible" >&2; exit 1; }
+  [ "$rc" = 0 ] || { echo "dump: no UI tree from the phone (uiautomator dump failed)" >&2; exit 1; }
   cp "$OUT/$label.xml" "$OUT/last-dump.xml"
   python3 - "$OUT/$label.xml" > "$OUT/$label.txt" <<'PY'
 import sys, xml.etree.ElementTree as ET
@@ -184,9 +201,11 @@ PY
 capture() {
   need python3
   local label="${1:-capture}"
-  local screen; screen=$(adb shell dumpsys power | grep -m1 -oE "mWakefulness=[A-Za-z]+" | cut -d= -f2)
-  [ "$screen" = "Awake" ] || { echo "capture: screen is $screen, not Awake; wake and unlock the phone first" >&2; exit 1; }
-  adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py" >/dev/null || { echo "capture: refused; the device-code screen is visible" >&2; exit 1; }
+  local screen; screen=$(awake_state)
+  [ "$screen" = "Awake" ] || { echo "capture: screen is ${screen:-unknown}, not Awake; wake and unlock the phone first" >&2; exit 1; }
+  local rc=0; adb exec-out uiautomator dump /dev/tty 2>/dev/null | python3 "$ROOT/scripts/verify_redact_guard.py" >/dev/null || rc=$?
+  [ "$rc" = 1 ] && { echo "capture: refused; the device-code screen is visible" >&2; exit 1; }
+  [ "$rc" = 0 ] || { echo "capture: no UI tree from the phone, so the device-code guard cannot run" >&2; exit 1; }
   local display; display=$(python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" inventory | python3 -c "import json,sys; d=json.load(sys.stdin); a=[x for x in d['physical_displays'] if x['active'] and not x['virtual']]; print(a[0]['physical_display_id'] if len(a)==1 else '')")
   [ -n "$display" ] || { echo "capture: no single active physical display (is the phone folded mid-transition?)" >&2; exit 1; }
   python3 "$PHONE_PROOF" --serial "$ANDROID_SERIAL" capture --physical-display-id "$display" \
@@ -233,5 +252,4 @@ case "${1:-}" in
   tap) shift; tap "$@" ;;
   type) shift; type_text "$@" ;;
   cleanup) cleanup ;;
-  *) sed -n 2,12p "$0"; exit 2 ;;
 esac
