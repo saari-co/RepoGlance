@@ -3482,14 +3482,21 @@
           "result": "clean",
           "reviewed_at": "2026-09-21T15:55:19+00:00",
           "source_identity": "git:cd8dbca77dc3a9f316dae4f0756eeef2934da0f7"
+        },
+        {
+          "classifications": [],
+          "ref": "self-review of the ledger/proof-only relock: app/ unchanged since cd8dbca (reviewed clean); choice now claims seamless on API 34+ only, API 31-33 approximate and unverified, resolving ClawSweeper P2 on 3d2837e; ClawSweeper re-review of the pushed head pending",
+          "result": "clean",
+          "reviewed_at": "2026-09-21T16:52:53+00:00",
+          "source_identity": "git:fd91aa9d4025061466a62d57565e1cab9d968ff3"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "self-review of the ledger/proof-only relock: app/ unchanged since cd8dbca (reviewed clean); choice now claims seamless on API 34+ only, API 31-33 approximate and unverified, resolving ClawSweeper P2 on 3d2837e; ClawSweeper re-review of the pushed head pending",
+      "review_result": "clean",
+      "review_source_identity": "git:fd91aa9d4025061466a62d57565e1cab9d968ff3",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T16:52:43+00:00",
+      "updated_at": "2026-09-21T16:52:53+00:00",
       "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md (dark+light on API 36, light on API 37 CP2A.260805.005; themed icon and QS tile checked); gradle check green at cd8dbca"
     }
   ],
@@ -3519,5 +3526,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T16:52:43+00:00"
+  "updated_at": "2026-09-21T16:52:53+00:00"
 }
