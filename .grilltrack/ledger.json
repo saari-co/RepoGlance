@@ -3604,7 +3604,15 @@
     "reason": "session boundary: maintainer routed the family-look grill to a fresh session",
     "resumed_at": "2026-09-21T23:18:38+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      "file:.grilltrack/work/gates/status-colour-029-phone.md",
+      "file:.grilltrack/work/picker/family-look-round-1.json"
+    ],
+    "next_safe_action": "Resume; VERIFY_SERIAL=59151FDCG000JA bin/verify-repoglance doctor; launch MIXED status-picker \"\" \"\" A; dump+capture A-E light and dark preview; hand Bobby the live picker; lock the pick, then implement it in production and update docs/design.md",
+    "paused_at": "2026-09-21T23:44:54+00:00",
+    "reason": "family-look round 1 (status-colour-029) is built and check-green at ff7bf76, but the Pixel 10 Pro Fold 59151FDCG000JA is not attached (USB and mdns empty); the device round needs Bobby to plug it in"
+  },
   "recommendation": {
     "alternatives": [
       "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)"
@@ -3614,8 +3622,8 @@
     "recorded_at": "2026-09-21T23:17:52+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T23:41:07+00:00"
+  "updated_at": "2026-09-21T23:44:54+00:00"
 }
