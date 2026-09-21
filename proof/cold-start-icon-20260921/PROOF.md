@@ -183,3 +183,9 @@ supported API levels, but API 31–33 is an unverified approximation. With the
 maintainer's approval, 028 was reopened and relocked. The seamless claim now
 covers API 34+ only, and API 31–33 is recorded as approximate, likely to show
 a small tone step, and unverified. No source changed.
+
+## API 31–33 risk accepted (maintainer, 2026-09-21)
+
+After ClawSweeper flagged the API 31–33 tone step as a merge risk, the
+maintainer chose not to run an API 33 emulator proof and accepted the risk.
+The fallback stays `system_neutral1_10` / `system_neutral1_900`, unverified.

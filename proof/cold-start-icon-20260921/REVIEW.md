@@ -50,3 +50,16 @@ The light-mode, themed-icon and Quick Settings tile checks were run on
 2026-09-21 after the maintainer changed the settings. All three pass (see
 PROOF.md "Maintainer-gated checks"). This is a documentation update after
 `cd8dbca`; the source is unchanged.
+
+## External reviews of `bffc68d` (PR #34)
+
+- **OpenClaw** `req-20260921T165929Z-35664611086`: correct (0.98), scoped clean,
+  no findings. This run reports P0 only.
+- **ClawSweeper** (revision 2, 17:03 UTC): platinum hermit 4/6 overall
+  (proof 5/6, patch 4/6), `proof: sufficient`, `status: ready for maintainer
+  look`. It confirmed the earlier ledger P2 was fixed.
+
+| # | Sev | Finding | Classification |
+| --- | --- | --- | --- |
+| C1 | P3 | `values/themes.xml` comment still said the fallback matches the app background with no flash | required_fix: reworded in `5ff704f` as an approximate API 31–33 fallback |
+| C2 | P1 (merge risk) | API 31–33 may still show a small tone step | human_gate, resolved by the maintainer. On 2026-09-21 the maintainer declined the API 33 emulator proof ("not that important") and accepted the risk. The risk stays recorded in the lock and PROOF.md. |
