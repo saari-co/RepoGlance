@@ -61,7 +61,7 @@ spinners are unchanged.
     (local, ignored; SHA-256 `f7d5433d…d876`). It has six centre crops:
     splash, splash, fade, loading, loading, loading.
 
-### F1: the dark start window is lighter than the app (open, maintainer decision)
+### F1: the dark start window is lighter than the app (decided: option 2)
 
 The splash background measures RGB (16,23,60), which is `system_neutral1_900`
 and the same colour as the grill's round 3 dark splash. The app's first
