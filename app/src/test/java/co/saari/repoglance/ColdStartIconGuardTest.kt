@@ -39,9 +39,11 @@ class ColdStartIconGuardTest {
     }
 
     @Test
-    fun startWindowBackgroundFollowsTheSystemInBothModes() {
+    fun startWindowBackgroundMatchesTheDynamicAppBackgroundInBothModes() {
         assertEquals("@android:color/system_neutral1_10", windowBackground("values"))
         assertEquals("@android:color/system_neutral1_900", windowBackground("values-night"))
+        assertEquals("@android:color/system_background_light", windowBackground("values-v34"))
+        assertEquals("@android:color/system_background_dark", windowBackground("values-night-v34"))
     }
 
     @Test

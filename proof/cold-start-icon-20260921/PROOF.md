@@ -4,9 +4,10 @@ GrillTrack track `gt-20260728163459-227573`, decision `cold-start-icon-028`
 (locked 2026-09-21). Built from `plans/cold-start-icon-028-handoff-20260921.md`
 on branch `claude/cold-start-mark`.
 
-**Result: implemented exactly as locked; verification is paused on one
-finding the maintainer must decide (F1: the dark start window is lighter than
-the app).**
+**Result:** implemented as locked. The first device run found F1: the dark
+start window was lighter than the app. The maintainer chose option 2, which is
+now built (see F1). Device re-verification waits for the Fold's system
+update to finish.
 
 ## What was built
 
@@ -74,7 +75,7 @@ background. In Compose Material 3 1.3.0 (the resolved version),
 `system_background_light`. On API 31–33 it uses a computed neutral-variant
 tone 6, which has no system resource.
 
-Options for the maintainer (none applied):
+Options put to the maintainer:
 
 1. Keep the lock as built (`system_neutral1_900` / `system_neutral1_10`) and
    accept the short darkening.
@@ -82,6 +83,20 @@ Options for the maintainer (none applied):
    `values-night-v34` (`system_background_dark`), keeping the current
    values as the API 31–33 fallback. This is a change to the locked resource.
    Seamlessness would still need to be proven on the device.
+
+**Decision (maintainer, 2026-09-21): option 2.** It follows Google's
+SplashScreen guidance (the splash is one colour matching the app's first
+frame, per a Developer Knowledge query). Built as `res/values-v34/themes.xml`
+(`system_background_light`) and `res/values-night-v34/themes.xml`
+(`system_background_dark`). API 31–33 keep `system_neutral1_10` /
+`system_neutral1_900`, which is the closest resource: M3 computes that
+background with no system resource there. `ColdStartIconGuardTest` asserts
+all four values. `./gradlew check` is green with unchanged baselines.
+
+**Pending:** re-record the dark cold start on the Fold after its update to
+confirm the splash and app colours match. At this run the Fold reported
+Android 16 (API 36), build `BD3A.250808.001`, patch 2025-09-05; the
+maintainer is updating it.
 
 ## Launcher drawer shot: not captured (fail-closed)
 
