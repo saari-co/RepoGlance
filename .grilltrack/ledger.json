@@ -3129,7 +3129,7 @@
       "context_ref": "file:proof/signin-return-20260921/BAL_PROBE.md",
       "created_at": "2026-09-21T12:04:01+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#31 merged as 7b591393a8e21022f16af879b047e93bbadf46aa",
       "dependencies": [
         "checking-splash-018"
       ],
@@ -3251,7 +3251,7 @@
       "review_source_identity": "git:84d5b30b6534045a0c95faec7c67ba76463b9f64",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T12:21:42+00:00",
+      "updated_at": "2026-09-21T15:28:17+00:00",
       "verification_ref": "file:proof/signin-return-20260921/PROOF.md; gradle check green at 84d5b30 (docs-only repair)"
     },
     {
@@ -3301,26 +3301,19 @@
     }
   ],
   "last_activation": {
-    "at": "2026-09-21T12:19:58+00:00",
+    "at": "2026-09-21T15:27:53+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
-    "artifact_refs": [
-      "file:proof/signin-return-20260921/PROOF.md"
-    ],
-    "next_safe_action": "Bobby signs in on an approved phone running this build (disconnect first if signed in), authorizes, and leaves the GitHub tab alone; agent runs nothing while the code is up and never uses launch during it, then dumps after-signin, records verify for signin-return-027, and moves to exact-source review",
-    "paused_at": "2026-09-21T12:15:18+00:00",
-    "reason": "waiting_for_human: signin-return-027 implemented at e5ec963 and verified by gradle check (265 tests), mutation-checked guards, and Pixel 10 Pro Fold holder dumps, captures and a continuity recording; the end-to-end auto-return needs a real GitHub sign-in, which only the maintainer may perform",
-    "resumed_at": "2026-09-21T12:19:58+00:00"
-  },
-  "pause": {
     "artifact_refs": [
       "file:plans/cold-start-icon-028-handoff-20260921.md"
     ],
     "next_safe_action": "Fresh session: read plans/cold-start-icon-028-handoff-20260921.md, resume the track, implement cold-start-icon-028 on branch claude/cold-start-mark, verify per the handoff, record implement/verify",
     "paused_at": "2026-09-21T15:26:07+00:00",
-    "reason": "handoff: maintainer routed the build of cold-start-icon-028 to a fresh session; decision locked, nothing implemented yet"
+    "reason": "handoff: maintainer routed the build of cold-start-icon-028 to a fresh session; decision locked, nothing implemented yet",
+    "resumed_at": "2026-09-21T15:27:53+00:00"
   },
+  "pause": null,
   "recommendation": {
     "alternatives": [
       "tab-abandoned-return: decide and prove what happens when the user leaves the GitHub tab for another app before the token lands (RepoGlance jumps over that app, or Android blocks it)"
@@ -3330,8 +3323,8 @@
     "recorded_at": "2026-09-21T12:21:59+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "paused",
+  "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T15:26:07+00:00"
+  "updated_at": "2026-09-21T15:28:17+00:00"
 }
