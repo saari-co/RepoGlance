@@ -37,6 +37,13 @@ object SnapshotRendering {
         RateLimitBucket.OK, RateLimitBucket.UNKNOWN -> null
     }
 
+    fun rateLimitRole(bucket: RateLimitBucket): CiColorRole = when (bucket) {
+        RateLimitBucket.EXHAUSTED -> CiColorRole.NEGATIVE
+        RateLimitBucket.LOW -> CiColorRole.IN_PROGRESS
+        RateLimitBucket.OK -> CiColorRole.POSITIVE
+        RateLimitBucket.UNKNOWN -> CiColorRole.NEUTRAL
+    }
+
     fun releaseLabel(release: ReleaseInfo?, basis: ValueBasis, now: Instant): String {
         if (basis == ValueBasis.UNKNOWN) return "Latest release: unknown"
         if (release == null) return "No releases"

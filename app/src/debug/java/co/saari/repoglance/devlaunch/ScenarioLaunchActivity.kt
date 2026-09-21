@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
+import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.hooks.RefreshProbe
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 //
 // screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
+//         | status-picker (extra candidate A..E)
 //         | checking (the production Checking screen held open)
 //         | signin-finishing (the production post-token sign-in screens held open)
 //         | none (apply the extras below and stay on the current screen)
@@ -93,6 +95,9 @@ class ScenarioLaunchActivity : ComponentActivity() {
             putExtra(EXTRA_CANDIDATE, candidate)
             putExtra(EXTRA_HYBRID, candidate?.endsWith(HYBRID_SUFFIX) == true)
         }
+        SCREEN_STATUS_PICKER -> Intent(this, StatusColourVariantPickerActivity::class.java).apply {
+            putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
+        }
         SCREEN_SPLASH_PICKER -> Intent(this, SplashVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
             putExtra(EXTRA_SLOT, intent.getStringExtra(EXTRA_SLOT))
@@ -123,6 +128,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_PICKER = "picker"
         const val SCREEN_NAVIGATOR_PICKER = "navigator-picker"
         const val SCREEN_SPLASH_PICKER = "splash-picker"
+        const val SCREEN_STATUS_PICKER = "status-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
