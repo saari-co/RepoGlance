@@ -124,16 +124,40 @@ all four values. `./gradlew check` is green with unchanged baselines.
   loading, loading. Full frames and the recording were deleted after
   extraction.
 
-## Launcher drawer shot: not captured (fail-closed)
+## Launcher drawer shot: first attempt failed closed; cause found
 
-The uiautomator bounds of the drawer's `RepoGlance` label did not line up
-with the inner-display frame from `screencap -d 4619827677550801152`. Two
-crops at those bounds showed other apps' icons and labels. Both crops were
-deleted and no drawer image was kept. The splash frames above show the launcher
-icon in RepoGlance's own window.
+On the first run, the uiautomator bounds of the drawer's `RepoGlance` label
+did not match the inner-display frame, and two crops showed other apps. Both
+were deleted. Cause: RepoGlance was not on the drawer's first screen. The only
+node labelled RepoGlance was the hidden home-screen dock prediction behind the
+drawer (no launcher id, bounds `[1462,1915][1584,2054]`). The later captures
+accept only a node whose label and description are both exactly `RepoGlance`
+inside the drawer's search results, or the home-dock node while no drawer is
+showing, with matching dumps before and after the capture.
 
-## Human checks (not done by the agent)
+## Maintainer-gated checks (2026-09-21)
 
-- Light mode start screen (no visible shift from splash to app).
-- Themed icons on: the glyph looks right.
-- Quick Settings tile shows the ringed glyph (not added on the 10 Pro Fold).
+Bobby switched on light mode and themed icons and added the tile. The agent
+then captured each result, cropped to RepoGlance's own UI only, with a dump
+before and after each capture that had to match (fail closed). The phone
+still reported build `BD3A.250808.001` (API 36), with the update downloading.
+`deviceLocked=0` was checked before driving.
+
+1. **Light-mode start:** seamless. `cmd uimode night` = `no`. Cold start
+   `LaunchState: COLD`, `TotalTime: 498`, 375 frames. The RepoGlance window
+   covers frames 23–374 without a break, all on background RGB (246,243,253)
+   (±1, which is video-encoding noise), from the first splash frame through
+   the loading screen. Crop:
+   `runs/cold-start-icon-028-runs/cold-start-light-v34-strip-frames-25-38-68-88-113-203.png`.
+2. **Themed icon:** correct. With themed icons on, the home-dock prediction
+   shows the monochrome layer: the two-ring commit-eye glyph tinted in the
+   system accent on the light tonal disc. The drawer's search result stays
+   full colour, because Pixel themes home-screen icons only. It shows the
+   round 3 B icon and the "RepoGl…" label. Crops:
+   `home-dock-themed-light.png`, `drawer-search-themed-light.png`.
+3. **Quick Settings tile:** it shows the ringed glyph, active state, small
+   tile. The tile's description reads "RepoGlance, latest push to <repo>
+   updated 5m ago" (019 behaviour unchanged). Crop: `qs-tile-light.png`.
+
+The agent did not change any system setting. Switching dark mode and themed
+icons back is the maintainer's call.

@@ -43,3 +43,10 @@ locked choice, the handoff and PROOF.md.
   checks (R2) must be done before delivery.
 
 **Result:** clean at `cd8dbca`.
+
+## R2 closed
+
+The light-mode, themed-icon and Quick Settings tile checks were run on
+2026-09-21 after the maintainer changed the settings. All three pass (see
+PROOF.md "Maintainer-gated checks"). This is a documentation update after
+`cd8dbca`; the source is unchanged.
