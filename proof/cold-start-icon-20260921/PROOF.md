@@ -101,8 +101,7 @@ SplashScreen guidance (the splash is one colour matching the app's first
 frame, per a Developer Knowledge query). Built as `res/values-v34/themes.xml`
 (`system_background_light`) and `res/values-night-v34/themes.xml`
 (`system_background_dark`). API 31–33 keep `system_neutral1_10` /
-`system_neutral1_900`, which is the closest resource: M3 computes that
-background with no system resource there. `ColdStartIconGuardTest` asserts
+`system_neutral1_900` as an approximate fallback. Material 3 computes the app background there from a neutral-variant tone 6 that has no system resource, and API 31–33 is unverified (review R1). `ColdStartIconGuardTest` asserts
 all four values. `./gradlew check` is green with unchanged baselines.
 
 ### Re-verification (option 2, source `9d2940e`)
