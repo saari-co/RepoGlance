@@ -30,7 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.state.AppPrefs
@@ -51,6 +53,8 @@ internal const val REPOGLANCE_INSTALLATION_SETTINGS_URL =
     "https://github.com/apps/repoglance-by-saari/installations/new"
 private const val STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS =
     "refreshCatalogAfterGitHubAccess"
+private const val STATE_RETURN_AFTER_GITHUB_VERIFICATION =
+    "returnAfterGitHubVerification"
 
 class MainActivity : ComponentActivity() {
     private val fixtureNavigatorScope = mutableStateOf<NavigatorScope?>(null)
@@ -58,6 +62,7 @@ class MainActivity : ComponentActivity() {
     private val fixtureNavigatorRouteToken = mutableIntStateOf(0)
     private lateinit var liveModel: RepoGlanceViewModel
     private var refreshCatalogAfterGitHubAccess = false
+    private var returnAfterGitHubVerification = false
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +71,11 @@ class MainActivity : ComponentActivity() {
         liveModel = ViewModelProvider(this)[RepoGlanceViewModel::class.java]
         refreshCatalogAfterGitHubAccess =
             savedInstanceState?.getBoolean(STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS) == true
+        returnAfterGitHubVerification =
+            savedInstanceState?.getBoolean(STATE_RETURN_AFTER_GITHUB_VERIFICATION) == true
+        lifecycleScope.launch {
+            liveModel.deviceAuthorizationCommitted.collect { returnFromGitHubVerification() }
+        }
 
         fixtureNavigatorScope.value = resolveFixtureScopeFromIntent(intent)
         fixtureNavigatorMode.value = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
@@ -91,7 +101,7 @@ class MainActivity : ComponentActivity() {
                             selectedRepository = liveModel.selectedRepository.value,
                             contentState = liveModel.repositoryContent.value,
                             connectionReady = liveModel.deviceFlowReady,
-                            onConnectGitHub = liveModel::beginGitHubAuthorization,
+                            onConnectGitHub = ::connectGitHub,
                             onCopyCodeAndOpenGitHub = ::copyCodeAndOpenGitHub,
                             onCancelGitHubAuthorization = liveModel::cancelGitHubAuthorization,
                             onRetry = liveModel::refreshCatalog,
@@ -119,6 +129,10 @@ class MainActivity : ComponentActivity() {
             STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS,
             refreshCatalogAfterGitHubAccess,
         )
+        outState.putBoolean(
+            STATE_RETURN_AFTER_GITHUB_VERIFICATION,
+            returnAfterGitHubVerification,
+        )
         super.onSaveInstanceState(outState)
     }
 
@@ -134,8 +148,24 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openGitHubVerification(verificationUri: String) {
+        returnAfterGitHubVerification = true
         CustomTabsIntent.Builder().setShowTitle(true).build()
             .launchUrl(this, Uri.parse(verificationUri))
+    }
+
+    private fun connectGitHub() {
+        returnAfterGitHubVerification = false
+        liveModel.beginGitHubAuthorization()
+    }
+
+    private fun returnFromGitHubVerification() {
+        if (!returnAfterGitHubVerification) return
+        returnAfterGitHubVerification = false
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+        )
     }
 
     private fun copyCodeAndOpenGitHub(userCode: String, verificationUri: String) {

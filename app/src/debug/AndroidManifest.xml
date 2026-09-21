@@ -23,6 +23,10 @@
             android:exported="true"
             android:label="verify-repoglance checking preview" />
         <activity
+            android:name="co.saari.repoglance.devlaunch.SignInFinishingPreviewActivity"
+            android:exported="true"
+            android:label="verify-repoglance sign-in finishing preview" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.ScenarioLaunchActivity"
             android:exported="true"
             android:label="verify-repoglance scenario launcher"
