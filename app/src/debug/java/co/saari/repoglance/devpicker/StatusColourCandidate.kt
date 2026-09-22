@@ -2,11 +2,9 @@ package co.saari.repoglance.devpicker
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.StatusColors
-import co.saari.repoglance.ui.theme.StatusShape
 import co.saari.repoglance.ui.theme.StatusTone
-import android.graphics.Color as AndroidColor
 
 /**
  * Five candidates for the `family-look` grill, slot `status-colour`: how
@@ -18,9 +16,13 @@ import android.graphics.Color as AndroidColor
  * in that repo): emerald ok, amber working, sky accent. Intercom has no
  * failing state; RepoGlance adds one red. "Harmonised" follows Google's
  * guidance for custom semantic colours: the hue leans towards the dynamic
- * primary by half the difference, capped at 15 degrees. This picker does that
- * in HSV rather than HCT, close enough to judge the direction; the production
- * implementation after a lock would use the real harmoniser.
+ * primary by half the difference, capped at 15 degrees.
+ *
+ * Round 1 was captured with candidates A-D as dots and E as tonal pills, and
+ * with an HSV hue nudge. After the maintainer locked E (2026-09-22) the
+ * production seam only renders pills and harmonises in CIELCh
+ * (ui/theme/StatusColors.kt), so this file now feeds every candidate's palette
+ * through that seam: the hues are the same, the shape is E's for all.
  */
 internal enum class StatusColourCandidate(
     val letter: String,
@@ -91,67 +93,19 @@ internal enum class StatusColourCandidate(
         "C's harmonised family hues applied as Material tonal surfaces: the status sits in a soft tinted pill " +
             "with dark ink, the way Google apps label state, instead of a saturated dot.",
     ) {
-        override fun palette(scheme: ColorScheme, dark: Boolean) = StatusColors(
-            ok = fixedTone(harmonise(EMERALD, scheme.primary), dark),
-            working = fixedTone(harmonise(AMBER, scheme.primary), dark),
-            failing = fixedTone(harmonise(RED, scheme.primary), dark),
-            neutral = StatusTone(scheme.outline, scheme.surfaceVariant, scheme.onSurfaceVariant),
-            shape = StatusShape.PILL,
-        )
+        override fun palette(scheme: ColorScheme, dark: Boolean) = FamilyStatus.colors(scheme)
     },
     ;
 
     abstract fun palette(scheme: ColorScheme, dark: Boolean): StatusColors
 
     companion object {
-        val EMERALD = Color(0xFF22C55E)
-        val AMBER = Color(0xFFF59E0B)
-        val RED = Color(0xFFEF4444)
-        private const val MAX_ROTATION = 15f
-        private const val HALF = 0.5f
-        private const val FULL_TURN = 360f
-        private const val HALF_TURN = 180f
-        private const val CONTAINER_SAT_LIGHT = 0.28f
-        private const val CONTAINER_VAL_LIGHT = 0.96f
-        private const val ON_CONTAINER_SAT_LIGHT = 0.95f
-        private const val ON_CONTAINER_VAL_LIGHT = 0.36f
-        private const val CONTAINER_SAT_DARK = 0.55f
-        private const val CONTAINER_VAL_DARK = 0.30f
-        private const val ON_CONTAINER_SAT_DARK = 0.30f
-        private const val ON_CONTAINER_VAL_DARK = 0.95f
-        private const val INK_SAT_DARK_MAX = 0.75f
+        val EMERALD = FamilyStatus.EMERALD
+        val AMBER = FamilyStatus.AMBER
+        val RED = FamilyStatus.RED
 
-        private fun hsv(color: Color): FloatArray = FloatArray(3).also { AndroidColor.colorToHSV(color.toArgb(), it) }
+        fun harmonise(design: Color, source: Color): Color = FamilyStatus.harmonise(design, source)
 
-        private fun fromHsv(h: Float, s: Float, v: Float): Color =
-            Color(AndroidColor.HSVToColor(floatArrayOf((h + FULL_TURN) % FULL_TURN, s, v)))
-
-        fun harmonise(design: Color, source: Color): Color {
-            val d = hsv(design)
-            val s = hsv(source)
-            var diff = s[0] - d[0]
-            if (diff > HALF_TURN) diff -= FULL_TURN
-            if (diff < -HALF_TURN) diff += FULL_TURN
-            val rotation = (kotlin.math.abs(diff) * HALF).coerceAtMost(MAX_ROTATION)
-            val hue = d[0] + if (diff >= 0) rotation else -rotation
-            return fromHsv(hue, d[1], d[2])
-        }
-
-        fun fixedTone(base: Color, dark: Boolean): StatusTone {
-            val (h, s, v) = hsv(base)
-            return if (dark) {
-                StatusTone(
-                    ink = fromHsv(h, s.coerceAtMost(INK_SAT_DARK_MAX), v),
-                    container = fromHsv(h, CONTAINER_SAT_DARK, CONTAINER_VAL_DARK),
-                    onContainer = fromHsv(h, ON_CONTAINER_SAT_DARK, ON_CONTAINER_VAL_DARK),
-                )
-            } else {
-                StatusTone(
-                    ink = base,
-                    container = fromHsv(h, CONTAINER_SAT_LIGHT, CONTAINER_VAL_LIGHT),
-                    onContainer = fromHsv(h, ON_CONTAINER_SAT_LIGHT, ON_CONTAINER_VAL_LIGHT),
-                )
-            }
-        }
+        fun fixedTone(base: Color, dark: Boolean): StatusTone = FamilyStatus.tone(base, dark)
     }
 }

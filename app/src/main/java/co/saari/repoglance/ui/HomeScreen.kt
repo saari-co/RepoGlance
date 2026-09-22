@@ -51,12 +51,11 @@ import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.render.Ages
-import co.saari.repoglance.render.CiColorRole
 import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
+import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.StatusColors
-import co.saari.repoglance.ui.theme.StatusShape
 import co.saari.repoglance.widget.RepoWidgetConfigActivity
 import co.saari.repoglance.widget.RepoWidgetReceiver
 import co.saari.repoglance.widget.StackWidgetReceiver
@@ -71,7 +70,7 @@ fun HomeScreen(
     onTogglePin: (String) -> Unit,
     onOpenNavigator: () -> Unit,
     onOpenRepo: (RepoRef) -> Unit,
-    statusColors: StatusColors? = null,
+    statusColors: StatusColors = FamilyStatus.colors(MaterialTheme.colorScheme),
 ) {
     val fixtureAnchor = remember(scenario) { Instant.now() }
     val now = rememberFreshnessNow()
@@ -210,7 +209,7 @@ private fun RepoCard(
     isPinned: Boolean,
     onTogglePin: () -> Unit,
     onOpenRepo: () -> Unit,
-    statusColors: StatusColors?,
+    statusColors: StatusColors,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(onClick = onOpenRepo, modifier = modifier.padding(vertical = 4.dp)) {
@@ -233,14 +232,11 @@ private fun RepoCard(
                 }
             }
             SnapshotRendering.rateLimitBanner(snapshot.rateLimit)?.let { banner ->
-                val tone = statusColors?.tone(SnapshotRendering.rateLimitRole(snapshot.rateLimit))
-                Surface(
-                    color = tone?.container ?: MaterialTheme.colorScheme.errorContainer,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
+                val tone = statusColors.tone(SnapshotRendering.rateLimitRole(snapshot.rateLimit))
+                Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
                     Text(
                         banner,
-                        color = tone?.onContainer ?: MaterialTheme.colorScheme.onErrorContainer,
+                        color = tone.onContainer,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(6.dp),
                     )
@@ -271,32 +267,16 @@ private fun RepoCard(
 }
 
 @Composable
-private fun CiStatus(ci: CiState, statusColors: StatusColors?) {
-    val role = CiSemanticRole.of(ci)
-    val label = SnapshotRendering.ciLabel(ci)
-    val tone = statusColors?.tone(role)
-    if (tone != null && statusColors.shape == StatusShape.PILL) {
-        Surface(color = tone.container, shape = CircleShape) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-            ) {
-                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(tone.ink))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(label, style = MaterialTheme.typography.labelLarge, color = tone.onContainer)
-            }
-        }
-    } else {
-        val color = tone?.ink ?: when (role) {
-            CiColorRole.POSITIVE -> MaterialTheme.colorScheme.primary
-            CiColorRole.NEGATIVE -> MaterialTheme.colorScheme.error
-            CiColorRole.IN_PROGRESS -> MaterialTheme.colorScheme.tertiary
-            CiColorRole.NEUTRAL -> MaterialTheme.colorScheme.outline
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
+private fun CiStatus(ci: CiState, statusColors: StatusColors) {
+    val tone = statusColors.tone(CiSemanticRole.of(ci))
+    Surface(color = tone.container, shape = CircleShape) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+        ) {
+            Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(tone.ink))
             Spacer(modifier = Modifier.width(6.dp))
-            Text(label, style = MaterialTheme.typography.bodyMedium)
+            Text(SnapshotRendering.ciLabel(ci), style = MaterialTheme.typography.labelLarge, color = tone.onContainer)
         }
     }
 }

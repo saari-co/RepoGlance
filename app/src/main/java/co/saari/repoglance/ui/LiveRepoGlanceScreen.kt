@@ -64,6 +64,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -84,8 +85,10 @@ import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
+import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.ui.brand.CheckingMark
+import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -480,11 +483,7 @@ private fun LiveRepositoryHome(
                                 it,
                                 modifier = Modifier.testTag("repoglance:rate-limit"),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (rateLimit.bucket == RateLimitBucket.EXHAUSTED) {
-                                    MaterialTheme.colorScheme.error
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                                color = rateLimitInk(rateLimit.bucket),
                             )
                         }
                         if (catalog.repositories.isNotEmpty()) {
@@ -899,13 +898,16 @@ private fun FreshnessRow(observedAt: Instant, rateLimit: RateLimitSnapshot, now:
     Text(
         listOfNotNull(Ages.updatedLabel(observedAt, now), rateText).joinToString(" · "),
         style = MaterialTheme.typography.labelSmall,
-        color = if (rateLimit.bucket == RateLimitBucket.EXHAUSTED) {
-            MaterialTheme.colorScheme.error
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
+        color = rateLimitInk(rateLimit.bucket),
         modifier = Modifier.padding(bottom = 4.dp),
     )
+}
+
+@Composable
+private fun rateLimitInk(bucket: RateLimitBucket): Color = when (bucket) {
+    RateLimitBucket.LOW, RateLimitBucket.EXHAUSTED ->
+        FamilyStatus.colors(MaterialTheme.colorScheme).tone(SnapshotRendering.rateLimitRole(bucket)).ink
+    RateLimitBucket.OK, RateLimitBucket.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
 }
 
 @Composable

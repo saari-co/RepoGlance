@@ -61,3 +61,26 @@
 | MIXED-E-dark.png | 3fad5f02610c746134c36d2fbeafbcd741ff5ab98c6d097337d01cef1d051612 |
 | MIXED-E-light-scrolled.png | cbfcc309ac276d329ddeab0747a160120d0c836899ffe7b36471f95ac050dbe4 |
 | MIXED-E-light.png | 266018d16ef4fb8e0d2cb7770d8336db17d72ba2a2eebf686f0f43d05d2406e0 |
+
+## Lock E implemented in production (2026-09-22)
+
+- Production seam: `FamilyStatus` in `ui/theme/StatusColors.kt` (CIELCh harmonise,
+  tonal pills). Consumers: fixture catalog CI pill + rate-limit banner, navigator
+  rate-limit banner, live screen rate-limit ink.
+- Device: same Fold, light mode. Production fixture home reached through
+  `launch <scenario> navigator` then the navigator's home control. Dark verified
+  through the debug picker's E candidate, which now renders the production seam.
+- Not device-verified: the navigator rate-limit banner (no fixture reachable
+  through the launcher rendered it) and the live screen's LOW/EXHAUSTED ink (the
+  signed-in session was in the OK bucket). Both share the seam with the proven
+  banner and pill.
+- `./gradlew check` green before commit.
+
+| frame | sha256 |
+| --- | --- |
+| prod-EXACT-scrolled.png | 161a6a8f074004949f210964ae64cb62a93c2d04017f606aec4fecc82d2576cc |
+| prod-EXACT-top.png | 34239e76ea52d4d937d7e5dd2bd7aadd62660b0b874e24a70e2e9c2216056b3d |
+| prod-MIXED-scrolled.png | 1d6a9e027f04301cc1f36bc4b913090a799e7ad0422381c2584d113e5cbc026d |
+| seam-E-dark-EXACT-scrolled.png | 5f9583dfd0cda16b0c5cda6b5e503f5389d3f569e353cd972296c39b9e09d3d2 |
+| seam-E-dark-EXACT-top.png | 3f7c7466fbfc7e0a5fc0f8148cd25d4efdb976ae7c483840fb5da529fe46bf1b |
+| seam-E-dark-MIXED-scrolled.png | acc4b80246bd6aba21bf53697fad6c32a7f61270822f3f8e66baa4a05e2efba5 |

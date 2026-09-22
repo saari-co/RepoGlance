@@ -1,7 +1,8 @@
 # Design contract: RepoGlance
 
-- **Version:** 0 (2026-09-21), started by the `family-look` grill. Nothing in
-  the unresolved section is decided.
+- **Version:** 1 (2026-09-22): status colour [status-colour-029]. Version 0
+  (2026-09-21) started the file with constraints only. Nothing in the
+  unresolved section is decided.
 - **Canonical path:** `docs/design.md`. The maintainer asked for `design.md`;
   it lives under `docs/` because `REPO_HYGIENE.md` keeps root markdown to the
   front-door set. This is the one current design language for the RepoGlance
@@ -59,17 +60,43 @@
 - **Typography:** M3 default type scale, system font. Section heads
   ("Issues", "PRs") are `titleSmall`; ages and rate-limit lines are
   `labelSmall`.
-- **Status semantics (code, not yet colour):** `render/CiSemanticRole.kt`
-  maps CI to POSITIVE / NEGATIVE / IN_PROGRESS / NEUTRAL; rate-limit buckets
-  map to the same roles (`SnapshotRendering.rateLimitRole`). Today the
-  catalog paints POSITIVE `primary`, NEGATIVE `error`, IN_PROGRESS
-  `tertiary`, NEUTRAL `outline`, and rate-limit banners `errorContainer`.
+- **Status colour [status-colour-029, "family tonal"]:** four meanings, one
+  hue each, shared with Swarm Intercom and harmonised with dynamic colour.
+  `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
+  NEUTRAL and `SnapshotRendering.rateLimitRole` maps rate-limit buckets to
+  the same roles (LOW = working, EXHAUSTED = failing).
+
+  | meaning | role | family hue | source |
+  | --- | --- | --- | --- |
+  | ok | POSITIVE | emerald `#22C55E` | Intercom `--ok` |
+  | working | IN_PROGRESS | amber `#F59E0B` | Intercom `--warn` |
+  | failing | NEGATIVE | red `#EF4444` | RepoGlance's own; Intercom has no failing state |
+  | neutral | NEUTRAL | `outline` on `surfaceVariant` | Material, unharmonised |
+
+  - **Harmonise:** each family hue leans towards the dynamic `primary` by
+    half the hue difference, capped at 15 degrees (Google's harmonise rule),
+    computed in CIELCh through `androidx.core.graphics.ColorUtils`
+    (`ui/theme/StatusColors.kt`, `FamilyStatus`). This is not HCT; it needs
+    no new dependency and was judged close enough on the Fold. Revisit if the
+    tint ever looks off against a wallpaper.
+  - **Tones:** each status is a `StatusTone` of ink, container and
+    on-container. Light: ink = the harmonised hue; container L 92 / C 24;
+    on-container L 30 / C 45. Dark (background luminance below 0.5): ink L
+    capped at 78; container L 30 / C 30; on-container L 90 / C 20.
+  - **Application:** status is a tonal pill (`CircleShape` container, 8 dp
+    ink dot, `labelLarge` on-container text) on catalog cards; rate-limit
+    banners use the container/on-container pair; the live screen's
+    rate-limit line uses the ink. Saturated dots are gone.
+  - **Rejected (round 1, do not reintroduce without a new grill):** A dynamic
+    roles (ok/working indistinct on blue wallpapers); B fixed hues
+    unharmonised; C harmonised dots; D ink-only monochrome.
+  - **Proof:** `.grilltrack/proof/family-look-round-1-captures-20260921.md`.
 
 ## Unresolved (decided by GrillTrack, one slot per round)
 
-- **Status colour [status-colour-029, round `family-look-round-1`]:** how the
-  four status roles get their colour. Candidates A–E are in
-  `.grilltrack/work/picker/family-look-round-1.json`; nothing is chosen.
+- **Status colour on widgets and the tile:** the Glance widgets and the
+  Quick Settings tile still show status as text only; whether they carry the
+  family tones is not grilled.
 - **Label typography:** whether RepoGlance adopts a shared label face or
   style with Intercom (uppercase section heads, chips). Not grilled.
 - **Shape and control language:** capsules and outlined state edges versus
