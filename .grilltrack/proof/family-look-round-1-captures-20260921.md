@@ -84,3 +84,12 @@
 | seam-E-dark-EXACT-scrolled.png | 5f9583dfd0cda16b0c5cda6b5e503f5389d3f569e353cd972296c39b9e09d3d2 |
 | seam-E-dark-EXACT-top.png | 3f7c7466fbfc7e0a5fc0f8148cd25d4efdb976ae7c483840fb5da529fe46bf1b |
 | seam-E-dark-MIXED-scrolled.png | acc4b80246bd6aba21bf53697fad6c32a7f61270822f3f8e66baa4a05e2efba5 |
+
+## Review fix (2026-09-22)
+
+- `1a286d8` adds the achromatic-primary guard (review P2 on `19b463d`). Reinstalled
+  and recaptured the production fixture home; `./gradlew check` green.
+
+| frame | sha256 |
+| --- | --- |
+| prod-fix-EXACT-top.png | 41dd9cecec4d5d7e3a0c8ae7417dbca13c3fb6314db7dc90051858d5c49a2e48 |
