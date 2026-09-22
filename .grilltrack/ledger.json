@@ -3589,10 +3589,38 @@
           "review_source_identity": null,
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-22T01:02:01+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-22T01:02:01+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "implemented",
+          "implementation_ref": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e (FamilyStatus seam, HomeScreen/NavigatorScreen/LiveRepoGlanceScreen consumers, docs/design.md v1)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
         }
       ],
       "id": "status-colour-029",
-      "implementation_ref": null,
+      "implementation_ref": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e (FamilyStatus seam, HomeScreen/NavigatorScreen/LiveRepoGlanceScreen consumers, docs/design.md v1)",
       "question": "How does RepoGlance colour its status meanings (ok / working / failing / neutral) so it shares a family with Swarm Intercom while keeping Material 3 dynamic colour as the base?",
       "rationale": "Maintainer picked E on the live picker (2026-09-22) after 40 fail-closed captures of A-E on the Pixel 10 Pro Fold, EXACT and MIXED, light and dark preview.",
       "repair_required": false,
@@ -3601,10 +3629,10 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "locked",
+      "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-22T00:30:44+00:00",
-      "verification_ref": null
+      "updated_at": "2026-09-22T01:02:01+00:00",
+      "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (46 fail-closed captures on Pixel 10 Pro Fold 59151FDCG000JA: round-1 A-E light/dark, production EXACT/MIXED light, seam E dark; ./gradlew check green at 19b463d)"
     }
   ],
   "last_activation": {
@@ -3634,5 +3662,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-22T00:33:15+00:00"
+  "updated_at": "2026-09-22T01:02:01+00:00"
 }

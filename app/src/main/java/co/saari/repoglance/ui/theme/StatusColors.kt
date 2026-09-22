@@ -45,6 +45,7 @@ object FamilyStatus {
     private const val FULL_TURN = 360.0
     private const val HALF_TURN = 180.0
     private const val DARK_LUMINANCE = 0.5f
+    private const val ACHROMATIC_CHROMA = 5.0
     private const val INK_DARK_MAX_L = 78.0
     private const val CONTAINER_L_LIGHT = 92.0
     private const val CONTAINER_C_LIGHT = 24.0
@@ -67,7 +68,8 @@ object FamilyStatus {
 
     fun harmonise(design: Color, source: Color): Color {
         val (dl, dc, dh) = lch(design)
-        val sh = lch(source)[2]
+        val (_, sc, sh) = lch(source)
+        if (sc < ACHROMATIC_CHROMA) return design
         var diff = sh - dh
         if (diff > HALF_TURN) diff -= FULL_TURN
         if (diff < -HALF_TURN) diff += FULL_TURN

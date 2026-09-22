@@ -77,8 +77,9 @@
     half the hue difference, capped at 15 degrees (Google's harmonise rule),
     computed in CIELCh through `androidx.core.graphics.ColorUtils`
     (`ui/theme/StatusColors.kt`, `FamilyStatus`). This is not HCT; it needs
-    no new dependency and was judged close enough on the Fold. Revisit if the
-    tint ever looks off against a wallpaper.
+    no new dependency and was judged close enough on the Fold. An achromatic
+    primary (monochrome theme, chroma below 5) leaves the hues unharmonised.
+    Revisit if the tint ever looks off against a wallpaper.
   - **Tones:** each status is a `StatusTone` of ink, container and
     on-container. Light: ink = the harmonised hue; container L 92 / C 24;
     on-container L 30 / C 45. Dark (background luminance below 0.5): ink L
