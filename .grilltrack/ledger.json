@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-21T16:52:43+00:00",
-    "domain": "App start while signed in: what shows from launch to the catalog (system splash, window background, in-app loading)",
-    "started_at": "2026-09-21T16:52:43+00:00",
-    "status": "confirmed",
-    "summary": "cold-start-icon-028 relocked with corrected wording (maintainer, 2026-09-21): seamless start claimed for API 34+ only; API 31-33 fallback approximate and unverified; implementation unchanged"
+    "confirmed_at": "2026-09-22T00:33:15+00:00",
+    "domain": "family-look: shared visual signatures with Swarm Intercom on RepoGlance's dynamic-colour base, one slot per round; round 1 slot = status colour (ok / working / failing / neutral)",
+    "started_at": "2026-09-21T23:41:07+00:00",
+    "status": "inspected",
+    "summary": "Domain: status colour for ok/working/failing/neutral. Lock: E family tonal (harmonised Intercom hues as tonal pills with dark ink; neutral = outline/surfaceVariant; dynamic colour base kept). Implementation: production seam FamilyStatus in ui/theme/StatusColors.kt (CIELCh harmonise via androidx ColorUtils, half the hue difference capped at 15 degrees, no new dependency), applied to the fixture catalog CI pill and rate-limit banner, the navigator rate-limit banner, and the live screen's rate-limit ink (LOW = working, EXHAUSTED = failing). Widgets and the tile keep their text-only status and are noted as unresolved. Verification: ./gradlew check green, production fixture home on the Fold in light and dark preview, docs/design.md v1 promoted."
   },
   "decisions": [
     {
@@ -3263,7 +3263,7 @@
       "context_ref": "file:.grilltrack/work/cold-start-icon/picker.json",
       "created_at": "2026-09-21T15:14:05+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#34 merged as 05c21fde48a9163e550361e128ae049d7b20a0f4",
       "dependencies": [
         "checking-splash-018"
       ],
@@ -3544,42 +3544,187 @@
           "result": "findings",
           "reviewed_at": "2026-09-21T17:25:17+00:00",
           "source_identity": "git:bffc68d0952dc4511707c04d4d8fa4c46f792cd7"
+        },
+        {
+          "classifications": [],
+          "ref": "PR #34: OpenClaw req-20260921T172552Z-4421723686 correct 0.99, 0 findings; ClawSweeper revision 3 platinum hermit 4/6, proof sufficient, ready for maintainer look, no findings; remaining P2 API 31-33 merge risk accepted by the maintainer",
+          "result": "clean",
+          "reviewed_at": "2026-09-21T22:42:10+00:00",
+          "source_identity": "git:1d4c144ac13a886d6012bd00cee7cbf0d5d734db"
         }
       ],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_ref": "PR #34: OpenClaw req-20260921T172552Z-4421723686 correct 0.99, 0 findings; ClawSweeper revision 3 platinum hermit 4/6, proof sufficient, ready for maintainer look, no findings; remaining P2 API 31-33 merge risk accepted by the maintainer",
+      "review_result": "clean",
+      "review_source_identity": "git:1d4c144ac13a886d6012bd00cee7cbf0d5d734db",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-21T17:25:17+00:00",
+      "updated_at": "2026-09-21T22:42:10+00:00",
       "verification_ref": "file:proof/cold-start-icon-20260921/PROOF.md; gradle check green at 5ff704f (comment-only change); device proof unchanged; API 31-33 risk accepted by the maintainer"
+    },
+    {
+      "baseline_ref": "git:ccb1b6a",
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-1.json"
+      ],
+      "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+      "context_ref": "file:plans/family-look-handoff-20260921.md",
+      "created_at": "2026-09-21T23:41:07+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "cold-start-icon-028"
+      ],
+      "domain": "family-look: shared visual signatures with Swarm Intercom on RepoGlance's dynamic-colour base, one slot per round; round 1 slot = status colour (ok / working / failing / neutral)",
+      "history": [
+        {
+          "at": "2026-09-22T00:30:44+00:00",
+          "choice": "unresolved: five candidates A dynamic roles, B family fixed, C family harmonised, D ink only, E family tonal (picker round family-look-round-1)",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-22T01:02:01+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-22T01:02:01+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "implemented",
+          "implementation_ref": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e (FamilyStatus seam, HomeScreen/NavigatorScreen/LiveRepoGlanceScreen consumers, docs/design.md v1)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-22T01:09:19+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "verified",
+          "implementation_ref": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e (FamilyStatus seam, HomeScreen/NavigatorScreen/LiveRepoGlanceScreen consumers, docs/design.md v1)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (46 fail-closed captures on Pixel 10 Pro Fold 59151FDCG000JA: round-1 A-E light/dark, production EXACT/MIXED light, seam E dark; ./gradlew check green at 19b463d)"
+        },
+        {
+          "at": "2026-09-22T01:09:35+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e (FamilyStatus seam, HomeScreen/NavigatorScreen/LiveRepoGlanceScreen consumers, docs/design.md v1)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "independent reviewer (session agent afd25fce): standards clean; P2 achromatic primary gives arbitrary LCh hue -> required_fix (landed as 1a286d8); P3 dark ink chroma clip, per-recompose colour cost, transitive androidx.core reliance, navigator banner + live ink not device-verified -> defer",
+          "review_result": "findings",
+          "review_source_identity": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (46 fail-closed captures on Pixel 10 Pro Fold 59151FDCG000JA: round-1 A-E light/dark, production EXACT/MIXED light, seam E dark; ./gradlew check green at 19b463d)"
+        },
+        {
+          "at": "2026-09-22T01:09:35+00:00",
+          "choice": "E family tonal: Swarm Intercom's family hues (emerald ok #22C55E, amber working #F59E0B, RepoGlance's red failing #EF4444) harmonised towards the dynamic primary per Google's guidance, applied as Material tonal surfaces: status sits in a soft tinted pill with dark ink; neutral stays outline / surfaceVariant. Dynamic colour remains the base.",
+          "from": "implemented",
+          "implementation_ref": "git:1a286d817e8ddd761254dca79f208678517fba57 (19b463d FamilyStatus seam + 1a286d8 achromatic guard from review P2)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (46 fail-closed captures on Pixel 10 Pro Fold 59151FDCG000JA: round-1 A-E light/dark, production EXACT/MIXED light, seam E dark; ./gradlew check green at 19b463d)"
+        }
+      ],
+      "id": "status-colour-029",
+      "implementation_ref": "git:1a286d817e8ddd761254dca79f208678517fba57 (19b463d FamilyStatus seam + 1a286d8 achromatic guard from review P2)",
+      "question": "How does RepoGlance colour its status meanings (ok / working / failing / neutral) so it shares a family with Swarm Intercom while keeping Material 3 dynamic colour as the base?",
+      "rationale": "Maintainer picked E on the live picker (2026-09-22) after 40 fail-closed captures of A-E on the Pixel 10 Pro Fold, EXACT and MIXED, light and dark preview.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "independent reviewer (session agent afd25fce): standards clean; P2 achromatic primary gives arbitrary LCh hue -> required_fix (landed as 1a286d8); P3 dark ink chroma clip, per-recompose colour cost, transitive androidx.core reliance, navigator banner + live ink not device-verified -> defer",
+          "result": "findings",
+          "reviewed_at": "2026-09-22T01:09:19+00:00",
+          "source_identity": "git:19b463da995eeb76d08a9dda048a594dcbfdc42e"
+        },
+        {
+          "classifications": [],
+          "ref": "independent reviewer (session agent a2af42e2): guard verified, no comments in main, lines < 120, design.md matches; P3s deferrable; clean",
+          "result": "clean",
+          "reviewed_at": "2026-09-22T01:09:53+00:00",
+          "source_identity": "git:1a286d817e8ddd761254dca79f208678517fba57"
+        }
+      ],
+      "review_ref": "independent reviewer (session agent a2af42e2): guard verified, no comments in main, lines < 120, design.md matches; P3s deferrable; clean",
+      "review_result": "clean",
+      "review_source_identity": "git:1a286d817e8ddd761254dca79f208678517fba57",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-22T01:09:53+00:00",
+      "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (47 fail-closed captures on the Fold incl. prod-fix-EXACT-top at 1a286d8; ./gradlew check green)"
     }
   ],
   "last_activation": {
-    "at": "2026-09-21T16:52:43+00:00",
+    "at": "2026-09-21T23:49:28+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
     "artifact_refs": [
-      "file:proof/cold-start-icon-20260921/PROOF.md"
+      "file:.grilltrack/work/gates/status-colour-029-phone.md",
+      "file:.grilltrack/work/picker/family-look-round-1.json"
     ],
-    "next_safe_action": "When the Fold is back: record its new build/SDK, check dumpsys trust deviceLocked=0, VERIFY_SERIAL=59151FDCG000JA, install -r the a17450c debug APK, re-record the dark cold start (screenrecord --display-id 4619827677550801152, centre crops of RepoGlance-window frames only) and confirm splash and app background match; then record verify, run exact-source review; maintainer does light mode, themed icon and QS tile checks",
-    "paused_at": "2026-09-21T15:44:24+00:00",
-    "reason": "waiting_for_human: cold-start-icon-028 option 2 implemented at a17450c, gradle check green; the Pixel 10 Pro Fold is mid system update (was Android 16 BD3A.250808.001, patch 2025-09-05), so the dark cold-start re-record cannot run yet",
-    "resumed_at": "2026-09-21T15:51:19+00:00"
+    "next_safe_action": "Resume; VERIFY_SERIAL=59151FDCG000JA bin/verify-repoglance doctor; launch MIXED status-picker \"\" \"\" A; dump+capture A-E light and dark preview; hand Bobby the live picker; lock the pick, then implement it in production and update docs/design.md",
+    "paused_at": "2026-09-21T23:44:54+00:00",
+    "reason": "family-look round 1 (status-colour-029) is built and check-green at ff7bf76, but the Pixel 10 Pro Fold 59151FDCG000JA is not attached (USB and mdns empty); the device round needs Bobby to plug it in",
+    "resumed_at": "2026-09-21T23:49:28+00:00"
   },
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "family-look: a shared 'same dev crew' signature across RepoGlance and Swarm Intercom without copying night glass: keep Material 3 dynamic color as the base; candidates include shared state-colour semantics (emerald ok / amber working / sky active) harmonised with dynamic color, a shared label typeface, and the black/grey/white mark language (maintainer asked for it 2026-09-21)"
+      "family-look: carry the family status tones into the Glance widgets and the Quick Settings tile (today text-only status), keeping the widget ledger composition lock",
+      "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)"
     ],
-    "reason": "cold-start-icon-028 relocked with option 2 and implemented at a17450c; device re-verify waits on the Fold's system update. Maintainer asked for cross-app alignment that keeps each app unique",
-    "recommended": "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)",
-    "recorded_at": "2026-09-21T15:44:24+00:00"
+    "reason": "status-colour-029 is verified and reviewed clean at 1a286d8; label typography is the next most visible family signature and stays bounded to one slot; widgets are the biggest surface still outside the new tones",
+    "recommended": "family-look round 2, slot label-typography: whether RepoGlance adopts a shared label style with Swarm Intercom (uppercase Space Grotesk-style section heads and chips, or a system-face treatment) for 'Issues'/'PRs' heads, ages and rate-limit lines; five candidates on the production catalog and navigator via a debug picker",
+    "recorded_at": "2026-09-22T01:09:53+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-21T17:25:17+00:00"
+  "updated_at": "2026-09-22T01:09:53+00:00"
 }
