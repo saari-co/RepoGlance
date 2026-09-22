@@ -50,21 +50,23 @@ import co.saari.repoglance.ui.theme.RepoGlanceTheme
  * GrillTrack live variant picker for the `family-look` grill, slot
  * `status-colour` — development tooling, debug source set only.
  *
- * Renders the production fixture catalog (HomeScreen, MIXED scenario: passing,
- * failing, running, last-good and a low rate limit) with one status palette
- * applied. Everything else on the canvas is production: dynamic colour, the
+ * Renders the production fixture catalog (HomeScreen) in the launched fixture
+ * scenario with one status palette applied. EXACT shows passing, failing and
+ * running in its first three cards; MIXED adds last-good, unknown, an
+ * exhausted rate-limit banner and No CI. The chrome collapses to one line so the cards
+ * stay in view. Everything else on the canvas is production: dynamic colour, the
  * locked mark, the cards, the copy. The chrome states the question, names each
  * candidate, describes the active one, and offers a light/dark preview toggle
  * so both modes can be judged without touching the phone's settings.
  * Pointer/touch: tap a chip. Keyboard: `1`–`5` jump, DPAD left/right step,
- * `D` toggles dark, `R` resets.
+ * `D` toggles dark, `H` hides or shows the chrome details, `R` resets.
  *
  * Manifest: .grilltrack/work/picker/family-look-round-1.json.
  *
  * Launch (via the scenario launcher):
- *   bin/verify-repoglance launch MIXED status-picker "" "" <A..E>
+ *   bin/verify-repoglance launch EXACT status-picker "" "" <A..E>
  *   adb shell am start -n co.saari.repoglance/.devlaunch.ScenarioLaunchActivity \
- *     --es screen status-picker --es candidate C
+ *     --es scenario EXACT --es screen status-picker --es candidate C
  */
 class StatusColourVariantPickerActivity : ComponentActivity() {
 
@@ -74,20 +76,25 @@ class StatusColourVariantPickerActivity : ComponentActivity() {
         val letter = intent.getStringExtra(EXTRA_CANDIDATE).orEmpty()
         val initial = StatusColourCandidate.entries.firstOrNull { it.letter.equals(letter, true) }
             ?: StatusColourCandidate.DYNAMIC_ROLES
-        setContent { Picker(initial = initial) }
+        val scenario = intent.getStringExtra(EXTRA_SCENARIO)
+            ?.let { name -> FixtureScenario.entries.firstOrNull { it.name == name } }
+            ?: FixtureScenario.EXACT
+        setContent { Picker(initial = initial, initialScenario = scenario) }
     }
 
     private companion object {
         const val EXTRA_CANDIDATE = "candidate"
+        const val EXTRA_SCENARIO = "scenario"
     }
 }
 
 @Composable
-private fun Picker(initial: StatusColourCandidate) {
+private fun Picker(initial: StatusColourCandidate, initialScenario: FixtureScenario) {
     val systemDark = isSystemInDarkTheme()
     var candidate by rememberSaveable { mutableStateOf(initial) }
     var dark by rememberSaveable { mutableStateOf(systemDark) }
-    var scenario by rememberSaveable { mutableStateOf(FixtureScenario.MIXED) }
+    var collapsed by rememberSaveable { mutableStateOf(false) }
+    var scenario by rememberSaveable { mutableStateOf(initialScenario) }
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
 
@@ -113,6 +120,7 @@ private fun Picker(initial: StatusColourCandidate) {
                         event.key == Key.DirectionLeft -> step(-1)
                         event.key == Key.DirectionRight -> step(+1)
                         event.key == Key.D -> dark = !dark
+                        event.key == Key.H -> collapsed = !collapsed
                         event.key == Key.R -> {
                             candidate = initial
                             dark = systemDark
@@ -127,8 +135,10 @@ private fun Picker(initial: StatusColourCandidate) {
                 PickerChrome(
                     candidate = candidate,
                     dark = dark,
+                    collapsed = collapsed,
                     onPick = ::pick,
                     onToggleDark = { dark = !dark },
+                    onToggleDetails = { collapsed = !collapsed },
                     onReset = {
                         candidate = initial
                         dark = systemDark
@@ -152,13 +162,15 @@ private fun Picker(initial: StatusColourCandidate) {
 private fun PickerChrome(
     candidate: StatusColourCandidate,
     dark: Boolean,
+    collapsed: Boolean,
     onPick: (Int) -> Unit,
     onToggleDark: () -> Unit,
+    onToggleDetails: () -> Unit,
     onReset: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp)) {
         Text(
-            "GrillTrack family-look · $QUESTION",
+            "GrillTrack family-look · " + if (collapsed) SHORT_QUESTION else QUESTION,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.testTag("repoglance:picker-question"),
@@ -181,16 +193,24 @@ private fun PickerChrome(
             )
             Spacer(modifier = Modifier.width(6.dp))
             AssistChip(
+                onClick = onToggleDetails,
+                label = { Text(if (collapsed) "Details" else "Hide details") },
+                modifier = Modifier.testTag("repoglance:picker-collapse"),
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            AssistChip(
                 onClick = onReset,
                 label = { Text("Reset") },
                 modifier = Modifier.testTag("repoglance:picker-reset"),
             )
         }
-        Text(
-            "${candidate.letter}: ${candidate.description}",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 4.dp).testTag("repoglance:picker-active"),
-        )
+        if (!collapsed) {
+            Text(
+                "${candidate.letter}: ${candidate.description}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp).testTag("repoglance:picker-active"),
+            )
+        }
         Text(
             "On canvas: status ${candidate.letter} ${candidate.shortName} · ${if (dark) "dark" else "light"} · " +
                 "dynamic colour and the locked mark unchanged",
@@ -205,5 +225,6 @@ private const val QUESTION =
     "deciding: how RepoGlance COLOURS STATUS meanings (ok / working / failing / neutral) across the app, " +
         "so it shares a family with Swarm Intercom on a dynamic-colour base. Cards, copy and the mark are not " +
         "being decided."
+private const val SHORT_QUESTION = "deciding: STATUS COLOUR (ok / working / failing / neutral)"
 private const val CANDIDATES = 5
 private val DIGIT_KEYS = listOf(Key.One, Key.Two, Key.Three, Key.Four, Key.Five)

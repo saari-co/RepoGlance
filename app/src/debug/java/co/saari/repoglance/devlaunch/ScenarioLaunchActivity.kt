@@ -97,6 +97,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         }
         SCREEN_STATUS_PICKER -> Intent(this, StatusColourVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
+            putExtra(EXTRA_SCENARIO, intent.getStringExtra(EXTRA_SCENARIO))
         }
         SCREEN_SPLASH_PICKER -> Intent(this, SplashVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
