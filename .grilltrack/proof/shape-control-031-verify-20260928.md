@@ -38,15 +38,19 @@ Manifest `.grilltrack/work/picker/family-look-round-3.json` validated
 | --- | --- | --- | --- |
 | live | live catalog filtered to `saari-co/RepoGlance` (only repo row in tree) | 24 dp flat tonal card, tonal borderless LIVE chip | 6cbd4230b3ed1a32 |
 | nav-prs | fixture navigator, PRS mode | tonal borderless Draft chip | a6f0eb44903fc027 |
-|- An earlier live-catalog capture showed unfiltered repositories; it was
-  deleted with its dumps and not used. A first fixture-home capture failed
-  its text gate (wrong needle) and was deleted.
+| home | fixture catalog, RATE_LIMITED (navigator, then `repoglance:fixture-home`) | 24 dp flat tonal cards; 16 dp tonal rate-limit banners ("Rate-limited — backing off"); tonal capsule "Passing" status pills; tonal borderless "Cached · 2h" chips; tonal capsule Navigator button; borderless pin buttons | fb5fb1ee4663e94b |
+
+- The `home` capture's tree contains "Rate-limited — backing off" and
+  "Passing" in both the before and after dumps, which were equal; the only
+  package was `co.saari.repoglance`.
+- Discarded captures: an earlier live-catalog capture showed unfiltered
+  repositories and was deleted with its dumps; a first fixture-home capture
+  failed its text gate (wrong needle) and was deleted.
 - The tonal Navigator button renders saturated indigo with light text: this
   device's Android 17 dynamic `secondaryContainer` is saturated. The selected
   sort FilterChip (also `secondaryContainer`) shows the same colour in the
   live capture, so this is the scheme, not a fill bug.
-ture catalog, which the signed-in app does not open.
-  They go through the same `StatusPill` / `StatusBanner` seam. The status
-  pill was seen under candidate C in the picker; a rate-limit banner was
-  not in any kept crop (open risk).
-- `./gradlew assembleDebug check`: green.
+- Not proven on device: the live screens' sign-in, error and access buttons
+  (same `PrimaryButton` / `SecondaryButton` seam; not reachable without
+  signing out).
+- `./gradlew assembleDebug check`: green; CI `build` green on `bd785cf`.
