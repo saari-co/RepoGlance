@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-22T00:33:15+00:00",
-    "domain": "family-look: shared visual signatures with Swarm Intercom on RepoGlance's dynamic-colour base, one slot per round; round 1 slot = status colour (ok / working / failing / neutral)",
-    "started_at": "2026-09-21T23:41:07+00:00",
+    "confirmed_at": "2026-09-28T18:14:44+00:00",
+    "domain": "family-look round 2: label typography (section heads, chips, age/rate-limit lines, button labels; body stays M3)",
+    "started_at": "2026-09-28T16:22:13+00:00",
     "status": "inspected",
-    "summary": "Domain: status colour for ok/working/failing/neutral. Lock: E family tonal (harmonised Intercom hues as tonal pills with dark ink; neutral = outline/surfaceVariant; dynamic colour base kept). Implementation: production seam FamilyStatus in ui/theme/StatusColors.kt (CIELCh harmonise via androidx ColorUtils, half the hue difference capped at 15 degrees, no new dependency), applied to the fixture catalog CI pill and rate-limit banner, the navigator rate-limit banner, and the live screen's rate-limit ink (LOW = working, EXHAUSTED = failing). Widgets and the tile keep their text-only status and are noted as unresolved. Verification: ./gradlew check green, production fixture home on the Fold in light and dark preview, docs/design.md v1 promoted."
+    "summary": "Maintainer confirmed 2026-09-28 ('yes, build it'): D mono as production default; live screen labels via LabelText; Space Grotesk removed; design.md v2; Fold proof."
   },
   "decisions": [
     {
@@ -3570,7 +3570,7 @@
       "context_ref": "file:plans/family-look-handoff-20260921.md",
       "created_at": "2026-09-21T23:41:07+00:00",
       "deferred_reason": null,
-      "delivery_ref": null,
+      "delivery_ref": "github:saari-co/RepoGlance#36 merged as e9d4647d3f1daa23a23ab223dab69536887c752c",
       "dependencies": [
         "cold-start-icon-028"
       ],
@@ -3696,35 +3696,107 @@
       "superseded_by": null,
       "updated_at": "2026-09-22T01:09:53+00:00",
       "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (47 fail-closed captures on the Fold incl. prod-fix-EXACT-top at 1a286d8; ./gradlew check green)"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-2.json"
+      ],
+      "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+      "context_ref": "file:.grilltrack/proof/family-look-round-2-captures-20260928.md",
+      "created_at": "2026-09-28T17:59:42+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "status-colour-029"
+      ],
+      "domain": "family-look round 2: label typography (section heads, chips, age/rate-limit lines, button labels; body stays M3)",
+      "history": [
+        {
+          "at": "2026-09-28T17:59:42+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:14:44+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:14:44+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "implemented",
+          "implementation_ref": "git:453420351dd8479999843858888e2d1405a5d6c0",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "label-typography-030",
+      "implementation_ref": "git:453420351dd8479999843858888e2d1405a5d6c0",
+      "question": "How does RepoGlance set its labels (section heads, chips, age/rate-limit lines, button labels)?",
+      "rationale": "maintainer chose D",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-28T18:14:44+00:00",
+      "verification_ref": "file:.grilltrack/proof/label-typography-030-verify-20260928.md"
     }
   ],
   "last_activation": {
-    "at": "2026-09-21T23:49:28+00:00",
+    "at": "2026-09-28T16:21:36+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
     "artifact_refs": [
-      "file:.grilltrack/work/gates/status-colour-029-phone.md",
-      "file:.grilltrack/work/picker/family-look-round-1.json"
+      "file:plans/family-look-round-2-handoff-20260928.md"
     ],
-    "next_safe_action": "Resume; VERIFY_SERIAL=59151FDCG000JA bin/verify-repoglance doctor; launch MIXED status-picker \"\" \"\" A; dump+capture A-E light and dark preview; hand Bobby the live picker; lock the pick, then implement it in production and update docs/design.md",
-    "paused_at": "2026-09-21T23:44:54+00:00",
-    "reason": "family-look round 1 (status-colour-029) is built and check-green at ff7bf76, but the Pixel 10 Pro Fold 59151FDCG000JA is not attached (USB and mdns empty); the device round needs Bobby to plug it in",
-    "resumed_at": "2026-09-21T23:49:28+00:00"
+    "next_safe_action": "In the new session: read the ledger, resume, read plans/family-look-round-2-handoff-20260928.md, agree the exact slot boundary with the maintainer, then run five-candidate rounds on the real app",
+    "paused_at": "2026-09-28T16:20:46+00:00",
+    "reason": "maintainer routed family-look round 2 (label typography) to a fresh sidebar session on 2026-09-28",
+    "resumed_at": "2026-09-28T16:21:36+00:00"
   },
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "family-look: carry the family status tones into the Glance widgets and the Quick Settings tile (today text-only status), keeping the widget ledger composition lock",
-      "last-catalog-open: open straight onto the last catalog, labelled with its age (queued by the maintainer during cold-start-icon-028)"
+      "status colour and mono labels on widgets and the tile",
+      "static brand fallback colour scheme"
     ],
-    "reason": "status-colour-029 is verified and reviewed clean at 1a286d8; label typography is the next most visible family signature and stays bounded to one slot; widgets are the biggest surface still outside the new tones",
-    "recommended": "family-look round 2, slot label-typography: whether RepoGlance adopts a shared label style with Swarm Intercom (uppercase Space Grotesk-style section heads and chips, or a system-face treatment) for 'Issues'/'PRs' heads, ages and rate-limit lines; five candidates on the production catalog and navigator via a debug picker",
-    "recorded_at": "2026-09-22T01:09:53+00:00"
+    "reason": "Pairs with the locked mono labels; chips, pills and buttons are the next visible family signature.",
+    "recommended": "family-look round 3: shape and control language (capsules and outlined state edges vs M3 defaults)",
+    "recorded_at": "2026-09-28T18:16:19+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-22T01:09:53+00:00"
+  "updated_at": "2026-09-28T18:16:19+00:00"
 }

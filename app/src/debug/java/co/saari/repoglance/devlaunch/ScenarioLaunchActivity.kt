@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
+import co.saari.repoglance.devpicker.LabelTypeVariantPickerActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
@@ -33,6 +34,7 @@ import kotlinx.coroutines.withContext
 // screen: live (default) | navigator | picker | navigator-picker (extra candidate A..E)
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | status-picker (extra candidate A..E)
+//         | type-picker (extra candidate A..E)
 //         | checking (the production Checking screen held open)
 //         | signin-finishing (the production post-token sign-in screens held open)
 //         | none (apply the extras below and stay on the current screen)
@@ -84,6 +86,12 @@ class ScenarioLaunchActivity : ComponentActivity() {
 
     private fun nextIntent(screen: String): Intent {
         HOLDER_SCREENS[screen]?.let { return Intent(this, it) }
+        FAMILY_PICKERS[screen]?.let {
+            return Intent(this, it).apply {
+                putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
+                putExtra(EXTRA_SCENARIO, intent.getStringExtra(EXTRA_SCENARIO))
+            }
+        }
         return extrasIntent(screen)
     }
 
@@ -94,10 +102,6 @@ class ScenarioLaunchActivity : ComponentActivity() {
             val candidate = intent.getStringExtra(EXTRA_CANDIDATE)
             putExtra(EXTRA_CANDIDATE, candidate)
             putExtra(EXTRA_HYBRID, candidate?.endsWith(HYBRID_SUFFIX) == true)
-        }
-        SCREEN_STATUS_PICKER -> Intent(this, StatusColourVariantPickerActivity::class.java).apply {
-            putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
-            putExtra(EXTRA_SCENARIO, intent.getStringExtra(EXTRA_SCENARIO))
         }
         SCREEN_SPLASH_PICKER -> Intent(this, SplashVariantPickerActivity::class.java).apply {
             putExtra(EXTRA_CANDIDATE, intent.getStringExtra(EXTRA_CANDIDATE))
@@ -130,6 +134,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_NAVIGATOR_PICKER = "navigator-picker"
         const val SCREEN_SPLASH_PICKER = "splash-picker"
         const val SCREEN_STATUS_PICKER = "status-picker"
+        const val SCREEN_TYPE_PICKER = "type-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
@@ -143,6 +148,10 @@ class ScenarioLaunchActivity : ComponentActivity() {
             SCREEN_PICKER to WidgetVariantPickerActivity::class.java,
             SCREEN_CHECKING to CheckingPreviewActivity::class.java,
             SCREEN_SIGNIN_FINISHING to SignInFinishingPreviewActivity::class.java,
+        )
+        val FAMILY_PICKERS: Map<String, Class<out Activity>> = mapOf(
+            SCREEN_STATUS_PICKER to StatusColourVariantPickerActivity::class.java,
+            SCREEN_TYPE_PICKER to LabelTypeVariantPickerActivity::class.java,
         )
     }
 }

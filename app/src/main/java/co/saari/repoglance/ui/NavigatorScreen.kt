@@ -90,6 +90,8 @@ import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.state.NavigatorSection
 import co.saari.repoglance.state.SnapshotStore
 import co.saari.repoglance.ui.theme.FamilyStatus
+import co.saari.repoglance.ui.theme.LabelRole
+import co.saari.repoglance.ui.theme.LabelText
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -432,7 +434,7 @@ internal fun NavigatorControls(
             TextButton(onClick = onBackToHome, modifier = Modifier.testTag("repoglance:fixture-home")) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Home")
+                LabelText("Home", LabelRole.BUTTON)
             }
             Spacer(modifier = Modifier.width(4.dp))
             Box(modifier = Modifier.weight(1f)) {
@@ -484,7 +486,7 @@ private fun FiltersMenu(
     }
 
     Box {
-        TextButton(onClick = { expanded = true }) { Text(label) }
+        TextButton(onClick = { expanded = true }) { LabelText(label, LabelRole.BUTTON) }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             availableFilters.forEach { option ->
                 DropdownMenuItem(
@@ -498,8 +500,9 @@ private fun FiltersMenu(
                 )
             }
             HorizontalDivider()
-            Text(
+            LabelText(
                 "Fixture state",
+                LabelRole.SECTION,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             )
@@ -550,7 +553,7 @@ private fun ModeSwitcher(mode: NavigatorMode, onModeChange: (NavigatorMode) -> U
                 selected = mode == m,
                 onClick = { onModeChange(m) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = NavigatorMode.entries.size),
-                label = { Text(m.name) },
+                label = { LabelText(m.name, LabelRole.BUTTON) },
                 modifier = Modifier.testTag("repoglance:fixture-mode-${m.name}"),
             )
         }
@@ -682,22 +685,28 @@ private fun SectionHeader(title: String, list: NavigatorList, now: Instant) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+            LabelText(
+                title,
+                LabelRole.SECTION,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f),
+            )
             when (list.valueBasis) {
                 ValueBasis.EXACT -> Unit
                 ValueBasis.LAST_GOOD -> {
                     val chipAge = list.observedAt?.let { Ages.format(it, now) } ?: "unknown"
-                    AssistChip(onClick = {}, label = { Text("Cached · $chipAge") })
+                    AssistChip(onClick = {}, label = { LabelText("Cached · $chipAge", LabelRole.CHIP) })
                 }
-                ValueBasis.UNKNOWN -> AssistChip(onClick = {}, label = { Text("Unknown") })
+                ValueBasis.UNKNOWN -> AssistChip(onClick = {}, label = { LabelText("Unknown", LabelRole.CHIP) })
             }
         }
         SnapshotRendering.rateLimitBanner(list.rateLimit)?.let { banner ->
             val tone = FamilyStatus.colors(MaterialTheme.colorScheme)
                 .tone(SnapshotRendering.rateLimitRole(list.rateLimit))
             Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
-                Text(
+                LabelText(
                     banner,
+                    LabelRole.META,
                     color = tone.onContainer,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(6.dp),
@@ -719,7 +728,7 @@ private fun EmptyRowsText(valueBasis: ValueBasis) {
 @Composable
 private fun LoadMoreButton(onClick: () -> Unit) {
     TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Text("Load more (fixture)")
+        LabelText("Load more (fixture)", LabelRole.BUTTON)
     }
 }
 
@@ -750,7 +759,7 @@ private fun NavigatorRowView(
                 )
                 if (item.pr?.isDraft == true) {
                     Spacer(modifier = Modifier.width(4.dp))
-                    AssistChip(onClick = {}, label = { Text("Draft") })
+                    AssistChip(onClick = {}, label = { LabelText("Draft", LabelRole.CHIP) })
                 }
             }
             Text(item.state, style = MaterialTheme.typography.labelSmall)
@@ -805,7 +814,7 @@ internal fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) ->
             onClick = { onOpenGitHub(item) },
             modifier = Modifier.testTag("repoglance:navigator-open-github"),
         ) {
-            Text("Open on GitHub")
+            LabelText("Open on GitHub", LabelRole.BUTTON)
         }
     }
 }

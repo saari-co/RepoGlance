@@ -89,6 +89,8 @@ import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.ui.brand.CheckingMark
 import co.saari.repoglance.ui.theme.FamilyStatus
+import co.saari.repoglance.ui.theme.LabelRole
+import co.saari.repoglance.ui.theme.LabelText
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -208,7 +210,7 @@ private fun AwaitingGitHubScreen(
                 enabled = minutesRemaining > 0L,
                 modifier = Modifier.testTag("repoglance:copy-code"),
             ) {
-                Text("Copy code & open GitHub")
+                LabelText("Copy code & open GitHub", LabelRole.BUTTON)
             }
             Spacer(Modifier.height(8.dp))
             Text(
@@ -217,7 +219,7 @@ private fun AwaitingGitHubScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.testTag(RETURN_INSTRUCTION_TEST_TAG),
             )
-            TextButton(onClick = onCancel) { Text("Cancel sign-in") }
+            TextButton(onClick = onCancel) { LabelText("Cancel sign-in", LabelRole.BUTTON) }
         }
     }
 }
@@ -251,7 +253,7 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
                 enabled = connectionReady,
                 modifier = Modifier.testTag("repoglance:connect-github"),
             ) {
-                Text("Connect GitHub")
+                LabelText("Connect GitHub", LabelRole.BUTTON)
             }
             if (!connectionReady) {
                 Spacer(Modifier.height(10.dp))
@@ -347,11 +349,11 @@ private fun FailureScreen(
             }
             Spacer(Modifier.height(20.dp))
             if (!needsNewSignIn) {
-                Button(onClick = onRetry) { Text("Try again") }
+                Button(onClick = onRetry) { LabelText("Try again", LabelRole.BUTTON) }
                 Spacer(Modifier.height(8.dp))
             }
             OutlinedButton(onClick = onConnectGitHub, enabled = connectionReady) {
-                Text(if (needsNewSignIn) "Reconnect GitHub" else "Start a new sign-in")
+                LabelText(if (needsNewSignIn) "Reconnect GitHub" else "Start a new sign-in", LabelRole.BUTTON)
             }
         }
     }
@@ -401,10 +403,10 @@ private fun LiveRepositoryHome(
                 TextButton(onClick = {
                     confirmSignOut = false
                     onSignOut()
-                }) { Text("Disconnect GitHub") }
+                }) { LabelText("Disconnect GitHub", LabelRole.BUTTON) }
             },
             dismissButton = {
-                TextButton(onClick = { confirmSignOut = false }) { Text("Cancel") }
+                TextButton(onClick = { confirmSignOut = false }) { LabelText("Cancel", LabelRole.BUTTON) }
             },
         )
     }
@@ -432,7 +434,7 @@ private fun LiveRepositoryHome(
                             }
                             AssistChip(
                                 onClick = {},
-                                label = { Text("LIVE") },
+                                label = { LabelText("LIVE", LabelRole.CHIP) },
                                 modifier = Modifier.testTag("repoglance:live"),
                             )
                             IconButton(
@@ -479,8 +481,9 @@ private fun LiveRepositoryHome(
                             RateLimitBucket.UNKNOWN -> "GitHub rate limit is unknown"
                         }
                         rateText?.let {
-                            Text(
+                            LabelText(
                                 it,
+                                LabelRole.META,
                                 modifier = Modifier.testTag("repoglance:rate-limit"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = rateLimitInk(rateLimit.bucket),
@@ -551,7 +554,9 @@ private fun LiveRepositoryHome(
                     ) {
                         Text("No repositories are shared with RepoGlance")
                         Spacer(Modifier.height(12.dp))
-                        Button(onClick = onManageGitHubAccess) { Text("Choose repositories on GitHub") }
+                        Button(onClick = onManageGitHubAccess) {
+                            LabelText("Choose repositories on GitHub", LabelRole.BUTTON)
+                        }
                     }
                 }
             } else {
@@ -566,7 +571,7 @@ private fun LiveRepositoryHome(
                                     query = ""
                                 },
                             ) {
-                                Text("Clear filters")
+                                LabelText("Clear filters", LabelRole.BUTTON)
                             }
                         }
                     }
@@ -600,8 +605,9 @@ private fun LiveRepositoryHome(
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            Text(
+                            LabelText(
                                 repository.pushedAt?.let { Ages.updatedLabel(it, now) } ?: "Push time unknown",
+                                LabelRole.META,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
@@ -645,8 +651,9 @@ private fun PinToggle(repoFull: String, pinned: Boolean, onToggle: () -> Unit) {
 @Composable
 private fun CatalogSortToggle(sort: CatalogSort, onSortChange: (CatalogSort) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
+        LabelText(
             "Sort",
+            LabelRole.SECTION,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -654,14 +661,14 @@ private fun CatalogSortToggle(sort: CatalogSort, onSortChange: (CatalogSort) -> 
         FilterChip(
             selected = sort == CatalogSort.RECENT,
             onClick = { onSortChange(CatalogSort.RECENT) },
-            label = { Text("Recent push") },
+            label = { LabelText("Recent push", LabelRole.CHIP) },
             modifier = Modifier.testTag(CATALOG_SORT_RECENT_TEST_TAG),
         )
         Spacer(Modifier.width(6.dp))
         FilterChip(
             selected = sort == CatalogSort.ALPHABETICAL,
             onClick = { onSortChange(CatalogSort.ALPHABETICAL) },
-            label = { Text("A to Z") },
+            label = { LabelText("A to Z", LabelRole.CHIP) },
             modifier = Modifier.testTag(CATALOG_SORT_ALPHA_TEST_TAG),
         )
     }
@@ -705,7 +712,7 @@ private fun LiveNavigator(
                         TextButton(onClick = onBack, modifier = Modifier.testTag("repoglance:live-home")) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                             Spacer(Modifier.width(4.dp))
-                            Text("Home")
+                            LabelText("Home", LabelRole.BUTTON)
                         }
                         Text(
                             repository.ref.full,
@@ -740,7 +747,7 @@ private fun LiveNavigator(
                                 selected = mode == candidate,
                                 onClick = { modeName = candidate.name },
                                 shape = SegmentedButtonDefaults.itemShape(index, NavigatorMode.entries.size),
-                                label = { Text(candidate.name) },
+                                label = { LabelText(candidate.name, LabelRole.BUTTON) },
                                 modifier = Modifier.testTag("repoglance:live-mode-${candidate.name}"),
                             )
                         }
@@ -781,7 +788,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.liveIssueSection(
     now: Instant,
     onOpen: (String) -> Unit,
 ) {
-    item { Text("Issues", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(vertical = 8.dp)) }
+    item {
+        LabelText(
+            "Issues",
+            LabelRole.SECTION,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
+    }
     when (val result = content.issues) {
         is GitHubApiResult.Failure -> item { FailureRow(result.message, result.rateLimit, now) }
         is GitHubApiResult.Success -> {
@@ -808,7 +822,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.livePullRequestSectio
     now: Instant,
     onOpen: (String) -> Unit,
 ) {
-    item { Text("PRs", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(vertical = 8.dp)) }
+    item {
+        LabelText(
+            "PRs",
+            LabelRole.SECTION,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
+    }
     when (val result = content.pullRequests) {
         is GitHubApiResult.Failure -> item { FailureRow(result.message, result.rateLimit, now) }
         is GitHubApiResult.Success -> {
@@ -867,9 +888,9 @@ private fun LivePullRequestRow(pullRequest: LivePullRequest, now: Instant, onOpe
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f),
                 )
-                if (pullRequest.isDraft) AssistChip(onClick = {}, label = { Text("Draft") })
+                if (pullRequest.isDraft) AssistChip(onClick = {}, label = { LabelText("Draft", LabelRole.CHIP) })
                 if (pullRequest.reviewRequestedFromViewer) {
-                    AssistChip(onClick = {}, label = { Text("Review requested") })
+                    AssistChip(onClick = {}, label = { LabelText("Review requested", LabelRole.CHIP) })
                 }
             }
             Text(
@@ -895,8 +916,9 @@ private fun FreshnessRow(observedAt: Instant, rateLimit: RateLimitSnapshot, now:
         RateLimitBucket.EXHAUSTED -> "Rate limit exhausted"
         RateLimitBucket.UNKNOWN -> "Rate limit unknown"
     }
-    Text(
+    LabelText(
         listOfNotNull(Ages.updatedLabel(observedAt, now), rateText).joinToString(" · "),
+        LabelRole.META,
         style = MaterialTheme.typography.labelSmall,
         color = rateLimitInk(rateLimit.bucket),
         modifier = Modifier.padding(bottom = 4.dp),
@@ -915,9 +937,13 @@ private fun FailureRow(message: String, rateLimit: RateLimitSnapshot, now: Insta
     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
         Text(message, color = MaterialTheme.colorScheme.error)
         if (rateLimit.bucket != RateLimitBucket.UNKNOWN) {
-            Text("Rate limit: ${rateLimit.bucket.name}", style = MaterialTheme.typography.bodySmall)
+            LabelText(
+                "Rate limit: ${rateLimit.bucket.name}",
+                LabelRole.META,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
-        rateLimit.waitLabel(now)?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+        rateLimit.waitLabel(now)?.let { LabelText(it, LabelRole.META, style = MaterialTheme.typography.bodySmall) }
         Text("No current value", style = MaterialTheme.typography.bodySmall)
     }
 }
@@ -929,8 +955,9 @@ private fun EmptyLiveRows(message: String) {
 
 @Composable
 private fun PartialPageRow(loadedCount: Int) {
-    Text(
+    LabelText(
         "Showing the $loadedCount most recently updated · more available on GitHub",
+        LabelRole.META,
         modifier = Modifier.padding(bottom = 6.dp),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,

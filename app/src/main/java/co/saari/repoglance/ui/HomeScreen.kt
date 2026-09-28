@@ -55,6 +55,8 @@ import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
 import co.saari.repoglance.ui.theme.FamilyStatus
+import co.saari.repoglance.ui.theme.LabelRole
+import co.saari.repoglance.ui.theme.LabelText
 import co.saari.repoglance.ui.theme.StatusColors
 import co.saari.repoglance.widget.RepoWidgetConfigActivity
 import co.saari.repoglance.widget.RepoWidgetReceiver
@@ -121,7 +123,7 @@ fun HomeScreen(
             onClick = onOpenNavigator,
             modifier = Modifier.fillMaxWidth().testTag("repoglance:fixture-navigator"),
         ) {
-            Text("Navigator")
+            LabelText("Navigator", LabelRole.BUTTON)
         }
         Spacer(modifier = Modifier.height(8.dp))
         PinWidgetsRow()
@@ -151,7 +153,7 @@ private fun PinWidgetsRow() {
                 }
             },
         ) {
-            Text("Pin repo widget")
+            LabelText("Pin repo widget", LabelRole.BUTTON)
         }
         OutlinedButton(
             modifier = Modifier.weight(1f),
@@ -165,7 +167,7 @@ private fun PinWidgetsRow() {
                 }
             },
         ) {
-            Text("Pin stack widget")
+            LabelText("Pin stack widget", LabelRole.BUTTON)
         }
     }
 }
@@ -234,8 +236,9 @@ private fun RepoCard(
             SnapshotRendering.rateLimitBanner(snapshot.rateLimit)?.let { banner ->
                 val tone = statusColors.tone(SnapshotRendering.rateLimitRole(snapshot.rateLimit))
                 Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
-                    Text(
+                    LabelText(
                         banner,
+                        LabelRole.META,
                         color = tone.onContainer,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(6.dp),
@@ -247,7 +250,7 @@ private fun RepoCard(
                 CiStatus(snapshot.defaultBranchCi, statusColors)
                 SnapshotRendering.ageChip(snapshot, now)?.let { chip ->
                     Spacer(modifier = Modifier.width(8.dp))
-                    AssistChip(onClick = {}, label = { Text("Cached · $chip") })
+                    AssistChip(onClick = {}, label = { LabelText("Cached · $chip", LabelRole.CHIP) })
                 }
             }
             Text(
@@ -260,8 +263,16 @@ private fun RepoCard(
                 SnapshotRendering.releaseLabel(snapshot.latestRelease, snapshot.valueBasis, now),
                 style = MaterialTheme.typography.bodySmall,
             )
-            Text(SnapshotRendering.pushedLabel(snapshot.pushedAt, now), style = MaterialTheme.typography.bodySmall)
-            Text(Ages.updatedLabel(snapshot.observedAt, now), style = MaterialTheme.typography.bodySmall)
+            LabelText(
+                SnapshotRendering.pushedLabel(snapshot.pushedAt, now),
+                LabelRole.META,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            LabelText(
+                Ages.updatedLabel(snapshot.observedAt, now),
+                LabelRole.META,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }
@@ -276,7 +287,12 @@ private fun CiStatus(ci: CiState, statusColors: StatusColors) {
         ) {
             Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(tone.ink))
             Spacer(modifier = Modifier.width(6.dp))
-            Text(SnapshotRendering.ciLabel(ci), style = MaterialTheme.typography.labelLarge, color = tone.onContainer)
+            LabelText(
+                SnapshotRendering.ciLabel(ci),
+                LabelRole.CHIP,
+                style = MaterialTheme.typography.labelLarge,
+                color = tone.onContainer,
+            )
         }
     }
 }
