@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,22 +64,25 @@ class RepoWidget : GlanceAppWidget() {
         val read = { readRepoWidgetData(context, appWidgetId) }
         val initial = readWidgetStores(read)
 
+        val tones = WidgetTones.of(context)
         provideContent {
             val data = redrawnWidgetData(initial, read)
             val config = data.config
             val appIntent = config?.let { liveRepositoryIntent(context, it.repo) }
 
-            GlanceTheme {
-                val isTall = LocalSize.current.height >= TALL_BREAKPOINT
-                Box(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .background(GlanceTheme.colors.background),
-                ) {
-                    when {
-                        config == null || appIntent == null -> UnconfiguredContent()
-                        isTall -> TallContent(config, data.snapshot, data.rows, data.freshness, appIntent)
-                        else -> CompactContent(config, data.snapshot, appIntent, data.freshness)
+            CompositionLocalProvider(LocalWidgetTones provides tones) {
+                GlanceTheme {
+                    val isTall = LocalSize.current.height >= TALL_BREAKPOINT
+                    Box(
+                        modifier = GlanceModifier
+                            .fillMaxSize()
+                            .background(GlanceTheme.colors.background),
+                    ) {
+                        when {
+                            config == null || appIntent == null -> UnconfiguredContent()
+                            isTall -> TallContent(config, data.snapshot, data.rows, data.freshness, appIntent)
+                            else -> CompactContent(config, data.snapshot, appIntent, data.freshness)
+                        }
                     }
                 }
             }
@@ -186,16 +190,11 @@ internal const val LEDGER_FRESHNESS_TAG = "ledger-freshness"
 
 @Composable
 internal fun CompactFreshness(snapshot: RepoSnapshot?, freshness: WidgetFreshness) {
-    val stale = snapshot?.valueBasis != ValueBasis.EXACT || freshness.rateLimitedUntil != null
-    Text(
+    FreshnessText(
         compactFreshnessLabel(snapshot, freshness),
-        maxLines = 1,
-        style = TextStyle(
-            color = if (stale) GlanceTheme.colors.error else GlanceTheme.colors.onSurfaceVariant,
-            fontSize = LEDGER_LABEL_SIZE,
-            fontWeight = if (stale) FontWeight.Bold else FontWeight.Normal,
-        ),
-        modifier = GlanceModifier.semantics { testTag = LEDGER_FRESHNESS_TAG },
+        freshnessRole(snapshot, freshness),
+        LEDGER_FRESHNESS_TAG,
+        fontSize = LEDGER_LABEL_SIZE,
     )
 }
 
@@ -224,6 +223,7 @@ internal fun CompactContent(
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = LEDGER_REPO_SIZE,
+                    fontFamily = labelFamily(),
                 ),
                 modifier = GlanceModifier.defaultWeight(),
             )
@@ -256,6 +256,7 @@ internal fun LedgerRow(label: String, value: String) {
             style = TextStyle(
                 color = GlanceTheme.colors.onSurfaceVariant,
                 fontSize = LEDGER_LABEL_SIZE,
+                fontFamily = labelFamily(),
             ),
             modifier = GlanceModifier
                 .semantics { testTag = LEDGER_LABEL_TAG }
@@ -275,32 +276,49 @@ internal fun LedgerRow(label: String, value: String) {
 }
 
 @Composable
-private fun TallContent(
+internal fun TallContent(
     config: RepoWidgetConfig,
     snapshot: RepoSnapshot?,
     rows: List<WidgetRow>,
     freshness: WidgetFreshness,
     appIntent: Intent,
 ) {
+    TallLook { TallBody(config, snapshot, rows, freshness, appIntent) }
+}
+
+@Composable
+private fun TallBody(
+    config: RepoWidgetConfig,
+    snapshot: RepoSnapshot?,
+    rows: List<WidgetRow>,
+    freshness: WidgetFreshness,
+    appIntent: Intent,
+) {
+    val role = freshnessRole(snapshot, freshness)
+        .takeIf { LocalWidgetLook.current.freshness != FreshnessStyle.MATERIAL_ERROR }
     Column(modifier = GlanceModifier.fillMaxSize()) {
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .background(GlanceTheme.colors.surfaceVariant)
+                .background(headerBackground(role))
                 .clickable(actionStartActivity(appIntent))
                 .padding(horizontal = 10.dp, vertical = 7.dp),
         ) {
             Text(
                 config.repo.full,
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = headerInk(role), fontWeight = FontWeight.Bold),
             )
-            Text(
-                tallHeaderLabel(snapshot, config.mode, freshness),
-                maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
-                modifier = GlanceModifier.semantics { testTag = TALL_HEADER_TAG },
-            )
+            if (LocalWidgetLook.current.freshness == FreshnessStyle.TONE_HEADER) {
+                Text(
+                    tallHeaderLabel(snapshot, config.mode, freshness),
+                    maxLines = 1,
+                    style = TextStyle(color = headerInk(role), fontFamily = labelFamily()),
+                    modifier = GlanceModifier.semantics { testTag = TALL_HEADER_TAG },
+                )
+            } else {
+                FreshnessText(tallHeaderLabel(snapshot, config.mode, freshness), role, TALL_HEADER_TAG)
+            }
         }
         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
             if (rows.isEmpty()) {
@@ -349,7 +367,11 @@ private fun WidgetFeedRow(row: WidgetRow, now: Instant) {
         Text(
             "${row.kind.name} #${row.number} \u00b7 ${Ages.format(row.updatedAt, now)}",
             maxLines = 1,
-            style = TextStyle(color = GlanceTheme.colors.primary, fontWeight = FontWeight.Bold),
+            style = TextStyle(
+                color = GlanceTheme.colors.primary,
+                fontWeight = FontWeight.Bold,
+                fontFamily = labelFamily(),
+            ),
         )
         Text(
             Sanitize.displayText(row.title),

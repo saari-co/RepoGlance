@@ -3,6 +3,7 @@ package co.saari.repoglance.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -30,6 +31,7 @@ import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.model.ValueBasis
+import co.saari.repoglance.render.CiColorRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.CatalogNamesStore
@@ -43,25 +45,34 @@ class StackWidget : GlanceAppWidget() {
         val read = { readStackWidgetData(context) }
         val initial = readWidgetStores(read)
 
+        val tones = WidgetTones.of(context)
         provideContent {
             val data = redrawnWidgetData(initial, read)
             val entries = data.entries
             val catalogIntent = liveCatalogIntent(context)
 
-            GlanceTheme {
-                Column(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .background(GlanceTheme.colors.background),
-                ) {
-                    StackHeader(stackHeaderLabel(entries.size, data.freshness), catalogIntent)
-                    LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
-                        if (entries.isEmpty()) {
-                            item { StackEmpty(catalogIntent) }
-                        } else {
-                            items(entries.size) { index ->
-                                val entry = entries[index]
-                                StackRow(liveRepositoryIntent(context, entry.repo), entry, data.freshness)
+            CompositionLocalProvider(LocalWidgetTones provides tones) {
+                TallLook {
+                    GlanceTheme {
+                        Column(
+                            modifier = GlanceModifier
+                                .fillMaxSize()
+                                .background(GlanceTheme.colors.background),
+                        ) {
+                            StackHeader(
+                                stackHeaderLabel(entries.size, data.freshness),
+                                catalogIntent,
+                                CiColorRole.NEGATIVE.takeIf { data.freshness.rateLimitedUntil != null },
+                            )
+                            LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+                                if (entries.isEmpty()) {
+                                    item { StackEmpty(catalogIntent) }
+                                } else {
+                                    items(entries.size) { index ->
+                                        val entry = entries[index]
+                                        StackRow(liveRepositoryIntent(context, entry.repo), entry, data.freshness)
+                                    }
+                                }
                             }
                         }
                     }
@@ -154,18 +165,18 @@ private fun liveCatalogIntent(context: Context): Intent = Intent(context, MainAc
 }
 
 @Composable
-private fun StackHeader(label: String, catalogIntent: Intent) {
+internal fun StackHeader(label: String, catalogIntent: Intent, role: CiColorRole?) {
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .background(GlanceTheme.colors.surfaceVariant)
+            .background(headerBackground(role))
             .clickable(actionStartActivity(catalogIntent))
             .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Text(
             label,
             maxLines = 1,
-            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
+            style = TextStyle(color = headerInk(role), fontWeight = FontWeight.Bold, fontFamily = labelFamily()),
             modifier = GlanceModifier.semantics { testTag = STACK_HEADER_TAG },
         )
     }
@@ -184,8 +195,8 @@ private fun StackEmpty(catalogIntent: Intent) {
 }
 
 @Composable
-private fun StackRow(rowIntent: Intent, entry: StackEntry, freshness: WidgetFreshness) {
-    val stale = entry.snapshot?.valueBasis != ValueBasis.EXACT
+internal fun StackRow(rowIntent: Intent, entry: StackEntry, freshness: WidgetFreshness) {
+    val role = freshnessRole(entry.snapshot, freshness.copy(rateLimitedUntil = null))
     Column(
         modifier = GlanceModifier
             .fillMaxWidth()
@@ -200,21 +211,13 @@ private fun StackRow(rowIntent: Intent, entry: StackEntry, freshness: WidgetFres
                 modifier = GlanceModifier.defaultWeight(),
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
-            Text(
-                stackRowAge(entry.snapshot, freshness),
-                maxLines = 1,
-                style = TextStyle(
-                    color = if (stale) GlanceTheme.colors.error else GlanceTheme.colors.onSurfaceVariant,
-                    fontWeight = if (stale) FontWeight.Bold else FontWeight.Normal,
-                ),
-                modifier = GlanceModifier.semantics { testTag = STACK_AGE_TAG },
-            )
+            FreshnessText(stackRowAge(entry.snapshot, freshness), role, STACK_AGE_TAG)
         }
         stackRowCounts(entry.snapshot)?.let { counts ->
             Text(
                 counts,
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontFamily = labelFamily()),
                 modifier = GlanceModifier.semantics { testTag = STACK_COUNTS_TAG },
             )
         }

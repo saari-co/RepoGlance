@@ -93,3 +93,5 @@ Compose:
     allowedCompositionLocals:
       - LocalLabelType
       - LocalControlShape
+      - LocalWidgetLook
+      - LocalWidgetTones

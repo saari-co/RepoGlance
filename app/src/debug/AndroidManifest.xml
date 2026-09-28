@@ -31,6 +31,10 @@
             android:exported="true"
             android:label="GrillTrack shape picker" />
         <activity
+            android:name="co.saari.repoglance.devpicker.WidgetLookVariantPickerActivity"
+            android:exported="true"
+            android:label="GrillTrack widget-look picker" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.CheckingPreviewActivity"
             android:exported="true"
             android:label="verify-repoglance checking preview" />

@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-28T18:34:27+00:00",
-    "domain": "family-look round 3: shape and control language (chips, status pills, buttons, banners, cards/rows)",
-    "started_at": "2026-09-28T18:24:58+00:00",
+    "confirmed_at": "2026-09-28T21:42:52+00:00",
+    "domain": "family-look round 4: widget freshness colour and label face (repo + stack widgets)",
+    "started_at": "2026-09-28T20:34:23+00:00",
     "status": "confirmed",
-    "summary": "Maintainer confirmed 2026-09-28 ('yes'): C Google tonal is production ControlShape.Default for chips, pills, primary buttons, banners, repo cards; secondary buttons borderless; FilterChips/segmented/widget-config button and list rows stay M3 (follow-up); widgets/tile untouched."
+    "summary": "Maintainer 2026-09-28 ('1; build it'): H is the production WidgetLook default; compact floor crowding (repo name lost behind the last-good capsule at 120x64) is a known follow-up round; widget CI and tile deferred."
   },
   "decisions": [
     {
@@ -3842,15 +3842,137 @@
           "result": "clean",
           "reviewed_at": "2026-09-28T18:58:03+00:00",
           "source_identity": "git:bd785cf627fe824abcaf21ddf055fbbcae1ad54e"
+        },
+        {
+          "classifications": [],
+          "ref": "clawsweeper:PR38 ff8b4c2 proof sufficient, ready for maintainer look; openclaw:req-20260928T195525Z-18915991208 correct(0.98); CI build green",
+          "result": "clean",
+          "reviewed_at": "2026-09-28T20:14:30+00:00",
+          "source_identity": "git:ff8b4c21defb5c2c16f4c14ca9f85518d67953ed"
         }
       ],
-      "review_ref": "openclaw:req-20260928T185742Z-17786671922 correct(0.98); self-review of diff c821c97..bd785cf no findings",
+      "review_ref": "clawsweeper:PR38 ff8b4c2 proof sufficient, ready for maintainer look; openclaw:req-20260928T195525Z-18915991208 correct(0.98); CI build green",
       "review_result": "clean",
-      "review_source_identity": "git:bd785cf627fe824abcaf21ddf055fbbcae1ad54e",
+      "review_source_identity": "git:ff8b4c21defb5c2c16f4c14ca9f85518d67953ed",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-28T18:58:03+00:00",
+      "updated_at": "2026-09-28T20:14:30+00:00",
       "verification_ref": "file:.grilltrack/proof/shape-control-031-verify-20260928.md"
+    },
+    {
+      "baseline_ref": "git:ee30262ece6f51c97563d9054a25f709d33bc826",
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-4.json"
+      ],
+      "choice": "Hybrid H (maintainer-requested): compact repo widget = C tonal capsule freshness, regular weight, mono labels; tall repo and stack widgets = D family ink, bold, system face. Roles: rate limited failing, last good working, no data neutral.",
+      "context_ref": null,
+      "created_at": "2026-09-28T21:42:52+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "status-colour-029",
+        "label-typography-030"
+      ],
+      "domain": "family-look round 4: widget freshness colour and label face (repo + stack widgets)",
+      "history": [
+        {
+          "at": "2026-09-28T21:42:52+00:00",
+          "choice": "Hybrid H (maintainer-requested): compact repo widget = C tonal capsule freshness, regular weight, mono labels; tall repo and stack widgets = D family ink, bold, system face. Roles: rate limited failing, last good working, no data neutral.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T21:46:59+00:00",
+          "choice": "Hybrid H (maintainer-requested): compact repo widget = C tonal capsule freshness, regular weight, mono labels; tall repo and stack widgets = D family ink, bold, system face. Roles: rate limited failing, last good working, no data neutral.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T21:46:59+00:00",
+          "choice": "Hybrid H (maintainer-requested): compact repo widget = C tonal capsule freshness, regular weight, mono labels; tall repo and stack widgets = D family ink, bold, system face. Roles: rate limited failing, last good working, no data neutral.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/WidgetLook.kt (uncommitted, branch claude/grilltrack-032-widgets)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "widget-look-032",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/WidgetLook.kt (uncommitted, branch claude/grilltrack-032-widgets)",
+      "question": "How do the repo and stack widgets show freshness state, and do widget labels take the mono face?",
+      "rationale": "Maintainer chose option 1 (confirm H, build it)",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-28T21:46:59+00:00",
+      "verification_ref": "file:.grilltrack/proof/widget-look-032-verify-20260928.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Keep the Quick Settings tile as is: stays active when the latest push is over a day old, subtitle 'repo \u00b7 open to refresh'.",
+      "context_ref": "file:app/src/main/java/co/saari/repoglance/tile/TileText.kt",
+      "created_at": "2026-09-28T22:47:05+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "family-look round 4: widget freshness colour and label face (repo + stack widgets)",
+      "history": [
+        {
+          "at": "2026-09-28T22:47:05+00:00",
+          "choice": "Keep the Quick Settings tile as is: stays active when the latest push is over a day old, subtitle 'repo \u00b7 open to refresh'.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "tile-stale-033",
+      "implementation_ref": null,
+      "question": "What should the system-drawn Quick Settings tile do when its data is over a day old?",
+      "rationale": "Maintainer choice",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-09-28T22:47:05+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -3869,16 +3991,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "status colour and mono labels on widgets and the tile",
-      "static brand fallback colour scheme"
+      "static brand fallback scheme for devices without dynamic colour",
+      "tonal shape on the remaining M3 controls (sort chips, segmented buttons, text buttons, list rows)"
     ],
-    "reason": "Pairs with the locked mono labels; chips, pills and buttons are the next visible family signature.",
-    "recommended": "family-look round 3: shape and control language (capsules and outlined state edges vs M3 defaults)",
-    "recorded_at": "2026-09-28T18:16:19+00:00"
+    "reason": "shape-control-031 merged as PR #38 (ee30262); widgets/tile are the last surface without the family look",
+    "recommended": "family-look round 4: status colour and mono labels on widgets and the Quick Settings tile",
+    "recorded_at": "2026-09-28T20:14:54+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-28T18:58:03+00:00"
+  "updated_at": "2026-09-28T22:47:05+00:00"
 }
