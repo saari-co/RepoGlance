@@ -3712,7 +3712,14 @@
     "reason": "family-look round 1 (status-colour-029) is built and check-green at ff7bf76, but the Pixel 10 Pro Fold 59151FDCG000JA is not attached (USB and mdns empty); the device round needs Bobby to plug it in",
     "resumed_at": "2026-09-21T23:49:28+00:00"
   },
-  "pause": null,
+  "pause": {
+    "artifact_refs": [
+      "file:plans/family-look-round-2-handoff-20260928.md"
+    ],
+    "next_safe_action": "In the new session: read the ledger, resume, read plans/family-look-round-2-handoff-20260928.md, agree the exact slot boundary with the maintainer, then run five-candidate rounds on the real app",
+    "paused_at": "2026-09-28T16:20:46+00:00",
+    "reason": "maintainer routed family-look round 2 (label typography) to a fresh sidebar session on 2026-09-28"
+  },
   "recommendation": {
     "alternatives": [
       "family-look: carry the family status tones into the Glance widgets and the Quick Settings tile (today text-only status), keeping the widget ledger composition lock",
@@ -3723,8 +3730,8 @@
     "recorded_at": "2026-09-22T01:09:53+00:00"
   },
   "schema_version": "grilltrack/v0.1",
-  "status": "active",
+  "status": "paused",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-28T16:19:39+00:00"
+  "updated_at": "2026-09-28T16:20:46+00:00"
 }
