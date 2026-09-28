@@ -1,7 +1,8 @@
 # Design contract: RepoGlance
 
-- **Version:** 2 (2026-09-28): label typography [label-typography-030].
-  Version 1 (2026-09-22): status colour [status-colour-029]. Version 0
+- **Version:** 3 (2026-09-28): shape and control language
+  [shape-control-031]. Version 2 (2026-09-28): label typography
+  [label-typography-030]. Version 1 (2026-09-22): status colour [status-colour-029]. Version 0
   (2026-09-21) started the file with constraints only. Nothing in the
   unresolved section is decided.
 - **Canonical path:** `docs/design.md`. The maintainer asked for `design.md`;
@@ -83,6 +84,32 @@
   - **Proof:** `.grilltrack/proof/family-look-round-2-captures-20260928.md`
     (picker) and `.grilltrack/proof/label-typography-030-verify-20260928.md`
     (production).
+- **Shape and control language [shape-control-031, "Google tonal"]:**
+  controls are tonal and borderless; there are no outlines on the seam's
+  controls. The seam is `ui/theme/ControlShape.kt`: sites call
+  `ControlChip`, `StatusPill`, `StatusBanner`, `PrimaryButton`,
+  `SecondaryButton` and `ControlCard`, which read `LocalControlShape`;
+  `ControlShape.Tonal` is the production default and `ControlShape.Material`
+  is the pre-lock M3 look.
+
+  | control | shape | fill / edge |
+  | --- | --- | --- |
+  | chips (Cached, Unknown, Draft, Review requested, LIVE) | 8 dp | `surfaceContainerHigh`, no edge |
+  | status pills | capsule | status container, no edge |
+  | primary buttons | capsule | filled tonal (`secondaryContainer`) |
+  | secondary buttons (pin widgets, connect on error) | capsule | no fill, no edge, primary text |
+  | rate-limit banners | 16 dp | status container, no edge |
+  | repo cards (fixture and live catalog) | 24 dp | `surfaceContainer`, flat, no edge |
+
+  - Outside the seam and still M3 (a follow-up, not decided): the sort
+    FilterChips, the navigator and widget-config segmented buttons, the
+    widget-config button, text buttons, and the navigator / live issue and
+    PR rows (flat rows with dividers).
+  - **Rejected (round 3, do not reintroduce without a new grill):** A M3
+    default; B Intercom outlined capsules with state edges; D squared
+    terminal (4–8 dp, hairline and state edges); E filled capsules with
+    chamfered cards.
+  - **Proof:** `.grilltrack/proof/shape-control-031-verify-20260928.md`.
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
@@ -124,8 +151,8 @@
   family tones is not grilled.
 - **Label typography on widgets and the tile:** Glance surfaces keep their
   own text styles; whether they take the mono labels is not grilled.
-- **Shape and control language:** capsules and outlined state edges versus
-  M3 defaults. Not grilled.
+- **Shape on the remaining M3 controls:** sort chips, segmented buttons,
+  text buttons and list rows kept M3 in round 3. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.
   Not grilled.
 - **Static brand fallback scheme** for devices without dynamic colour. Not

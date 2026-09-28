@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
 import co.saari.repoglance.devpicker.LabelTypeVariantPickerActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
+import co.saari.repoglance.devpicker.ShapeVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
@@ -135,6 +136,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_SPLASH_PICKER = "splash-picker"
         const val SCREEN_STATUS_PICKER = "status-picker"
         const val SCREEN_TYPE_PICKER = "type-picker"
+        const val SCREEN_SHAPE_PICKER = "shape-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
@@ -152,6 +154,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         val FAMILY_PICKERS: Map<String, Class<out Activity>> = mapOf(
             SCREEN_STATUS_PICKER to StatusColourVariantPickerActivity::class.java,
             SCREEN_TYPE_PICKER to LabelTypeVariantPickerActivity::class.java,
+            SCREEN_SHAPE_PICKER to ShapeVariantPickerActivity::class.java,
         )
     }
 }

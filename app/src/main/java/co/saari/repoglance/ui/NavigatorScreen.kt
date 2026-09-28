@@ -31,8 +31,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -89,9 +87,12 @@ import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.state.NavigatorSection
 import co.saari.repoglance.state.SnapshotStore
+import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.LabelRole
 import co.saari.repoglance.ui.theme.LabelText
+import co.saari.repoglance.ui.theme.PrimaryButton
+import co.saari.repoglance.ui.theme.StatusBanner
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -695,15 +696,15 @@ private fun SectionHeader(title: String, list: NavigatorList, now: Instant) {
                 ValueBasis.EXACT -> Unit
                 ValueBasis.LAST_GOOD -> {
                     val chipAge = list.observedAt?.let { Ages.format(it, now) } ?: "unknown"
-                    AssistChip(onClick = {}, label = { LabelText("Cached · $chipAge", LabelRole.CHIP) })
+                    ControlChip(label = { LabelText("Cached · $chipAge", LabelRole.CHIP) })
                 }
-                ValueBasis.UNKNOWN -> AssistChip(onClick = {}, label = { LabelText("Unknown", LabelRole.CHIP) })
+                ValueBasis.UNKNOWN -> ControlChip(label = { LabelText("Unknown", LabelRole.CHIP) })
             }
         }
         SnapshotRendering.rateLimitBanner(list.rateLimit)?.let { banner ->
             val tone = FamilyStatus.colors(MaterialTheme.colorScheme)
                 .tone(SnapshotRendering.rateLimitRole(list.rateLimit))
-            Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
+            StatusBanner(tone = tone, modifier = Modifier.fillMaxWidth()) {
                 LabelText(
                     banner,
                     LabelRole.META,
@@ -759,7 +760,7 @@ private fun NavigatorRowView(
                 )
                 if (item.pr?.isDraft == true) {
                     Spacer(modifier = Modifier.width(4.dp))
-                    AssistChip(onClick = {}, label = { LabelText("Draft", LabelRole.CHIP) })
+                    ControlChip(label = { LabelText("Draft", LabelRole.CHIP) })
                 }
             }
             Text(item.state, style = MaterialTheme.typography.labelSmall)
@@ -810,7 +811,7 @@ internal fun DetailPane(item: RowItem?, now: Instant, onOpenGitHub: (RowItem) ->
             Text("CI: " + SnapshotRendering.ciLabel(pr.ciRollup))
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Button(
+        PrimaryButton(
             onClick = { onOpenGitHub(item) },
             modifier = Modifier.testTag("repoglance:navigator-open-github"),
         ) {

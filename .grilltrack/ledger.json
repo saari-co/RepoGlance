@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-28T18:14:44+00:00",
-    "domain": "family-look round 2: label typography (section heads, chips, age/rate-limit lines, button labels; body stays M3)",
-    "started_at": "2026-09-28T16:22:13+00:00",
-    "status": "inspected",
-    "summary": "Maintainer confirmed 2026-09-28 ('yes, build it'): D mono as production default; live screen labels via LabelText; Space Grotesk removed; design.md v2; Fold proof."
+    "confirmed_at": "2026-09-28T18:34:27+00:00",
+    "domain": "family-look round 3: shape and control language (chips, status pills, buttons, banners, cards/rows)",
+    "started_at": "2026-09-28T18:24:58+00:00",
+    "status": "confirmed",
+    "summary": "Maintainer confirmed 2026-09-28 ('yes'): C Google tonal is production ControlShape.Default for chips, pills, primary buttons, banners, repo cards; secondary buttons borderless; FilterChips/segmented/widget-config button and list rows stay M3 (follow-up); widgets/tile untouched."
   },
   "decisions": [
     {
@@ -3769,6 +3769,88 @@
       "superseded_by": null,
       "updated_at": "2026-09-28T18:14:44+00:00",
       "verification_ref": "file:.grilltrack/proof/label-typography-030-verify-20260928.md"
+    },
+    {
+      "baseline_ref": "git:c821c979f8b4f0e13828eb4b353a4c516967633e",
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-3.json"
+      ],
+      "choice": "C Google tonal: borderless tonal 8 dp chips, tonal capsule status pills, tonal capsule primary buttons, 16 dp tonal banners, 24 dp flat tonal cards; no outlines",
+      "context_ref": null,
+      "created_at": "2026-09-28T18:32:06+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "status-colour-029",
+        "label-typography-030"
+      ],
+      "domain": "family-look round 3: shape and control language (chips, status pills, buttons, banners, cards/rows)",
+      "history": [
+        {
+          "at": "2026-09-28T18:32:06+00:00",
+          "choice": "C Google tonal: borderless tonal 8 dp chips, tonal capsule status pills, tonal capsule primary buttons, 16 dp tonal banners, 24 dp flat tonal cards; no outlines",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:44:22+00:00",
+          "choice": "C Google tonal: borderless tonal 8 dp chips, tonal capsule status pills, tonal capsule primary buttons, 16 dp tonal banners, 24 dp flat tonal cards; no outlines",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:44:22+00:00",
+          "choice": "C Google tonal: borderless tonal 8 dp chips, tonal capsule status pills, tonal capsule primary buttons, 16 dp tonal banners, 24 dp flat tonal cards; no outlines",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/ui/theme/ControlShape.kt (uncommitted, branch claude/grilltrack-031-shape)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "shape-control-031",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/ui/theme/ControlShape.kt (uncommitted, branch claude/grilltrack-031-shape)",
+      "question": "What shape and control language do chips, status pills, buttons, banners and cards/rows use?",
+      "rationale": "Maintainer picked C on the live Fold picker 2026-09-28",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": "openclaw:req-20260928T185742Z-17786671922 correct(0.98); self-review of diff c821c97..bd785cf no findings",
+          "result": "clean",
+          "reviewed_at": "2026-09-28T18:58:03+00:00",
+          "source_identity": "git:bd785cf627fe824abcaf21ddf055fbbcae1ad54e"
+        }
+      ],
+      "review_ref": "openclaw:req-20260928T185742Z-17786671922 correct(0.98); self-review of diff c821c97..bd785cf no findings",
+      "review_result": "clean",
+      "review_source_identity": "git:bd785cf627fe824abcaf21ddf055fbbcae1ad54e",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-28T18:58:03+00:00",
+      "verification_ref": "file:.grilltrack/proof/shape-control-031-verify-20260928.md"
     }
   ],
   "last_activation": {
@@ -3798,5 +3880,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-28T18:16:19+00:00"
+  "updated_at": "2026-09-28T18:58:03+00:00"
 }
