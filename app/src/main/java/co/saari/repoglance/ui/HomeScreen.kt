@@ -21,18 +21,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -54,10 +49,16 @@ import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
+import co.saari.repoglance.ui.theme.ControlCard
+import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.LabelRole
 import co.saari.repoglance.ui.theme.LabelText
+import co.saari.repoglance.ui.theme.PrimaryButton
+import co.saari.repoglance.ui.theme.SecondaryButton
+import co.saari.repoglance.ui.theme.StatusBanner
 import co.saari.repoglance.ui.theme.StatusColors
+import co.saari.repoglance.ui.theme.StatusPill
 import co.saari.repoglance.widget.RepoWidgetConfigActivity
 import co.saari.repoglance.widget.RepoWidgetReceiver
 import co.saari.repoglance.widget.StackWidgetReceiver
@@ -119,7 +120,7 @@ fun HomeScreen(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        Button(
+        PrimaryButton(
             onClick = onOpenNavigator,
             modifier = Modifier.fillMaxWidth().testTag("repoglance:fixture-navigator"),
         ) {
@@ -135,7 +136,7 @@ private fun PinWidgetsRow() {
     val context = LocalContext.current
     val appWidgetManager = remember { AppWidgetManager.getInstance(context) }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(
+        SecondaryButton(
             modifier = Modifier.weight(1f),
             onClick = {
                 if (appWidgetManager.isRequestPinAppWidgetSupported) {
@@ -155,7 +156,7 @@ private fun PinWidgetsRow() {
         ) {
             LabelText("Pin repo widget", LabelRole.BUTTON)
         }
-        OutlinedButton(
+        SecondaryButton(
             modifier = Modifier.weight(1f),
             onClick = {
                 if (appWidgetManager.isRequestPinAppWidgetSupported) {
@@ -214,7 +215,7 @@ private fun RepoCard(
     statusColors: StatusColors,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(onClick = onOpenRepo, modifier = modifier.padding(vertical = 4.dp)) {
+    ControlCard(onClick = onOpenRepo, modifier = modifier.padding(vertical = 4.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -235,7 +236,7 @@ private fun RepoCard(
             }
             SnapshotRendering.rateLimitBanner(snapshot.rateLimit)?.let { banner ->
                 val tone = statusColors.tone(SnapshotRendering.rateLimitRole(snapshot.rateLimit))
-                Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
+                StatusBanner(tone = tone, modifier = Modifier.fillMaxWidth()) {
                     LabelText(
                         banner,
                         LabelRole.META,
@@ -250,7 +251,7 @@ private fun RepoCard(
                 CiStatus(snapshot.defaultBranchCi, statusColors)
                 SnapshotRendering.ageChip(snapshot, now)?.let { chip ->
                     Spacer(modifier = Modifier.width(8.dp))
-                    AssistChip(onClick = {}, label = { LabelText("Cached · $chip", LabelRole.CHIP) })
+                    ControlChip(label = { LabelText("Cached · $chip", LabelRole.CHIP) })
                 }
             }
             Text(
@@ -280,7 +281,7 @@ private fun RepoCard(
 @Composable
 private fun CiStatus(ci: CiState, statusColors: StatusColors) {
     val tone = statusColors.tone(CiSemanticRole.of(ci))
-    Surface(color = tone.container, shape = CircleShape) {
+    StatusPill(tone = tone) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),

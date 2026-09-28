@@ -30,12 +30,9 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
@@ -44,7 +41,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -88,9 +84,13 @@ import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.ui.brand.CheckingMark
+import co.saari.repoglance.ui.theme.ControlCard
+import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.LabelRole
 import co.saari.repoglance.ui.theme.LabelText
+import co.saari.repoglance.ui.theme.PrimaryButton
+import co.saari.repoglance.ui.theme.SecondaryButton
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -205,7 +205,7 @@ private fun AwaitingGitHubScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
-            Button(
+            PrimaryButton(
                 onClick = { onCopyCodeAndOpenGitHub(userCode, verificationUri) },
                 enabled = minutesRemaining > 0L,
                 modifier = Modifier.testTag("repoglance:copy-code"),
@@ -248,7 +248,7 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
-            Button(
+            PrimaryButton(
                 onClick = onConnectGitHub,
                 enabled = connectionReady,
                 modifier = Modifier.testTag("repoglance:connect-github"),
@@ -349,10 +349,10 @@ private fun FailureScreen(
             }
             Spacer(Modifier.height(20.dp))
             if (!needsNewSignIn) {
-                Button(onClick = onRetry) { LabelText("Try again", LabelRole.BUTTON) }
+                PrimaryButton(onClick = onRetry) { LabelText("Try again", LabelRole.BUTTON) }
                 Spacer(Modifier.height(8.dp))
             }
-            OutlinedButton(onClick = onConnectGitHub, enabled = connectionReady) {
+            SecondaryButton(onClick = onConnectGitHub, enabled = connectionReady) {
                 LabelText(if (needsNewSignIn) "Reconnect GitHub" else "Start a new sign-in", LabelRole.BUTTON)
             }
         }
@@ -432,8 +432,7 @@ private fun LiveRepositoryHome(
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            AssistChip(
-                                onClick = {},
+                            ControlChip(
                                 label = { LabelText("LIVE", LabelRole.CHIP) },
                                 modifier = Modifier.testTag("repoglance:live"),
                             )
@@ -554,7 +553,7 @@ private fun LiveRepositoryHome(
                     ) {
                         Text("No repositories are shared with RepoGlance")
                         Spacer(Modifier.height(12.dp))
-                        Button(onClick = onManageGitHubAccess) {
+                        PrimaryButton(onClick = onManageGitHubAccess) {
                             LabelText("Choose repositories on GitHub", LabelRole.BUTTON)
                         }
                     }
@@ -577,7 +576,7 @@ private fun LiveRepositoryHome(
                     }
                 }
                 items(matchingRepositories, key = { it.id }) { repository ->
-                    ElevatedCard(
+                    ControlCard(
                         onClick = { onSelectRepository(repository) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     ) {
@@ -888,9 +887,9 @@ private fun LivePullRequestRow(pullRequest: LivePullRequest, now: Instant, onOpe
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f),
                 )
-                if (pullRequest.isDraft) AssistChip(onClick = {}, label = { LabelText("Draft", LabelRole.CHIP) })
+                if (pullRequest.isDraft) ControlChip(label = { LabelText("Draft", LabelRole.CHIP) })
                 if (pullRequest.reviewRequestedFromViewer) {
-                    AssistChip(onClick = {}, label = { LabelText("Review requested", LabelRole.CHIP) })
+                    ControlChip(label = { LabelText("Review requested", LabelRole.CHIP) })
                 }
             }
             Text(

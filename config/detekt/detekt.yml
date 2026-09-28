@@ -92,3 +92,4 @@ Compose:
     active: true
     allowedCompositionLocals:
       - LocalLabelType
+      - LocalControlShape
