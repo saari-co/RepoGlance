@@ -8,7 +8,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 
 enum class LabelRole { SECTION, CHIP, META, BUTTON }
 
@@ -30,7 +33,23 @@ data class LabelType(
     }
 
     companion object {
-        val Default = LabelType()
+        val Material = LabelType()
+
+        val Mono = LabelType(
+            section = LabelStyle(mono(12f, FontWeight.SemiBold)),
+            chip = LabelStyle(mono(12.5f, FontWeight.Normal)),
+            meta = LabelStyle(mono(11f, FontWeight.Normal)),
+            button = LabelStyle(mono(14f, FontWeight.Medium)),
+        )
+
+        val Default = Mono
+
+        private fun mono(size: Float, weight: FontWeight) = TextStyle(
+            fontFamily = FontFamily.Monospace,
+            fontSize = size.sp,
+            fontWeight = weight,
+            letterSpacing = 0.sp,
+        )
     }
 }
 

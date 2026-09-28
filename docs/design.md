@@ -1,6 +1,7 @@
 # Design contract: RepoGlance
 
-- **Version:** 1 (2026-09-22): status colour [status-colour-029]. Version 0
+- **Version:** 2 (2026-09-28): label typography [label-typography-030].
+  Version 1 (2026-09-22): status colour [status-colour-029]. Version 0
   (2026-09-21) started the file with constraints only. Nothing in the
   unresolved section is decided.
 - **Canonical path:** `docs/design.md`. The maintainer asked for `design.md`;
@@ -57,9 +58,31 @@
   is checked; still under reduced motion.
 - **App start [cold-start-icon-028]:** the start window matches the M3
   dynamic background on API 34+; API 31–33 is an approximate fallback.
-- **Typography:** M3 default type scale, system font. Section heads
-  ("Issues", "PRs") are `titleSmall`; ages and rate-limit lines are
-  `labelSmall`.
+- **Typography, body:** M3 default type scale on the system font for
+  titles, row text and reading text.
+- **Typography, labels [label-typography-030, "mono labels"]:** every label
+  is set in the system monospace (`FontFamily.Monospace`), sentence case, no
+  tracking, no bundled font. The seam is `ui/theme/LabelType.kt`: label sites
+  call `LabelText(text, LabelRole.X)`, which merges the role's style over
+  the site's base style; `LabelType.Mono` is the production default and
+  `LabelType.Material` is the pre-lock M3 look.
+
+  | role | covers | size / weight |
+  | --- | --- | --- |
+  | SECTION | "Issues", "PRs", "Sort", "Fixture state" heads | 12 sp / 600 |
+  | CHIP | Cached · age, Unknown, Draft, Review requested, LIVE, sort chips, status pills | 12.5 sp / 400 |
+  | META | data-age lines, pushed/updated lines, rate-limit lines and banners | 11 sp / 400 |
+  | BUTTON | button, text-button and segmented-button labels | 14 sp / 500 |
+
+  - Menu items, text fields, titles, row text, the sign-in code and dialog
+    bodies are not labels and stay M3.
+  - **Rejected (round 2, do not reintroduce without a new grill):** A M3
+    default; B Intercom's uppercase tracked structure on the system font;
+    C Space Grotesk bundled for labels (APK weight and an OFL file); E
+    heavier, larger sentence-case "expressive" labels.
+  - **Proof:** `.grilltrack/proof/family-look-round-2-captures-20260928.md`
+    (picker) and `.grilltrack/proof/label-typography-030-verify-20260928.md`
+    (production).
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
@@ -85,7 +108,7 @@
     on-container L 30 / C 45. Dark (background luminance below 0.5): ink L
     capped at 78; container L 30 / C 30; on-container L 90 / C 20.
   - **Application:** status is a tonal pill (`CircleShape` container, 8 dp
-    ink dot, `labelLarge` on-container text) on catalog cards; rate-limit
+    ink dot, CHIP-role mono on-container text) on catalog cards; rate-limit
     banners use the container/on-container pair; the live screen's
     rate-limit line uses the ink. Saturated dots are gone.
   - **Rejected (round 1, do not reintroduce without a new grill):** A dynamic
@@ -99,8 +122,8 @@
 - **Status colour on widgets and the tile:** the Glance widgets and the
   Quick Settings tile still show status as text only; whether they carry the
   family tones is not grilled.
-- **Label typography:** whether RepoGlance adopts a shared label face or
-  style with Intercom (uppercase section heads, chips). Not grilled.
+- **Label typography on widgets and the tile:** Glance surfaces keep their
+  own text styles; whether they take the mono labels is not grilled.
 - **Shape and control language:** capsules and outlined state edges versus
   M3 defaults. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.

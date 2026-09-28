@@ -42,7 +42,9 @@ class DeviceAuthorizationUiGuardTest {
         )
         assertTrue(
             "The user must still be able to cancel the pending authorization",
-            authorizationScreen.contains("TextButton(onClick = onCancel) { Text(\"Cancel sign-in\") }"),
+            authorizationScreen.contains(
+                "TextButton(onClick = onCancel) { LabelText(\"Cancel sign-in\", LabelRole.BUTTON) }",
+            ),
         )
         assertEquals(
             "The copy-and-open callback must have exactly one invocation in the UI source",
