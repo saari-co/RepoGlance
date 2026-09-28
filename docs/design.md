@@ -91,7 +91,8 @@
   - **Rejected (round 1, do not reintroduce without a new grill):** A dynamic
     roles (ok/working indistinct on blue wallpapers); B fixed hues
     unharmonised; C harmonised dots; D ink-only monochrome.
-  - **Proof:** `.grilltrack/proof/family-look-round-1-captures-20260921.md`.
+  - **Proof:** `.grilltrack/proof/family-look-round-1-captures-20260921.md`
+    (catalog, navigator banner and live rate-limit ink all seen on the Fold).
 
 ## Unresolved (decided by GrillTrack, one slot per round)
 

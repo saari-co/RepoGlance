@@ -93,3 +93,23 @@
 | frame | sha256 |
 | --- | --- |
 | prod-fix-EXACT-top.png | 41dd9cecec4d5d7e3a0c8ae7417dbca13c3fb6314db7dc90051858d5c49a2e48 |
+
+## Coverage gap closed (2026-09-28)
+
+- ClawSweeper on PR #36 (head a880788) left one P1 merge-risk item: the navigator
+  rate-limit banner and the live rate-limit ink were not device-verified. Same Fold,
+  light mode, unlocked, debug build of a880788.
+- Navigator: `launch EXACT navigator acme/rocket BOTH`, Filters menu, fixture state
+  Rate-limited; the list shows the "Rate-limited — backing off" banner in the failing
+  container tone.
+- Live: debug fault `rateFault LOW` armed through the scenario launcher, live catalog
+  launched twice so the recorded LOW bucket is displayed, catalog filtered to
+  `saari-co/RepoGlance` (the dump holds no other repository label) before capture;
+  the line reads "GitHub rate limit is low: 250 remaining" in the working (amber)
+  ink. Fault disarmed afterwards (`rateFault OFF`), app force-stopped, MIXED restored.
+- Both frames: matching before/after dumps, `co.saari.repoglance` only.
+
+| frame | sha256 |
+| --- | --- |
+| live-low-ink.png | 0de61a78e4cc5bd46a5ce303a7f51b5696dadf6b43f62b30777a94ec685bff17 |
+| nav-ratelimited-banner.png | d47a95584c0b5ad6fde9c0005cafd2ed6b0992995024d049cb9257a6018cbb6b |
