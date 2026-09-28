@@ -89,6 +89,7 @@ import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.state.NavigatorSection
 import co.saari.repoglance.state.SnapshotStore
+import co.saari.repoglance.ui.theme.FamilyStatus
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -692,10 +693,12 @@ private fun SectionHeader(title: String, list: NavigatorList, now: Instant) {
             }
         }
         SnapshotRendering.rateLimitBanner(list.rateLimit)?.let { banner ->
-            Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+            val tone = FamilyStatus.colors(MaterialTheme.colorScheme)
+                .tone(SnapshotRendering.rateLimitRole(list.rateLimit))
+            Surface(color = tone.container, modifier = Modifier.fillMaxWidth()) {
                 Text(
                     banner,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    color = tone.onContainer,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(6.dp),
                 )

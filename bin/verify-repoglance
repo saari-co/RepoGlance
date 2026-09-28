@@ -3,7 +3,7 @@
 # Approved test phones (.claude/skills/verify-repoglance/devices.tsv) over adb only; never drives any other device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
-#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|checking
+#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|status-picker|checking
 #   bin/verify-repoglance dump [label]           # uiautomator tree -> runs/verify-repoglance-runs/<run>/<label>.xml (+ .txt)
 #   bin/verify-repoglance capture <label>        # inner-display PNG + manifest via phone_proof
 #   bin/verify-repoglance tap <resource-id>      # tap the centre of a node by resource-id (from the last dump)
@@ -141,6 +141,7 @@ launch() {
     picker) expect="devpicker.WidgetVariantPickerActivity"; marker="PRODUCTION" ;;
     navigator-picker) expect="devpicker.NavigatorVariantPickerActivity"; marker="deciding: what a row TAP does" ;;
     splash-picker) expect="devpicker.SplashVariantPickerActivity"; marker="checking-splash-018" ;;
+    status-picker) expect="devpicker.StatusColourVariantPickerActivity"; marker="family-look" ;;
     checking) expect="devlaunch.CheckingPreviewActivity"; marker="repoglance:checking-mark" ;;
     signin-finishing) expect="devlaunch.SignInFinishingPreviewActivity"; marker="repoglance:signin-mark" ;;
     navigator) expect="co.saari.repoglance/.MainActivity"; marker="repoglance:fixture-home" ;;
