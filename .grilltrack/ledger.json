@@ -3,11 +3,12 @@
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
     "cadence": "sequential",
-    "confirmed": false,
+    "confirmed": true,
+    "confirmed_at": "2026-09-28T18:14:44+00:00",
     "domain": "family-look round 2: label typography (section heads, chips, age/rate-limit lines, button labels; body stays M3)",
     "started_at": "2026-09-28T16:22:13+00:00",
-    "status": "grilling",
-    "summary": "Maintainer confirmed scope 2026-09-28: all four label roles in; body text stays M3 default."
+    "status": "confirmed",
+    "summary": "Maintainer confirmed 2026-09-28 ('yes, build it'): D mono as production default; live screen labels via LabelText; Space Grotesk removed; design.md v2; Fold proof."
   },
   "decisions": [
     {
@@ -3695,6 +3696,79 @@
       "superseded_by": null,
       "updated_at": "2026-09-22T01:09:53+00:00",
       "verification_ref": "file:.grilltrack/proof/family-look-round-1-captures-20260921.md (47 fail-closed captures on the Fold incl. prod-fix-EXACT-top at 1a286d8; ./gradlew check green)"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-2.json"
+      ],
+      "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+      "context_ref": "file:.grilltrack/proof/family-look-round-2-captures-20260928.md",
+      "created_at": "2026-09-28T17:59:42+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "status-colour-029"
+      ],
+      "domain": "family-look round 2: label typography (section heads, chips, age/rate-limit lines, button labels; body stays M3)",
+      "history": [
+        {
+          "at": "2026-09-28T17:59:42+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:14:44+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-28T18:14:44+00:00",
+          "choice": "D mono labels: section heads, chips/status pills, age and rate-limit lines and button labels set in the system monospace (heads 12 sp/600, chips 12.5 sp/400, ages 11 sp/400, buttons 14 sp/500); body text stays M3; no bundled font.",
+          "from": "implemented",
+          "implementation_ref": "git:453420351dd8479999843858888e2d1405a5d6c0",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "label-typography-030",
+      "implementation_ref": "git:453420351dd8479999843858888e2d1405a5d6c0",
+      "question": "How does RepoGlance set its labels (section heads, chips, age/rate-limit lines, button labels)?",
+      "rationale": "maintainer chose D",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-28T18:14:44+00:00",
+      "verification_ref": "file:.grilltrack/proof/label-typography-030-verify-20260928.md"
     }
   ],
   "last_activation": {
@@ -3724,5 +3798,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-28T16:22:13+00:00"
+  "updated_at": "2026-09-28T18:14:44+00:00"
 }
