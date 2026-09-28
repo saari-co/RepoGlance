@@ -88,3 +88,7 @@ formatting:
 
 Compose:
   active: true
+  CompositionLocalAllowlist:
+    active: true
+    allowedCompositionLocals:
+      - LocalLabelType
