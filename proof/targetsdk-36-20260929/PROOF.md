@@ -102,8 +102,9 @@ RESULT onResume #2                          11:38:41.430
 
 ## Not proven here
 
-- **Real end-to-end sign-in at targetSdk 36.** Human-gated: the maintainer
-  signs in. The probe proves the launch is allowed, not the full flow.
+- **Automatic return after a slow sign-in.** The maintainer-driven sign-in
+  below completed at targetSdk 36, but RepoGlance did not come back over the
+  GitHub tab by itself. See that section.
 - **Fold inner display after BACK, and the Fold two-pane detail.** Not re-run
   because the Fold was in use by another agent. The XL covers the phone
   layout.
@@ -111,3 +112,63 @@ RESULT onResume #2                          11:38:41.430
   depends on the changed platform behaviours above.
 - **#32.** Leaving the GitHub tab for another app before the token lands is
   still deferred.
+
+## Real GitHub sign-in at targetSdk 36 (maintainer-driven, 2026-09-29)
+
+ClawSweeper's P1 on this PR asked for a real device-flow sign-in on a
+targetSdk 36 build.
+
+- **Device:** Pixel 10 Pro XL `63310DLCQ000RV`, Android 17.
+- **Build:** this branch's debug APK
+  `e2add2aa6ec7c3ecf6d0b3ae940711e46831a84b07a2f770c1caffefbd8a2b97`
+  (`targetSdk=36`; `doctor` passed, and the device APK equals the local
+  build). The phone had no session beforehand.
+- **Operator:** the maintainer signed in. The agent ran no dump, tap or
+  capture while a code was on screen.
+- **Evidence:** the timeline comes from the `events` log buffer, filtered to
+  RepoGlance and Custom Tab activity lifecycle (component names only), and
+  from `ActivityManager` freezer lines.
+
+| Time | Event |
+| --- | --- |
+| 17:03:16.871 | RepoGlance opens the GitHub verification Custom Tab in its own task (t77) |
+| 17:03:44.244 | `freezing … co.saari.repoglance`: the cached-app freezer suspends RepoGlance behind the tab, 28 s after the tab opened |
+| 17:05:55 | Google account and credential screens (maintainer's sign-in to GitHub) |
+| 17:05:58.386 | `MainActivity` resumes with no `START` for it: a manual switch back, not the self-start |
+| 17:06:00.877 | RepoGlance opens a second verification tab (the "Copy code & open GitHub" pattern) |
+| 17:06:08 | passkey authentication in the tab |
+| 17:07:11.509 | `freezing … co.saari.repoglance` again, 71 s after the second tab opened |
+| ~17:10 | GitHub shows "Congratulations, you're all set". Over 10 s of checks, RepoGlance is still `isFrozen=true` and the tab is still top-resumed. No self-start. |
+| 17:11:06.819 | Maintainer closes the tab (`wm_finish_activity … app-request`) |
+| 17:11:06.895 | `MainActivity` resumes and thaws. The resume wake rechecks GitHub, the token lands, and the catalog loads. |
+
+The result:
+
+- **Sign-in completes at targetSdk 36.** After the tab closed, the live
+  catalog loaded. The task held only `MainActivity`; no Custom Tab was left
+  behind.
+  - After a force-stop and relaunch, the dump has `repoglance:live` and
+    `repoglance:refresh-repositories`, with no `Connect GitHub`. The
+    encrypted session persisted.
+  - Filtered capture `signin-live-filtered`: the only repository-shaped
+    label in the dump is `saari-co/RepoGlance`.
+    SHA-256 `89bdaeadd9a3b866b9cc92fb839b13900d80ae00c47118b43a95e58e318e750d`.
+- **Background-launch blocks:** 0 logged for RepoGlance. No StrictMode disk
+  violation came from RepoGlance frames.
+- **The automatic return did not happen in this run.** RepoGlance was frozen
+  both times it sat behind the tab. A frozen process cannot poll GitHub, so
+  the self-start in `returnFromGitHubVerification` never had a token to
+  react to. The code screen's fallback ("If it doesn't, close the GitHub
+  tab") is what completed sign-in.
+- **Attribution: probably not specific to targetSdk 36.** The cached-app
+  freezer applies regardless of target SDK. The earlier targetSdk 35 proof
+  (`proof/signin-return-20260921/PROOF.md`) completed authorization quickly.
+  An A/B on a targetSdk 35 build would need the maintainer to disconnect and
+  sign in again, so it was not run.
+  - The freezer's threshold was not isolated. Freezes were logged 28 s and
+    71 s after the tab opened, while a real sign-in here, with a passkey and
+    a typed code, took several minutes.
+- **Product gap, not a regression in this diff.** Automatic return only
+  works when authorization finishes before Android freezes the backgrounded
+  app. `AGENTS.md` rules out a wakelock or foreground polling service, so
+  closing the gap needs its own decision. It sits next to #32.
