@@ -7,7 +7,7 @@ The compact home-screen widget shows one repository's open issues, open PRs, and
 - `compact-exact` renders live counts with the clock time they were observed (`17:00`, `Mon 19:00` from an earlier day).
 - `compact-last-good` renders preserved counts with `last good <time>` in an amber family capsule on its own row under the repo name, and the counts merge onto one line (`12 issues · 4 PRs`); while the rate limit is exhausted the capsule is red and reads `rate limited · <time>` (widget-look-032, compact-crowding-034).
 - `compact-no-data` renders a neutral `no data` capsule and an em dash per count (`— issues · — PRs`), never `0`.
-- `compact-sizes` keeps every state legible from the 140x64dp floor (the widget's minimum width since compact-crowding-034) through 180x64 and 250x90dp; the `to review` count appears only at the wide size.
+- `compact-sizes` keeps every state legible from the 140x64dp floor (the widget's minimum width since compact-crowding-034) through 180x64 and 250x90dp with a 24-hour clock. With a 12-hour clock, `last good <day> <h:mm AM>` (data older than today) and `rate limited · <h:mm AM>` truncate at 140x64 and at the Fold's 148x89: a known, deferred gap (compact-12h-fit-035), not a pass. The `to review` count appears only when the widget is at least 84dp tall (148x89 and 250x90).
 
 ## How to get to it (user POV)
 
