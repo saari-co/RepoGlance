@@ -2,6 +2,7 @@ package co.saari.repoglance.state
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import co.saari.repoglance.model.CiState
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.model.RepoRef
@@ -19,14 +20,14 @@ object LiveSnapshotStore {
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun save(context: Context, snapshot: RepoSnapshot) {
-        prefs(context).edit().putString(snapshot.repo.full, encode(snapshot)).apply()
+        prefs(context).edit { putString(snapshot.repo.full, encode(snapshot)) }
     }
 
     fun load(context: Context, repo: RepoRef): RepoSnapshot? =
         prefs(context).getString(repo.full, null)?.let { decode(repo, it) }
 
     fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit { clear() }
     }
 
     internal fun encode(snapshot: RepoSnapshot): String = JSONObject().apply {

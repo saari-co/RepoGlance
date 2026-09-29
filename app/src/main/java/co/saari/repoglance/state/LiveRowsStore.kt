@@ -2,6 +2,7 @@ package co.saari.repoglance.state
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import co.saari.repoglance.data.LiveIssue
 import co.saari.repoglance.data.LivePullRequest
 import co.saari.repoglance.model.RepoRef
@@ -22,14 +23,14 @@ object LiveRowsStore {
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun save(context: Context, repo: RepoRef, rows: List<WidgetRow>) {
-        prefs(context).edit().putString(repo.full, encode(rows)).apply()
+        prefs(context).edit { putString(repo.full, encode(rows)) }
     }
 
     fun load(context: Context, repo: RepoRef): List<WidgetRow> =
         prefs(context).getString(repo.full, null)?.let(::decode).orEmpty()
 
     fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit { clear() }
     }
 
     fun replacementRows(issues: List<LiveIssue>?, pullRequests: List<LivePullRequest>?): List<WidgetRow>? {

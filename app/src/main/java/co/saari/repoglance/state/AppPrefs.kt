@@ -7,6 +7,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.core.content.edit
 import co.saari.repoglance.data.CatalogSort
 import co.saari.repoglance.fixtures.FixtureScenario
 
@@ -26,7 +27,7 @@ object AppPrefs {
     }
 
     fun setSelectedScenario(context: Context, scenario: FixtureScenario) {
-        prefs(context).edit().putString(KEY_SCENARIO, scenario.name).apply()
+        prefs(context).edit { putString(KEY_SCENARIO, scenario.name) }
     }
 
     fun pinnedRepos(context: Context): Set<String> =
@@ -35,7 +36,7 @@ object AppPrefs {
     fun togglePin(context: Context, repoFull: String) {
         val current = pinnedRepos(context)
         val next = if (repoFull in current) current - repoFull else current + repoFull
-        prefs(context).edit().putStringSet(KEY_PINNED, next).apply()
+        prefs(context).edit { putStringSet(KEY_PINNED, next) }
     }
 
     fun livePins(context: Context): Set<String> =
@@ -44,20 +45,20 @@ object AppPrefs {
     fun toggleLivePin(context: Context, repoFull: String) {
         val current = livePins(context)
         val next = if (repoFull in current) current - repoFull else current + repoFull
-        prefs(context).edit().putStringSet(KEY_LIVE_PINS, next).apply()
+        prefs(context).edit { putStringSet(KEY_LIVE_PINS, next) }
     }
 
     fun addLivePin(context: Context, repoFull: String) {
-        prefs(context).edit().putStringSet(KEY_LIVE_PINS, livePins(context) + repoFull).apply()
+        prefs(context).edit { putStringSet(KEY_LIVE_PINS, livePins(context) + repoFull) }
     }
 
     fun removeLivePins(context: Context, repoFulls: Collection<String>) {
         if (repoFulls.isEmpty()) return
-        prefs(context).edit().putStringSet(KEY_LIVE_PINS, livePins(context) - repoFulls.toSet()).apply()
+        prefs(context).edit { putStringSet(KEY_LIVE_PINS, livePins(context) - repoFulls.toSet()) }
     }
 
     fun clearLivePins(context: Context) {
-        prefs(context).edit().remove(KEY_LIVE_PINS).apply()
+        prefs(context).edit { remove(KEY_LIVE_PINS) }
     }
 
     @Composable
@@ -70,7 +71,7 @@ object AppPrefs {
     }
 
     fun setCatalogSort(context: Context, sort: CatalogSort) {
-        prefs(context).edit().putString(KEY_CATALOG_SORT, sort.name).apply()
+        prefs(context).edit { putString(KEY_CATALOG_SORT, sort.name) }
     }
 
     @Composable

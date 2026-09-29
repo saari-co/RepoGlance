@@ -1,6 +1,7 @@
 package co.saari.repoglance.hooks
 
 import android.content.Context
+import androidx.core.content.edit
 import co.saari.repoglance.data.HttpRequest
 import co.saari.repoglance.data.HttpResponse
 import co.saari.repoglance.data.HttpTransport
@@ -37,13 +38,14 @@ object TransportFault {
 
     fun arm(context: Context, kind: Kind?, resetSeconds: Long, now: Instant = Instant.now()) {
         val armed = kind?.let { Armed(it, now.plusSeconds(resetSeconds)) }
-        val editor = prefs(context).edit()
-        if (armed == null) {
-            editor.clear()
-        } else {
-            editor.putString(KEY_KIND, armed.kind.name).putString(KEY_RESETS_AT, armed.resetsAt.toString())
+        prefs(context).edit {
+            if (armed == null) {
+                clear()
+            } else {
+                putString(KEY_KIND, armed.kind.name)
+                putString(KEY_RESETS_AT, armed.resetsAt.toString())
+            }
         }
-        editor.apply()
         cached = armed
         loaded = true
     }
@@ -82,11 +84,11 @@ object TransportFault {
     private fun record(context: Context, kind: Kind, status: Int) {
         val prefs = prefs(context)
         val served = "served.${kind.name}"
-        prefs.edit()
-            .putInt(served, prefs.getInt(served, 0) + 1)
-            .putString("$served.lastStatus", status.toString())
-            .putString("$served.lastAt", Instant.now().toString())
-            .apply()
+        prefs.edit {
+            putInt(served, prefs.getInt(served, 0) + 1)
+            putString("$served.lastStatus", status.toString())
+            putString("$served.lastAt", Instant.now().toString())
+        }
     }
 
     private fun isRateHeader(name: String?): Boolean = name?.startsWith("X-RateLimit-", ignoreCase = true) == true

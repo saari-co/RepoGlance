@@ -98,12 +98,12 @@ val releaseKeystoreFile = System.getenv("ANDROID_KEYSTORE_PATH")
 
 android {
     namespace = "co.saari.repoglance"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "co.saari.repoglance"
         minSdk = 31
-        targetSdk = 35
+        targetSdk = 36
         versionCode = repoGlanceVersion.versionCode
         versionName = repoGlanceVersion.versionName
 
@@ -241,6 +241,7 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.browser)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)

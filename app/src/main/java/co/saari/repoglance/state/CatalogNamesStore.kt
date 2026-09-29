@@ -2,6 +2,7 @@ package co.saari.repoglance.state
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
@@ -16,11 +17,11 @@ object CatalogNamesStore {
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun save(context: Context, names: List<String>, viewerLogin: String, pushedAt: Map<String, Instant>) {
-        prefs(context).edit()
-            .putString(KEY_NAMES, JSONArray(names).toString())
-            .putString(KEY_VIEWER, viewerLogin)
-            .putString(KEY_PUSHED_AT, encodePushedAt(pushedAt))
-            .apply()
+        prefs(context).edit {
+            putString(KEY_NAMES, JSONArray(names).toString())
+            putString(KEY_VIEWER, viewerLogin)
+            putString(KEY_PUSHED_AT, encodePushedAt(pushedAt))
+        }
     }
 
     fun pushedAt(context: Context): Map<String, Instant> =
@@ -49,6 +50,6 @@ object CatalogNamesStore {
     }
 
     fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit { clear() }
     }
 }

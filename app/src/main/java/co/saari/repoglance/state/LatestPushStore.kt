@@ -2,6 +2,7 @@ package co.saari.repoglance.state
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import co.saari.repoglance.data.LiveRepository
 import co.saari.repoglance.data.mostRecentlyPushed
 import java.time.Instant
@@ -28,11 +29,11 @@ object LatestPushStore {
     }
 
     fun save(context: Context, record: LatestPushRecord) {
-        prefs(context).edit()
-            .putString(KEY_REPO, record.repoFull)
-            .putLong(KEY_PUSHED_AT, record.pushedAt.toEpochMilli())
-            .putLong(KEY_OBSERVED_AT, record.observedAt.toEpochMilli())
-            .apply()
+        prefs(context).edit {
+            putString(KEY_REPO, record.repoFull)
+            putLong(KEY_PUSHED_AT, record.pushedAt.toEpochMilli())
+            putLong(KEY_OBSERVED_AT, record.observedAt.toEpochMilli())
+        }
     }
 
     fun load(context: Context): LatestPushRecord? {
@@ -47,6 +48,6 @@ object LatestPushStore {
     }
 
     fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit { clear() }
     }
 }
