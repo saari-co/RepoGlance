@@ -19,15 +19,15 @@ import java.time.Instant
 
 object Fixtures {
 
-    private const val YOU = "octodev"
-    private val CAST = listOf("octodev", "mkraft", "jrivera", "tstone")
+    internal const val YOU = "octodev"
+    internal val CAST = listOf("octodev", "mkraft", "jrivera", "tstone")
     private val ROW_REPOS = listOf(
         RepoRef("saari-co", "RepoGlance"),
         RepoRef("dinkuskit", "blocks"),
         RepoRef("acme", "rocket"),
     )
 
-    private val LABEL_POOL = listOf(
+    internal val LABEL_POOL = listOf(
         "bug",
         "enhancement",
         "ci",
@@ -37,7 +37,7 @@ object Fixtures {
         "triage",
     )
 
-    private val TITLE_POOL = listOf(
+    internal val TITLE_POOL = listOf(
         "Fix flaky retry in sync worker",
         "Add pagination to issue navigator",
         "Investigate CI flake on macOS runners",

@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "sequential",
+    "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-09-29T14:10:49+00:00",
-    "domain": "family-look round 5: compact repo widget crowding (stale capsule vs repo name)",
-    "started_at": "2026-09-29T12:59:44+00:00",
+    "confirmed_at": "2026-09-29T18:44:13+00:00",
+    "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+    "started_at": "2026-09-29T17:56:22+00:00",
     "status": "inspected",
-    "summary": "Maintainer 2026-09-29: D is the production compact layout; minWidth 140 dp; tall/stack and capsule colours unchanged."
+    "summary": "Maintainer confirmed 2026-09-29 ('confirmed, go ahead and build it'): build sample-app-038 as summarised \u2014 in-app sample mode on the real screens, fictional corpus, no network/token access, separate sample pins, provisional SAMPLE chip, sign-in exit without a code request, sample-item note, persistence until sign-in, verify-repoglance feature file; verify with unit tests, build+check, and the Pixel 10 Pro XL."
   },
   "decisions": [
     {
@@ -4097,34 +4097,256 @@
       "superseded_by": null,
       "updated_at": "2026-09-29T14:38:45+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "B first: an in-app sample-data mode reachable from the sign-in screen, built on the existing fixture corpus and labelled as sample on every surface, declared in Play Console App access. Fallback A (a dedicated reviewer GitHub account with instructions) only if Play review asks for credentials.",
+      "context_ref": "https://support.google.com/googleplay/android-developer/answer/15748846",
+      "created_at": "2026-09-29T17:56:22+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+      "history": [
+        {
+          "at": "2026-09-29T17:56:22+00:00",
+          "choice": "B first: an in-app sample-data mode reachable from the sign-in screen, built on the existing fixture corpus and labelled as sample on every surface, declared in Play Console App access. Fallback A (a dedicated reviewer GitHub account with instructions) only if Play review asks for credentials.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "reviewer-access-036",
+      "implementation_ref": null,
+      "question": "How do Google Play reviewers get past GitHub sign-in to review RepoGlance?",
+      "rationale": "Maintainer 2026-09-29 ('Lets [s]tick with B to start'). Play Console Help answer/15748846 requires reusable credentials that bypass OTP/2-step; GitHub may email a new-device code to accounts without 2FA, and GitHub's Terms say a login may not be shared by multiple people. Sample mode avoids both and also yields store screenshots without exposing real repos.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T17:56:22+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; fictional owners only (no saari-co/RepoGlance or dinkuskit/blocks with fake numbers); sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible. Default: a sample issue/PR's detail replaces 'Open on GitHub' with a sample-item note.",
+      "context_ref": ".grilltrack/maps/sample-mode.md",
+      "created_at": "2026-09-29T17:58:13+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "reviewer-access-036"
+      ],
+      "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+      "history": [
+        {
+          "at": "2026-09-29T17:58:13+00:00",
+          "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; fictional owners only (no saari-co/RepoGlance or dinkuskit/blocks with fake numbers); sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible. Default: a sample issue/PR's detail replaces 'Open on GitHub' with a sample-item note.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "sample-mode-037",
+      "implementation_ref": null,
+      "question": "How does sample mode behave: which screens, widgets, repo names, and what happens across restarts?",
+      "rationale": "Maintainer picked the recommended option on all four questions 2026-09-29. Real screens make review and store screenshots match what signed-in users get; widgets are the product's core; real names with fake numbers would break the truth guardrail; persistence is required for sample widgets.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T17:58:13+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+      "context_ref": ".grilltrack/maps/sample-mode.md",
+      "created_at": "2026-09-29T18:44:12+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "sample-mode-037"
+      ],
+      "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+      "history": [
+        {
+          "at": "2026-09-29T18:44:13+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T18:56:59+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T19:25:26+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "implemented",
+          "implementation_ref": "file:.grilltrack/work/sample-app-038-build.md",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T19:40:55+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "verified",
+          "implementation_ref": "file:.grilltrack/work/sample-app-038-build.md",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        },
+        {
+          "at": "2026-09-29T19:40:55+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:.grilltrack/work/sample-app-038-build.md",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer",
+            "human_gate"
+          ],
+          "review_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "review_result": "findings",
+          "review_source_identity": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "to": "implemented",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        },
+        {
+          "at": "2026-09-29T19:40:55+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "implemented",
+          "implementation_ref": "file:.grilltrack/proof/sample-app-038-verify-20260929.md",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        }
+      ],
+      "id": "sample-app-038",
+      "implementation_ref": "file:.grilltrack/proof/sample-app-038-verify-20260929.md",
+      "question": "What does the first sample-mode slice build in the app?",
+      "rationale": "",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer",
+            "human_gate"
+          ],
+          "ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "result": "findings",
+          "reviewed_at": "2026-09-29T19:40:55+00:00",
+          "source_identity": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "classifications": [],
+          "ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-29T19:46:44+00:00",
+          "source_identity": "sha256:68c1ca58c0ec5f056be479fd999233019ba462043f8ac643e54aeb3375dc62e7"
+        }
+      ],
+      "review_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+      "review_result": "clean",
+      "review_source_identity": "sha256:68c1ca58c0ec5f056be479fd999233019ba462043f8ac643e54aeb3375dc62e7",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T19:46:44+00:00",
+      "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
     }
   ],
   "last_activation": {
-    "at": "2026-09-28T16:21:36+00:00",
+    "at": "2026-09-29T19:17:17+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
     "artifact_refs": [
-      "file:plans/family-look-round-2-handoff-20260928.md"
+      ".grilltrack/work/sample-app-038-build.md",
+      ".grilltrack/maps/sample-mode.md",
+      ".claude/skills/verify-repoglance/features/sample-mode.md"
     ],
-    "next_safe_action": "In the new session: read the ledger, resume, read plans/family-look-round-2-handoff-20260928.md, agree the exact slot boundary with the maintainer, then run five-candidate rounds on the real app",
-    "paused_at": "2026-09-28T16:20:46+00:00",
-    "reason": "maintainer routed family-look round 2 (label typography) to a fresh sidebar session on 2026-09-28",
-    "resumed_at": "2026-09-28T16:21:36+00:00"
+    "next_safe_action": "When the XL is attached (or Bobby frees the Fold), run the sample-mode recipe in .claude/skills/verify-repoglance/features/sample-mode.md with VERIFY_SERIAL set, then write .grilltrack/proof/sample-app-038-verify-20260929.md and record verify",
+    "paused_at": "2026-09-29T18:56:59+00:00",
+    "reason": "Device verification blocked: Pixel 10 Pro XL (63310DLCQ000RV) disconnected; Pixel 10 Pro Fold in use by another agent (OpenClaw, Phone Lab)",
+    "resumed_at": "2026-09-29T19:17:17+00:00"
   },
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "live default-branch CI read so widgets can show CI",
-      "static brand fallback scheme for devices without dynamic colour"
+      "sample-marker-040 now: round of five on the SAMPLE marker look across the in-app screens only, extended to widgets later",
+      "compact-12h-fit-035: the deferred 12-hour clock truncation on the compact widget"
     ],
-    "reason": "compact-crowding-034 ships with a logged 12-hour truncation; closing it is the smallest honest next slice",
-    "recommended": "compact 12-hour capsule fit (compact-12h-fit-035): a round of five on the stale capsule text at 148x89 with a 12-hour clock",
-    "recorded_at": "2026-09-29T14:38:45+00:00"
+    "reason": "RepoGlance is widget-first, so Play reviewers and store screenshots need the widgets to work without an account; 039 is the next node on .grilltrack/maps/sample-mode.md and the marker round needs its canvas",
+    "recommended": "sample-widgets-039: repo and stack widgets and the Quick Settings tile in sample mode (sample pins, widget config from the sample catalog, SAMPLE on the widget, switch to live or empty on sign-in, no background refresh for sample), and retire the stale FIXTURE PREVIEW label",
+    "recorded_at": "2026-09-29T19:46:59+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-29T14:38:45+00:00"
+  "updated_at": "2026-09-29T19:46:59+00:00"
 }

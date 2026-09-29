@@ -20,12 +20,14 @@ import co.saari.repoglance.data.findRepositoryByName
 import co.saari.repoglance.data.orderRepositories
 import co.saari.repoglance.data.sessionInvalidationFailure
 import co.saari.repoglance.refresh.BackgroundRefresh
+import co.saari.repoglance.sample.SampleAccount
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.state.LatestPushStore
 import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
+import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.state.latestPushRecordFor
 import co.saari.repoglance.widget.RepoWidgetConfigStore
 import co.saari.repoglance.widget.WidgetRefresh
@@ -50,6 +52,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     val liveState = mutableStateOf<LiveUiState>(LiveUiState.Checking)
     val selectedRepository = mutableStateOf<LiveRepository?>(null)
     val repositoryContent = mutableStateOf<ContentUiState>(ContentUiState.Idle)
+    val sampleMode = mutableStateOf(false)
     private var pendingRepositoryFull: String? = null
 
     private val services = LiveGitHub.services(application)
@@ -152,7 +155,32 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun refreshCatalog() {
+        if (sampleMode.value) {
+            setSampleMode(true)
+            return
+        }
         loadCatalog(LiveUiState.LoadingRepositories)
+    }
+
+    fun setSampleMode(active: Boolean) {
+        val context = getApplication<Application>()
+        if (active != sampleMode.value) {
+            backToRepositories()
+            pendingRepositoryFull = null
+        }
+        sampleMode.value = active
+        if (active) {
+            val now = Instant.now()
+            liveState.value = LiveUiState.Ready(
+                catalog = SampleAccount.catalog(now),
+                observedAt = now,
+                rateLimit = SampleAccount.RATE_LIMIT,
+            )
+            viewModelScope.launch(sessionDispatcher) { SampleModeStore.enter(context) }
+        } else {
+            liveState.value = LiveUiState.SignedOut
+            viewModelScope.launch(sessionDispatcher) { SampleModeStore.leave(context) }
+        }
     }
 
     private fun loadCatalog(loadingState: LiveUiState) {
@@ -205,6 +233,12 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     fun refreshSelectedRepository() {
         val repository = selectedRepository.value ?: return
+        if (sampleMode.value) {
+            repositoryContentLoadJob?.cancel()
+            repositoryContentGeneration.incrementAndGet()
+            repositoryContent.value = ContentUiState.Ready(SampleAccount.content(repository, Instant.now()))
+            return
+        }
         val catalog = (liveState.value as? LiveUiState.Ready)?.catalog ?: return
         repositoryContent.value = ContentUiState.Loading
         val requestGeneration = repositoryContentGeneration.incrementAndGet()
@@ -232,21 +266,13 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 )
             } else {
                 repositoryContent.value = ContentUiState.Ready(content)
-                persistLiveSnapshot(sessionGeneration, repository, content)
+                val context = getApplication<Application>()
+                withContext(Dispatchers.IO) {
+                    LiveRefresh.persist(context, services, sessionGeneration, repository, content)
+                }
+                WidgetRefresh.updateAll(context)
             }
         }
-    }
-
-    private suspend fun persistLiveSnapshot(
-        sessionGeneration: Long,
-        repository: LiveRepository,
-        content: LiveRepositoryContent,
-    ) {
-        val context = getApplication<Application>()
-        withContext(Dispatchers.IO) {
-            LiveRefresh.persist(context, services, sessionGeneration, repository, content)
-        }
-        WidgetRefresh.updateAll(context)
     }
 
     fun backToRepositories() {
@@ -280,10 +306,18 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun bootstrapSessionState() {
         bootstrapJob = viewModelScope.launch {
-            if (hasSavedSession()) {
-                refreshCatalog()
-            } else {
-                liveState.value = LiveUiState.SignedOut
+            val context = getApplication<Application>()
+            val storedSample = withContext(sessionDispatcher) {
+                AppPrefs.preload(context)
+                SampleModeStore.isActive(context)
+            }
+            when {
+                hasSavedSession() -> {
+                    if (storedSample) launch(sessionDispatcher) { SampleModeStore.leave(context) }
+                    refreshCatalog()
+                }
+                storedSample -> setSampleMode(true)
+                else -> liveState.value = LiveUiState.SignedOut
             }
         }
     }

@@ -42,6 +42,14 @@ update. Live CI is not fetched, so the widgets have no CI column. CI/release
 pressure, signing, release, general distribution, and revocation of the
 earlier prototype client secret remain maintainer-gated or planned.
 
+Sample mode is available and verified on the emulator (Android 16) and a
+Pixel 10 Pro XL (Android 17): **Explore with
+sample data** on the sign-in screen opens the real catalog, repository view
+and navigator on a made-up account, marked `SAMPLE` on every screen, without
+a GitHub account or any network call. It stays until the user chooses
+**Sign in with GitHub**. Widgets and the Quick Settings tile do not show
+sample data yet.
+
 ## Planned
 
 - **Widgets first.** Per-repo and multi-repo stack widgets in Material You
