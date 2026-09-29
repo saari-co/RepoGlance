@@ -3,12 +3,15 @@
 # Approved test phones (.claude/skills/verify-repoglance/devices.tsv) over adb only; never drives any other device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
-#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|status-picker|type-picker|shape-picker|widget-look-picker|checking
+#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|status-picker|type-picker|shape-picker|widget-look-picker|compact-picker|checking
 #   bin/verify-repoglance dump [label]           # uiautomator tree -> runs/verify-repoglance-runs/<run>/<label>.xml (+ .txt)
 #   bin/verify-repoglance capture <label>        # inner-display PNG + manifest via phone_proof
 #   bin/verify-repoglance tap <resource-id>      # tap the centre of a node by resource-id (from the last dump)
 #   bin/verify-repoglance type <text>            # type into the focused field
 #   bin/verify-repoglance cleanup                # force-stop, restore MIXED scenario; evidence is kept
+#   bin/verify-repoglance widget-state <last_good|rate_limited|no_data|restore> [owner/name]   # debug seed for placed widgets
+#   bin/verify-repoglance widget-bounds          # launcher bounds (px and dp) of placed RepoGlance widgets
+#   bin/verify-repoglance widget-resize <repo|stack> <bottom-edge-delta-px>   # long-press, drag the bottom resize handle
 set -euo pipefail
 
 PKG="co.saari.repoglance"
@@ -70,7 +73,7 @@ pick_serial() {
   export ANDROID_SERIAL
 }
 case "${1:-}" in
-  doctor|launch|dump|capture|tap|type|cleanup) need adb; pick_serial ;;
+  doctor|launch|dump|capture|tap|type|cleanup|widget-state|widget-bounds|widget-resize) need adb; pick_serial ;;
   *) sed -n 2,12p "$0" >&2; exit 2 ;;
 esac
 
@@ -145,6 +148,7 @@ launch() {
     type-picker) expect="devpicker.LabelTypeVariantPickerActivity"; marker="family-look" ;;
     shape-picker) expect="devpicker.ShapeVariantPickerActivity"; marker="family-look" ;;
     widget-look-picker) expect="devpicker.WidgetLookVariantPickerActivity"; marker="family-look" ;;
+    compact-picker) expect="devpicker.CompactVariantPickerActivity"; marker="family-look" ;;
     checking) expect="devlaunch.CheckingPreviewActivity"; marker="repoglance:checking-mark" ;;
     signin-finishing) expect="devlaunch.SignInFinishingPreviewActivity"; marker="repoglance:signin-mark" ;;
     navigator) expect="co.saari.repoglance/.MainActivity"; marker="repoglance:fixture-home" ;;
@@ -249,8 +253,55 @@ cleanup() {
   echo "cleanup: app stopped, scenario restored to MIXED, airplane mode off; evidence kept in $OUT"
 }
 
+widget_state() {
+  local state="${1:?state}" repo="${2:-saari-co/RepoGlance}"
+  adb shell run-as "$PKG" rm -f files/widget-seed.txt 2>/dev/null || true
+  adb shell am start -W -n "$PKG/.devlaunch.WidgetStateSeedActivity" --es state "$state" --es repo "$repo" >/dev/null
+  local i line; for i in 1 2 3 4 5 6 7 8 9 10; do
+    line=$(adb shell run-as "$PKG" cat files/widget-seed.txt 2>/dev/null) && [ -n "$line" ] && { echo "$line"; return 0; }
+    sleep 1
+  done
+  echo "widget-state: no result from the seed activity" >&2; exit 1
+}
+
+# Placed RepoGlance widgets on the launcher: "<kind> <bounds> <w>x<h>dp <texts>".
+widget_bounds() {
+  adb shell uiautomator dump /sdcard/rg-launcher.xml >/dev/null
+  adb shell cat /sdcard/rg-launcher.xml > "$OUT/launcher.xml"
+  local density; density=$(adb shell wm density | awk '/Override/ {o=$3} /Physical/ {p=$3} END {print o ? o : p}')
+  python3 - "$OUT/launcher.xml" "$density" <<'PY'
+import sys, re, xml.etree.ElementTree as ET
+r = ET.parse(sys.argv[1]).getroot(); dp = int(sys.argv[2]) / 160
+for n in r.iter('node'):
+    if not n.get('class', '').endswith('LauncherAppWidgetHostView'): continue
+    t = [c.get('text') for c in n.iter('node') if c.get('text')]
+    kind = 'stack' if any(x.startswith('Pinned') for x in t) else 'repo' if any('RepoGlance' in x for x in t) else None
+    if not kind: continue
+    x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
+    print(kind, n.get('bounds'), f"{round((x2-x1)/dp)}x{round((y2-y1)/dp)}dp", ' | '.join(t[:4]))
+PY
+}
+
+widget_resize() {
+  local kind="${1:?repo|stack}" delta="${2:?bottom edge delta px}"
+  adb shell cmd statusbar collapse >/dev/null 2>&1 || true
+  adb shell input keyevent HOME; sleep 1
+  local b; b=$(widget_bounds | awk -v k="$kind" '$1==k {print $2; exit}')
+  [ -n "$b" ] || { echo "widget-resize: no placed $kind widget" >&2; exit 1; }
+  read -r x1 y1 x2 y2 <<<"$(printf '%s' "$b" | tr -c '0-9' ' ')"
+  local cx=$(( (x1 + x2) / 2 )) cy=$(( y1 + (y2 - y1) / 3 ))
+  adb shell input swipe "$cx" "$cy" "$cx" "$cy" 1500
+  sleep 1
+  adb shell input swipe "$cx" $(( y2 - 3 )) "$cx" $(( y2 - 3 + delta )) 900
+  sleep 1; adb shell input keyevent BACK; sleep 1
+  widget_bounds | awk -v k="$kind" '$1==k'
+}
+
 case "${1:-}" in
   doctor) doctor ;;
+  widget-state) shift; widget_state "$@" ;;
+  widget-bounds) widget_bounds ;;
+  widget-resize) shift; widget_resize "$@" ;;
   launch) shift; launch "$@" ;;
   dump) shift; dump "$@" ;;
   capture) shift; capture "$@" ;;

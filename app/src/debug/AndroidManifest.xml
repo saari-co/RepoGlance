@@ -35,6 +35,16 @@
             android:exported="true"
             android:label="GrillTrack widget-look picker" />
         <activity
+            android:name="co.saari.repoglance.devpicker.CompactVariantPickerActivity"
+            android:exported="true"
+            android:label="GrillTrack compact-widget picker" />
+        <activity
+            android:name="co.saari.repoglance.devlaunch.WidgetStateSeedActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="verify-repoglance widget state seed" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.CheckingPreviewActivity"
             android:exported="true"
             android:label="verify-repoglance checking preview" />

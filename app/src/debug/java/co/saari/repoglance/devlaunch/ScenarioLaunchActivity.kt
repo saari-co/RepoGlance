@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.MainActivity
+import co.saari.repoglance.devpicker.CompactVariantPickerActivity
 import co.saari.repoglance.devpicker.LabelTypeVariantPickerActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
 import co.saari.repoglance.devpicker.ShapeVariantPickerActivity
@@ -139,6 +140,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_TYPE_PICKER = "type-picker"
         const val SCREEN_SHAPE_PICKER = "shape-picker"
         const val SCREEN_WIDGET_LOOK_PICKER = "widget-look-picker"
+        const val SCREEN_COMPACT_PICKER = "compact-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
@@ -158,6 +160,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
             SCREEN_TYPE_PICKER to LabelTypeVariantPickerActivity::class.java,
             SCREEN_SHAPE_PICKER to ShapeVariantPickerActivity::class.java,
             SCREEN_WIDGET_LOOK_PICKER to WidgetLookVariantPickerActivity::class.java,
+            SCREEN_COMPACT_PICKER to CompactVariantPickerActivity::class.java,
         )
     }
 }

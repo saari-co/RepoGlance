@@ -44,6 +44,14 @@ class WidgetLookTest {
         assertEquals(FreshnessStyle.TONE_CAPSULE, look.freshness)
         assertEquals(true, look.mono)
         assertEquals(WidgetLook(mono = false, freshness = FreshnessStyle.TONE_INK, staleBold = true), look.tall)
+        assertEquals(CompactLayout.MERGED_COUNTS, look.compact)
+    }
+
+    @Test
+    fun capsuleTakesItsOwnRowOnlyWhenStale() {
+        assertEquals(CapsulePlace.INLINE, capsulePlace(CompactLayout.MERGED_COUNTS, stale = false, narrow = true))
+        assertEquals(CapsulePlace.OWN_ROW, capsulePlace(CompactLayout.MERGED_COUNTS, stale = true, narrow = false))
+        assertEquals(CapsulePlace.INLINE, capsulePlace(CompactLayout.INLINE, stale = true, narrow = true))
     }
 
     @Test

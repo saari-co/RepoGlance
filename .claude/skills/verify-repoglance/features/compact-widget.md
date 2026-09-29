@@ -5,14 +5,21 @@ The compact home-screen widget shows one repository's open issues, open PRs, and
 ## Sub-features
 
 - `compact-exact` renders live counts with the clock time they were observed (`17:00`, `Mon 19:00` from an earlier day).
-- `compact-last-good` renders preserved counts with `last good <time>` in the error colour; while the rate limit is exhausted the label reads `rate limited · <time>`.
-- `compact-no-data` renders `no data` and an em dash per count, never `0`.
-- `compact-sizes` keeps all rows legible at 120x64, 180x64, and 250x90dp; the `to review` row appears only at the wide size.
+- `compact-last-good` renders preserved counts with `last good <time>` in an amber family capsule on its own row under the repo name, and the counts merge onto one line (`12 issues · 4 PRs`); while the rate limit is exhausted the capsule is red and reads `rate limited · <time>` (widget-look-032, compact-crowding-034).
+- `compact-no-data` renders a neutral `no data` capsule and an em dash per count (`— issues · — PRs`), never `0`.
+- `compact-sizes` keeps every state legible from the 140x64dp floor (the widget's minimum width since compact-crowding-034) through 180x64 and 250x90dp; the `to review` count appears only at the wide size.
 
 ## How to get to it (user POV)
 
 - Long-press the home screen, add the RepoGlance repo widget, choose a repository in the configuration screen.
 - Developer route: open the GrillTrack widget picker, which renders the production compact composition at all three sizes for exact, last-good, no-data, and the persisted live store.
+- Developer route for the current layout at the floor: `bin/verify-repoglance launch MIXED compact-picker "" "" D` renders fresh, last good, rate limited and no data at 140x64 and 148x89 (tap `repoglance:picker-canvas` for 180x64 and 250x90).
+
+- Launcher-placed widgets: the maintainer pre-authorizes placing, resizing and state-seeding RepoGlance's own widgets on the registered test phone.
+  - **Find them.** `bin/verify-repoglance widget-bounds` prints each placed RepoGlance widget as `repo|stack <bounds> <w>x<h>dp <texts>`.
+  - **Resize.** `bin/verify-repoglance widget-resize repo -255` long-presses the repo widget and drags its bottom handle up 255 px (one row on the Fold).
+  - **Seed a state.** `bin/verify-repoglance widget-state last_good|rate_limited|no_data` (debug build only) relabels the stored record and redraws; it stashes the real records first. Always finish with `bin/verify-repoglance widget-state restore`.
+  - **Capture.** Dump the launcher, screencap, dump again; keep only the crop of the RepoGlance host view and delete the full-screen image.
 
 ## Driving it with verify-repoglance
 

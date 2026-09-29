@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-28T21:42:52+00:00",
-    "domain": "family-look round 4: widget freshness colour and label face (repo + stack widgets)",
-    "started_at": "2026-09-28T20:34:23+00:00",
-    "status": "confirmed",
-    "summary": "Maintainer 2026-09-28 ('1; build it'): H is the production WidgetLook default; compact floor crowding (repo name lost behind the last-good capsule at 120x64) is a known follow-up round; widget CI and tile deferred."
+    "confirmed_at": "2026-09-29T14:10:49+00:00",
+    "domain": "family-look round 5: compact repo widget crowding (stale capsule vs repo name)",
+    "started_at": "2026-09-29T12:59:44+00:00",
+    "status": "inspected",
+    "summary": "Maintainer 2026-09-29: D is the production compact layout; minWidth 140 dp; tall/stack and capsule colours unchanged."
   },
   "decisions": [
     {
@@ -3924,13 +3924,21 @@
       "rationale": "Maintainer chose option 1 (confirm H, build it)",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": "clawsweeper:PR39 5103208 proof sufficient, status ready for maintainer look, one P1 merge-risk item = accepted compact 120x64 crowding; openclaw:req-20260929T004600Z-242313631287 correct(0.98); CI build green",
+          "result": "clean",
+          "reviewed_at": "2026-09-29T01:48:26+00:00",
+          "source_identity": "git:5103208ade070bc3305f3b187d873786a16fac47"
+        }
+      ],
+      "review_ref": "clawsweeper:PR39 5103208 proof sufficient, status ready for maintainer look, one P1 merge-risk item = accepted compact 120x64 crowding; openclaw:req-20260929T004600Z-242313631287 correct(0.98); CI build green",
+      "review_result": "clean",
+      "review_source_identity": "git:5103208ade070bc3305f3b187d873786a16fac47",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-28T21:46:59+00:00",
+      "updated_at": "2026-09-29T01:48:26+00:00",
       "verification_ref": "file:.grilltrack/proof/widget-look-032-verify-20260928.md"
     },
     {
@@ -3973,6 +3981,122 @@
       "superseded_by": null,
       "updated_at": "2026-09-28T22:47:05+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": "git:580f6ad16a6b89e11ea499b1be2b418fc353c85e",
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/family-look-round-5.json"
+      ],
+      "choice": "D merged counts: when stale, the compact repo widget puts the capsule on its own row under the repo name and merges counts onto one bold 9 sp line ('12 issues \u00b7 4 PRs'); fresh keeps today's rows. Repo widget minimum width raised 110 -> 140 dp, compact render size 120x64 -> 140x64.",
+      "context_ref": null,
+      "created_at": "2026-09-29T14:10:49+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widget-look-032"
+      ],
+      "domain": "family-look round 5: compact repo widget crowding (stale capsule vs repo name)",
+      "history": [
+        {
+          "at": "2026-09-29T14:10:49+00:00",
+          "choice": "D merged counts: when stale, the compact repo widget puts the capsule on its own row under the repo name and merges counts onto one bold 9 sp line ('12 issues \u00b7 4 PRs'); fresh keeps today's rows. Repo widget minimum width raised 110 -> 140 dp, compact render size 120x64 -> 140x64.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T14:19:05+00:00",
+          "choice": "D merged counts: when stale, the compact repo widget puts the capsule on its own row under the repo name and merges counts onto one bold 9 sp line ('12 issues \u00b7 4 PRs'); fresh keeps today's rows. Repo widget minimum width raised 110 -> 140 dp, compact render size 120x64 -> 140x64.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T14:19:05+00:00",
+          "choice": "D merged counts: when stale, the compact repo widget puts the capsule on its own row under the repo name and merges counts onto one bold 9 sp line ('12 issues \u00b7 4 PRs'); fresh keeps today's rows. Repo widget minimum width raised 110 -> 140 dp, compact render size 120x64 -> 140x64.",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt (uncommitted, branch claude/grilltrack-034-compact)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "compact-crowding-034",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/widget/RepoWidget.kt (uncommitted, branch claude/grilltrack-034-compact)",
+      "question": "How does the compact repo widget keep its repo name when a stale capsule needs the top row?",
+      "rationale": "Maintainer: 'Lock D, raise the floor' and '140 dp'",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T14:19:05+00:00",
+      "verification_ref": "file:.grilltrack/proof/compact-crowding-034-verify-20260929.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Not decided: D ships as is.",
+      "context_ref": "file:.grilltrack/proof/compact-crowding-034-verify-20260929.md",
+      "created_at": "2026-09-29T14:38:45+00:00",
+      "deferred_reason": "Maintainer 2026-09-29 chose to ship D as is. Risk: with a 12-hour clock, 'last good <day> <h:mm AM>' (older than today) and 'rate limited \u00b7 <h:mm AM>' truncate at 140x64 and 148x89, hiding part of the data age (truth rule 3). 24-hour clocks, fresh, same-day last good and no data fit.",
+      "delivery_ref": null,
+      "dependencies": [
+        "compact-crowding-034"
+      ],
+      "domain": "family-look round 5: compact repo widget crowding (stale capsule vs repo name)",
+      "history": [
+        {
+          "at": "2026-09-29T14:38:45+00:00",
+          "choice": "Not decided: D ships as is.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "Maintainer 2026-09-29 chose to ship D as is. Risk: with a 12-hour clock, 'last good <day> <h:mm AM>' (older than today) and 'rate limited \u00b7 <h:mm AM>' truncate at 140x64 and 148x89, hiding part of the data age (truth rule 3). 24-hour clocks, fresh, same-day last good and no data fit.",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "deferred",
+          "verification_ref": null
+        }
+      ],
+      "id": "compact-12h-fit-035",
+      "implementation_ref": null,
+      "question": "How should the compact widget's stale capsule fit a 12-hour clock at the placed 2x1 size?",
+      "rationale": "Found during compact-crowding-034 verification on the Fold (12-hour clock)",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "deferred",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T14:38:45+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -3991,16 +4115,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "static brand fallback scheme for devices without dynamic colour",
-      "tonal shape on the remaining M3 controls (sort chips, segmented buttons, text buttons, list rows)"
+      "live default-branch CI read so widgets can show CI",
+      "static brand fallback scheme for devices without dynamic colour"
     ],
-    "reason": "shape-control-031 merged as PR #38 (ee30262); widgets/tile are the last surface without the family look",
-    "recommended": "family-look round 4: status colour and mono labels on widgets and the Quick Settings tile",
-    "recorded_at": "2026-09-28T20:14:54+00:00"
+    "reason": "compact-crowding-034 ships with a logged 12-hour truncation; closing it is the smallest honest next slice",
+    "recommended": "compact 12-hour capsule fit (compact-12h-fit-035): a round of five on the stale capsule text at 148x89 with a 12-hour clock",
+    "recorded_at": "2026-09-29T14:38:45+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-28T22:47:05+00:00"
+  "updated_at": "2026-09-29T14:38:45+00:00"
 }

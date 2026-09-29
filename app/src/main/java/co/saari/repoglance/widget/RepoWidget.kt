@@ -90,7 +90,7 @@ class RepoWidget : GlanceAppWidget() {
     }
 
     companion object {
-        private val COMPACT_SIZE = DpSize(120.dp, 64.dp)
+        private val COMPACT_SIZE = DpSize(140.dp, 64.dp)
         private val NARROW_TALL_SIZE = DpSize(120.dp, 120.dp)
         private val WIDE_TALL_SIZE = DpSize(250.dp, 140.dp)
         private val TALL_BREAKPOINT = 100.dp
@@ -158,6 +158,7 @@ internal const val WIDGET_PREVIEW_LABEL = "FIXTURE PREVIEW"
 private val LEDGER_REPO_SIZE = 10.sp
 private val LEDGER_LABEL_SIZE = 8.sp
 private val LEDGER_VALUE_SIZE = 11.sp
+private val LEDGER_MERGED_SIZE = 9.sp
 
 private val LEDGER_THIRD_ROW_BREAKPOINT = 84.dp
 
@@ -175,13 +176,17 @@ private fun UnconfiguredContent() {
     }
 }
 
-internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, freshness: WidgetFreshness): String {
+internal fun compactFreshnessLabel(
+    snapshot: RepoSnapshot?,
+    freshness: WidgetFreshness,
+    short: Boolean = false,
+): String {
     val observedAt = snapshot?.observedAt
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
     val clock = freshness.clock.format(observedAt, freshness.now)
     return when {
-        freshness.rateLimitedUntil != null -> "rate limited · $clock"
-        snapshot.valueBasis == ValueBasis.LAST_GOOD -> "last good $clock"
+        freshness.rateLimitedUntil != null -> (if (short) "limited · " else "rate limited · ") + clock
+        snapshot.valueBasis == ValueBasis.LAST_GOOD -> (if (short) "cached " else "last good ") + clock
         else -> clock
     }
 }
@@ -189,11 +194,20 @@ internal fun compactFreshnessLabel(snapshot: RepoSnapshot?, freshness: WidgetFre
 internal const val LEDGER_FRESHNESS_TAG = "ledger-freshness"
 
 @Composable
-internal fun CompactFreshness(snapshot: RepoSnapshot?, freshness: WidgetFreshness) {
+internal fun CompactFreshness(
+    snapshot: RepoSnapshot?,
+    freshness: WidgetFreshness,
+    modifier: GlanceModifier = GlanceModifier,
+) {
     FreshnessText(
-        compactFreshnessLabel(snapshot, freshness),
+        compactFreshnessLabel(
+            snapshot,
+            freshness,
+            short = LocalWidgetLook.current.compact == CompactLayout.SHORT_NAME_FIRST,
+        ),
         freshnessRole(snapshot, freshness),
         LEDGER_FRESHNESS_TAG,
+        modifier = modifier,
         fontSize = LEDGER_LABEL_SIZE,
     )
 }
@@ -206,12 +220,21 @@ internal fun CompactContent(
     freshness: WidgetFreshness,
 ) {
     val basis = snapshot?.valueBasis ?: ValueBasis.UNKNOWN
+    val layout = LocalWidgetLook.current.compact
+    val place = capsulePlace(
+        layout,
+        stale = freshnessRole(snapshot, freshness) != null,
+        narrow = LocalSize.current.width < COMPACT_RESPONSIVE_BREAKPOINT,
+    )
+    val ownRow = place == CapsulePlace.OWN_ROW
+    val bottom = place == CapsulePlace.BOTTOM
+    val nameFirst = layout == CompactLayout.SHORT_NAME_FIRST
 
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .clickable(actionStartActivity(appIntent))
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp, vertical = if (ownRow || bottom) 3.dp else 6.dp),
     ) {
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
@@ -225,20 +248,68 @@ internal fun CompactContent(
                     fontSize = LEDGER_REPO_SIZE,
                     fontFamily = labelFamily(),
                 ),
-                modifier = GlanceModifier.defaultWeight(),
+                modifier = if (nameFirst) GlanceModifier else GlanceModifier.defaultWeight(),
             )
-            Spacer(modifier = GlanceModifier.width(4.dp))
-            CompactFreshness(snapshot, freshness)
+            if (!ownRow && !bottom) {
+                Spacer(modifier = GlanceModifier.width(4.dp))
+                CompactFreshness(
+                    snapshot,
+                    freshness,
+                    modifier = if (nameFirst) GlanceModifier.defaultWeight() else GlanceModifier,
+                )
+            }
         }
-        LedgerRow("issues", SnapshotRendering.countText(snapshot?.openIssues, basis))
-        LedgerRow("PRs", SnapshotRendering.countText(snapshot?.openPrs, basis))
-        if (LocalSize.current.height >= LEDGER_THIRD_ROW_BREAKPOINT) {
+        if (ownRow) CompactFreshness(snapshot, freshness)
+        CompactCounts(snapshot, basis, merged = ownRow && layout == CompactLayout.MERGED_COUNTS)
+        if (bottom) CompactFreshness(snapshot, freshness)
+    }
+}
+
+internal enum class CapsulePlace { INLINE, OWN_ROW, BOTTOM }
+
+internal fun capsulePlace(layout: CompactLayout, stale: Boolean, narrow: Boolean): CapsulePlace = when {
+    !stale -> CapsulePlace.INLINE
+    layout == CompactLayout.OWN_ROW || layout == CompactLayout.MERGED_COUNTS -> CapsulePlace.OWN_ROW
+    layout == CompactLayout.RESPONSIVE && narrow -> CapsulePlace.BOTTOM
+    else -> CapsulePlace.INLINE
+}
+
+@Composable
+private fun CompactCounts(snapshot: RepoSnapshot?, basis: ValueBasis, merged: Boolean) {
+    val tallEnough = LocalSize.current.height >= LEDGER_THIRD_ROW_BREAKPOINT
+    Column(modifier = GlanceModifier.fillMaxWidth()) {
+        if (merged) {
+            MergedCounts(snapshot, basis)
+        } else {
+            LedgerRow("issues", SnapshotRendering.countText(snapshot?.openIssues, basis))
+            LedgerRow("PRs", SnapshotRendering.countText(snapshot?.openPrs, basis))
+        }
+        if (tallEnough) {
             LedgerRow(
                 "to review",
                 SnapshotRendering.countText(snapshot?.prsAwaitingMyReview, basis),
             )
         }
     }
+}
+
+internal const val LEDGER_MERGED_TAG = "ledger-merged"
+private val COMPACT_RESPONSIVE_BREAKPOINT = 180.dp
+
+@Composable
+private fun MergedCounts(snapshot: RepoSnapshot?, basis: ValueBasis) {
+    Text(
+        SnapshotRendering.countText(snapshot?.openIssues, basis) + " issues · " +
+            SnapshotRendering.countText(snapshot?.openPrs, basis) + " PRs",
+        maxLines = 1,
+        style = TextStyle(
+            color = GlanceTheme.colors.onBackground,
+            fontSize = LEDGER_MERGED_SIZE,
+            fontWeight = FontWeight.Bold,
+            fontFamily = labelFamily(),
+        ),
+        modifier = GlanceModifier.semantics { testTag = LEDGER_MERGED_TAG },
+    )
 }
 
 internal const val LEDGER_LABEL_TAG = "ledger-label"

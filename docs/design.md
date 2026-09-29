@@ -1,6 +1,7 @@
 # Design contract: RepoGlance
 
-- **Version:** 4 (2026-09-28): widget freshness and labels
+- **Version:** 5 (2026-09-29): compact widget crowding
+  [compact-crowding-034]. Version 4 (2026-09-28): widget freshness and labels
   [widget-look-032]. Version 3 (2026-09-28): shape and control language
   [shape-control-031]. Version 2 (2026-09-28): label typography
   [label-typography-030]. Version 1 (2026-09-22): status colour [status-colour-029]. Version 0
@@ -130,6 +131,19 @@
     line are mono; tall and stack widgets stay on the system face.
   - The stack header is not coloured; stack row ages ignore the rate limit
     (the header carries it), as before.
+  - **Compact layout [compact-crowding-034, "merged counts"]:** fresh, the
+    compact widget keeps the name, clock and issue / PR rows. Stale, the
+    capsule takes its own row under the repo name and the counts merge onto
+    one bold 9 sp mono line ("12 issues · 4 PRs"); "to review" keeps its own
+    row when the widget is at least 84 dp tall. `CompactLayout.MERGED_COUNTS`
+    on `WidgetLook.Family`.
+  - **Widget floor:** `repo_widget_info.xml` `minWidth` is 140 dp and the
+    compact responsive size is 140x64. With a 24-hour clock every state fits
+    from 139 dp; with a 12-hour clock the capsule can truncate (see
+    Unresolved). The Fold's 2x1 cell is 148x89 dp.
+  - **Rejected (round 5):** A inline; B capsule own row with separate count
+    rows (clips at 64 dp); C short words, name first (capsule truncates to
+    "ca…"); E responsive bottom band (clips at 64 dp).
   - **Rejected (round 4):** A M3 error; B family ink + mono everywhere;
     E tinted header band. C and D survive only as the compact and
     tall/stack halves of the hybrid.
@@ -170,8 +184,11 @@
 
 ## Unresolved (decided by GrillTrack, one slot per round)
 
-- **Compact widget at its 120x64 floor:** the stale capsule pushes the repo
-  name off. Follow-up round, not grilled.
+- **Compact capsule with a 12-hour clock [compact-12h-fit-035, deferred]:**
+  at 140x64 and at the Fold's 148x89, "last good <day> <h:mm AM>" (data
+  older than today) and "rate limited · <h:mm AM>" truncate, hiding part
+  of the data age. Shipped as is by maintainer choice; open risk against
+  truth rule 3.
 - **CI on widgets:** needs a live CI read first (the live store has no CI).
   Not grilled.
 - **Tile state:** the system draws the tile, so only icon, active state and

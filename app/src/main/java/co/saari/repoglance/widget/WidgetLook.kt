@@ -31,12 +31,15 @@ import androidx.glance.color.ColorProvider as dayNight
 
 enum class FreshnessStyle { MATERIAL_ERROR, TONE_INK, TONE_CAPSULE, TONE_HEADER }
 
+enum class CompactLayout { INLINE, OWN_ROW, SHORT_NAME_FIRST, MERGED_COUNTS, RESPONSIVE }
+
 @Immutable
 data class WidgetLook(
     val mono: Boolean,
     val freshness: FreshnessStyle,
     val staleBold: Boolean,
     val tall: WidgetLook? = null,
+    val compact: CompactLayout = CompactLayout.INLINE,
 ) {
     companion object {
         val Material = WidgetLook(mono = false, freshness = FreshnessStyle.MATERIAL_ERROR, staleBold = true)
@@ -46,6 +49,7 @@ data class WidgetLook(
             freshness = FreshnessStyle.TONE_CAPSULE,
             staleBold = false,
             tall = WidgetLook(mono = false, freshness = FreshnessStyle.TONE_INK, staleBold = true),
+            compact = CompactLayout.MERGED_COUNTS,
         )
 
         val Default = Family
