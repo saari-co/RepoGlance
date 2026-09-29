@@ -13,7 +13,6 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
-import androidx.glance.color.ColorProvider
 import androidx.glance.layout.padding
 import androidx.glance.semantics.semantics
 import androidx.glance.semantics.testTag
@@ -28,6 +27,7 @@ import co.saari.repoglance.render.CiColorRole
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.StatusColors
 import co.saari.repoglance.ui.theme.StatusTone
+import androidx.glance.color.ColorProvider as dayNight
 
 enum class FreshnessStyle { MATERIAL_ERROR, TONE_INK, TONE_CAPSULE, TONE_HEADER }
 
@@ -69,9 +69,9 @@ data class WidgetTones(val working: WidgetTone, val failing: WidgetTone, val neu
             val night = FamilyStatus.colors(dynamicDarkColorScheme(context))
             fun pair(pick: (StatusColors) -> StatusTone) =
                 WidgetTone(
-                    ink = ColorProvider(pick(day).ink, pick(night).ink),
-                    container = ColorProvider(pick(day).container, pick(night).container),
-                    onContainer = ColorProvider(pick(day).onContainer, pick(night).onContainer),
+                    ink = dayNight(pick(day).ink, pick(night).ink),
+                    container = dayNight(pick(day).container, pick(night).container),
+                    onContainer = dayNight(pick(day).onContainer, pick(night).onContainer),
                 )
             return WidgetTones(
                 working = pair { it.working },

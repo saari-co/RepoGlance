@@ -75,3 +75,14 @@ RepoGlance); then "Pin stack widget" → "Add to home screen".
 - The notification shade was open at the start of this run; it was
   collapsed with `cmd statusbar collapse` (no setting changed).
 - `./gradlew assembleDebug check`: green.
+
+## Review repair (ClawSweeper P1 on `9249477`)
+
+- ClawSweeper flagged two `ColorProvider` imports as a compile conflict. At
+  `9249477`, CI `build` passed and `./gradlew check` was green: in Glance
+  1.1.1, `androidx.glance.unit.ColorProvider` is the interface (type) and
+  `androidx.glance.color.ColorProvider(day, night)` is a factory function,
+  so the names resolve by use.
+- To remove the ambiguity for readers, the factory is now imported as
+  `dayNight`; no behaviour change. `./gradlew assembleDebug check` green
+  again on the fix commit.
