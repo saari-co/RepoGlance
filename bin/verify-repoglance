@@ -10,7 +10,7 @@
 #   bin/verify-repoglance type <text>            # type into the focused field
 #   bin/verify-repoglance cleanup                # force-stop, restore MIXED scenario; evidence is kept
 #   bin/verify-repoglance widget-state <last_good|rate_limited|no_data|restore> [owner/name]   # debug seed for placed widgets
-#   bin/verify-repoglance widget-bounds          # launcher bounds (px and dp) of placed RepoGlance widgets
+#   bin/verify-repoglance widget-bounds          # go home, print launcher bounds (px and dp) of placed RepoGlance widgets
 #   bin/verify-repoglance widget-resize <repo|stack> <bottom-edge-delta-px>   # long-press, drag the bottom resize handle
 set -euo pipefail
 
@@ -300,7 +300,7 @@ widget_resize() {
 case "${1:-}" in
   doctor) doctor ;;
   widget-state) shift; widget_state "$@" ;;
-  widget-bounds) widget_bounds ;;
+  widget-bounds) adb shell cmd statusbar collapse >/dev/null 2>&1 || true; adb shell input keyevent HOME; sleep 1; widget_bounds ;;
   widget-resize) shift; widget_resize "$@" ;;
   launch) shift; launch "$@" ;;
   dump) shift; dump "$@" ;;
