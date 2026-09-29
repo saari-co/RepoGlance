@@ -1,6 +1,7 @@
 # Design contract: RepoGlance
 
-- **Version:** 3 (2026-09-28): shape and control language
+- **Version:** 4 (2026-09-28): widget freshness and labels
+  [widget-look-032]. Version 3 (2026-09-28): shape and control language
   [shape-control-031]. Version 2 (2026-09-28): label typography
   [label-typography-030]. Version 1 (2026-09-22): status colour [status-colour-029]. Version 0
   (2026-09-21) started the file with constraints only. Nothing in the
@@ -110,6 +111,29 @@
     terminal (4–8 dp, hairline and state edges); E filled capsules with
     chamfered cards.
   - **Proof:** `.grilltrack/proof/shape-control-031-verify-20260928.md`.
+- **Widgets [widget-look-032, hybrid "C compact, D tall/stack"]:** the
+  repo and stack widgets carry the family status meanings on their
+  freshness line. The seam is `widget/WidgetLook.kt` (`LocalWidgetLook`,
+  `LocalWidgetTones`, `FreshnessText`, `TallLook`); `WidgetLook.Family` is
+  the production default and `WidgetLook.Material` is the pre-lock look.
+  Tones come from `FamilyStatus` over the dynamic light and dark schemes as
+  day/night `ColorProvider`s.
+
+  | state | role | compact widget | tall repo + stack widgets |
+  | --- | --- | --- | --- |
+  | fresh | none | onSurfaceVariant | onSurfaceVariant |
+  | last good | working (amber) | tonal capsule, regular | ink, bold |
+  | rate limited | failing (red) | tonal capsule, regular | ink, bold |
+  | no data | neutral | tonal capsule, regular | ink, bold |
+
+  - Labels: the compact widget's repo name, ledger labels and freshness
+    line are mono; tall and stack widgets stay on the system face.
+  - The stack header is not coloured; stack row ages ignore the rate limit
+    (the header carries it), as before.
+  - **Rejected (round 4):** A M3 error; B family ink + mono everywhere;
+    E tinted header band. C and D survive only as the compact and
+    tall/stack halves of the hybrid.
+  - **Proof:** `.grilltrack/proof/widget-look-032-verify-20260928.md`.
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
@@ -146,11 +170,12 @@
 
 ## Unresolved (decided by GrillTrack, one slot per round)
 
-- **Status colour on widgets and the tile:** the Glance widgets and the
-  Quick Settings tile still show status as text only; whether they carry the
-  family tones is not grilled.
-- **Label typography on widgets and the tile:** Glance surfaces keep their
-  own text styles; whether they take the mono labels is not grilled.
+- **Compact widget at its 120x64 floor:** the stale capsule pushes the repo
+  name off. Follow-up round, not grilled.
+- **CI on widgets:** needs a live CI read first (the live store has no CI).
+  Not grilled.
+- **Tile state:** the system draws the tile, so only icon, active state and
+  subtitle wording can change. Not grilled.
 - **Shape on the remaining M3 controls:** sort chips, segmented buttons,
   text buttons and list rows kept M3 in round 3. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.
