@@ -19,8 +19,8 @@ import java.time.Instant
 
 object Fixtures {
 
-    internal const val YOU = "octodev"
-    internal val CAST = listOf("octodev", "mkraft", "jrivera", "tstone")
+    private const val YOU = "octodev"
+    private val CAST = listOf("octodev", "mkraft", "jrivera", "tstone")
     private val ROW_REPOS = listOf(
         RepoRef("saari-co", "RepoGlance"),
         RepoRef("dinkuskit", "blocks"),

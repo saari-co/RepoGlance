@@ -12,33 +12,67 @@ import java.time.Instant
 
 class SampleAccountTest {
     private val now = Instant.parse("2026-09-29T16:00:00Z")
-    private val realOwners = listOf("saari-co", "dinkuskit", "saariuslystoned", "smokyproductcompany")
+
+    private val approvedSampleRepositories = listOf(
+        "saari-co/rocket",
+        "saari-co/api-server",
+        "saari-co/mobile-app",
+        "dinkuskit/infra",
+        "dinkuskit/design-system",
+        "saariuslystoned/dotfiles",
+        "saari-co/legacy-site",
+    )
+
+    private val publicRealRepositories = listOf("saari-co/RepoGlance", "dinkuskit/blocks")
 
     @Test
-    fun sampleDataNeverUsesTheMaintainersRealOwners() {
-        val catalog = SampleAccount.catalog(now)
-        val text = buildList {
-            add(catalog.viewer.login)
-            catalog.repositories.forEach { repository ->
-                add(repository.ref.full)
-                val content = SampleAccount.content(repository, now)
-                issues(content).forEach { add(it.title); add(it.author); it.assignee?.let(::add); addAll(it.labels) }
-                pullRequests(content).forEach { add(it.title); add(it.author); addAll(it.labels) }
-            }
+    fun sampleRepositoriesAreExactlyTheApprovedNames() {
+        assertEquals(
+            "changing the sample set needs a fresh 404 check under the owner (see the sample-app-038 proof)",
+            approvedSampleRepositories,
+            SampleAccount.catalog(now).repositories.map { it.ref.full },
+        )
+        for (real in publicRealRepositories) {
+            assertFalse(
+                "a real repository must never carry sample numbers: $real",
+                approvedSampleRepositories.any { it.equals(real, ignoreCase = true) },
+            )
         }
-        for (value in text) {
-            for (owner in realOwners) {
-                assertFalse("'$value' must not name the real owner $owner", value.contains(owner, ignoreCase = true))
+    }
+
+    @Test
+    fun sampleOwnersAreTheMaintainersOwnAccounts() {
+        val catalog = SampleAccount.catalog(now)
+        assertEquals("saariuslystoned", catalog.viewer.login)
+        assertEquals(setOf("saari-co", "dinkuskit", "saariuslystoned"), catalog.repositories.map { it.ref.owner }.toSet())
+        val text = catalog.repositories.flatMap { repository ->
+            val content = SampleAccount.content(repository, now)
+            issues(content).map { it.title + it.author } + pullRequests(content).map { it.title + it.author }
+        }
+        assertFalse(text.any { it.contains("smokyproductcompany", ignoreCase = true) })
+    }
+
+    @Test
+    fun everySamplePersonIsTheMaintainersOwnHandle() {
+        for (repository in SampleAccount.catalog(now).repositories) {
+            val content = SampleAccount.content(repository, now)
+            issues(content).forEach {
+                assertEquals(SampleAccount.VIEWER_LOGIN, it.author)
+                assertTrue(it.assignee == null || it.assignee == SampleAccount.VIEWER_LOGIN)
+            }
+            pullRequests(content).forEach {
+                assertEquals(SampleAccount.VIEWER_LOGIN, it.author)
+                assertTrue(it.assignee == null || it.assignee == SampleAccount.VIEWER_LOGIN)
+                assertFalse("GitHub cannot request a review from the PR's own author", it.reviewRequestedFromViewer)
             }
         }
     }
 
     @Test
-    fun catalogIsAFictionalAccountWithSeveralOwnersAndVisibilities() {
+    fun catalogHasSeveralOwnersAndVisibilities() {
         val repositories = SampleAccount.catalog(now).repositories
         assertTrue(repositories.size in 6..8)
         assertEquals(repositories.size, repositories.map { it.id }.distinct().size)
-        assertEquals(setOf("acme", "octoco", SampleAccount.VIEWER_LOGIN), repositories.map { it.ref.owner }.toSet())
         assertTrue(repositories.any { it.isPrivate })
         assertTrue(repositories.any { !it.isPrivate })
         assertTrue(repositories.any { it.isArchived })
@@ -67,7 +101,6 @@ class SampleAccountTest {
         val all = SampleAccount.catalog(now).repositories.map { SampleAccount.content(it, now) }
         assertTrue(all.sumOf { issues(it).size } >= 10)
         assertTrue(all.flatMap(::pullRequests).any { it.isDraft })
-        assertTrue(all.flatMap(::pullRequests).any { it.reviewRequestedFromViewer })
     }
 
     @Test

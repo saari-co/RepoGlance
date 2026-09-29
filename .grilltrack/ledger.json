@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-29T18:44:13+00:00",
+    "confirmed_at": "2026-09-29T22:39:48+00:00",
     "domain": "reviewer access: sample-data mode reachable without a GitHub account",
-    "started_at": "2026-09-29T17:56:22+00:00",
-    "status": "inspected",
-    "summary": "Maintainer confirmed 2026-09-29 ('confirmed, go ahead and build it'): build sample-app-038 as summarised \u2014 in-app sample mode on the real screens, fictional corpus, no network/token access, separate sample pins, provisional SAMPLE chip, sign-in exit without a code request, sample-item note, persistence until sign-in, verify-repoglance feature file; verify with unit tests, build+check, and the Pixel 10 Pro XL."
+    "started_at": "2026-09-29T22:24:22+00:00",
+    "status": "confirmed",
+    "summary": "Maintainer 2026-09-29 ('a a'): sample authors and assignees become saariuslystoned only, Review requested is dropped from sample PRs, realistic sample repository names stay. Verify with unit tests, the gate and an emulator run."
   },
   "decisions": [
     {
@@ -4165,6 +4165,48 @@
           "review_source_identity": null,
           "to": "locked",
           "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T22:24:22+00:00",
+          "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; fictional owners only (no saari-co/RepoGlance or dinkuskit/blocks with fake numbers); sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible. Default: a sample issue/PR's detail replaces 'Open on GitHub' with a sample-item note.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "Maintainer 2026-09-29 ('use dinkuskit and some other real accounts'; 'use saari-co too that way dinkuskit will be on there'): sample owners become the maintainer's own accounts instead of third-party handles, answering ClawSweeper's #43 P1 that acme/octoco/octodev are real third-party accounts.",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T22:24:22+00:00",
+          "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; fictional owners only (no saari-co/RepoGlance or dinkuskit/blocks with fake numbers); sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible. Default: a sample issue/PR's detail replaces 'Open on GitHub' with a sample-item note.",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T22:24:35+00:00",
+          "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; fictional owners only (no saari-co/RepoGlance or dinkuskit/blocks with fake numbers); sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible. Default: a sample issue/PR's detail replaces 'Open on GitHub' with a sample-item note.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "Owner rule changed by the maintainer: the maintainer's own accounts replace fictional third-party handles; all other behaviour carried into sample-mode-042.",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "superseded",
+          "verification_ref": null
         }
       ],
       "id": "sample-mode-037",
@@ -4177,9 +4219,9 @@
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "locked",
-      "superseded_by": null,
-      "updated_at": "2026-09-29T17:58:13+00:00",
+      "status": "superseded",
+      "superseded_by": "sample-mode-042",
+      "updated_at": "2026-09-29T22:24:35+00:00",
       "verification_ref": null
     },
     {
@@ -4282,6 +4324,48 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        },
+        {
+          "at": "2026-09-29T22:24:22+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "verified",
+          "implementation_ref": "file:.grilltrack/proof/sample-app-038-verify-20260929.md",
+          "note": "dependency sample-mode-037 changed: Maintainer 2026-09-29 ('use dinkuskit and some other real accounts'; 'use saari-co too that way dinkuskit will be on there'): sample owners become the maintainer's own accounts instead of third-party handles, answering ClawSweeper's #43 P1 that acme/octoco/octodev are real third-party accounts.",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "review_result": "clean",
+          "review_source_identity": "sha256:68c1ca58c0ec5f056be479fd999233019ba462043f8ac643e54aeb3375dc62e7",
+          "to": "needs_reverification",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        },
+        {
+          "at": "2026-09-29T22:29:23+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "needs_reverification",
+          "implementation_ref": "file:.grilltrack/proof/sample-app-038-verify-20260929.md",
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+        },
+        {
+          "at": "2026-09-29T22:29:23+00:00",
+          "choice": "Explore with sample data entry under Connect GitHub; a fictional healthy account (~6-8 repos, issues and PRs, derived from the fixtures with real owners renamed) behind the real catalog, repo view and navigator; no network or token-store access in sample; sample pins kept separately; provisional SAMPLE marker reusing the LIVE chip; always-visible 'Sign in with GitHub' exit to the Connect screen without requesting a code; sample detail replaces Open on GitHub with 'Sample item \u2014 not on GitHub'; sample mode persists until sign-in; verify-repoglance sample-mode feature file. Widgets, tile, marker look, FIXTURE PREVIEW label and Play Console text are later nodes.",
+          "from": "implemented",
+          "implementation_ref": "file:.grilltrack/proof/sample-app-038-verify-20260929.md",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
         }
       ],
       "id": "sample-app-038",
@@ -4308,19 +4392,148 @@
           "result": "clean",
           "reviewed_at": "2026-09-29T19:46:44+00:00",
           "source_identity": "sha256:68c1ca58c0ec5f056be479fd999233019ba462043f8ac643e54aeb3375dc62e7"
+        },
+        {
+          "classifications": [],
+          "ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-29T22:45:13+00:00",
+          "source_identity": "sha256:f69204545c5fbf8f88733f27a8bfcf5475a7df2130f9ffa09a1c98eb08a1b10e"
         }
       ],
       "review_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
       "review_result": "clean",
-      "review_source_identity": "sha256:68c1ca58c0ec5f056be479fd999233019ba462043f8ac643e54aeb3375dc62e7",
+      "review_source_identity": "sha256:f69204545c5fbf8f88733f27a8bfcf5475a7df2130f9ffa09a1c98eb08a1b10e",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-09-29T19:46:44+00:00",
+      "updated_at": "2026-09-29T22:45:13+00:00",
+      "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; sample owners are the maintainer's own accounts (saari-co, dinkuskit, viewer saariuslystoned) with repository names that do not exist under them (checked 404), so no real repository shows made-up numbers and no third-party account is named as an owner; sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible; a sample row tap shows a sample-item note instead of opening GitHub.",
+      "context_ref": "github:saari-co/RepoGlance#43",
+      "created_at": "2026-09-29T22:24:35+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "reviewer-access-036"
+      ],
+      "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+      "history": [
+        {
+          "at": "2026-09-29T22:24:35+00:00",
+          "choice": "Real signed-in screens (catalog, repo view, navigator) fed sample data; widgets work in sample mode, marked SAMPLE, and signed-in widgets never show sample rows; sample owners are the maintainer's own accounts (saari-co, dinkuskit, viewer saariuslystoned) with repository names that do not exist under them (checked 404), so no real repository shows made-up numbers and no third-party account is named as an owner; sample mode persists across restarts until the user chooses to sign in, with a sign-in action always visible; a sample row tap shows a sample-item note instead of opening GitHub.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "sample-mode-042",
+      "implementation_ref": null,
+      "question": "How does sample mode behave: which screens, widgets, repo names and owners, and what happens across restarts?",
+      "rationale": "Maintainer 2026-09-29 ('use dinkuskit and some other real accounts'; 'use saari-co too that way dinkuskit will be on there') after ClawSweeper's #43 P1 that acme/octoco/octodev are real third-party accounts. Everything else in sample-mode-037 carries over unchanged.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T22:24:35+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Every sample issue and PR is authored by the maintainer's own handle saariuslystoned (assignee saariuslystoned or none); no third-party GitHub user is named anywhere in sample data. Because GitHub cannot request a review from a PR's own author, no sample PR shows Review requested. Sample repository names stay realistic (no sample- prefix); a future collision with a real repository is guarded only by the pinned list plus a 404 and owner-list check when the list changes (accepted risk).",
+      "context_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+      "created_at": "2026-09-29T22:39:48+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "sample-mode-042"
+      ],
+      "domain": "reviewer access: sample-data mode reachable without a GitHub account",
+      "history": [
+        {
+          "at": "2026-09-29T22:39:48+00:00",
+          "choice": "Every sample issue and PR is authored by the maintainer's own handle saariuslystoned (assignee saariuslystoned or none); no third-party GitHub user is named anywhere in sample data. Because GitHub cannot request a review from a PR's own author, no sample PR shows Review requested. Sample repository names stay realistic (no sample- prefix); a future collision with a real repository is guarded only by the pinned list plus a 404 and owner-list check when the list changes (accepted risk).",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T22:42:41+00:00",
+          "choice": "Every sample issue and PR is authored by the maintainer's own handle saariuslystoned (assignee saariuslystoned or none); no third-party GitHub user is named anywhere in sample data. Because GitHub cannot request a review from a PR's own author, no sample PR shows Review requested. Sample repository names stay realistic (no sample- prefix); a future collision with a real repository is guarded only by the pinned list plus a 404 and owner-list check when the list changes (accepted risk).",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-29T22:42:41+00:00",
+          "choice": "Every sample issue and PR is authored by the maintainer's own handle saariuslystoned (assignee saariuslystoned or none); no third-party GitHub user is named anywhere in sample data. Because GitHub cannot request a review from a PR's own author, no sample PR shows Review requested. Sample repository names stay realistic (no sample- prefix); a future collision with a real repository is guarded only by the pinned list plus a 404 and owner-list check when the list changes (accepted risk).",
+          "from": "implemented",
+          "implementation_ref": "file:app/src/main/java/co/saari/repoglance/sample/SampleAccount.kt",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "sample-people-043",
+      "implementation_ref": "file:app/src/main/java/co/saari/repoglance/sample/SampleAccount.kt",
+      "question": "Who authors the sample issues and PRs, and do sample repository names carry a sample- prefix?",
+      "rationale": "Maintainer 2026-09-29 ('a a') on review-3 findings 1 and 5.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+          "result": "clean",
+          "reviewed_at": "2026-09-29T22:45:13+00:00",
+          "source_identity": "sha256:f69204545c5fbf8f88733f27a8bfcf5475a7df2130f9ffa09a1c98eb08a1b10e"
+        }
+      ],
+      "review_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md",
+      "review_result": "clean",
+      "review_source_identity": "sha256:f69204545c5fbf8f88733f27a8bfcf5475a7df2130f9ffa09a1c98eb08a1b10e",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-29T22:45:13+00:00",
       "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
     }
   ],
   "last_activation": {
-    "at": "2026-09-29T19:17:17+00:00",
+    "at": "2026-09-29T22:24:22+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
@@ -4348,5 +4561,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-29T19:46:59+00:00"
+  "updated_at": "2026-09-29T22:45:13+00:00"
 }

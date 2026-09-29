@@ -16,7 +16,7 @@ import java.time.Duration
 import java.time.Instant
 
 object SampleAccount {
-    const val VIEWER_LOGIN = Fixtures.YOU
+    const val VIEWER_LOGIN = "saariuslystoned"
     const val ITEM_NOTE = "Sample item — not on GitHub"
     const val OUTSIDE_SAMPLE = "Not part of the sample account"
 
@@ -36,13 +36,13 @@ object SampleAccount {
     )
 
     private val REPOS = listOf(
-        SampleRepo(1L, RepoRef("acme", "rocket"), false, false, Duration.ofMinutes(25), 5, 3, 412),
-        SampleRepo(2L, RepoRef("acme", "api-server"), true, false, Duration.ofHours(2), 3, 2, 218),
-        SampleRepo(3L, RepoRef("acme", "mobile-app"), false, false, Duration.ofHours(6), 4, 2, 87),
-        SampleRepo(4L, RepoRef("octoco", "infra"), true, false, Duration.ofDays(1), 2, 1, 1_203),
-        SampleRepo(5L, RepoRef("octoco", "blocks"), false, false, Duration.ofDays(3), 1, 0, 36),
+        SampleRepo(1L, RepoRef("saari-co", "rocket"), false, false, Duration.ofMinutes(25), 5, 3, 412),
+        SampleRepo(2L, RepoRef("saari-co", "api-server"), true, false, Duration.ofHours(2), 3, 2, 218),
+        SampleRepo(3L, RepoRef("saari-co", "mobile-app"), false, false, Duration.ofHours(6), 4, 2, 87),
+        SampleRepo(4L, RepoRef("dinkuskit", "infra"), true, false, Duration.ofDays(1), 2, 1, 1_203),
+        SampleRepo(5L, RepoRef("dinkuskit", "design-system"), false, false, Duration.ofDays(3), 1, 0, 36),
         SampleRepo(6L, RepoRef(VIEWER_LOGIN, "dotfiles"), false, false, Duration.ofDays(9), 0, 1, 14),
-        SampleRepo(7L, RepoRef("acme", "legacy-site"), false, true, null, 0, 0, 1),
+        SampleRepo(7L, RepoRef("saari-co", "legacy-site"), false, true, null, 0, 0, 1),
     )
 
     fun catalog(now: Instant): LiveRepositoryCatalog = LiveRepositoryCatalog(
@@ -87,8 +87,8 @@ object SampleAccount {
             LiveIssue(
                 number = repo.firstNumber + repo.pullRequestCount + i,
                 title = pick(Fixtures.TITLE_POOL, seed),
-                author = pick(Fixtures.CAST, seed + 1),
-                assignee = if (i % 2 == 0) pick(Fixtures.CAST, seed + 2) else null,
+                author = VIEWER_LOGIN,
+                assignee = if (i % 2 == 0) VIEWER_LOGIN else null,
                 labels = labels(seed, count = 1 + i % 2),
                 commentCount = (seed * 3) % 7,
                 updatedAt = rowUpdatedAt(repo, i, now),
@@ -102,11 +102,11 @@ object SampleAccount {
             LivePullRequest(
                 number = repo.firstNumber + j,
                 title = pick(Fixtures.TITLE_POOL, seed),
-                author = pick(Fixtures.CAST, seed + 2),
+                author = VIEWER_LOGIN,
                 assignee = null,
                 labels = labels(seed, count = j % 2),
                 isDraft = j == 1,
-                reviewRequestedFromViewer = j == 0 && repoIndex % 2 == 0,
+                reviewRequestedFromViewer = false,
                 updatedAt = rowUpdatedAt(repo, j, now),
                 htmlUrl = "",
             )

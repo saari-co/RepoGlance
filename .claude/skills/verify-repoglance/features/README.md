@@ -76,5 +76,5 @@ required state, commands, and observable proof.
 - [Stack widget](./stack-widget.md) covers the large widget over the live
   pinned set: order, per-row clock times, empty state, and taps.
 - [Sample mode](./sample-mode.md) covers `Explore with sample data`: the
-  made-up account on the real screens, its marker, pins, row note, restart
+  made-up repositories on the real screens, its marker, pins, row note, restart
   persistence, and the exit to sign-in.

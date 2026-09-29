@@ -25,13 +25,19 @@ Facts (source-linked, main 432be33df55d14c5f0d58f10c5e3fa35fc94d118):
 - An unconfigured repo widget still says `FIXTURE PREVIEW`
   (`RepoWidget.kt:156-177`), including for signed-in users.
 
-Locked behaviour (`sample-mode-037`, maintainer 2026-09-29):
+Locked behaviour (`sample-mode-037`, superseded by `sample-mode-042`, maintainer 2026-09-29):
 
 - Sample mode uses the real signed-in screens (catalog, repo view,
   navigator), fed sample data.
 - Widgets work in sample mode and are marked as sample. Signed-in widgets
   never show sample rows.
-- Sample data uses fictional owners only.
+- Sample data uses fictional owners only. **Superseded 2026-09-29 by
+  `sample-mode-042`:** owners are the maintainer's own accounts (`saari-co`,
+  `dinkuskit`, viewer `saariuslystoned`) under repository names that do not
+  exist on GitHub, after ClawSweeper flagged `acme`, `octoco` and `octodev` as
+  real third-party accounts. Ledger note: `sample-app-038` still lists
+  `sample-mode-037` as its dependency (the ledger tool cannot re-point it),
+  so it is re-verified under `sample-mode-042` by hand; see the proof.
 - Sample mode persists across restarts until the user chooses to sign in.
   A sign-in action is always visible while in sample mode.
 - Default: the detail view of a sample issue or PR replaces "Open on GitHub"

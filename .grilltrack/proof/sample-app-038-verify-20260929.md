@@ -295,3 +295,161 @@ rebase had no conflicts.
 | Cold start in sample | 0 | sample bar 1 |
 | Sign in with GitHub (exit) | 0 | `repoglance:connect-github` 1, `Enter this code on GitHub` 0; capture `r-exit` `af8fd729b54414f43aa741ddba1c89ac1b39537de4a3e17e8081037f67a44b9d` |
 | Cold start after exit | — | Connect screen, sample bar 0 |
+
+## ClawSweeper review of 2a63d37: two P1 merge risks, both addressed
+
+ClawSweeper reviewed head `2a63d378ff8199bbf6ccb888c40856b908fda7c2` (5/6,
+no findings) and listed two maintainer-owned P1 merge risks.
+
+### 1. Signed-in cold start not run on a device: now run
+
+- **Device:** Pixel 10 Pro XL `63310DLCQ000RV`, Android 17. It holds the
+  maintainer's GitHub session from the #42 sign-in. #43's rebased debug APK
+  `b3b59f7a25b31cb52ea455af601312e20f2ac1924a4a4f571e25cc3fa5f26ab3` was
+  installed over #42's build with `adb install -r`, which keeps the session;
+  `doctor` passed.
+- **Cold start:** force-stop, then `am start -a MAIN -c LAUNCHER`.
+  - `repoglance:live` 1 and `repoglance:refresh-repositories` 1: the live
+    catalog, so the real session wins.
+  - `repoglance:sample-bar`, `repoglance:connect-github` and
+    `repoglance:explore-sample` are all 0.
+  - RepoGlance StrictMode disk frames: 0.
+- **Sample prefs:** `shared_prefs/repoglance_sample.xml` exists from the
+  earlier sample run and holds no keys (no stale flag).
+- **Capture:** the catalog was filtered to `saari-co/RepoGlance`, the only
+  repository-shaped label in the dump, then captured as
+  `signedin-cold-filtered`,
+  `d6df1601f2201eeeb33e2436d1886cab4390d27ae19906a2aa7583bf4bfeffea`.
+
+### 2. Sample owner handles were real third-party accounts: owners changed
+
+The maintainer decided on 2026-09-29 to use their own accounts
+(`sample-mode-042`, which supersedes `sample-mode-037`).
+
+- **Sample repositories:** `saari-co/rocket`, `saari-co/api-server`,
+  `saari-co/mobile-app`, `saari-co/legacy-site`, `dinkuskit/infra`,
+  `dinkuskit/design-system` and `saariuslystoned/dotfiles`.
+- **Viewer:** `@saariuslystoned`.
+- **Names checked:** `gh api repos/<name>` returns 404 for all seven
+  (2026-09-29). The token belongs to the maintainer and can see their
+  private repositories, so 404 means the name does not exist. No real
+  repository shows made-up numbers.
+- **Guard:** `SampleAccountTest` pins the exact list. A changed list fails
+  until someone re-runs the 404 check. The test also checks the owner set
+  and a denylist of the two public real repositories, `saari-co/RepoGlance`
+  and `dinkuskit/blocks`.
+- **Mutation:** renaming `saari-co/mobile-app` to `saari-co/RepoGlance`
+  fails the guard. The exact-list assertion catches it before the denylist
+  runs. The denylist is a written statement of intent that is redundant with
+  the exact list, and it is trimmed to the two public real repositories so
+  the test names no private repository.
+- **Still third-party:** row authors come from the fixture cast (`octodev`,
+  `mkraft`, `jrivera`, `tstone`), and some of those are real GitHub users.
+  They appear only as authors of made-up rows. The maintainer decision
+  covered owners only. *(Resolved by `sample-people-043` below: every
+  sample author is now `saariuslystoned`.)*
+
+Gate: `./gradlew assembleDebug check` BUILD SUCCESSFUL
+(`runs/build-runs/sample-owners-check.log`); 286 debug unit tests, 0 failures
+(SampleAccountTest 7/7).
+
+Emulator run: approved emulator, Android 16, no session, APK
+`2a1a957d1d67d0cefa90e941e22f9d358f4bad826463eabc8e476050445f5e9e`,
+targetSdk 36, `doctor` passed.
+
+| Step | StrictMode | Observed |
+| --- | --- | --- |
+| Signed-out cold start | 0 | Connect and Explore present |
+| Enter sample | 0 | `@saariuslystoned · 7 repositories`, sample bar, no `repoglance:live`; labels `saari-co/rocket saari-co/api-server saari-co/mobile-app dinkuskit/infra`; no `saari-co/RepoGlance` |
+| Owner filter | — | menu `All dinkuskit saari-co saariuslystoned`; `dinkuskit` leaves `dinkuskit/infra dinkuskit/design-system` |
+| Open `saari-co/rocket` | — | sample bar, 5 issue rows |
+| Tap a row | — | toast `Sample item — not on GitHub`, top stays `co.saari.repoglance/.MainActivity` |
+| Cold start in sample | 0 | sample bar, `@saariuslystoned · 7 repositories` |
+| Exit | 0 | Connect screen, no `Enter this code on GitHub` |
+
+| Capture | SHA-256 |
+| --- | --- |
+| `o-sample-catalog` | `6d8363e488aa97c88536d27a81d8a0fce5fb172e00de2d03a9062d11c7c2dd6d` |
+| `o-sample-repo` | `8608c5f65e7d7a912c7519dea86c964b6e729babad987554349fb3ebe84776bb` |
+
+
+### Review 3 (tree a45756055555a2574c8ed0dc5361dbcf03439d99) and fixes
+
+The independent reviewer found no P0 or P1, and the app change itself is
+correct.
+
+| # | Finding | Classification | Resolution |
+| --- | --- | --- | --- |
+| 1 | P2: row authors and assignees (`octodev`, `mkraft`, `jrivera`, `tstone`) are real third-party accounts | human_gate | Waiting on the maintainer |
+| 2 | P2: in the ledger, `sample-app-038` still depends on the superseded `sample-mode-037`, and its choice text still says "real owners renamed" | required_fix (disclosure) | See the ledger notes below and the map |
+| 3 | P3: the 037 re-lock reads as a maintainer decision | required_fix (disclosure) | See the ledger notes below |
+| 4 | P3: the 404 check had no positive control, and the mutation claim credited the denylist | required_fix | Positive control recorded below; mutation wording corrected above |
+| 5 | P3: plausible names under the maintainer's accounts could be created later | human_gate | Waiting on the maintainer, same question as 1 |
+| 6 | P3: the denylist named six private repositories | required_fix | Trimmed to `saari-co/RepoGlance` and `dinkuskit/blocks` |
+| 7 | P3: stale wording ("made-up account", the README's XL claim, the test name) | required_fix | Reworded; test renamed `sampleRepositoriesAreExactlyTheApprovedNames` |
+
+**Positive control for the 404 check.** The token belongs to
+`saariuslystoned` and lists private repositories under all three owners
+(counts only): saari-co 42, dinkuskit 2, saariuslystoned 7. Across the 81
+repositories those owners hold (the live catalog also shows 81), none of the
+7 sample names appears. The control `saari-co/RepoGlance` appears once.
+
+**Ledger notes.**
+- **Dependency:** `sample-app-038` records `sample-mode-037` as its
+  dependency. 037 is superseded by `sample-mode-042`, and the ledger tool
+  cannot edit a dependency or a recorded choice. From the 042 supersession
+  onward, 038 was re-implemented and re-verified under 042's owner rule
+  (maintainer's own accounts, names that do not exist). Its choice text
+  ("real owners renamed") describes the first implementation.
+- **The 037 re-lock was mechanical.** After `reopen`, the tool refused a
+  new proposal under the same ID. The `lock` that followed re-locked the old
+  "fictional owners only" text, and the tool logged it as "user accepted the
+  scoped decision". The maintainer never re-accepted that choice. The real
+  decision is `sample-mode-042` (lock, then supersede 037), recorded next.
+- **Timestamps:** the `confirm`, `implement` and `verify` events at
+  22:29:23Z were recorded in one batch after the work they describe. The
+  edits were 22:25–22:27Z and the emulator run 22:27–22:28Z.
+
+### sample-people-043: authors are the maintainer's handle (maintainer "a a")
+
+The maintainer answered review-3 findings 1 and 5:
+
+- **(1a)** Every sample issue and PR is authored by `saariuslystoned`, with
+  assignee `saariuslystoned` or none. `Fixtures.CAST` is private again and no
+  longer feeds sample data. GitHub cannot request a review from a PR's own
+  author, so no sample PR sets `reviewRequestedFromViewer`, and the
+  `Review requested` chip no longer appears in sample mode. Drafts remain.
+- **(2a)** The realistic repository names stay, and the collision risk is
+  accepted. It is guarded by the pinned list plus the 404 and owner-list
+  check whenever the list changes.
+
+Guard: `SampleAccountTest.everySamplePersonIsTheMaintainersOwnHandle`.
+Mutation: setting an issue author to `mkraft` fails it.
+
+Gate: `./gradlew assembleDebug check` BUILD SUCCESSFUL
+(`runs/build-runs/sample-people-check.log`); 287 debug unit tests, 0 failures
+(SampleAccountTest 8/8).
+
+Emulator run: approved emulator, Android 16, no session, APK
+`ae004f5bebf89db1aa48c9513033317627a947aaa1ec13fc2741ccf938fad2bb`,
+targetSdk 36, `doctor` passed.
+
+- **Catalog:** `@saariuslystoned · 7 repositories` with the sample bar;
+  RepoGlance StrictMode disk frames 0.
+- **`saari-co/rocket`:** `by saariuslystoned` ×6, third-party authors 0,
+  `Review requested` 0. After scrolling to the PRs: `Draft` 1,
+  `Review requested` 0, third-party authors 0.
+- **Exit:** the Connect screen, no code screen, StrictMode frames 0.
+- **Capture:** `p-sample-repo`,
+  `0a7fd48ab288416c3b213eb2e5358b05d266a3aacc44c4c16c4b32fbc72bce54`.
+
+The `sample-app-038` slice now includes this change and was verified with it.
+
+### Review 4 (tree dcc556bc14dbbf5bce4688a74392bdab50fb73b6): clean
+
+The reviewer checked the delta from review 3 (the owner fixes, `sample-people-043`
+and the review-3 disclosures). One P3 about proof wording was fixed. The
+confirmation of tree `dcc556bc14dbbf5bce4688a74392bdab50fb73b6` is clean. Source identity: the diff
+`git diff --no-color --full-index 103fc8dbc1a1da58afd8beb3a41f5e2f8fb0db78 dcc556bc14dbbf5bce4688a74392bdab50fb73b6` (20 files changed, 1866 insertions(+), 194 deletions(-))
+has `sha256:f69204545c5fbf8f88733f27a8bfcf5475a7df2130f9ffa09a1c98eb08a1b10e`. It is recorded in the ledger for `sample-app-038` and
+`sample-people-043`. Later edits to this file and the ledger are records only.
