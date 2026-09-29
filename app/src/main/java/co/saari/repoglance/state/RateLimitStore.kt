@@ -2,6 +2,7 @@ package co.saari.repoglance.state
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.model.RateLimitBucket
 import java.time.Instant
@@ -22,10 +23,10 @@ object RateLimitStore {
 
     fun record(context: Context, snapshot: RateLimitSnapshot, now: Instant) {
         val state = stateToRecord(snapshot, now) ?: return
-        prefs(context).edit()
-            .putString(KEY_BUCKET, state.bucket.name)
-            .putString(KEY_RESETS_AT, state.resetsAt?.toString())
-            .apply()
+        prefs(context).edit {
+            putString(KEY_BUCKET, state.bucket.name)
+            putString(KEY_RESETS_AT, state.resetsAt?.toString())
+        }
     }
 
     fun load(context: Context): RateLimitState? {
@@ -38,7 +39,7 @@ object RateLimitStore {
     }
 
     fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit { clear() }
     }
 
     internal fun stateToRecord(snapshot: RateLimitSnapshot, now: Instant): RateLimitState? = when (snapshot.bucket) {

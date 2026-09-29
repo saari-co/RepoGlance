@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -30,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
     private fun openGitHubVerification(verificationUri: String) {
         returnAfterGitHubVerification = true
         CustomTabsIntent.Builder().setShowTitle(true).build()
-            .launchUrl(this, Uri.parse(verificationUri))
+            .launchUrl(this, verificationUri.toUri())
     }
 
     private fun connectGitHub() {
@@ -185,7 +185,7 @@ class MainActivity : ComponentActivity() {
         refreshCatalogAfterGitHubAccess = true
         CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(
             this,
-            Uri.parse(REPOGLANCE_INSTALLATION_SETTINGS_URL),
+            REPOGLANCE_INSTALLATION_SETTINGS_URL.toUri(),
         )
     }
 

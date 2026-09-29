@@ -1,6 +1,7 @@
 package co.saari.repoglance.widget
 
 import android.content.Context
+import androidx.core.content.edit
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
 
@@ -24,22 +25,22 @@ object RepoWidgetConfigStore {
 
     fun save(context: Context, appWidgetId: Int, config: RepoWidgetConfig) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(key(appWidgetId, REPO_SUFFIX), config.repo.full)
-            .putString(key(appWidgetId, MODE_SUFFIX), config.mode.name)
-            .apply()
+            .edit {
+                putString(key(appWidgetId, REPO_SUFFIX), config.repo.full)
+                putString(key(appWidgetId, MODE_SUFFIX), config.mode.name)
+            }
     }
 
     fun remove(context: Context, appWidgetId: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .remove(key(appWidgetId, REPO_SUFFIX))
-            .remove(key(appWidgetId, MODE_SUFFIX))
-            .apply()
+            .edit {
+                remove(key(appWidgetId, REPO_SUFFIX))
+                remove(key(appWidgetId, MODE_SUFFIX))
+            }
     }
 
     fun clearAll(context: Context) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit { clear() }
     }
 
     fun configuredRepos(context: Context): List<String> =

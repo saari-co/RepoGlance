@@ -2,13 +2,13 @@ package co.saari.repoglance.link
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 
 object GitHubAppLauncher {
     const val PACKAGE_NAME = "com.github.android"
 
     fun intent(url: String, adjacent: Boolean): Intent =
-        Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        Intent(Intent.ACTION_VIEW, url.toUri()).apply {
             setPackage(PACKAGE_NAME)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addFlags(flags(adjacent))

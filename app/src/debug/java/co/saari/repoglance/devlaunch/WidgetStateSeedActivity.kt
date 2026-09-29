@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import co.saari.repoglance.data.RateLimitSnapshot
 import co.saari.repoglance.model.RateLimitBucket
@@ -53,10 +54,10 @@ class WidgetStateSeedActivity : ComponentActivity() {
         val stash = context.getSharedPreferences(STASH, Context.MODE_PRIVATE)
         val current = LiveSnapshotStore.load(context, repo)
         if (state != "restore" && !stash.contains(repo.full)) {
-            stash.edit()
-                .putString(repo.full, current?.let { LiveSnapshotStore.encode(it) } ?: NONE)
-                .putBoolean(RATE_SEEDED, false)
-                .apply()
+            stash.edit {
+                putString(repo.full, current?.let { LiveSnapshotStore.encode(it) } ?: NONE)
+                putBoolean(RATE_SEEDED, false)
+            }
         }
         val now = Instant.now()
         return when (state) {
@@ -71,21 +72,21 @@ class WidgetStateSeedActivity : ComponentActivity() {
                     if (RateLimitStore.exhaustedUntil(real, now) != null) {
                         return "rate_limited: refused, a real exhausted rate limit is active"
                     }
-                    stash.edit()
-                        .putString(RATE_BUCKET, real.bucket.name)
-                        .putString(RATE_RESETS, real.resetsAt?.toString())
-                        .apply()
+                    stash.edit {
+                        putString(RATE_BUCKET, real.bucket.name)
+                        putString(RATE_RESETS, real.resetsAt?.toString())
+                    }
                 }
                 RateLimitStore.record(
                     context,
                     RateLimitSnapshot(RateLimitBucket.EXHAUSTED, 0, null, now.plusSeconds(RESET_SECONDS)),
                     now,
                 )
-                stash.edit().putBoolean(RATE_SEEDED, true).apply()
+                stash.edit { putBoolean(RATE_SEEDED, true) }
                 "rate_limited: exhausted until ${now.plusSeconds(RESET_SECONDS)}"
             }
             "no_data" -> {
-                context.getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE).edit().remove(repo.full).apply()
+                context.getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE).edit { remove(repo.full) }
                 "no_data: removed stored snapshot for ${repo.full}"
             }
             "restore" -> restore(context, repo)
@@ -96,9 +97,9 @@ class WidgetStateSeedActivity : ComponentActivity() {
     private fun restore(context: Context, repo: RepoRef): String {
         val stash = context.getSharedPreferences(STASH, Context.MODE_PRIVATE)
         val raw = stash.getString(repo.full, null) ?: return "restore: nothing stashed for ${repo.full}"
-        val snapshots = context.getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE).edit()
-        if (raw == NONE) snapshots.remove(repo.full) else snapshots.putString(repo.full, raw)
-        snapshots.apply()
+        context.getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE).edit {
+            if (raw == NONE) remove(repo.full) else putString(repo.full, raw)
+        }
         if (stash.getBoolean(RATE_SEEDED, false)) {
             RateLimitStore.clear(context)
             stash.getString(RATE_BUCKET, null)?.let { bucket ->
@@ -110,7 +111,12 @@ class WidgetStateSeedActivity : ComponentActivity() {
                 )
             }
         }
-        stash.edit().remove(repo.full).remove(RATE_SEEDED).remove(RATE_BUCKET).remove(RATE_RESETS).apply()
+        stash.edit {
+            remove(repo.full)
+            remove(RATE_SEEDED)
+            remove(RATE_BUCKET)
+            remove(RATE_RESETS)
+        }
         return "restore: ${repo.full} back to the stashed record"
     }
 

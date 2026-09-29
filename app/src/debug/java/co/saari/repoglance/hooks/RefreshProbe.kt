@@ -1,6 +1,7 @@
 package co.saari.repoglance.hooks
 
 import android.content.Context
+import androidx.core.content.edit
 import java.time.Instant
 
 // Debug-only probe for the stale-session proof (GrillTrack
@@ -32,8 +33,8 @@ object RefreshProbe {
 
     private fun record(context: Context, state: String) {
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(state, Instant.now().toString())
-            .apply()
+            .edit {
+                putString(state, Instant.now().toString())
+            }
     }
 }
