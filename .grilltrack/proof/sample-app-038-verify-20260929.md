@@ -269,3 +269,29 @@ never signed in.
 | `xl-sample-catalog` | `f8f6492aef10c357b3dcbf26563c62c8863624f27c16f0e2492ed9d4bf50a378` |
 | `xl-sample-repo` | `4c8e5f912ef0a5095f5ad8748c6cf2735fac0c6ffe9931abb4016b63715c4918` |
 | `xl-sample-exit` | `8fce558621f0f7fc7f17f8138848ec74756771c716faa2eedb807e67cc4cafa3` |
+
+## After rebase onto #42 (targetSdk 36)
+
+The branch was rebased onto `main` 103fc8dbc1a1da58afd8beb3a41f5e2f8fb0db78,
+the #42 merge (compileSdk/targetSdk 36, AGP 8.10.1, UseKtx lint). The
+rebase had no conflicts.
+
+- **Gate:** `./gradlew assembleDebug assembleRelease check` BUILD
+  SUCCESSFUL. Lint reports no new issues. There are 285 debug unit tests
+  with 0 failures, and `aapt2` gives `targetSdkVersion '36'`.
+- **Device:** the approved emulator (`EMULATOR37X1X11X0`, Android 16), no
+  session. APK `b3b59f7a25b31cb52ea455af601312e20f2ac1924a4a4f571e25cc3fa5f26ab3`,
+  `targetSdk=36`; `doctor` passed.
+- **StrictMode:** counts are RepoGlance frames under
+  `DiskReadViolation`/`DiskWriteViolation` after each step.
+
+| Step | StrictMode | Observed |
+| --- | --- | --- |
+| Signed-out cold start | 0 | `repoglance:connect-github` 1, `repoglance:explore-sample` 1 |
+| Tap Explore with sample data | 0 | `repoglance:sample-bar` 1, `@octodev · 7 repositories` 1, `repoglance:live` 0 |
+| Open `acme/rocket` | — | sample bar present, 5 issue rows |
+| Tap `#415` | — | toast queue `text=Sample item — not on GitHub`, top stays `co.saari.repoglance/.MainActivity` |
+| BACK (predictive back at target 36) | — | returns to the sample catalog (`repoglance:refresh-repositories` present) |
+| Cold start in sample | 0 | sample bar 1 |
+| Sign in with GitHub (exit) | 0 | `repoglance:connect-github` 1, `Enter this code on GitHub` 0; capture `r-exit` `af8fd729b54414f43aa741ddba1c89ac1b39537de4a3e17e8081037f67a44b9d` |
+| Cold start after exit | — | Connect screen, sample bar 0 |
