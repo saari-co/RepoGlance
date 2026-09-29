@@ -3,7 +3,7 @@
      WidgetRefresh after an in-app repository open, a widget save, and each
      30-minute WorkManager refresh of the pinned set. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="110dp"
+    android:minWidth="140dp"
     android:minHeight="40dp"
     android:targetCellWidth="2"
     android:targetCellHeight="1"
