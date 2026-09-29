@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RepoGlance</string>
-    <string name="widget_repo_description">One repo\'s PRs, issues, CI, and release at a glance</string>
+    <string name="widget_repo_description">One repo\'s issues, PRs, and recent activity at a glance</string>
     <string name="widget_stack_description">A stack of your pinned repos at a glance</string>
     <string name="widget_config_title">Configure RepoGlance widget</string>
 </resources>
