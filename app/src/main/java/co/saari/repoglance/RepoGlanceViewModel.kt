@@ -360,7 +360,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             RateLimitStore.clear(context)
             RepoWidgetConfigStore.clearAll(context)
         }
-        WidgetRefresh.updateAll(context)
+        withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }
     }
 
     override fun onCleared() {
