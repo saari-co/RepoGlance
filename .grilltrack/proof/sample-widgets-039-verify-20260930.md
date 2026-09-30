@@ -183,13 +183,58 @@ down. Run dir `runs/verify-repoglance-runs/sample-widgets-039-final/`.
 - Cleanup: tile removed, both widgets removed (`widget-bounds` empty),
   signed out and not in sample mode, emulator shut down.
 
+## Signed-in physical Fold (ClawSweeper P1 follow-up, maintainer option 2)
+
+ClawSweeper (`9bd85f6a`, 5/6, proof sufficient, no findings) held one merge
+risk: no physical phone and no signed-in device. The maintainer chose to run
+the signed-in side on the Fold (`59151FDCG000JA`, inner display, posture
+`OPENED`). Before driving, the Fold sat idle on the launcher, with no other
+adb client on it. The PR's APK
+`5c08d1ea3469621814a169eeb195153528cb4c71ffd6b4a11993009002608f3f` was
+installed over the Fold's earlier `6a110834…` debug build with
+`install -r -d`, so data and session were kept. Doctor reported
+`apk_local == apk_device`. There was no sign-in, sign-out or capture.
+Launcher text was read with repository names masked; only the public
+`saari-co/RepoGlance` is named here.
+
+- **Baseline, then after install:** a repo widget (148x89 dp) reading
+  `RepoGlance`, `Tue 8:36 AM`, `issues` `3`, `PRs` `2`, and the stack reading
+  `Pinned · 0`, `Pin repositories in RepoGlance`. Both before and after the
+  app-update redraw, the widgets show no `sample` and no `FIXTURE PREVIEW`.
+- **Session:** the app shows `@saariuslystoned · 82 repositories` with
+  `repoglance:live`, and no `repoglance:sample-bar`, `connect-github` or
+  `explore-sample`.
+- **Live setup:** `APPWIDGET_CONFIGURE` for widget 16 shows the live note
+  `Saving pins this repository in RepoGlance; …` with `saari-co/RepoGlance`
+  selected. The open list has 11 visible repository entries and none of the
+  seven sample names. Cancelled, so the widget was unchanged.
+- **Live pin redraw:** pinning `saari-co/RepoGlance` in the live catalog
+  redraws the stack at once to `Pinned · 1`, `saari-co/RepoGlance`,
+  `Tue 8:36 AM`, `issues 3 · PRs 2 · review 0` (a live clock, no `sample`).
+  It was unpinned afterwards, and the stack is back to `Pinned · 0`.
+- **Tile:** already in the shade, so no `add-tile`. It reads
+  `RepoGlance, latest push to <repo> updated 4m ago` (live, no sample).
+  After a widget header tap opened the live `saari-co/RepoGlance` view
+  (`repoglance:live-home`), `click-tile` landed on the live catalog:
+  `repoglance:live` and `Find a repository`, with no `live-home` and no
+  sample bar.
+- **Logcat for the run:** no RepoGlance crash, and no main-thread disk
+  violation. One `UntaggedSocketViolation` from the live network transport
+  (`HttpTransport.kt:50`), which predates this change and which this PR does
+  not touch.
+- **End state:** the launcher is showing, pins are as found, and the Fold now
+  runs the PR build.
+
 ## Not proven here
 
-- **Physical phone and the Fold's cover display:** the emulator ran on the
-  inner display only.
-- **A signed-in device:** "signed-in widgets never show sample rows" rests on
-  the mode branch and its guards (`SampleWidgetsGuardTest`), not on a
-  signed-in device run.
+- **Sample mode on a physical phone and the Fold's cover display:** the
+  sample-mode run used the emulator's inner display. The physical Fold ran
+  only the signed-in side, because entering sample mode needs a signed-out
+  device and agents never sign out.
+- **Signed-in isolation:** proven on the signed-in Fold for placed widgets,
+  setup, pin redraw and the tile. The cross-mode case (sample mode followed
+  by a real sign-in) rests on the leave redraw, proven on the emulator, and
+  the guards.
 - **Real launcher drag from the widget picker:** placement used the app's
   `requestPinAppWidget` route; the setup launch is the same `APPWIDGET_CONFIGURE`.
 - **Tile subtitle pixels:** proven from `content-desc`; the narrow slot shows
