@@ -3,6 +3,7 @@ package co.saari.repoglance.tile
 import co.saari.repoglance.link.Sanitize
 import co.saari.repoglance.render.Ages
 import co.saari.repoglance.state.LatestPushRecord
+import co.saari.repoglance.ui.theme.SampleMarker
 import java.time.Duration
 import java.time.Instant
 
@@ -14,6 +15,7 @@ object TileTexts {
     private const val LOCKED = "Unlock to see the latest push"
     private const val REFRESH = "open to refresh"
     private const val SAMPLE = "Sample"
+    private const val SAMPLE_DATA = "Sample data"
     private val STALE_AFTER: Duration = Duration.ofHours(24)
 
     fun of(record: LatestPushRecord?, now: Instant, locked: Boolean = false): TileText {
@@ -34,12 +36,21 @@ object TileTexts {
         return TileText(subtitle, active = true, contentDescription = description)
     }
 
-    fun sample(latest: LatestPushRecord?, now: Instant, locked: Boolean = false): TileText {
+    fun sample(
+        latest: LatestPushRecord?,
+        now: Instant,
+        locked: Boolean = false,
+        marker: SampleMarker = SampleMarker.Default,
+    ): TileText {
         if (locked) return TileText(LOCKED, active = true, contentDescription = "$LABEL, $LOCKED")
         if (latest == null) return TileText(SAMPLE, active = true, contentDescription = "$LABEL, sample data")
         val repo = Sanitize.displayText(latest.repoFull)
+        val prefix = when (marker) {
+            SampleMarker.CHIP_ROW -> SAMPLE
+            SampleMarker.BANNER -> SAMPLE_DATA
+        }
         return TileText(
-            "$SAMPLE · $repo · ${Ages.format(latest.pushedAt, now)}",
+            "$prefix · $repo · ${Ages.format(latest.pushedAt, now)}",
             active = true,
             contentDescription = "$LABEL, sample data, latest push to $repo " +
                 Ages.updatedLabel(latest.pushedAt, now).lowercase(),

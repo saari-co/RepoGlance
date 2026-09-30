@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-09-30T20:49:30+00:00",
-    "domain": "sample-widgets-039: repo and stack widgets and the Quick Settings tile in sample mode, sample pins and widget config, sign-in transition, no background refresh, retire FIXTURE PREVIEW",
-    "started_at": "2026-09-30T20:34:44+00:00",
+    "confirmed_at": "2026-09-30T23:18:28+00:00",
+    "domain": "sample-marker-040: the look of the sample marker across the in-app screens, the widgets and the Quick Settings tile (one slot, round of five on the real sample canvas)",
+    "started_at": "2026-09-30T22:29:10+00:00",
     "status": "inspected",
-    "summary": "Maintainer 2026-09-30 'confirmed, use the emulator, add-tile ok': build sample-widgets-039 as summarised (1A-6A plus defaults: sample taps open the app never GitHub, no background refresh for sample, redraw on enter/leave/sample pin, SampleModeGuardTest relaxed to allow redraw only, cold-start sample widget tap keeps its repository). Verify with ./gradlew assembleDebug check and on the approved emulator (widget placement and add-tile/remove-tile approved there), then exact-source review."
+    "summary": "Maintainer 2026-09-30 'confirmed, emulator ok, open the PR once clean': B becomes the production default of LocalSampleMarker, A kept as pre-lock reference, C/D/E production code removed and the picker trimmed to A/B (round record kept in proof and design.md), test tags kept, tests/guards/docs/recipes updated; verify with the gate and on the signed-out approved emulator (widgets and add-tile/remove-tile approved), exact-source review, PR once clean."
   },
   "decisions": [
     {
@@ -4724,6 +4724,149 @@
       "superseded_by": null,
       "updated_at": "2026-09-30T21:37:45+00:00",
       "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#final-smoke APK 5c08d1ea (leave then Back empties widgets; no StrictMode; gate check-6 green, 308 tests)"
+    },
+    {
+      "baseline_ref": "git:f2c8816b8d69967daa091776c9e0727579c1c141",
+      "candidate_refs": [
+        "file:.grilltrack/work/picker/sample-marker-round-1.json"
+      ],
+      "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+      "context_ref": null,
+      "created_at": "2026-09-30T23:17:16+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "sample-widgets-039",
+        "sample-app-038",
+        "shape-control-031",
+        "label-typography-030",
+        "status-colour-029",
+        "widget-look-032"
+      ],
+      "domain": "sample-marker-040: the look of the sample marker across the in-app screens, the widgets and the Quick Settings tile (one slot, round of five on the real sample canvas)",
+      "history": [
+        {
+          "at": "2026-09-30T23:17:16+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T23:33:35+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T23:33:35+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "implemented",
+          "implementation_ref": "git-tree:ebdcf8a2022b0a634b26d416a47fb95cd7786f25 (base f2c8816b8d69967daa091776c9e0727579c1c141, branch claude/grilltrack-040-sample-marker, uncommitted) app/src/main/java/co/saari/repoglance/ui/theme/SampleMarker.kt",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T23:40:06+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "verified",
+          "implementation_ref": "git-tree:ebdcf8a2022b0a634b26d416a47fb95cd7786f25 (base f2c8816b8d69967daa091776c9e0727579c1c141, branch claude/grilltrack-040-sample-marker, uncommitted) app/src/main/java/co/saari/repoglance/ui/theme/SampleMarker.kt",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md (emulator + Fold, APK b9f49b5e; gate green, 313 tests)"
+        },
+        {
+          "at": "2026-09-30T23:40:06+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "needs_reverification",
+          "implementation_ref": "git-tree:ebdcf8a2022b0a634b26d416a47fb95cd7786f25 (base f2c8816b8d69967daa091776c9e0727579c1c141, branch claude/grilltrack-040-sample-marker, uncommitted) app/src/main/java/co/saari/repoglance/ui/theme/SampleMarker.kt",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "review_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review round 1 (git tree ebdcf8a2022b0a634b26d416a47fb95cd7786f25)",
+          "review_result": "findings",
+          "review_source_identity": "sha256:8af2d1afb0bded779123a60818f22440d3236f831aec952b924f7f9342b952df",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md (emulator + Fold, APK b9f49b5e; gate green, 313 tests)"
+        },
+        {
+          "at": "2026-09-30T23:40:06+00:00",
+          "choice": "B tonal banner (round sample-marker-round-1): app = a tertiary tonal banner card under the header on the catalog and the repository view with SAMPLE, the sentence 'These repositories are made up. Sign in to see your own GitHub.' and a filled 'Sign in with GitHub' button; widgets = 'sample' in a tertiary capsule in the compact time slot, and a tertiary header band on the tall repo widget (header line keeps '\u00b7 sample') and the stack widget (rows keep the plain 'sample'); tile subtitle 'Sample data \u00b7 <repo> \u00b7 <age>'. Emphasis uses the dynamic tertiary role (not the status hues). Rejected: A chip row (today's provisional), C top strip, D header badge, E bottom bar.",
+          "from": "implemented",
+          "implementation_ref": "git-tree:5a46faf22485e28f47f356590bd20d669220ae07 (review 1 repairs: tile recipe wording, picker default B and wording, picker pin gotcha)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md (emulator + Fold, APK b9f49b5e; gate green, 313 tests)"
+        }
+      ],
+      "id": "sample-marker-040",
+      "implementation_ref": "git-tree:5a46faf22485e28f47f356590bd20d669220ae07 (review 1 repairs: tile recipe wording, picker default B and wording, picker pin gotcha)",
+      "question": "How is sample mode marked across the app screens, the repo and stack widgets and the Quick Settings tile?",
+      "rationale": "Maintainer 2026-09-30 picked B on the live picker (SampleMarkerPickerActivity on the Fold, captures A 0e109941, B 033ea734, C abe1acc7, D 0939a814, E 49c5cd22). Known trait seen and accepted in the picker: on Android 16 the app's dynamic tertiaryContainer is vivid purple while Glance widgets render the older pale-pink token.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review round 1 (git tree ebdcf8a2022b0a634b26d416a47fb95cd7786f25)",
+          "result": "findings",
+          "reviewed_at": "2026-09-30T23:40:06+00:00",
+          "source_identity": "sha256:8af2d1afb0bded779123a60818f22440d3236f831aec952b924f7f9342b952df"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review round 2 (git tree 5a46faf22485e28f47f356590bd20d669220ae07)",
+          "result": "clean",
+          "reviewed_at": "2026-09-30T23:40:45+00:00",
+          "source_identity": "sha256:ba9e412287f5f4dca8f48a82d601b4f3c158d9c7eda21391fb1189225404d9ed"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review round 2 (git tree 5a46faf22485e28f47f356590bd20d669220ae07)",
+      "review_result": "clean",
+      "review_source_identity": "sha256:ba9e412287f5f4dca8f48a82d601b4f3c158d9c7eda21391fb1189225404d9ed",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-30T23:40:45+00:00",
+      "verification_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review (picker opens on B with no letter on the Fold, APK 1334d0b5; gate check-2 green)"
     }
   ],
   "last_activation": {
@@ -4744,16 +4887,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "play-app-access-041 after 040: Play Console App access text and store screenshots from sample mode (human-gated Console)",
-      "widget-setup follow-ups deferred by the 039 review: setup opened from a widget returns to the app instead of home (task affinity), and main-thread prefs reads in RepoWidgetReceiver.onDeleted"
+      "sample-mode follow-ups from the 039/040 reviews: widget setup opened from a widget returns to the app instead of home, main-thread prefs reads in RepoWidgetReceiver.onDeleted, and the debug picker's main-thread Glance rendering",
+      "compact-12h-fit-035: the deferred 12-hour clock truncation on the compact widget"
     ],
-    "reason": "039 built the widget and tile canvas the marker round needs (map node 3 depends on 1 and 2); the provisional plain 'sample' word is the weakest marker surface",
-    "recommended": "sample-marker-040: the look of the sample marker across the in-app chip, the widget 'sample' word and the tile subtitle, as one round of five on the real sample screens and placed widgets",
-    "recorded_at": "2026-09-30T21:37:45+00:00"
+    "reason": "The sample-mode map's last node is the Play reviewer path; the in-app, widget and marker slices it depends on are verified",
+    "recommended": "play-app-access-041: the Play Console App access text and store screenshots from sample mode (human-gated Console; map node 4, now unblocked by 038-040)",
+    "recorded_at": "2026-09-30T23:40:45+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-30T21:37:45+00:00"
+  "updated_at": "2026-09-30T23:40:45+00:00"
 }

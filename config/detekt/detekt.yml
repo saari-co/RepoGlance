@@ -95,3 +95,4 @@ Compose:
       - LocalControlShape
       - LocalWidgetLook
       - LocalWidgetTones
+      - LocalSampleMarker
