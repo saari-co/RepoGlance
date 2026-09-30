@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       # Same JDK as ci.yml / canary.yml (gradle/libs.versions.toml targets
-      # JDK 17, AGP 8.7.3, Kotlin 2.0.21). No explicit Android SDK setup step:
+      # JDK 17, AGP 8.10.1, Kotlin 2.0.21, compileSdk 36). No explicit Android SDK setup step:
       # ubuntu-latest ships a preinstalled SDK/build-tools image, same as
       # canary.yml relies on.
       - name: Set up Java

@@ -81,29 +81,36 @@
 <body>
 <main>
   <h1>RepoGlance Privacy Policy</h1>
-  <p class="updated">Last updated: 2026-08-17</p>
+  <p class="updated">Last updated: 2026-09-30</p>
 
   <h2>Summary</h2>
   <p>
-    RepoGlance is a read-only Android home-screen widget that shows information
-    about GitHub repositories. RepoGlance has no developer-operated backend: the
-    app on your device communicates directly with GitHub's own servers
-    (<code>github.com</code> / <code>api.github.com</code>). The developer (Saari) does not collect,
-    store, receive, or share any personal data through this app.
+    RepoGlance is a read-only Android app with home-screen widgets and an issue
+    navigator for GitHub repositories. RepoGlance has no developer-operated
+    backend: the app on your device communicates directly with GitHub's own
+    servers (<code>github.com</code> / <code>api.github.com</code>). The developer (Saari) does not
+    collect, store, receive, or share any personal data through this app.
   </p>
 
   <h2>Data handled on your device</h2>
   <ul>
-    <li><strong>Sign-in</strong>: RepoGlance uses GitHub's official OAuth device-authorization
-      flow to let you sign in. This flow is run by GitHub; RepoGlance never sees
-      your GitHub password.</li>
-    <li><strong>Access token</strong>: the access token GitHub issues after sign-in is stored
-      locally on your device. It is used only to make API calls to GitHub on
-      your behalf (for example, to fetch the repositories you ask the widget to
-      track). It is never transmitted to the developer or to any third party.</li>
-    <li><strong>Repository data</strong>: repository metadata (name, stats, activity, etc.) is
-      fetched directly from GitHub's API and displayed on-device. RepoGlance does
-      not relay this data anywhere else.</li>
+    <li><strong>Sign-in</strong>: RepoGlance uses GitHub's official device-authorization flow
+      to let you sign in. You enter a short code on GitHub's own page; RepoGlance
+      never sees your GitHub password.</li>
+    <li><strong>Access token</strong>: the access token (and refresh token) GitHub issues after
+      sign-in is encrypted with a key held by Android Keystore and stored only in
+      the app's private storage on your device, excluded from backups. It is used
+      only to make API calls to GitHub on your behalf (for example, to list the
+      repositories you have shared with RepoGlance and their open issues and pull
+      requests). It is never transmitted to the developer or to any third party.</li>
+    <li><strong>Repository data</strong>: repository metadata (names, visibility, push times,
+      open issue and pull request titles, labels, authors, and counts) is fetched
+      directly from GitHub's API and displayed on-device. The latest successful
+      result is cached on your device so the app and its widgets can show it with
+      its age when GitHub cannot be reached. RepoGlance does not relay this data
+      anywhere else.</li>
+    <li><strong>Sample mode</strong>: &ldquo;Explore with sample data&rdquo; shows made-up repositories that
+      are built into the app. It makes no network requests and needs no account.</li>
   </ul>
 
   <h2>Data sharing</h2>
@@ -120,23 +127,35 @@
     SDKs. This was verified directly against the app's source and its declared
     dependencies as of this writing: no Firebase, Crashlytics, Google Analytics,
     Google Play Services, AdMob, Sentry, Mixpanel, Amplitude, App Center,
-    Segment, or Matomo (or similar) libraries are present. The app requests only
-    the <code>android.permission.INTERNET</code> permission.
+    Segment, or Matomo (or similar) libraries are present.
   </p>
 
-  <h2>Data retention and deletion</h2>
+  <h2>Permissions</h2>
+  <p>
+    RepoGlance requests <code>android.permission.INTERNET</code> to reach GitHub. The
+    installed app also lists <code>ACCESS_NETWORK_STATE</code>, <code>WAKE_LOCK</code>,
+    <code>RECEIVE_BOOT_COMPLETED</code>, and <code>FOREGROUND_SERVICE</code>: these are declared by
+    Android Jetpack WorkManager, the system library RepoGlance uses to refresh
+    pinned repositories in the background about every 30 minutes while a network
+    connection is available. RepoGlance's own code does not request wake locks or
+    start a foreground service. It requests no location, contacts, storage,
+    camera, microphone, or notification permission.
+  </p>
+
+  <h2 id="data-retention-and-deletion">Data retention and deletion</h2>
   <p>
     Your access token and any cached repository data live only on your device.
     To remove them:
   </p>
   <ul>
-    <li>Sign out within the app, or</li>
+    <li>Choose <strong>Disconnect GitHub</strong> in the app's menu, which deletes the saved
+      session and the cached GitHub data, or</li>
     <li>Uninstall the app.</li>
   </ul>
   <p>
     You can also revoke RepoGlance's access to your GitHub account at any time
-    from GitHub itself: <strong>Settings &rarr; Applications</strong> (Authorized OAuth Apps), on
-    <a href="https://github.com/settings/applications">github.com</a>.
+    from GitHub itself: <strong>Settings &rarr; Applications &rarr; Authorized GitHub Apps</strong>, on
+    <a href="https://github.com/settings/apps/authorizations">github.com</a>.
   </p>
 
   <h2>Children</h2>

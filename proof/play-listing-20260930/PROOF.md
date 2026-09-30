@@ -1,0 +1,154 @@
+# Play listing assets and release-build check (2026-09-30)
+
+Tracker: [#7](https://github.com/saari-co/RepoGlance/issues/7), step 1 (a
+build Play will accept) and the store-listing graphics. Branch
+`claude/play-release-0.4.0-beta.1`, off `main` at
+`a0625da73c02e299b7a122b6ab78b22c19a169b3`. There were no source changes;
+the proof below is of that `main` source.
+
+## Release build Play will receive
+
+A local `./gradlew --no-daemon testDebugUnitTest assembleRelease
+bundleRelease assembleDebug` on `a0625da` finished with `BUILD SUCCESSFUL`
+(101 tasks) and exit 0. These are the same Gradle tasks `release.yml` runs
+on a tag. The local build is unsigned; CI signs with the upload key.
+
+- `GITHUB_REF_NAME=v0.4.0-beta.1 ./gradlew -q printVersion` printed
+  `versionName=0.4.0-beta.1` and `versionCode=40001`.
+- `aapt2 dump badging` (build-tools 37.0.0) shows `targetSdkVersion:'36'`,
+  `compileSdkVersion='36'`, and `native-code: 'arm64-v8a' 'armeabi-v7a' 'x86'
+  'x86_64'`.
+- `aapt2 dump permissions` on the release APK lists:
+  - `INTERNET`
+  - `WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED` and
+    `FOREGROUND_SERVICE`, merged from WorkManager 2.9.1
+  - the AndroidX `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` signature
+    permission
+
+  There is no `AD_ID` permission and no typed `FOREGROUND_SERVICE_*`
+  permission.
+  - `grep` finds no `WakeLock`, `PowerManager`, `startForeground` or
+    `setForeground` in `app/src/main/java`.
+  - The published privacy policy said the app "requests only
+    `android.permission.INTERNET`", which is false for the shipped APK. It is
+    corrected in this PR (see `docs/PRIVACY.md` and `docs/privacy/index.html`,
+    "Permissions").
+- **16 KB page size.** The only native library is
+  `libandroidx.graphics.path.so`, from Compose, for 4 ABIs.
+  - Every ELF `PT_LOAD` segment is aligned to `16384` on all four ABIs.
+  - `zipalign -c -P 16 -v 4` printed `Verification successful`, with each
+    `.so` `(OK)`.
+- Sizes: the release APK is 44,786,303 bytes and the AAB is 12,328,778 bytes
+  (R8 minify is off).
+
+## Sample-mode captures
+
+- **Device:** the approved emulator `EMULATOR37X1X11X0` (AVD
+  `Pixel_10_Pro_Fold`, API 36), booted with `-no-snapshot-save`. It was the
+  only emulator running.
+- **Other phones:** the Pixel 10 Pro XL (`63310DLCQ000RV`) holds the
+  maintainer's GitHub session, so sample mode is unreachable there. The
+  physical Fold (`59151FDCG000JA`) was attached and idle on the launcher,
+  but it was not driven: its session state was unknown, and checking it
+  would mean opening a possibly live catalog.
+- **Doctor:** with `VERIFY_SERIAL=EMULATOR37X1X11X0`, after `launch` installed
+  the local debug build, `apk_local` and `apk_device` were both
+  `da3ae9cc81add08d5a77ecc78f13f070c293ddbc0482a25e9ebef8e9967d6afb`. The
+  scenario launcher was present, the device was awake, and the posture was
+  `OPENED`.
+- **Clean status bar:** SystemUI demo mode showed the clock at `9:30`, a full
+  battery and wifi, and no notifications. Dark theme came from `cmd uimode
+  night yes`. Both were restored afterwards.
+
+The walk followed `features/sample-mode.md`, run as
+`VERIFY_RUN_ID=play-screens-20260930`:
+
+1. **Entry.** The `signin` dump had `repoglance:connect-github` and
+   `repoglance:explore-sample`. After `tap repoglance:explore-sample`, the
+   dump had `@saariuslystoned · 7 repositories`, `repoglance:sample-bar`,
+   `SAMPLE` and `Made-up repositories, not your GitHub`.
+2. **Pins.** The pin toggles for `saari-co/rocket` and `dinkuskit/infra`
+   pinned them, and the dump order became `saari-co/rocket`,
+   `dinkuskit/infra`, `saari-co/api-server`, `saari-co/mobile-app`. Both were
+   unpinned before exit; the next dump had zero `Unpin`.
+3. **Repository view.** `saari-co/rocket` showed `repoglance:live-mode-*`,
+   Issues `#415`–`#419` and PRs `#412`–`#414`, with `Draft` on `#413`.
+4. **Persistence.** After folding (`device_state state 0`) and relaunching
+   with `launch MIXED live`, the app reopened in sample mode with the pins
+   kept.
+5. **Exit.** `tap repoglance:sample-sign-in` led to a dump with
+   `repoglance:connect-github` and `repoglance:explore-sample`, and zero
+   `Enter this code`, so no device code was requested. After a force-stop
+   and relaunch, `explore-sample` was present: the Connect screen, not
+   sample mode.
+
+**Guard on every capture.** A script read the paired dump(s) and asserted
+three things:
+
+- every `owner/name` label is one of the seven sample names;
+- `repoglance:sample-bar` is present (absent only on the Connect screen);
+- `saari-co/RepoGlance` and the `repoglance:live` chip are absent.
+
+The owner-filter dropdown is a popup window whose dump holds only the menu,
+so for that capture the dumps just before and after it (`p-home`, `p-back`)
+carry the sample bar.
+
+### Play-ready files
+
+The Play-ready files were converted to 24-bit RGB PNG (Play rejects alpha in
+screenshots). They were uploaded to the private asset release
+[`saari-co/swarm-pr-assets@repoglance-play-listing-20260930`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930).
+The asset digests GitHub reports equal the local SHA-256s below.
+
+| Asset | Size | SHA-256 | Raw capture (SHA-256 prefix) |
+| --- | --- | --- | --- |
+| [`phone-01-catalog-pinned.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-01-catalog-pinned.png) | 1080×1920 | `2abb02de39b79c2d7edbdd5ca147dc48c3a1d12f1abf174de09665390dd4b6ce` | `play-phone-1-catalog` `b50dc4122f15` |
+| [`phone-02-repository-issues-and-prs.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-02-repository-issues-and-prs.png) | 1080×1920 | `8eb02c9985117504c7d91749c80b46a0ccbbf235102c34b21e77b610a4c7d6ac` | `play-phone-2-repo-both` `83535c1edbb3` |
+| [`phone-03-repository-prs.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-03-repository-prs.png) | 1080×1920 | `3c3e3c24ea3949e699fa9ea9e91152ba29f10ad4145bcfdc46d4241636f8fb2d` | `play-phone-3-repo-prs` `0ee0c4df4776` |
+| [`phone-04-owner-filter.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-04-owner-filter.png) | 1080×1920 | `7d9a3a3d428e642bf356e043184e021dc116e262f5b720adb4eb48ac41c15618` | `play-phone-4-owner-filter` `4de190a701c7` |
+| [`phone-05-connect-or-explore-sample.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-05-connect-or-explore-sample.png) | 1080×1920 | `e26d3dc08f4da4308d43c376b1b99b6d0ea8f6f3eaaee897ebf40d660b186127` | `play-phone-5-connect` `3687ce3830ed` |
+| [`fold-reference-01-catalog-pinned-inner.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/fold-reference-01-catalog-pinned-inner.png) | 2076×2152 | `a9dea5b2425aa674e6ccb5b63b8f6ae7235d90e5dd3a26d99c72694895dd5efe` | `sample-catalog-pinned-inner-dark` `12c54c947481` |
+| [`fold-reference-02-repository-inner.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/fold-reference-02-repository-inner.png) | 2076×2152 | `d4591874ff5c962dd19b862b5d8da78a82c0208ef9fdc47c6a07b3b7d10e5343` | `sample-repo-inner-dark` `3dc619faea87` |
+| [`fold-reference-03-repository-prs-inner.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/fold-reference-03-repository-prs-inner.png) | 2076×2152 | `2f03bf5e6b3ae2b320f2f5b296efb0af7f36df94cf1224149f9447dc17147441` | `sample-prs-inner-dark` `79a3a20fa697` |
+| [`playstore-icon-512.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/playstore-icon-512.png) | 512×512 | `ca169a39b067de4abea1c8a13a41e7b63f7cf280761dd333ae1c80def8710f59` | rendered |
+| [`feature-graphic-1024x500.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/feature-graphic-1024x500.png) | 1024×500 | `d013bdb49d9ce33087835d4d0efd9a3d15a8c1d723ceada76f1119d163f18a15` | rendered |
+
+- **Phone shots.** These are real app frames on the cover display with
+  `wm size 1080x1920`, which gives Play's recommended 9:16. The native cover
+  panel is 1080×2364, which breaks Play's rule that the long side be at most
+  twice the short side. The override was reset afterwards.
+- **Fold references.** These are the native inner display. They are not
+  used for a Play slot, because tablet slots need 16:9 or 9:16.
+- **Icon.** The icon is a transcription of `ic_launcher_background.xml` and
+  `ic_launcher_foreground.xml` to SVG, drawn over the full 108 dp canvas with
+  no mask and rendered by headless Chrome. Pixel samples: top centre
+  `(46,50,56)` = `#2E3238`, bottom centre `(4,5,6)` = `#040506`, mark centre
+  white.
+- **Feature graphic.** It shows the same mark, the wordmark (Roboto), the
+  tagline, and phone shot 1 in a device frame.
+
+### Not used
+
+- **`sample-catalog-cover-dark`** (`6c1708e0…5158`) caught the keyguard
+  after folding. It was discarded, and the retake came after `wm
+  dismiss-keyguard`.
+- **Landscape large-screen renders** (`play-large-1-catalog` `b3772261…ec6a`
+  and `play-large-5-connect` `2ebab1f3…f88a`, at 2560×1440) were rejected as
+  listing assets. In landscape the catalog header takes most of the height,
+  and one repository row shows. Finding: large-screen landscape layout is
+  worth a GrillTrack node before the tablet slots are filled.
+- **Widgets and the Quick Settings tile** were not captured. They do not
+  render sample data until `sample-widgets-039`, and faking their data is
+  out of bounds.
+
+## Restored state
+
+After the walk:
+
+- The sample mode exit was done.
+- `wm size reset`, SystemUI demo mode `exit` and `sysui_demo_allowed 0`, and
+  `cmd uimode night no` were run.
+- `bin/verify-repoglance cleanup` printed `app stopped, scenario restored to
+  MIXED, airplane mode off`.
+- Evidence stays in the ignored `runs/verify-repoglance-runs/play-screens-20260930/`
+  and `runs/play-release-runs/20260930/`.
