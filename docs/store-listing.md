@@ -6,6 +6,10 @@ closed-testing build. Paste the fenced blocks into the matching Play Console
 fields. Every claim here must stay true of the build being submitted. When
 the app changes, update this file in the same PR.
 
+Everything below is ready to paste except **App access**. That section waits
+on `sample-widgets-039`, or on the maintainer accepting the risk that
+reviewers cannot see the widgets and tile without an account.
+
 Sources: [PRIVACY.md](PRIVACY.md) (published at
 <https://saari-co.github.io/RepoGlance/privacy/>),
 [AUTH_ARCHITECTURE.md](AUTH_ARCHITECTURE.md), `app/src/main/AndroidManifest.xml`
@@ -95,6 +99,10 @@ Capture proof is in
   sample data**, so none shows a real account's repositories. The repository
   names sit under the maintainer's own accounts (`saari-co`, `dinkuskit`,
   `saariuslystoned`), and each screenshot carries the `SAMPLE` bar.
+- **The marker is provisional.** The screenshots show today's `SAMPLE`
+  marker, whose look is still provisional (`sample-marker-040`). If that
+  round changes it, retake the screenshots before `play-app-access-041` is
+  closed.
 - **Icon.** The icon is the ringed commit-eye, rendered from the adaptive
   launcher icon's background and foreground vectors over the full 108 dp
   canvas. This is what Android Studio's Play Store icon export does.
@@ -130,9 +138,31 @@ https://saari-co.github.io/RepoGlance/privacy/
 
 ### App access
 
-Choose **All or some functionality in my app is restricted**, because live
-data needs a GitHub sign-in. Add one set of instructions. Leave the username
-and password empty; if the form requires them, put `Not required` in both.
+> **Not ready to paste yet.** GrillTrack `play-app-access-041` (this text
+> and the store screenshots) depends on `sample-widgets-039` and
+> `sample-marker-040`. Until `sample-widgets-039` lands, sample mode shows the
+> catalog, repository view and issue/PR lists, but not the home-screen
+> widgets or the Quick Settings tile. The listing describes those surfaces,
+> so a reviewer on the no-credential path cannot reach everything it
+> advertises. Sending a release for review requires this declaration, so
+> the maintainer chooses one of these:
+>
+> 1. **Wait for `sample-widgets-039`** (recommended by the decision map and
+>    ClawSweeper). Then re-verify sample mode on the tagged build, drop the
+>    last sentence of the text below, and describe the sample widgets and
+>    tile as they actually behave.
+> 2. **Submit now and accept the risk.** Paste the interim text below as it
+>    stands. It names the gap rather than hiding it. If review asks for
+>    credentials, the fallback decided on 2026-09-29 is a dedicated reviewer
+>    GitHub account, which is a maintainer action.
+
+Form choices, the same for both options:
+
+- Choose **All or some functionality in my app is restricted**, because live
+  data needs a GitHub sign-in.
+- Add one set of instructions.
+- Leave the username and password empty. If the form requires them, put
+  `Not required` in both.
 
 - **Name:**
 
@@ -140,14 +170,11 @@ and password empty; if the form requires them, put `Not required` in both.
   Sample mode (no credentials needed)
   ```
 
-- **Any other information** (726 characters):
+- **Any other information** (interim text, 726 characters):
 
   ```
   No credentials are needed. On the first screen, tap "Explore with sample data". This opens the app's real catalog, repository view and issue/PR lists on seven made-up repositories, marked SAMPLE on every screen. Sample mode makes no network requests. Things to try: filter "Account or organization" by dinkuskit, search for "rocket", pin a repository, and open saari-co/rocket to switch between Issues, PRs and Both. Tapping a sample item shows "Sample item — not on GitHub". Tap "Sign in with GitHub" to leave sample mode. Signing in with a real GitHub account shows the same screens for that account's repositories. In this version, the home-screen widgets and the Quick Settings tile show data only for a signed-in account.
   ```
-
-If review asks for credentials anyway, the fallback decided on 2026-09-29 is
-a dedicated reviewer GitHub account. That is a maintainer action.
 
 ### Ads
 
