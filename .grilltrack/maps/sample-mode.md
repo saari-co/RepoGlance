@@ -56,11 +56,13 @@ Frontier nodes (one per GrillTrack cycle):
    catalog. Sample widgets switch to live or empty on sign-in, and background
    refresh never runs for sample. It also removes the stale `FIXTURE PREVIEW`
    label. **Verified on the emulator, review clean on tree `c8b449ba`
-   (`.grilltrack/proof/sample-widgets-039-verify-20260930.md`).**
+   (`.grilltrack/proof/sample-widgets-039-verify-20260930.md`); merged in
+   #45 (`f2c8816b`).**
 3. `sample-marker-040`: the look of the sample marker across app, widgets
-   and tile. This is a round of five on the real sample screens. **Current
-   frontier.** The canvas now exists: the in-app `SAMPLE` chip, the widget
-   `sample` word (provisional plain fresh style) and the tile subtitle.
+   and tile. This is a round of five on the real sample screens. **Locked B
+   tonal banner (round 1: A chip row, C top strip, D header badge, E bottom
+   bar rejected); verified on the emulator and the Fold
+   (`.grilltrack/proof/sample-marker-040-verify-20260930.md`).**
 4. `play-app-access-041`: the Play Console App access text and store
    screenshots from sample mode. This is human-gated (Console).
 

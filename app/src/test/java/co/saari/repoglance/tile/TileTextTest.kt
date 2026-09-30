@@ -49,7 +49,12 @@ class TileTextTest {
     fun sampleModeNamesTheLatestSamplePushAndSaysSample() {
         val latest = LatestPushRecord("saari-co/rocket", now.minus(Duration.ofMinutes(25)), now)
         val text = TileTexts.sample(latest, now)
-        assertEquals("Sample · saari-co/rocket · 25m", text.subtitle)
+        assertEquals("Sample data · saari-co/rocket · 25m", text.subtitle)
+        assertEquals(
+            "the pre-lock chip-row wording stays reachable through the seam",
+            "Sample · saari-co/rocket · 25m",
+            TileTexts.sample(latest, now, marker = co.saari.repoglance.ui.theme.SampleMarker.CHIP_ROW).subtitle,
+        )
         assertTrue(text.active)
         assertTrue(text.contentDescription.startsWith("RepoGlance, sample data, latest push to saari-co/rocket"))
         assertEquals("Sample", TileTexts.sample(null, now).subtitle)

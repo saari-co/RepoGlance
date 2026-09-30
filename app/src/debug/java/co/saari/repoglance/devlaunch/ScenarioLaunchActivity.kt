@@ -10,6 +10,7 @@ import co.saari.repoglance.MainActivity
 import co.saari.repoglance.devpicker.CompactVariantPickerActivity
 import co.saari.repoglance.devpicker.LabelTypeVariantPickerActivity
 import co.saari.repoglance.devpicker.NavigatorVariantPickerActivity
+import co.saari.repoglance.devpicker.SampleMarkerPickerActivity
 import co.saari.repoglance.devpicker.ShapeVariantPickerActivity
 import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
@@ -141,6 +142,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_SHAPE_PICKER = "shape-picker"
         const val SCREEN_WIDGET_LOOK_PICKER = "widget-look-picker"
         const val SCREEN_COMPACT_PICKER = "compact-picker"
+        const val SCREEN_SAMPLE_MARKER_PICKER = "sample-marker-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
@@ -161,6 +163,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
             SCREEN_SHAPE_PICKER to ShapeVariantPickerActivity::class.java,
             SCREEN_WIDGET_LOOK_PICKER to WidgetLookVariantPickerActivity::class.java,
             SCREEN_COMPACT_PICKER to CompactVariantPickerActivity::class.java,
+            SCREEN_SAMPLE_MARKER_PICKER to SampleMarkerPickerActivity::class.java,
         )
     }
 }

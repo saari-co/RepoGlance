@@ -91,7 +91,9 @@ import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.LabelRole
 import co.saari.repoglance.ui.theme.LabelText
+import co.saari.repoglance.ui.theme.LocalSampleMarker
 import co.saari.repoglance.ui.theme.PrimaryButton
+import co.saari.repoglance.ui.theme.SampleMarker
 import co.saari.repoglance.ui.theme.SecondaryButton
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.launch
@@ -289,24 +291,9 @@ private fun ConnectGitHubScreen(
 
 @Composable
 private fun SampleModeBar(onSignIn: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth().testTag(SAMPLE_BAR_TEST_TAG),
-    ) {
-        ControlChip(
-            label = { LabelText("SAMPLE", LabelRole.CHIP) },
-            modifier = Modifier.testTag(SAMPLE_CHIP_TEST_TAG),
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(
-            "Made-up repositories, not your GitHub",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f),
-        )
-        TextButton(onClick = onSignIn, modifier = Modifier.testTag(SAMPLE_SIGN_IN_TEST_TAG)) {
-            LabelText("Sign in with GitHub", LabelRole.BUTTON)
-        }
+    when (LocalSampleMarker.current) {
+        SampleMarker.CHIP_ROW -> SampleChipRow(onSignIn, modifier)
+        SampleMarker.BANNER -> SampleBanner(onSignIn, modifier)
     }
 }
 
