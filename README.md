@@ -4,8 +4,9 @@
 
 RepoGlance is a read-only, widget-first Android app optimized for Google
 Pixels: Material You home-screen widgets showing each repository's PR/issue
-pressure, default-branch CI state, latest release, and data age — paired
-with a fast issue navigator — without ever mutating GitHub.
+pressure and data age (default-branch CI state and latest release are
+planned) — paired with a fast issue navigator — without ever mutating
+GitHub.
 
 Inspired by the excellent [RepoBar](https://github.com/steipete/RepoBar) by
 Peter Steinberger (macOS menu bar). RepoGlance is the Pixel-native analog,
@@ -14,66 +15,64 @@ and deep links into the GitHub mobile app.
 
 ## Status
 
-Slice 1 available: typed snapshot model, fixture corpus, and truth-rule tests.
+RepoGlance is in beta. `main` is the source for **0.4.0-beta.1**, the first
+Google Play candidate; it is not on Google Play yet, and the launch is
+tracked in [#7](https://github.com/saari-co/RepoGlance/issues/7). Version
+tags build signed APKs and AABs on
+[GitHub Releases](https://github.com/saari-co/RepoGlance/releases)
+([docs/RELEASING.md](docs/RELEASING.md)).
 
-Slice 2 available: fixture-first Glance widgets (per-repo + stack) and an
-in-app fixture mode (pinning, navigator, cached search), plus per-widget
-repository/mode configuration and a Fold-first navigator shell.
+Available on `main`, with device proof in [`proof/`](proof/) and
+[`.grilltrack/proof/`](.grilltrack/proof/):
 
-The prototype live-data slice on this branch adds user-present GitHub App
-device-flow sign-in, Keystore-backed rotating tokens, live repository
-discovery, and repo-scoped open issue/PR lists. The repaired public-client
-device flow is source-, JVM-, and physical-Fold verified: the exact installed
-APK completed GitHub authorization, loaded the public live RepoGlance
-navigator, and retained its encrypted session across a force-stop/cold launch.
-The live repository home can filter visible repositories by account or
-organization before applying repository search. GitHub App installation and
-repository-sharing controls live under **Manage GitHub access** in the header
-menu rather than occupying the permanent navigation surface.
-Live widgets are available and physical-Fold verified: repositories are
-pinned in place from the live catalog; a per-repo widget is configured from
-the last catalog load and shows that repository's saved counts with their
-`as of` time (`last good` when stale, `no data` never shown as zero); the
-stack widget lists every live pin, most recent push first. Pinned
-repositories refresh in the background every 30 minutes on a network
-connection (WorkManager, no wakelock or foreground service) within a visible
-rate-limit budget, and both widgets redraw from saved data after an app
-update. Live CI is not fetched, so the widgets have no CI column. CI/release
-pressure, signing, release, general distribution, and revocation of the
-earlier prototype client secret remain maintainer-gated or planned.
+- **Sign in with GitHub.** A GitHub App device flow that the user completes
+  on GitHub's own page. The token is encrypted with Android Keystore and
+  rotated before it expires. Proven on a Pixel 10 Pro Fold, and again on a
+  Pixel 10 Pro XL after the move to API 36. See [Auth](#auth) below.
+- **Live catalog.** Every repository the GitHub App installation shares,
+  filtered by account or organization, searched, and sorted by recent push
+  or A to Z. Pin a repository in place from its row; pinned repositories
+  sort first.
+- **Repository view.** Open issues and pull requests (Issues, PRs or both)
+  with search over the loaded rows. A tap opens the item in the GitHub app.
+- **Widgets.** A per-repository widget set up from the live catalog, and a
+  stack widget over the pinned set. Every value shows its age; a stale value
+  says `last good`, a missing one `no data`, never zero. Pinned repositories
+  refresh about every 30 minutes on a network connection (WorkManager, no
+  wakelock or foreground service) within a visible rate-limit budget, and
+  both widgets redraw from saved data after an app update.
+- **Quick Settings tile.** It shows the latest push, and a tap opens the
+  catalog.
+- **Sample mode.** **Explore with sample data** on the sign-in screen opens
+  the real catalog, repository view and navigator on seven made-up
+  repositories under RepoGlance's own accounts, marked `SAMPLE` on every
+  screen, with no GitHub account and no network call. It stays until the
+  user chooses **Sign in with GitHub**. Verified on the emulator
+  (Android 16); a Pixel 10 Pro XL (Android 17) ran an earlier owner set.
+- **Read-only.** RepoGlance performs no GitHub writes of any kind.
 
-Sample mode is available and verified on the emulator (Android 16); a Pixel
-10 Pro XL (Android 17) ran the earlier owner set and the signed-in cold start: **Explore with
-sample data** on the sign-in screen opens the real catalog, repository view
-and navigator on made-up repositories under RepoGlance's own accounts,
-marked `SAMPLE` on every screen, without
-a GitHub account or any network call. It stays until the user chooses
-**Sign in with GitHub**. Widgets and the Quick Settings tile do not show
-sample data yet.
+Not available yet:
+
+- CI state, latest release, and a watched-CI live notification. Live CI is
+  not fetched, so the widgets have no CI column.
+- Sample data in the widgets and the Quick Settings tile
+  (`sample-widgets-039`).
+- Account-wide and organization-wide issue navigation with the Mine,
+  Mentions and Awaiting-my-review filters. On live data the navigator is per
+  repository today.
+- Google Play distribution ([#7](https://github.com/saari-co/RepoGlance/issues/7)).
+  Revoking the earlier prototype client secret remains maintainer-gated.
 
 ## Planned
 
-- **Widgets first.** Per-repo and multi-repo stack widgets in Material You
-  dynamic color, light/dark, with the data age always visible. Pixel Fold
-  cover- and inner-display sizes are first-class.
-- **Account-first discovery.** Sign in once; switch between your account
-  and your orgs; every repo you can see shows its open PRs, issues, CI
-  state, and latest release.
-- **Pin what matters.** Pin any repo in place (the pin toggle lives on the
-  row, like pinning a session in the Claude Code app). Pinned repos float
-  to the top, earn widget slots, and are the only background-refresh set —
-  that is what keeps battery and API rate limits honest. No preset pins.
-- **Issue navigator.** Scope account-wide, org-wide, or to one repo; show
-  issues only, PRs only, or both; filter by Open / Mine / Mentions /
-  Recently updated / Awaiting my review; instant search over cached rows.
-  Full threads and every action deep-link to the installed GitHub app.
-- **Pressure surfaces.** A Quick Settings attention tile and a single
-  watched-CI-run live notification. No notification firehose.
-- **Honest by contract.** Unknown never renders as zero; stale data is
-  labelled with its age; rate-limited is a visible state, never silently
-  masked with old numbers.
+The product direction is in [VISION.md](VISION.md). Next up, beyond the
+"not available yet" list above: a CI column and pressure fields from the
+read-only Checks, Commit statuses and Contents permissions, and the single
+watched-CI-run notification. Honest by contract throughout: unknown never
+renders as zero, stale data is labelled with its age, and rate-limited is a
+visible state, never masked with old numbers.
 
-## Auth (prototype)
+## Auth
 
 RepoGlance requests a short user code from its public GitHub App, keeps that
 code visible, and waits for an explicit **Copy code & open GitHub** tap. That
