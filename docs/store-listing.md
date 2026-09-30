@@ -24,10 +24,10 @@ what the app works with, and ends with a non-affiliation line.
 
 ## Short description
 
-(80 characters max; 78 used)
+(80 characters max; 76 used)
 
 ```
-Read-only GitHub widgets, pinned repos, and open issues and PRs on your Pixel.
+Read-only GitHub widgets, pinned repos, and open issues and PRs at a glance.
 ```
 
 ## Full description
