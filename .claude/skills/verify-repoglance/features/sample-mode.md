@@ -6,15 +6,15 @@ Someone without a GitHub account taps `Explore with sample data` on the sign-in 
 
 - `sample-entry`: an `Explore with sample data` button under `Connect GitHub` on the signed-out screen.
 - `sample-catalog`: `@saariuslystoned · 7 repositories`. Owners are the maintainer's own accounts `saari-co`, `dinkuskit` and `saariuslystoned`, under repository names that do not exist on GitHub, so no real repository shows made-up numbers; there is one archived repository and one with an unknown push time. The owner filter, search, sort and pins all work.
-- `sample-marker`: a `SAMPLE` chip and `Made-up repositories, not your GitHub` on the catalog and the repository view. The `LIVE` chip, `Manage GitHub access` and `Disconnect GitHub` are absent.
+- `sample-marker`: a tonal banner under the header on the catalog and the repository view with `SAMPLE`, `These repositories are made up. Sign in to see your own GitHub.` and a `Sign in with GitHub` button (GrillTrack `sample-marker-040`, B tonal banner). The `LIVE` chip, `Manage GitHub access` and `Disconnect GitHub` are absent.
 - `sample-pins`: pins are kept apart from the real pinned set and never refresh a widget.
 - `sample-rows`: issues and PRs under each repository, all authored by `saariuslystoned`, with no third-party GitHub user named. No sample PR shows `Review requested`, because GitHub cannot request a review from a PR's own author. A tap shows `Sample item — not on GitHub` and never opens GitHub.
 - `sample-persist`: the app reopens in sample mode after a force-stop until the user signs in.
 - `sample-exit`: `Sign in with GitHub` returns to the Connect screen without requesting a device code.
 - `sample-widget-setup`: adding a repo widget in sample mode lists the seven sample repositories, sample pins first, with the note `Sample data: saving pins this sample repository; …`. Saving pins the repository among the sample pins; removing the widget unpins it and the stack drops it at once.
-- `sample-widgets`: the compact widget reads `rocket  sample  issues 5  PRs 3`, the tall size `saari-co/rocket` / `ISSUES 5 · PRS 3 · sample` over sample rows, and the stack `Pinned · N` with `sample` in each row's time slot. No clock and no rate-limit text appear on a sample widget.
+- `sample-widgets`: the compact widget reads `rocket  sample  issues 5  PRs 3` with `sample` in a tinted capsule, the tall size `saari-co/rocket` / `ISSUES 5 · PRS 3 · sample` in a tinted header band over sample rows, and the stack `Pinned · N` in a tinted header band with `sample` in each row's time slot. No clock and no rate-limit text appear on a sample widget.
 - `sample-widget-taps`: a widget header, tall row or stack row opens that sample repository in the app, never GitHub, including from a stopped app.
-- `sample-tile`: the tile is active and describes itself as `RepoGlance, sample data, latest push to saari-co/rocket updated 25m ago` (subtitle `Sample · saari-co/rocket · 25m`); a tap opens the sample catalog.
+- `sample-tile`: the tile is active and describes itself as `RepoGlance, sample data, latest push to saari-co/rocket updated 25m ago` (subtitle `Sample data · saari-co/rocket · 25m`); a tap opens the sample catalog.
 - `sample-widget-exit`: after `Sign in with GitHub`, repo widgets read `RepoGlance` / `Tap to choose a repository`, the stack reads `Pinned · 0` / `Pin repositories in RepoGlance`, and the tile reads `Open to connect`. Entering sample mode again starts with no pins and unconfigured widgets.
 
 ## How to get to it (user POV)
@@ -55,7 +55,7 @@ Preconditions:
 
 - Sample mode is stored on the phone. A run that stops midway leaves the next `launch MIXED live` on the sample catalog instead of the Connect screen, and `bin/verify-repoglance cleanup` does not clear it. End every run with **Exit**, or run `adb shell pm clear co.saari.repoglance` on a phone with no session to keep.
 - Sample repositories sit under the maintainer's real accounts, so a sample capture shows `saari-co/…` names. Only the `SAMPLE` bar tells it apart from the live catalog. Assert `repoglance:sample-bar` before any capture, and never mix sample captures with live-screen proof.
-- The `SAMPLE` marker's look is provisional (GrillTrack `sample-marker-040`). Assert its test tags and text, not its colours.
+- The `SAMPLE` marker is the tonal banner (GrillTrack `sample-marker-040`). Assert its test tags and text, not its colours: on Android 16 the app banner is vivid purple while widgets use a pale pink, and both follow the wallpaper.
 - Remove any widgets and the tile you placed when you finish: drag each widget to the launcher's `Remove` target (its position moves, so read it from a dump while dragging) and run `remove-tile`.
 - The first tap on a widget right after `HOME` can be swallowed while the launcher settles. If nothing opens, dump and tap again before calling it a failure.
 - A tile in a narrow Quick Settings slot shows only its icon. Prove the subtitle from the `content-desc`, not a capture.

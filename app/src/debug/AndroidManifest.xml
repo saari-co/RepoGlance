@@ -39,6 +39,10 @@
             android:exported="true"
             android:label="GrillTrack compact-widget picker" />
         <activity
+            android:name="co.saari.repoglance.devpicker.SampleMarkerPickerActivity"
+            android:exported="true"
+            android:label="GrillTrack sample-marker picker" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.WidgetStateSeedActivity"
             android:exported="true"
             android:excludeFromRecents="true"

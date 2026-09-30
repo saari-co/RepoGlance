@@ -1,7 +1,8 @@
 # Design contract: RepoGlance
 
-- **Version:** 6 (2026-09-30): sample widgets and the unconfigured widget
-  [sample-widgets-039]. Version 5 (2026-09-29): compact widget crowding
+- **Version:** 7 (2026-09-30): sample marker, tonal banner
+  [sample-marker-040]. Version 6 (2026-09-30): sample widgets and the
+  unconfigured widget [sample-widgets-039]. Version 5 (2026-09-29): compact widget crowding
   [compact-crowding-034]. Version 4 (2026-09-28): widget freshness and labels
   [widget-look-032]. Version 3 (2026-09-28): shape and control language
   [shape-control-031]. Version 2 (2026-09-28): label typography
@@ -153,11 +154,31 @@
     the clock time of its data, a sample widget shows the word `sample`:
     the compact freshness slot, the tall header in place of `as of`, and
     each stack row. Sample data was never fetched and never refreshes, so
-    no clock is shown. The look is provisional (the plain fresh style, no
-    capsule) until the marker round `sample-marker-040`.
+    no clock is shown. Its look is the sample marker below.
   - **Unconfigured repo widget [sample-widgets-039]:** `RepoGlance` over
     `Tap to choose a repository`; a tap opens that widget's setup. It
     replaced the stale `FIXTURE PREVIEW` label.
+- **Sample marker [sample-marker-040, "B tonal banner"]:** sample mode is
+  marked with the dynamic `tertiary` role, never a status hue. The seam is
+  `ui/theme/SampleMarker.kt` (`LocalSampleMarker`, `sampleTone()`):
+  `SampleMarker.BANNER` is the production default and `SampleMarker.CHIP_ROW`
+  is the pre-lock look.
+
+  | surface | marker |
+  | --- | --- |
+  | catalog and repository view | 16 dp tonal banner (`tertiaryContainer`) under the header: SAMPLE (section label), "These repositories are made up. Sign in to see your own GitHub." and a tonal primary "Sign in with GitHub" |
+  | compact repo widget | `sample` in a tertiary capsule (8 dp, mono 8 sp) in the time slot |
+  | tall repo widget | tertiary header band; the header line reads `ISSUES n · PRS n · sample` |
+  | stack widget | tertiary header band; each row keeps the plain `sample` |
+  | Quick Settings tile | subtitle `Sample data · <repo> · <push age>` |
+
+  - On Android 16 the app's dynamic `tertiaryContainer` renders vivid purple
+    while Glance widgets render the older pale-pink system token; seen and
+    accepted in the picker.
+  - **Rejected (round 1, do not reintroduce without a new grill):** A chip
+    row (the provisional look, kept only as the seam's pre-lock value);
+    C full-bleed top strip; D header badge; E persistent bottom bar.
+  - **Proof:** `.grilltrack/proof/sample-marker-040-verify-20260930.md`.
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
@@ -203,10 +224,7 @@
   Not grilled.
 - **Tile state:** the system draws the tile, so only icon, active state and
   subtitle wording can change. Not grilled beyond sample mode, where the
-  subtitle reads `Sample · <repo> · <push age>` [sample-widgets-039].
-- **Sample marker look [sample-marker-040]:** the in-app chip, the widget
-  `sample` word and the tile subtitle are provisional; one round of five on
-  the real sample screens decides them.
+  subtitle reads `Sample data · <repo> · <push age>` [sample-marker-040].
 - **Shape on the remaining M3 controls:** sort chips, segmented buttons,
   text buttons and list rows kept M3 in round 3. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.

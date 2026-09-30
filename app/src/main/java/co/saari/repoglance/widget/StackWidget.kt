@@ -38,6 +38,7 @@ import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
 import co.saari.repoglance.state.SampleModeStore
+import co.saari.repoglance.ui.theme.SampleMarker
 import java.time.Instant
 
 class StackWidget : GlanceAppWidget() {
@@ -64,6 +65,7 @@ class StackWidget : GlanceAppWidget() {
                                 stackHeaderLabel(entries.size, data.freshness),
                                 catalogIntent,
                                 CiColorRole.NEGATIVE.takeIf { data.freshness.rateLimitedUntil != null },
+                                sampleMarker(data.freshness),
                             )
                             LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                                 if (entries.isEmpty()) {
@@ -181,18 +183,23 @@ private fun liveCatalogIntent(context: Context): Intent = Intent(context, MainAc
 }
 
 @Composable
-internal fun StackHeader(label: String, catalogIntent: Intent, role: CiColorRole?) {
+internal fun StackHeader(label: String, catalogIntent: Intent, role: CiColorRole?, sample: SampleMarker? = null) {
+    val band = sample == SampleMarker.BANNER
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .background(headerBackground(role))
+            .background(if (band) GlanceTheme.colors.tertiaryContainer else headerBackground(role))
             .clickable(actionStartActivity(catalogIntent))
             .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Text(
             label,
             maxLines = 1,
-            style = TextStyle(color = headerInk(role), fontWeight = FontWeight.Bold, fontFamily = labelFamily()),
+            style = TextStyle(
+                color = if (band) GlanceTheme.colors.onTertiaryContainer else headerInk(role),
+                fontWeight = FontWeight.Bold,
+                fontFamily = labelFamily(),
+            ),
             modifier = GlanceModifier.semantics { testTag = STACK_HEADER_TAG },
         )
     }

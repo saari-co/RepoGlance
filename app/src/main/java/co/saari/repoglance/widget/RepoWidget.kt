@@ -50,6 +50,7 @@ import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
 import co.saari.repoglance.state.SampleModeStore
+import co.saari.repoglance.ui.theme.SampleMarker
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -294,16 +295,25 @@ internal fun CompactContent(
             )
             if (!ownRow && !bottom) {
                 Spacer(modifier = GlanceModifier.width(4.dp))
-                CompactFreshness(
-                    snapshot,
-                    freshness,
-                    modifier = if (nameFirst) GlanceModifier.defaultWeight() else GlanceModifier,
-                )
+                CompactSlot(snapshot, freshness, if (nameFirst) GlanceModifier.defaultWeight() else GlanceModifier)
             }
         }
         if (ownRow) CompactFreshness(snapshot, freshness)
         CompactCounts(snapshot, basis, merged = ownRow && layout == CompactLayout.MERGED_COUNTS)
         if (bottom) CompactFreshness(snapshot, freshness)
+    }
+}
+
+@Composable
+private fun CompactSlot(
+    snapshot: RepoSnapshot?,
+    freshness: WidgetFreshness,
+    modifier: GlanceModifier = GlanceModifier,
+) {
+    if (sampleMarker(freshness) == SampleMarker.BANNER) {
+        SampleCapsule(SAMPLE_TIME_LABEL, modifier)
+    } else {
+        CompactFreshness(snapshot, freshness, modifier = modifier)
     }
 }
 
@@ -409,24 +419,26 @@ private fun TallBody(
 ) {
     val role = freshnessRole(snapshot, freshness)
         .takeIf { LocalWidgetLook.current.freshness != FreshnessStyle.MATERIAL_ERROR }
+    val band = sampleMarker(freshness) == SampleMarker.BANNER
+    val ink = if (band) GlanceTheme.colors.onTertiaryContainer else headerInk(role)
     Column(modifier = GlanceModifier.fillMaxSize()) {
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .background(headerBackground(role))
+                .background(if (band) GlanceTheme.colors.tertiaryContainer else headerBackground(role))
                 .clickable(actionStartActivity(appIntent))
                 .padding(horizontal = 10.dp, vertical = 7.dp),
         ) {
             Text(
                 config.repo.full,
                 maxLines = 1,
-                style = TextStyle(color = headerInk(role), fontWeight = FontWeight.Bold),
+                style = TextStyle(color = ink, fontWeight = FontWeight.Bold),
             )
-            if (LocalWidgetLook.current.freshness == FreshnessStyle.TONE_HEADER) {
+            if (band || LocalWidgetLook.current.freshness == FreshnessStyle.TONE_HEADER) {
                 Text(
                     tallHeaderLabel(snapshot, config.mode, freshness),
                     maxLines = 1,
-                    style = TextStyle(color = headerInk(role), fontFamily = labelFamily()),
+                    style = TextStyle(color = ink, fontFamily = labelFamily()),
                     modifier = GlanceModifier.semantics { testTag = TALL_HEADER_TAG },
                 )
             } else {
