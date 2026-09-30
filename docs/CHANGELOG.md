@@ -7,7 +7,7 @@ release-notes body used for that tag's GitHub Release — see
 ## 0.4.0-beta.1
 
 First Google Play candidate (closed testing). Everything merged since
-`v0.3.0-beta.1`, #6 through #45. RepoGlance stays read-only: it never
+`v0.3.0-beta.1`, #6 through #47. RepoGlance stays read-only: it never
 changes anything on GitHub.
 
 **Sign-in**
@@ -39,6 +39,8 @@ changes anything on GitHub.
 - Pinned repositories refresh about every 30 minutes while a network is
   available, through WorkManager, within a visible GitHub rate-limit budget.
   There is no wake lock and no foreground service (#22, #29).
+- Disconnecting GitHub or cancelling sign-in now always redraws placed
+  widgets, so they never keep the previous live counts after sign-out (#46).
 - Widgets redraw from saved data after an app update and read their stores
   off the main thread (#24, #26). Their look now matches the app (#39), and
   the widget picker describes only what the widget shows (#40).

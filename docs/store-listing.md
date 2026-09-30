@@ -144,23 +144,35 @@ https://saari-co.github.io/RepoGlance/privacy/
 
 ### App access
 
-- Choose **All or some functionality in my app is restricted**, because live
-  data needs a GitHub sign-in.
-- Add one set of instructions.
-- Leave the username and password empty. If the form requires them, put
-  `Not required` in both.
+In Console this is now **Sign in details** ("previously called App access").
+Saved 2026-09-30.
 
+- **Is any part of your app restricted?** Yes, because live data needs a
+  GitHub sign-in.
+- **One set of sign in details.** Username and password are left empty.
 - **Name:**
 
   ```
   Sample mode (no credentials needed)
   ```
 
-- **Any other information** (912 characters):
+- **Any other information required to access your app** (Console caps this
+  at 500 characters; 442 used):
 
   ```
-  No credentials are needed. On the first screen, tap "Explore with sample data". This opens the app's real catalog, repository view and issue/PR lists on seven made-up repositories, marked SAMPLE, with no network requests. Try: filter "Account or organization" by dinkuskit, search for "rocket", pin saari-co/rocket, and open it to switch between Issues, PRs and Both. Tapping a sample item shows "Sample item — not on GitHub". Widgets: from the home screen's widget picker, add a RepoGlance widget; its setup lists the sample repositories, and the stack widget lists your sample pins. Each widget shows "sample" where a live widget shows its time. Quick Settings: edit the tiles and add RepoGlance; it reads "Sample · <repository> · <age>" and opens the app. Tap "Sign in with GitHub" to leave sample mode. Signing in with a real GitHub account shows the same screens and widgets for that account's repositories.
+  No credentials needed. On the first screen tap "Explore with sample data": the real catalog, repository view and issue/PR lists open on 7 made-up repositories marked SAMPLE, with no network use. Widgets: add a RepoGlance widget from the widget picker; its setup lists the sample repositories and it shows "sample" as its time. Quick Settings: add the RepoGlance tile; it shows the latest sample push. "Sign in with GitHub" leaves sample mode.
   ```
+
+- **"Sign in details in this declaration provide full access to all the
+  features and content within this app, including premium or paid
+  content":** ticked (maintainer decision).
+  - Sample mode reaches every screen, both widgets and the tile.
+  - Nothing is paid.
+  - What it cannot show is completing GitHub sign-in or a real account's
+    live data.
+- **"Allowing Google to use these sign-in details for testing on Google and
+  trusted partner devices":** left on, the default (maintainer decision). The
+  details hold no credentials.
 
 If review asks for credentials anyway, the fallback decided on 2026-09-29 is
 a dedicated reviewer GitHub account. That is a maintainer action.
@@ -206,7 +218,10 @@ a dedicated reviewer GitHub account. That is a maintainer action.
 
 - **Target age groups:** 18 and over only. This is a developer utility; the
   privacy policy says it is not directed at children.
-- **Could the store listing unintentionally appeal to children:** No
+- **Saved 2026-09-30.** The target age is 18 and over only. The optional
+  "Restrict users that Google has determined to be minors" was left
+  unticked. With 18+ only, Console skipped the App details, Ads and Store
+  presence steps, so it never asked the "appeals to children" question.
 
 ### Data safety
 
