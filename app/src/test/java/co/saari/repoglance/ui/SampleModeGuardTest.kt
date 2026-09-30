@@ -3,6 +3,7 @@ package co.saari.repoglance.ui
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -23,18 +24,41 @@ class SampleModeGuardTest {
             "deviceFlowClient",
             "recordLatestPush",
             "LiveRefresh",
-            "WidgetRefresh",
             "beginGitHubAuthorization",
             "signOut(",
             "clearSavedSession",
             "BackgroundRefresh",
+            "AppPrefs.",
+            "LiveSnapshotStore",
+            "LiveRowsStore",
+            "RateLimitStore",
+            "CatalogNamesStore",
+            "LatestPushStore",
+            "RepoWidgetConfigStore",
         )) {
             assertFalse("setSampleMode must not touch $forbidden", setSampleMode.contains(forbidden))
         }
+        assertEquals(
+            "widgets are only redrawn, once on entering and once on leaving",
+            2,
+            Regex(Regex.escape("WidgetRefresh.")).findAll(setSampleMode).count(),
+        )
         val enter = section(setSampleMode, "if (active) {", "} else {")
         assertTrue(enter.contains("SampleAccount.catalog(now)"))
         assertTrue(enter.contains("rateLimit = SampleAccount.RATE_LIMIT"))
-        assertTrue(enter.contains("SampleModeStore.enter(context)"))
+        assertTrue(
+            "the sample flag write and its redraw survive the screen closing",
+            Regex(Regex.escape("viewModelScope.launch(sessionDispatcher + NonCancellable) {")).findAll(setSampleMode).count() == 2,
+        )
+        assertEquals(
+            "the redraw runs on a dispatcher onCleared never closes",
+            2,
+            Regex(Regex.escape("withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }")).findAll(setSampleMode).count(),
+        )
+        assertTrue(
+            "widgets redraw after the sample flag is stored, so they read sample data",
+            enter.indexOf("SampleModeStore.enter(context)") in 0 until enter.indexOf("WidgetRefresh.updateAll(context)"),
+        )
 
         val refresh = section(viewModel, "fun refreshCatalog() {", "fun setSampleMode(")
         assertTrue(
@@ -69,11 +93,23 @@ class SampleModeGuardTest {
         val branches = section(bootstrap, "when {", "else -> liveState.value = LiveUiState.SignedOut")
         assertTrue(
             "a real session wins over a stored sample flag",
-            branches.indexOf("hasSavedSession() ->") in 0 until branches.indexOf("storedSample -> setSampleMode(true)"),
+            branches.indexOf("hasSavedSession() ->") in 0 until branches.indexOf("storedSample -> {"),
         )
+        val restore = section(branches, "storedSample -> {", "\n                }\n")
+        val order = listOf(
+            "val pending = pendingRepositoryFull",
+            "setSampleMode(true)",
+            "pendingRepositoryFull = pending\n",
+            "openPendingRepository(",
+        ).map { restore.indexOf(it) }
+        assertTrue("a cold start from a sample widget still opens its repository: $order", order.all { it >= 0 })
+        assertEquals(order.sorted(), order)
+        val staleFlag = section(branches, "hasSavedSession() ->", "refreshCatalog()")
+        assertTrue("a stale sample flag is cleared when a real session wins", staleFlag.contains("SampleModeStore.leave(context)"))
         assertTrue(
-            "a stale sample flag is cleared when a real session wins",
-            section(branches, "hasSavedSession() ->", "refreshCatalog()").contains("SampleModeStore.leave(context)"),
+            "clearing a stale flag survives sign-out cancelling the bootstrap, and its redraw survives onCleared",
+            staleFlag.contains("launch(sessionDispatcher + NonCancellable) {") &&
+                staleFlag.contains("withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }"),
         )
 
         val transition = section(setSampleMode, "if (active != sampleMode.value) {", "}")
@@ -87,10 +123,18 @@ class SampleModeGuardTest {
 
         val leave = section(setSampleMode, "} else {", "\n    }\n")
         assertTrue("leaving lands on the Connect screen", leave.contains("liveState.value = LiveUiState.SignedOut"))
-        assertTrue(leave.contains("SampleModeStore.leave(context)"))
+        assertTrue(
+            "sample widgets empty out after the sample state is cleared",
+            leave.indexOf("SampleModeStore.leave(context)") in 0 until leave.indexOf("WidgetRefresh.updateAll(context)"),
+        )
         assertTrue(setSampleMode.contains("sampleMode.value = active"))
 
         assertTrue(activity.contains("onExploreSampleData = { liveModel.setSampleMode(true) },"))
+        val create = section(activity, "override fun onCreate(", "setContent {")
+        assertTrue(
+            "a recreated activity keeps its screen instead of replaying a widget or tile intent",
+            create.contains("if (savedInstanceState == null) handleLiveIntent(intent)"),
+        )
         assertTrue(activity.contains("onLeaveSampleData = { liveModel.setSampleMode(false) },"))
     }
 
@@ -108,10 +152,15 @@ class SampleModeGuardTest {
         val home = section(screen, "private fun LiveRepositoryHome(", "private fun DisconnectDialog(")
         assertTrue(home.contains("if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)"))
         assertTrue(home.contains("SampleModeStore.togglePin(context, repository.ref.full)"))
-        val samplePinBranch = section(section(home, "onTogglePin = {", "},\n"), "if (sampleMode) {", "} else {")
+        val toggle = section(home, "onTogglePin = {", "},\n")
+        val samplePinBranch = section(toggle, "if (sampleMode) {", "} else {")
         assertTrue(samplePinBranch.contains("SampleModeStore.togglePin(context, repository.ref.full)"))
-        assertFalse("sample pin taps never refresh the live widgets", samplePinBranch.contains("WidgetRefresh"))
-        assertFalse(samplePinBranch.contains("AppPrefs."))
+        assertFalse("a sample pin never touches the live pins", samplePinBranch.contains("AppPrefs."))
+        assertFalse(samplePinBranch.contains("BackgroundRefresh"))
+        assertTrue(
+            "a pin change only redraws the widgets, which read the pins of the current mode",
+            toggle.substringAfter("} else {").substringAfter("}\n").contains("widgetScope.launch { WidgetRefresh.updateAll(context) }"),
+        )
 
         val title = section(screen, "private fun CatalogTitleRow(", "private fun CatalogRateLimitLine(")
         val liveChip = title.indexOf("LabelText(\"LIVE\"")

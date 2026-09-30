@@ -535,8 +535,8 @@ private fun LiveRepositoryHome(
                                 SampleModeStore.togglePin(context, repository.ref.full)
                             } else {
                                 AppPrefs.toggleLivePin(context, repository.ref.full)
-                                widgetScope.launch { WidgetRefresh.updateAll(context) }
                             }
+                            widgetScope.launch { WidgetRefresh.updateAll(context) }
                         },
                     )
                 }

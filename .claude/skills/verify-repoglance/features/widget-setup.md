@@ -4,7 +4,8 @@ Adding the compact/tall RepoGlance widget opens a setup screen listing the repos
 
 ## Sub-features
 
-- `widget-setup-list` lists catalog repositories with pinned ones first; with nothing loaded yet it shows `No repositories to choose from yet` and `Open RepoGlance`.
+- `widget-setup-list` lists catalog repositories with pinned ones first; with nothing loaded yet it shows `No repositories to choose from yet` and `Open RepoGlance`. In sample mode it lists the sample repositories instead (see [Sample mode](./sample-mode.md)).
+- `widget-unconfigured` a repo widget without a repository reads `RepoGlance` / `Tap to choose a repository`; a tap opens that widget's setup screen. This happens after Disconnect GitHub and after leaving sample mode.
 - `widget-setup-pin` saving pins the repository in the live catalog (thumbtack filled).
 - `widget-setup-unpin` deleting the widget, or pointing it at another repository, unpins the old one when no other widget uses it.
 - `widget-tall-rows` the tall size shows saved issue/PR rows with ages and an `as of <clock time>` in the header (`as of Tue 14:05` from an earlier day, `as of 12 Sep` from a week or more ago), `last good ·` after a failed fetch, `rate limited · resets <time> ·` while backing off, or `no data · open RepoGlance to load` and `No saved rows · open RepoGlance to load`.

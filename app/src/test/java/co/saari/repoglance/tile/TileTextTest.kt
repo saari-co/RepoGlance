@@ -46,6 +46,36 @@ class TileTextTest {
     }
 
     @Test
+    fun sampleModeNamesTheLatestSamplePushAndSaysSample() {
+        val latest = LatestPushRecord("saari-co/rocket", now.minus(Duration.ofMinutes(25)), now)
+        val text = TileTexts.sample(latest, now)
+        assertEquals("Sample · saari-co/rocket · 25m", text.subtitle)
+        assertTrue(text.active)
+        assertTrue(text.contentDescription.startsWith("RepoGlance, sample data, latest push to saari-co/rocket"))
+        assertEquals("Sample", TileTexts.sample(null, now).subtitle)
+    }
+
+    @Test
+    fun sampleModeKeepsTheLockedShadeUnchanged() {
+        val latest = LatestPushRecord("saari-co/rocket", now.minus(Duration.ofMinutes(25)), now)
+        val text = TileTexts.sample(latest, now, locked = true)
+        assertEquals("Unlock to see the latest push", text.subtitle)
+        assertFalse(text.contentDescription.contains("rocket"))
+    }
+
+    @Test
+    fun aTapOpensTheCatalogEvenWhenTheAppWasLeftOnARepository() {
+        val source = String(
+            java.nio.file.Files.readAllBytes(
+                repositoryRoot().resolve("app/src/main/java/co/saari/repoglance/tile/RepoGlanceTileService.kt"),
+            ),
+            Charsets.UTF_8,
+        )
+        val open = source.substringAfter("private fun openCatalog()").substringBefore("if (Build.VERSION")
+        assertTrue(open.contains("putExtra(EXTRA_LIVE_CATALOG, true)"))
+    }
+
+    @Test
     fun serviceRedactsOnTheLockScreenItselfNotOnlyASecureOne() {
         val source = String(
             java.nio.file.Files.readAllBytes(

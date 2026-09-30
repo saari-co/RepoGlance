@@ -23,7 +23,13 @@ object WidgetRefresh {
     suspend fun updateAll(context: Context) {
         val manager = GlanceAppWidgetManager(context)
         manager.getGlanceIds(RepoWidget::class.java).forEach { redraw(context, RepoWidget(), it) }
-        manager.getGlanceIds(StackWidget::class.java).forEach { redraw(context, StackWidget(), it) }
+        updateStacks(context)
+    }
+
+    suspend fun updateStacks(context: Context) {
+        GlanceAppWidgetManager(context)
+            .getGlanceIds(StackWidget::class.java)
+            .forEach { redraw(context, StackWidget(), it) }
     }
 
     suspend fun redraw(context: Context, glanceId: GlanceId) = redraw(context, RepoWidget(), glanceId)

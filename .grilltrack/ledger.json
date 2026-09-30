@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "sequential",
+    "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-09-29T22:39:48+00:00",
-    "domain": "reviewer access: sample-data mode reachable without a GitHub account",
-    "started_at": "2026-09-29T22:24:22+00:00",
-    "status": "confirmed",
-    "summary": "Maintainer 2026-09-29 ('a a'): sample authors and assignees become saariuslystoned only, Review requested is dropped from sample PRs, realistic sample repository names stay. Verify with unit tests, the gate and an emulator run."
+    "confirmed_at": "2026-09-30T20:49:30+00:00",
+    "domain": "sample-widgets-039: repo and stack widgets and the Quick Settings tile in sample mode, sample pins and widget config, sign-in transition, no background refresh, retire FIXTURE PREVIEW",
+    "started_at": "2026-09-30T20:34:44+00:00",
+    "status": "inspected",
+    "summary": "Maintainer 2026-09-30 'confirmed, use the emulator, add-tile ok': build sample-widgets-039 as summarised (1A-6A plus defaults: sample taps open the app never GitHub, no background refresh for sample, redraw on enter/leave/sample pin, SampleModeGuardTest relaxed to allow redraw only, cold-start sample widget tap keeps its repository). Verify with ./gradlew assembleDebug check and on the approved emulator (widget placement and add-tile/remove-tile approved there), then exact-source review."
   },
   "decisions": [
     {
@@ -4530,6 +4530,200 @@
       "superseded_by": null,
       "updated_at": "2026-09-29T22:45:13+00:00",
       "verification_ref": ".grilltrack/proof/sample-app-038-verify-20260929.md"
+    },
+    {
+      "baseline_ref": "git:a0625da73c02e299b7a122b6ab78b22c19a169b3",
+      "candidate_refs": [],
+      "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+      "context_ref": "file:.grilltrack/maps/sample-mode.md",
+      "created_at": "2026-09-30T20:48:18+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "sample-mode-042",
+        "sample-app-038",
+        "widget-live-config-022",
+        "stack-widget-live-024",
+        "widget-background-refresh-023",
+        "quick-settings-tile-019"
+      ],
+      "domain": "sample-widgets-039: repo and stack widgets and the Quick Settings tile in sample mode, sample pins and widget config, sign-in transition, no background refresh, retire FIXTURE PREVIEW",
+      "history": [
+        {
+          "at": "2026-09-30T20:48:18+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T21:19:48+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "implemented",
+          "implementation_ref": "git-tree:34bf98f9748cf8eb5e7bb3bac0c97338a2c3ac64 (base a0625da73c02e299b7a122b6ab78b22c19a169b3, branch claude/grilltrack-039-sample-widgets, uncommitted) app/src/main/java/co/saari/repoglance/widget/SampleWidgetData.kt",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "verified",
+          "implementation_ref": "git-tree:34bf98f9748cf8eb5e7bb3bac0c97338a2c3ac64 (base a0625da73c02e299b7a122b6ab78b22c19a169b3, branch claude/grilltrack-039-sample-widgets, uncommitted) app/src/main/java/co/saari/repoglance/widget/SampleWidgetData.kt",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#emulator-run (EMULATOR37X1X11X0, APKs a3999f97/7b17c37f/f7485f6c; gate check-3 green)"
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "needs_reverification",
+          "implementation_ref": "git-tree:34bf98f9748cf8eb5e7bb3bac0c97338a2c3ac64 (base a0625da73c02e299b7a122b6ab78b22c19a169b3, branch claude/grilltrack-039-sample-widgets, uncommitted) app/src/main/java/co/saari/repoglance/widget/SampleWidgetData.kt",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "review_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 1 (git tree 34bf98f9748cf8eb5e7bb3bac0c97338a2c3ac64)",
+          "review_result": "findings",
+          "review_source_identity": "sha256:563935966f62240e969df69c339a3d982b74ca93706e9ed7b75acd44218a4643",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#emulator-run (EMULATOR37X1X11X0, APKs a3999f97/7b17c37f/f7485f6c; gate check-3 green)"
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "implemented",
+          "implementation_ref": "git-tree:da68a22dee28b2cbcfb44d65e7ab2e274e8014ff (review 1 repairs: savedInstanceState guard, NonCancellable redraw, widget-bounds text check)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#emulator-run (EMULATOR37X1X11X0, APKs a3999f97/7b17c37f/f7485f6c; gate check-3 green)"
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "verified",
+          "implementation_ref": "git-tree:da68a22dee28b2cbcfb44d65e7ab2e274e8014ff (review 1 repairs: savedInstanceState guard, NonCancellable redraw, widget-bounds text check)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#final-smoke APK 654e28f3 (recreation stays on repository); gate check-5 green"
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "needs_reverification",
+          "implementation_ref": "git-tree:da68a22dee28b2cbcfb44d65e7ab2e274e8014ff (review 1 repairs: savedInstanceState guard, NonCancellable redraw, widget-bounds text check)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 2 (git tree da68a22dee28b2cbcfb44d65e7ab2e274e8014ff)",
+          "review_result": "findings",
+          "review_source_identity": "sha256:e9701f6cc0908f1bb7bd92acee3ea0513f7cd2ac49aa37fb85bc7286152d2517",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#final-smoke APK 654e28f3 (recreation stays on repository); gate check-5 green"
+        },
+        {
+          "at": "2026-09-30T21:37:45+00:00",
+          "choice": "1A: wherever a live widget shows its observed clock time, a sample widget shows the word 'sample' (compact freshness slot, tall header in place of 'as of', each stack row); no clock on sample widgets. 2A: widget setup in sample mode lists the 7 sample repositories, sample pins first; saving pins the repository in the sample pins and removing or repointing the widget unpins it (022 mirrored); no background refresh. 3A: sample pins start empty. 4A: leaving sample mode forgets sample widget setups with the rest of the sample state; repo widgets fall to the unconfigured state and the stack follows live pins; nothing is auto-assigned or auto-pinned. 5A: the unconfigured repo widget reads 'RepoGlance' / 'Tap to choose a repository' and a tap opens that widget's setup (live or sample list by mode), replacing FIXTURE PREVIEW for everyone. 6A: in sample mode the tile is active with subtitle 'Sample \u00b7 <latest sample push repo> \u00b7 <age>' computed from the sample data, and a tap opens the sample catalog; the locked shade is unchanged. Defaults: sample widget taps (header, tall rows, stack rows) open the sample repository in the app, never GitHub; sample mode never schedules or feeds background refresh; widgets redraw (no network) on entering or leaving sample and on a sample pin change; the marker look stays provisional for sample-marker-040.",
+          "from": "implemented",
+          "implementation_ref": "git-tree:c8b449ba19aa93eb1392961845dd5ba9b55febbb (review 2 repairs: redraw on Dispatchers.IO, bootstrap guard, INVARIANTS wording)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#final-smoke APK 654e28f3 (recreation stays on repository); gate check-5 green"
+        }
+      ],
+      "id": "sample-widgets-039",
+      "implementation_ref": "git-tree:c8b449ba19aa93eb1392961845dd5ba9b55febbb (review 2 repairs: redraw on Dispatchers.IO, bootstrap guard, INVARIANTS wording)",
+      "question": "How do the repo and stack widgets, widget setup and the Quick Settings tile behave in sample mode, what happens to them on sign-in, and what replaces the FIXTURE PREVIEW label?",
+      "rationale": "Maintainer 2026-09-30 frontier batch answer '1A 2A 3A 4A 5A 6A' after the behaviour prototype (sample_widgets_039_grill). 1A: sample data is never fetched and sample widgets never refresh, so a clock would freeze and read as stale live data.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 1 (git tree 34bf98f9748cf8eb5e7bb3bac0c97338a2c3ac64)",
+          "result": "findings",
+          "reviewed_at": "2026-09-30T21:37:45+00:00",
+          "source_identity": "sha256:563935966f62240e969df69c339a3d982b74ca93706e9ed7b75acd44218a4643"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 2 (git tree da68a22dee28b2cbcfb44d65e7ab2e274e8014ff)",
+          "result": "findings",
+          "reviewed_at": "2026-09-30T21:37:45+00:00",
+          "source_identity": "sha256:e9701f6cc0908f1bb7bd92acee3ea0513f7cd2ac49aa37fb85bc7286152d2517"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 3 (git tree c8b449ba19aa93eb1392961845dd5ba9b55febbb)",
+          "result": "clean",
+          "reviewed_at": "2026-09-30T21:37:45+00:00",
+          "source_identity": "sha256:a29eea4b930c167ce676661916fe7446fad305f36f56f82e156dc312790b731f"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#review round 3 (git tree c8b449ba19aa93eb1392961845dd5ba9b55febbb)",
+      "review_result": "clean",
+      "review_source_identity": "sha256:a29eea4b930c167ce676661916fe7446fad305f36f56f82e156dc312790b731f",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-09-30T21:37:45+00:00",
+      "verification_ref": "file:.grilltrack/proof/sample-widgets-039-verify-20260930.md#final-smoke APK 5c08d1ea (leave then Back empties widgets; no StrictMode; gate check-6 green, 308 tests)"
     }
   ],
   "last_activation": {
@@ -4550,16 +4744,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "sample-marker-040 now: round of five on the SAMPLE marker look across the in-app screens only, extended to widgets later",
-      "compact-12h-fit-035: the deferred 12-hour clock truncation on the compact widget"
+      "play-app-access-041 after 040: Play Console App access text and store screenshots from sample mode (human-gated Console)",
+      "widget-setup follow-ups deferred by the 039 review: setup opened from a widget returns to the app instead of home (task affinity), and main-thread prefs reads in RepoWidgetReceiver.onDeleted"
     ],
-    "reason": "RepoGlance is widget-first, so Play reviewers and store screenshots need the widgets to work without an account; 039 is the next node on .grilltrack/maps/sample-mode.md and the marker round needs its canvas",
-    "recommended": "sample-widgets-039: repo and stack widgets and the Quick Settings tile in sample mode (sample pins, widget config from the sample catalog, SAMPLE on the widget, switch to live or empty on sign-in, no background refresh for sample), and retire the stale FIXTURE PREVIEW label",
-    "recorded_at": "2026-09-29T19:46:59+00:00"
+    "reason": "039 built the widget and tile canvas the marker round needs (map node 3 depends on 1 and 2); the provisional plain 'sample' word is the weakest marker surface",
+    "recommended": "sample-marker-040: the look of the sample marker across the in-app chip, the widget 'sample' word and the tile subtitle, as one round of five on the real sample screens and placed widgets",
+    "recorded_at": "2026-09-30T21:37:45+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-29T22:45:13+00:00"
+  "updated_at": "2026-09-30T21:37:45+00:00"
 }

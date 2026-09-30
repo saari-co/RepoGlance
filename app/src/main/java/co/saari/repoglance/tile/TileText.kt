@@ -13,6 +13,7 @@ object TileTexts {
     private const val CONNECT = "Open to connect"
     private const val LOCKED = "Unlock to see the latest push"
     private const val REFRESH = "open to refresh"
+    private const val SAMPLE = "Sample"
     private val STALE_AFTER: Duration = Duration.ofHours(24)
 
     fun of(record: LatestPushRecord?, now: Instant, locked: Boolean = false): TileText {
@@ -31,5 +32,17 @@ object TileTexts {
             "$LABEL, latest push to $repo ${Ages.updatedLabel(record.pushedAt, now).lowercase()}"
         }
         return TileText(subtitle, active = true, contentDescription = description)
+    }
+
+    fun sample(latest: LatestPushRecord?, now: Instant, locked: Boolean = false): TileText {
+        if (locked) return TileText(LOCKED, active = true, contentDescription = "$LABEL, $LOCKED")
+        if (latest == null) return TileText(SAMPLE, active = true, contentDescription = "$LABEL, sample data")
+        val repo = Sanitize.displayText(latest.repoFull)
+        return TileText(
+            "$SAMPLE · $repo · ${Ages.format(latest.pushedAt, now)}",
+            active = true,
+            contentDescription = "$LABEL, sample data, latest push to $repo " +
+                Ages.updatedLabel(latest.pushedAt, now).lowercase(),
+        )
     }
 }

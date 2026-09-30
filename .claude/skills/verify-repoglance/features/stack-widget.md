@@ -34,5 +34,6 @@ Preconditions:
 - At a low rate limit only repositories with their own repo widget refresh; other stack rows keep their numbers with an older clock time.
 - After an app update both widgets (repo and stack) redraw from saved data without the app being opened; no GitHub call is made, so the numbers and their time are whatever was last saved.
 - CI is not fetched on the live path, so the stack has no CI column.
+- In sample mode the stack lists the sample pins with `sample` in each row's time slot; see [Sample mode](./sample-mode.md). Removing a repo widget redraws the stack at once.
 - While rate limited, the one-line header holds the full `rate limited · resets <time>` in the dump, but the screen cuts the time (`resets 12:0…`); assert it from a capture as well as the dump.
 - Glance test tags (`stack-header`, `stack-age`, `stack-counts`) are visible to the JVM Glance tests only; on device assert by visible text.

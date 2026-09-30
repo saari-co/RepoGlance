@@ -77,4 +77,4 @@ required state, commands, and observable proof.
   pinned set: order, per-row clock times, empty state, and taps.
 - [Sample mode](./sample-mode.md) covers `Explore with sample data`: the
   made-up repositories on the real screens, its marker, pins, row note, restart
-  persistence, and the exit to sign-in.
+  persistence, the sample widgets and tile, and the exit to sign-in.

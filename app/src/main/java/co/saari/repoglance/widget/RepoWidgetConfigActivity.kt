@@ -5,6 +5,7 @@ package co.saari.repoglance.widget
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -50,8 +51,12 @@ import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.refresh.BackgroundRefresh
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.CatalogNamesStore
+import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.Instant
 
 class RepoWidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,26 +81,65 @@ class RepoWidgetConfigActivity : ComponentActivity() {
             return
         }
 
-        val repos = WidgetPins.configurationList(CatalogNamesStore.load(this), AppPrefs.livePins(this))
-        val saved = RepoWidgetConfigStore.load(this, appWidgetId)
+        enableEdgeToEdge()
+        lifecycleScope.launch {
+            val setup = withContext(Dispatchers.IO) { loadWidgetSetup(this@RepoWidgetConfigActivity, appWidgetId) }
+            showSetup(setup, appWidgetId, glanceId)
+        }
+    }
+
+    private fun showSetup(setup: WidgetSetup, appWidgetId: Int, glanceId: GlanceId) {
+        val repos = setup.repos
         if (repos.isEmpty()) {
-            enableEdgeToEdge()
             setContent { RepoGlanceTheme { NoRepositoriesScreen(onOpenApp = ::openApp) } }
             return
         }
+        val saved = setup.saved
         val initialRepo = saved?.repo?.takeIf { it in repos } ?: repos.first()
         val initialMode = saved?.mode ?: NavigatorMode.BOTH
 
-        enableEdgeToEdge()
         setContent {
             RepoGlanceTheme {
                 RepoWidgetConfigScreen(
                     repos = repos,
                     initialRepo = initialRepo,
                     initialMode = initialMode,
-                    onSave = { repo, mode -> saveAndFinish(appWidgetId, glanceId, saved?.repo?.full, repo, mode) },
+                    note = if (setup.sample) SAMPLE_SETUP_NOTE else LIVE_SETUP_NOTE,
+                    onSave = { repo, mode ->
+                        if (setup.sample) {
+                            saveSampleAndFinish(appWidgetId, saved?.repo?.full, repo, mode)
+                        } else {
+                            saveAndFinish(appWidgetId, glanceId, saved?.repo?.full, repo, mode)
+                        }
+                    },
                 )
             }
+        }
+    }
+
+    private fun saveSampleAndFinish(
+        appWidgetId: Int,
+        previousRepo: String?,
+        repo: RepoRef,
+        mode: NavigatorMode,
+    ) {
+        val context = this
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                if (SampleModeStore.isActive(context)) {
+                    SampleModeStore.saveWidgetConfig(context, appWidgetId, RepoWidgetConfig(repo, mode))
+                    SampleModeStore.addPin(context, repo.full)
+                    if (previousRepo != null && previousRepo != repo.full) {
+                        SampleModeStore.removePins(
+                            context,
+                            WidgetPins.releasedRepositories(listOf(previousRepo), SampleModeStore.widgetRepos(context)),
+                        )
+                    }
+                }
+            }
+            WidgetRefresh.updateAll(context)
+            setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
+            finish()
         }
     }
 
@@ -128,6 +172,36 @@ class RepoWidgetConfigActivity : ComponentActivity() {
     }
 }
 
+internal data class WidgetSetup(
+    val sample: Boolean,
+    val repos: List<RepoRef>,
+    val saved: RepoWidgetConfig?,
+)
+
+internal fun loadWidgetSetup(context: Context, appWidgetId: Int): WidgetSetup =
+    if (SampleModeStore.isActive(context)) {
+        WidgetSetup(
+            sample = true,
+            repos = SampleWidgetData.configurationList(SampleModeStore.pins(context), Instant.now()),
+            saved = SampleModeStore.widgetConfig(context, appWidgetId),
+        )
+    } else {
+        WidgetSetup(
+            sample = false,
+            repos = WidgetPins.configurationList(CatalogNamesStore.load(context), AppPrefs.livePins(context)),
+            saved = RepoWidgetConfigStore.load(context, appWidgetId),
+        )
+    }
+
+internal const val LIVE_SETUP_NOTE =
+    "Saving pins this repository in RepoGlance; removing the widget unpins it. " +
+        "Counts and rows refresh in the background about every 30 minutes " +
+        "and whenever you open the repository in the app."
+
+internal const val SAMPLE_SETUP_NOTE =
+    "Sample data: saving pins this sample repository; removing the widget unpins it. " +
+        "Sample widgets show made-up numbers and never refresh from GitHub."
+
 @Composable
 private fun NoRepositoriesScreen(onOpenApp: () -> Unit) {
     Column(
@@ -153,6 +227,7 @@ private fun RepoWidgetConfigScreen(
     repos: List<RepoRef>,
     initialRepo: RepoRef,
     initialMode: NavigatorMode,
+    note: String,
     onSave: (RepoRef, NavigatorMode) -> Unit,
 ) {
     var selectedRepoFull by rememberSaveable { mutableStateOf(initialRepo.full) }
@@ -221,9 +296,7 @@ private fun RepoWidgetConfigScreen(
                     }
                 }
                 Text(
-                    "Saving pins this repository in RepoGlance; removing the widget unpins it. " +
-                        "Counts and rows refresh in the background about every 30 minutes " +
-                        "and whenever you open the repository in the app.",
+                    note,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -37,6 +37,7 @@ import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.CatalogNamesStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
+import co.saari.repoglance.state.SampleModeStore
 import java.time.Instant
 
 class StackWidget : GlanceAppWidget() {
@@ -87,7 +88,21 @@ internal data class StackWidgetData(
     val freshness: WidgetFreshness,
 )
 
-internal fun readStackWidgetData(context: Context): StackWidgetData {
+internal fun readStackWidgetData(context: Context): StackWidgetData =
+    if (SampleModeStore.isActive(context)) readSampleStackWidgetData(context) else readLiveStackWidgetData(context)
+
+internal fun readSampleStackWidgetData(context: Context): StackWidgetData {
+    val now = Instant.now()
+    return StackWidgetData(
+        entries = StackRows.order(
+            pins = SampleModeStore.pins(context),
+            catalogPushedAt = SampleWidgetData.pushedAt(now),
+        ) { SampleWidgetData.snapshot(it, now) },
+        freshness = WidgetFreshness(now = now, clock = widgetClock(context), rateLimitedUntil = null, sample = true),
+    )
+}
+
+internal fun readLiveStackWidgetData(context: Context): StackWidgetData {
     val now = Instant.now()
     return StackWidgetData(
         entries = StackRows.order(
@@ -154,6 +169,7 @@ internal fun stackRowCounts(snapshot: RepoSnapshot?): String? {
 internal fun stackRowAge(snapshot: RepoSnapshot?, freshness: WidgetFreshness): String {
     val observedAt = snapshot?.observedAt
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
+    if (freshness.sample) return SAMPLE_TIME_LABEL
     val clock = freshness.clock.format(observedAt, freshness.now)
     return if (snapshot.valueBasis == ValueBasis.LAST_GOOD) "last good $clock" else clock
 }

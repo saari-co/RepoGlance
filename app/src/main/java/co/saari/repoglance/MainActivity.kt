@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
 
         fixtureNavigatorScope.value = resolveFixtureScopeFromIntent(intent)
         fixtureNavigatorMode.value = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
-        handleLiveIntent(intent)
+        if (savedInstanceState == null) handleLiveIntent(intent)
 
         setContent {
             RepoGlanceTheme {
