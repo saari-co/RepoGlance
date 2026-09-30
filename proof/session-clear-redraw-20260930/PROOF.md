@@ -92,24 +92,66 @@ re-checked):
 | Redraw back to bare `WidgetRefresh.updateAll(context)` (byte-identical to `origin/main`) | 2 of 3 fail on assertions. `theSignOut…`: "the sign-out redraw runs on Dispatchers.IO, so its suspensions never resume onto the closed session dispatcher". `noViewModelRedraw…`: "… never directly on sessionDispatcher expected:<1> but was:<2>" |
 | IO redraw moved above `session.signOut {` | 1 of 3 fails on an assertion. `theSignOut…`: "widgets redraw after the stores are cleared, outside the session lock" |
 
+## Runtime reproduction
+
+Added after the ClawSweeper review of `2015dde` asked for real behaviour
+proof.
+
+`app/src/test/java/co/saari/repoglance/SessionDispatcherCloseTest.kt` runs
+the race for real on the JVM. It uses kotlinx.coroutines 1.7.3 (the version
+the app resolves) and needs no test-only dispatcher or new dependency. The
+setup matches the ViewModel's:
+
+- `sessionDispatcher` is a real `Executors.newSingleThreadExecutor().asCoroutineDispatcher()`.
+- The session clear is launched as `launch(sessionDispatcher + NonCancellable)`
+  on a `SupervisorJob` scope that stands in for `viewModelScope`.
+- The redraw stand-in suspends twice, like Glance: once awaiting a pending
+  widget-state write (`updateAppWidgetState`), then again at `yield()`
+  (`update`).
+
+Each run then:
+
+1. waits until the redraw is suspended
+2. does what `ViewModel.clear()` does: cancels the scope, then closes the
+   dispatcher (`onCleared`)
+3. waits for the session thread to go idle, which guarantees the redraw is
+   parked inside its suspension
+4. completes the Glance write
+
+| Test | Redraw runs | Steps recorded | Session-clear job |
+|---|---|---|---|
+| `aRedrawSuspendedOnTheSessionDispatcherIsLostWhenOnClearedClosesIt` | directly on `sessionDispatcher` (the `main` code) | `stores cleared`, `redraw started`, then nothing | cancelled: the redraw is lost |
+| `aRedrawOnIoFinishesWhenOnClearedClosesTheSessionDispatcher` | inside `withContext(Dispatchers.IO)` (this PR) | `stores cleared`, `redraw started`, `widget state written`, `widgets updated` | cancelled only by the final return to the closed dispatcher, after the redraw |
+
+The first row is the negative control: it reproduces the reported loss on
+the real coroutines runtime. The only difference between the two rows is
+the `withContext(Dispatchers.IO)` wrapper, and `SessionClearRedrawGuardTest`
+pins that the real helper uses the wrapped form.
+
+Stability: 30 of 30 consecutive `--rerun` runs of the class passed (2/2 each
+time).
+
 ## Verification
 
 `ANDROID_HOME=~/Library/Android/sdk ./gradlew assembleDebug check` finished
-with BUILD SUCCESSFUL in 1m 15s (81 tasks, 62 executed):
+with BUILD SUCCESSFUL, run again after adding the runtime test:
 
 | Unit tests | Tests | Failures | Errors | Skipped |
 |---|---|---|---|---|
-| `testDebugUnitTest` | 290 | 0 | 0 | 0 |
-| `testReleaseUnitTest` | 284 | 0 | 0 | 0 |
+| `testDebugUnitTest` | 292 | 0 | 0 | 0 |
+| `testReleaseUnitTest` | 286 | 0 | 0 | 0 |
 
-`SessionClearRedrawGuardTest` ran 3/3 green in both variants.
-`LatestPushRecordTest` is still green, 4/4.
+In both variants, `SessionClearRedrawGuardTest` ran 3/3 green and
+`SessionDispatcherCloseTest` ran 2/2 green. `LatestPushRecordTest` is still
+green, 4/4.
 
-**Not proven on a device.** A device run would have to catch the ViewModel
-being cleared inside the redraw window, which is timing-dependent. It would
-also sign the test phone's real session out, and signing back in needs
-maintainer approval (`AGENTS.md` hard gates). This proof covers the source
-and the scheduling mechanism only.
+**Not run in the app on a device.** The runtime test reproduces the
+coroutine race, not the app. The project has no Robolectric, and
+`RepoGlanceViewModel` builds the real GitHub services, so the test cannot
+construct it. A device run would have to catch the ViewModel being cleared
+inside the redraw window, which is timing-dependent. It would also sign the
+test phone's real session out, and signing back in needs maintainer approval
+(`AGENTS.md` hard gates).
 
 ## Report only: `RepoWidgetReceiver.onDeleted` main-thread prefs reads
 
