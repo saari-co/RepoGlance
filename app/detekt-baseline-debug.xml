@@ -4,7 +4,6 @@
   <CurrentIssues>
     <ID>ComplexCondition:GitHubDeviceFlowClient.kt$GitHubDeviceFlowClient$uri.scheme != "https" || uri.host != "github.com" || uri.port != -1 || uri.path != "/login/device" || uri.rawQuery != null || uri.rawFragment != null || uri.userInfo != null</ID>
     <ID>CyclomaticComplexMethod:GitHubApiClient.kt$GitHubApiClient$private fun HttpResponse.rateLimit(observedAt: Instant = clock.instant()): RateLimitSnapshot</ID>
-    <ID>CyclomaticComplexMethod:LiveRepoGlanceScreen.kt$@Composable private fun LiveRepositoryHome( catalog: LiveRepositoryCatalog, observedAt: Instant, rateLimit: RateLimitSnapshot, selectedOwner: String?, onSelectedOwnerChange: (String?) -&gt; Unit, onSelectRepository: (LiveRepository) -&gt; Unit, onRefresh: () -&gt; Unit, onManageGitHubAccess: () -&gt; Unit, onSignOut: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:NavigatorScreen.kt$@Composable fun NavigatorScreen( scenario: FixtureScenario, initialScope: NavigatorScope, initialMode: NavigatorMode = DefaultNavigatorMode, onBackToHome: () -&gt; Unit, )</ID>
     <ID>LongMethod:Fixtures.kt$Fixtures$fun navigatorList( scope: NavigatorScope, mode: NavigatorMode, filter: NavigatorFilter, state: ListState, now: Instant, ): NavigatorList</ID>
     <ID>LongMethod:WidgetVariantPickerActivity.kt$WidgetVariantPickerActivity$@OptIn(ExperimentalGlanceRemoteViewsApi::class) override fun onCreate(savedInstanceState: Bundle?)</ID>

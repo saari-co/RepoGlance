@@ -27,7 +27,7 @@ object Fixtures {
         RepoRef("acme", "rocket"),
     )
 
-    private val LABEL_POOL = listOf(
+    internal val LABEL_POOL = listOf(
         "bug",
         "enhancement",
         "ci",
@@ -37,7 +37,7 @@ object Fixtures {
         "triage",
     )
 
-    private val TITLE_POOL = listOf(
+    internal val TITLE_POOL = listOf(
         "Fix flaky retry in sync worker",
         "Add pagination to issue navigator",
         "Investigate CI flake on macOS runners",

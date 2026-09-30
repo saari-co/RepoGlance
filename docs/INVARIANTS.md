@@ -82,6 +82,7 @@ Seeded from the accepted review findings on RepoGlance pull requests #2, #4,
 | Release builds contain no debug tooling | `AGENTS.md`; PR #12 picker | debug source set only (`app/src/debug`); no lint guard yet | 3 |
 | Screen-level composables expose a `modifier` parameter | Compose rules `ModifierMissing` | six existing screens are frozen in `app/detekt-baseline-debug.xml`; any new emitting composable without a modifier fails detekt | 2 (ratchet) |
 | Cover-display app shell must not overlap the status bar | Fold proof run 2026-08-11 | unguarded until the device verifier tier (Grill C) captures the `CLOSED` posture | 4 |
+| Sample mode never reaches GitHub, the session, or the live and widget stores; sample rows never open GitHub; sample repositories are a fixed list under the maintainer's own accounts (saari-co, dinkuskit, saariuslystoned) and never reuse a real repository name; every sample author and assignee is the maintainer's own handle; a repository outside the sample set renders as unavailable, never as empty; sample pins stay apart from live pins; sample-mode prefs load off the main thread | GrillTrack `sample-app-038`, `sample-mode-042`, `sample-people-043` (reviewer access, #7) | `SampleModeGuardTest`, `SampleAccountTest` (pins the exact list and a denylist of real repositories). That the listed names do not exist on GitHub is an API observation (404 on 2026-09-29, `.grilltrack/proof/sample-app-038-verify-20260929.md`), not a guard: changing the list needs a fresh check. | 2 |
 
 ## Migrated rationale
 

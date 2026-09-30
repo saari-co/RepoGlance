@@ -21,6 +21,10 @@ object AppPrefs {
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    fun preload(context: Context) {
+        prefs(context).all
+    }
+
     fun selectedScenario(context: Context): FixtureScenario {
         val stored = prefs(context).getString(KEY_SCENARIO, null) ?: return FixtureScenario.MIXED
         return runCatching { FixtureScenario.valueOf(stored) }.getOrDefault(FixtureScenario.MIXED)

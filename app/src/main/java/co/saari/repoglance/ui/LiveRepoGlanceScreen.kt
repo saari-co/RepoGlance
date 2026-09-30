@@ -82,7 +82,9 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RateLimitBucket
 import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.SnapshotRendering
+import co.saari.repoglance.sample.SampleAccount
 import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.ui.brand.CheckingMark
 import co.saari.repoglance.ui.theme.ControlCard
 import co.saari.repoglance.ui.theme.ControlChip
@@ -102,7 +104,10 @@ fun LiveRepoGlanceScreen(
     selectedRepository: LiveRepository?,
     contentState: ContentUiState,
     connectionReady: Boolean,
+    sampleMode: Boolean,
     onConnectGitHub: () -> Unit,
+    onExploreSampleData: () -> Unit,
+    onLeaveSampleData: () -> Unit,
     onCopyCodeAndOpenGitHub: (String, String) -> Unit,
     onCancelGitHubAuthorization: () -> Unit,
     onRetry: () -> Unit,
@@ -125,7 +130,7 @@ fun LiveRepoGlanceScreen(
 
     when (state) {
         LiveUiState.Checking -> CheckingScreen()
-        LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub)
+        LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub, onExploreSampleData)
         LiveUiState.RequestingDeviceCode -> CenteredStatus("Starting GitHub sign-in…", showProgress = true)
         is LiveUiState.AwaitingDeviceAuthorization -> AwaitingGitHubScreen(
             userCode = state.userCode,
@@ -152,6 +157,8 @@ fun LiveRepoGlanceScreen(
                     catalog = state.catalog,
                     observedAt = state.observedAt,
                     rateLimit = state.rateLimit,
+                    sampleMode = sampleMode,
+                    onLeaveSampleData = onLeaveSampleData,
                     selectedOwner = retainedRepositoryOwner(selectedOwner, state.catalog.repositories),
                     onSelectedOwnerChange = { selectedOwner = it },
                     onSelectRepository = onSelectRepository,
@@ -166,6 +173,8 @@ fun LiveRepoGlanceScreen(
                 LiveNavigator(
                     repository = selectedRepository,
                     contentState = contentState,
+                    sampleMode = sampleMode,
+                    onLeaveSampleData = onLeaveSampleData,
                     onBack = onBackToRepositories,
                     onRefresh = onRefreshRepository,
                 )
@@ -225,7 +234,11 @@ private fun AwaitingGitHubScreen(
 }
 
 @Composable
-private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () -> Unit) {
+private fun ConnectGitHubScreen(
+    connectionReady: Boolean,
+    onConnectGitHub: () -> Unit,
+    onExploreSampleData: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -263,6 +276,36 @@ private fun ConnectGitHubScreen(connectionReady: Boolean, onConnectGitHub: () ->
                     color = MaterialTheme.colorScheme.tertiary,
                 )
             }
+            Spacer(Modifier.height(8.dp))
+            TextButton(
+                onClick = onExploreSampleData,
+                modifier = Modifier.testTag(EXPLORE_SAMPLE_TEST_TAG),
+            ) {
+                LabelText("Explore with sample data", LabelRole.BUTTON)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SampleModeBar(onSignIn: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth().testTag(SAMPLE_BAR_TEST_TAG),
+    ) {
+        ControlChip(
+            label = { LabelText("SAMPLE", LabelRole.CHIP) },
+            modifier = Modifier.testTag(SAMPLE_CHIP_TEST_TAG),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            "Made-up repositories, not your GitHub",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        TextButton(onClick = onSignIn, modifier = Modifier.testTag(SAMPLE_SIGN_IN_TEST_TAG)) {
+            LabelText("Sign in with GitHub", LabelRole.BUTTON)
         }
     }
 }
@@ -360,6 +403,10 @@ private fun FailureScreen(
 }
 
 internal const val REPO_SEARCH_TEST_TAG = "repoglance:repo-search"
+internal const val EXPLORE_SAMPLE_TEST_TAG = "repoglance:explore-sample"
+internal const val SAMPLE_BAR_TEST_TAG = "repoglance:sample-bar"
+internal const val SAMPLE_CHIP_TEST_TAG = "repoglance:sample"
+internal const val SAMPLE_SIGN_IN_TEST_TAG = "repoglance:sample-sign-in"
 internal const val SIGNIN_MARK_TEST_TAG = "repoglance:signin-mark"
 internal const val SIGNIN_MESSAGE_TEST_TAG = "repoglance:signin-message"
 internal const val RETURN_INSTRUCTION_TEST_TAG = "repoglance:signin-return-instruction"
@@ -373,6 +420,8 @@ private fun LiveRepositoryHome(
     catalog: LiveRepositoryCatalog,
     observedAt: Instant,
     rateLimit: RateLimitSnapshot,
+    sampleMode: Boolean,
+    onLeaveSampleData: () -> Unit,
     selectedOwner: String?,
     onSelectedOwnerChange: (String?) -> Unit,
     onSelectRepository: (LiveRepository) -> Unit,
@@ -382,31 +431,23 @@ private fun LiveRepositoryHome(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var confirmSignOut by remember { mutableStateOf(false) }
-    var accountMenuExpanded by remember { mutableStateOf(false) }
-    var ownerMenuExpanded by remember { mutableStateOf(false) }
-    val ownerOptions = remember(catalog.repositories) { availableRepositoryOwners(catalog.repositories) }
     val context = LocalContext.current
     val widgetScope = rememberCoroutineScope()
     val sort by AppPrefs.rememberCatalogSort(context)
-    val pins by AppPrefs.rememberLivePins(context)
+    val livePins by AppPrefs.rememberLivePins(context)
+    val samplePins by SampleModeStore.rememberPins(context)
+    val pins = if (sampleMode) samplePins else livePins
     val matchingRepositories = remember(catalog.repositories, selectedOwner, query, sort, pins) {
         visibleRepositories(catalog.repositories, selectedOwner, query, sort, pins)
     }
     val now = rememberFreshnessNow()
 
     if (confirmSignOut) {
-        AlertDialog(
-            onDismissRequest = { confirmSignOut = false },
-            title = { Text("Disconnect RepoGlance?") },
-            text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmSignOut = false
-                    onSignOut()
-                }) { LabelText("Disconnect GitHub", LabelRole.BUTTON) }
-            },
-            dismissButton = {
-                TextButton(onClick = { confirmSignOut = false }) { LabelText("Cancel", LabelRole.BUTTON) }
+        DisconnectDialog(
+            onDismiss = { confirmSignOut = false },
+            onConfirm = {
+                confirmSignOut = false
+                onSignOut()
             },
         )
     }
@@ -423,112 +464,20 @@ private fun LiveRepositoryHome(
             item(key = "repository-header") {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("RepoGlance", style = MaterialTheme.typography.headlineSmall)
-                                Text(
-                                    "@${catalog.viewer.login} · ${catalog.repositories.size} repositories · " +
-                                        Ages.updatedLabel(observedAt, now),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
-                            ControlChip(
-                                label = { LabelText("LIVE", LabelRole.CHIP) },
-                                modifier = Modifier.testTag("repoglance:live"),
-                            )
-                            IconButton(
-                                onClick = onRefresh,
-                                modifier = Modifier.testTag("repoglance:refresh-repositories"),
-                            ) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Refresh repositories")
-                            }
-                            Box {
-                                IconButton(onClick = { accountMenuExpanded = true }) {
-                                    Icon(
-                                        Icons.Default.MoreVert,
-                                        contentDescription = "Account and access settings",
-                                    )
-                                }
-                                DropdownMenu(
-                                    expanded = accountMenuExpanded,
-                                    onDismissRequest = { accountMenuExpanded = false },
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text("Manage GitHub access") },
-                                        onClick = {
-                                            accountMenuExpanded = false
-                                            onManageGitHubAccess()
-                                        },
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Disconnect GitHub") },
-                                        onClick = {
-                                            accountMenuExpanded = false
-                                            confirmSignOut = true
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                        val rateText = when (rateLimit.bucket) {
-                            RateLimitBucket.OK -> rateLimit.remaining?.let { "GitHub rate limit: $it remaining" }
-                            RateLimitBucket.LOW -> "GitHub rate limit is low: ${rateLimit.remaining ?: "?"} remaining"
-                            RateLimitBucket.EXHAUSTED -> listOfNotNull(
-                                "GitHub rate limit is exhausted",
-                                rateLimit.waitLabel(now),
-                            ).joinToString(" · ")
-                            RateLimitBucket.UNKNOWN -> "GitHub rate limit is unknown"
-                        }
-                        rateText?.let {
-                            LabelText(
-                                it,
-                                LabelRole.META,
-                                modifier = Modifier.testTag("repoglance:rate-limit"),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = rateLimitInk(rateLimit.bucket),
-                            )
-                        }
+                        CatalogTitleRow(
+                            catalog = catalog,
+                            observedAt = observedAt,
+                            now = now,
+                            sampleMode = sampleMode,
+                            onRefresh = onRefresh,
+                            onManageGitHubAccess = onManageGitHubAccess,
+                            onRequestSignOut = { confirmSignOut = true },
+                        )
+                        if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)
+                        CatalogRateLimitLine(rateLimit, now)
                         if (catalog.repositories.isNotEmpty()) {
                             Spacer(Modifier.height(8.dp))
-                            ExposedDropdownMenuBox(
-                                expanded = ownerMenuExpanded,
-                                onExpandedChange = { ownerMenuExpanded = it },
-                            ) {
-                                TextField(
-                                    value = selectedOwner ?: "All",
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    label = { Text("Account or organization") },
-                                    trailingIcon = {
-                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = ownerMenuExpanded)
-                                    },
-                                    modifier = Modifier
-                                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                                        .fillMaxWidth()
-                                        .testTag(OWNER_FILTER_TEST_TAG),
-                                )
-                                ExposedDropdownMenu(
-                                    expanded = ownerMenuExpanded,
-                                    onDismissRequest = { ownerMenuExpanded = false },
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text("All") },
-                                        onClick = {
-                                            onSelectedOwnerChange(null)
-                                            ownerMenuExpanded = false
-                                        },
-                                    )
-                                    ownerOptions.forEach { owner ->
-                                        DropdownMenuItem(
-                                            text = { Text(owner) },
-                                            onClick = {
-                                                onSelectedOwnerChange(owner)
-                                                ownerMenuExpanded = false
-                                            },
-                                        )
-                                    }
-                                }
-                            }
+                            OwnerFilter(selectedOwner, catalog.repositories, onSelectedOwnerChange)
                             Spacer(Modifier.height(8.dp))
                             OutlinedTextField(
                                 value = query,
@@ -576,43 +525,214 @@ private fun LiveRepositoryHome(
                     }
                 }
                 items(matchingRepositories, key = { it.id }) { repository ->
-                    ControlCard(
-                        onClick = { onSelectRepository(repository) },
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    ) {
-                        Column(modifier = Modifier.padding(14.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    repository.ref.full,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                PinToggle(
-                                    repoFull = repository.ref.full,
-                                    pinned = repository.ref.full in pins,
-                                    onToggle = {
-                                        AppPrefs.toggleLivePin(context, repository.ref.full)
-                                        widgetScope.launch { WidgetRefresh.updateAll(context) }
-                                    },
-                                )
+                    RepositoryCard(
+                        repository = repository,
+                        pinned = repository.ref.full in pins,
+                        now = now,
+                        onSelect = { onSelectRepository(repository) },
+                        onTogglePin = {
+                            if (sampleMode) {
+                                SampleModeStore.togglePin(context, repository.ref.full)
+                            } else {
+                                AppPrefs.toggleLivePin(context, repository.ref.full)
+                                widgetScope.launch { WidgetRefresh.updateAll(context) }
                             }
-                            Text(
-                                buildString {
-                                    append(if (repository.isPrivate) "Private" else "Public")
-                                    if (repository.isArchived) append(" · Archived")
-                                },
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            LabelText(
-                                repository.pushedAt?.let { Ages.updatedLabel(it, now) } ?: "Push time unknown",
-                                LabelRole.META,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
+                        },
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DisconnectDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Disconnect RepoGlance?") },
+        text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { LabelText("Disconnect GitHub", LabelRole.BUTTON) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { LabelText("Cancel", LabelRole.BUTTON) }
+        },
+    )
+}
+
+@Composable
+private fun CatalogTitleRow(
+    catalog: LiveRepositoryCatalog,
+    observedAt: Instant,
+    now: Instant,
+    sampleMode: Boolean,
+    onRefresh: () -> Unit,
+    onManageGitHubAccess: () -> Unit,
+    onRequestSignOut: () -> Unit,
+) {
+    var accountMenuExpanded by remember { mutableStateOf(false) }
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("RepoGlance", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "@${catalog.viewer.login} · ${catalog.repositories.size} repositories · " +
+                    Ages.updatedLabel(observedAt, now),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        if (!sampleMode) {
+            ControlChip(
+                label = { LabelText("LIVE", LabelRole.CHIP) },
+                modifier = Modifier.testTag("repoglance:live"),
+            )
+        }
+        IconButton(
+            onClick = onRefresh,
+            modifier = Modifier.testTag("repoglance:refresh-repositories"),
+        ) {
+            Icon(Icons.Default.Refresh, contentDescription = "Refresh repositories")
+        }
+        if (!sampleMode) {
+            Box {
+                IconButton(onClick = { accountMenuExpanded = true }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "Account and access settings",
+                    )
+                }
+                DropdownMenu(
+                    expanded = accountMenuExpanded,
+                    onDismissRequest = { accountMenuExpanded = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Manage GitHub access") },
+                        onClick = {
+                            accountMenuExpanded = false
+                            onManageGitHubAccess()
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Disconnect GitHub") },
+                        onClick = {
+                            accountMenuExpanded = false
+                            onRequestSignOut()
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CatalogRateLimitLine(rateLimit: RateLimitSnapshot, now: Instant) {
+    val rateText = when (rateLimit.bucket) {
+        RateLimitBucket.OK -> rateLimit.remaining?.let { "GitHub rate limit: $it remaining" }
+        RateLimitBucket.LOW -> "GitHub rate limit is low: ${rateLimit.remaining ?: "?"} remaining"
+        RateLimitBucket.EXHAUSTED -> listOfNotNull(
+            "GitHub rate limit is exhausted",
+            rateLimit.waitLabel(now),
+        ).joinToString(" · ")
+        RateLimitBucket.UNKNOWN -> "GitHub rate limit is unknown"
+    }
+    rateText?.let {
+        LabelText(
+            it,
+            LabelRole.META,
+            modifier = Modifier.testTag("repoglance:rate-limit"),
+            style = MaterialTheme.typography.labelSmall,
+            color = rateLimitInk(rateLimit.bucket),
+        )
+    }
+}
+
+@Composable
+private fun OwnerFilter(
+    selectedOwner: String?,
+    repositories: List<LiveRepository>,
+    onSelectedOwnerChange: (String?) -> Unit,
+) {
+    var ownerMenuExpanded by remember { mutableStateOf(false) }
+    val ownerOptions = remember(repositories) { availableRepositoryOwners(repositories) }
+    ExposedDropdownMenuBox(
+        expanded = ownerMenuExpanded,
+        onExpandedChange = { ownerMenuExpanded = it },
+    ) {
+        TextField(
+            value = selectedOwner ?: "All",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Account or organization") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = ownerMenuExpanded)
+            },
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth()
+                .testTag(OWNER_FILTER_TEST_TAG),
+        )
+        ExposedDropdownMenu(
+            expanded = ownerMenuExpanded,
+            onDismissRequest = { ownerMenuExpanded = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text("All") },
+                onClick = {
+                    onSelectedOwnerChange(null)
+                    ownerMenuExpanded = false
+                },
+            )
+            ownerOptions.forEach { owner ->
+                DropdownMenuItem(
+                    text = { Text(owner) },
+                    onClick = {
+                        onSelectedOwnerChange(owner)
+                        ownerMenuExpanded = false
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RepositoryCard(
+    repository: LiveRepository,
+    pinned: Boolean,
+    now: Instant,
+    onSelect: () -> Unit,
+    onTogglePin: () -> Unit,
+) {
+    ControlCard(
+        onClick = onSelect,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    repository.ref.full,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                PinToggle(
+                    repoFull = repository.ref.full,
+                    pinned = pinned,
+                    onToggle = onTogglePin,
+                )
+            }
+            Text(
+                buildString {
+                    append(if (repository.isPrivate) "Private" else "Public")
+                    if (repository.isArchived) append(" · Archived")
+                },
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            LabelText(
+                repository.pushedAt?.let { Ages.updatedLabel(it, now) } ?: "Push time unknown",
+                LabelRole.META,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }
@@ -684,6 +804,8 @@ internal fun retainedRepositoryOwner(
 private fun LiveNavigator(
     repository: LiveRepository,
     contentState: ContentUiState,
+    sampleMode: Boolean,
+    onLeaveSampleData: () -> Unit,
     onBack: () -> Unit,
     onRefresh: () -> Unit,
 ) {
@@ -695,6 +817,10 @@ private fun LiveNavigator(
     val now = rememberFreshnessNow()
 
     fun open(url: String) {
+        if (sampleMode) {
+            Toast.makeText(context, SampleAccount.ITEM_NOTE, Toast.LENGTH_SHORT).show()
+            return
+        }
         if (!GitHubAppLauncher.open(context, url, adjacent = true)) {
             Toast.makeText(context, "GitHub app is not available", Toast.LENGTH_SHORT).show()
         }
@@ -725,6 +851,7 @@ private fun LiveNavigator(
                             Icon(Icons.Default.Refresh, contentDescription = "Refresh repository")
                         }
                     }
+                    if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it },
