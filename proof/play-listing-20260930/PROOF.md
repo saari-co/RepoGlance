@@ -152,3 +152,70 @@ After the walk:
   MIXED, airplane mode off`.
 - Evidence stays in the ignored `runs/verify-repoglance-runs/play-screens-20260930/`
   and `runs/play-release-runs/20260930/`.
+
+## Addendum: widget and tile captures after #45 (2026-09-30)
+
+These were taken after `sample-widgets-039` merged in #45 (`main` at
+`f2c8816b8d69967daa091776c9e0727579c1c141`).
+
+**Device and setup**
+
+- The approved emulator `EMULATOR37X1X11X0`, booted with `-no-snapshot-save`.
+- `launch` installed the debug build of that commit. Doctor then reported
+  `apk_local` = `apk_device` =
+  `36042d89028c10053529428a2f6e47cd748c88f3334353534a8ba5c47f3b6745`.
+- Capture conditions matched the first set: cover display, `wm size
+  1080x1920`, dark theme, SystemUI demo mode.
+- The maintainer approved widget and tile screenshots from sample mode for
+  this run. Run id: `play-widgets-20260930`.
+
+**Walk**
+
+1. **Entry.** `Explore with sample data` gave a dump with
+   `repoglance:sample-bar` and `@saariuslystoned · 7 repositories`.
+2. **Stack widget.** The debug fixture home's `Pin stack widget` led to the
+   launcher's `Add to home screen`.
+3. **Repo widget.** `Pin repo widget` led to `Add to home screen`, then to
+   `RepoWidgetConfigActivity`. Its note read `Sample data: saving pins this
+   sample repository; removing the widget unpins it. Sample widgets show
+   made-up numbers and never refresh from GitHub.` Saving `saari-co/rocket`
+   pinned it.
+4. **Second pin.** Pinning `saari-co/api-server` in the catalog turned the
+   stack into `Pinned · 2`.
+5. **Tall size.** Dragging the repo widget's resize handles by hand made it
+   tall. The launcher dump then read:
+   - stack: `Pinned · 2`, `saari-co/rocket` `sample` `issues 5 · PRs 3 ·
+     review 0`, `saari-co/api-server` `sample` `issues 3 · PRs 2 · review 0`;
+   - repo widget: `saari-co/rocket`, `ISSUES 5 · PRS 3 · sample`, `ISSUE #415
+     · 25m`, `PR #412 · 25m`, `ISSUE #416 · 1h`.
+6. **Tile.** `cmd statusbar add-tile …RepoGlanceTileService` added it, and
+   its content-desc read `RepoGlance, sample data, latest push to
+   saari-co/rocket updated 25m ago`.
+   - QS edit mode widened the tile, which then showed `RepoGlance` / `Sample
+     · saari-co/rocket · 25m`.
+   - `click-tile` opened `co.saari.repoglance/.MainActivity` on the sample
+     catalog (`@saariuslystoned · 7 repositories`, `repoglance:sample-bar`).
+7. **Exit.** `remove-tile` removed the tile, and `Sign in with GitHub` led
+   back to the Connect screen (`explore-sample` present). The launcher dump
+   then read `Pinned · 0`, `Pin repositories in RepoGlance`, `RepoGlance`,
+   `Tap to choose a repository`.
+8. **Restore.** `wm size reset`, demo mode exit, `uimode night no`, posture
+   `OPENED`, and `cleanup`. The emulator was then stopped.
+   - The two widgets stayed placed on the launcher's second page, because
+     adb drag-to-remove did not take.
+   - The emulator's quickboot snapshot is not saved, so they should not
+     persist. This was not verified.
+
+| Asset | Size | SHA-256 | Raw capture (SHA-256 prefix) |
+| --- | --- | --- | --- |
+| [`phone-06-home-widgets.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-06-home-widgets.png) | 1080×1920 | `00f79a4182f724d226349c07a9bcf493ae3e55dc137700f0abc47c37cdfe09a6` | `home-widgets-tall` `c27c1e5a3a7a` |
+| [`phone-07-quick-settings-tile.png`](https://github.com/saari-co/swarm-pr-assets/releases/download/repoglance-play-listing-20260930/phone-07-quick-settings-tile.png) | 1080×1920 | `42eda062fa1d8ddb2fc2dc233e500f2d3e44064d30da5506bde7eb720813b6af` | `qs-tile-large` `50d74439fc24` |
+
+**Checks on the new assets**
+
+- The launcher dump's repository-shaped labels are `saari-co/rocket` and
+  `saari-co/api-server`, both sample names.
+- Every widget time slot reads `sample`.
+- `saari-co/RepoGlance` does not appear.
+- The asset digests GitHub reports equal the local SHA-256s.
+- The screenshots still show the provisional marker (`sample-marker-040`).

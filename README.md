@@ -46,17 +46,21 @@ Available on `main`, with device proof in [`proof/`](proof/) and
 - **Sample mode.** **Explore with sample data** on the sign-in screen opens
   the real catalog, repository view and navigator on seven made-up
   repositories under RepoGlance's own accounts, marked `SAMPLE` on every
-  screen, with no GitHub account and no network call. It stays until the
-  user chooses **Sign in with GitHub**. Verified on the emulator
-  (Android 16); a Pixel 10 Pro XL (Android 17) ran an earlier owner set.
+  screen, with no GitHub account and no network call.
+  - The repo and stack widgets can be set up from the sample repositories
+    and show `sample` where a live widget shows its time. The Quick Settings
+    tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, never
+    GitHub.
+  - Sample mode stays until the user chooses **Sign in with GitHub**, which
+    also clears the sample widget setups.
+  - Verified on the emulator (Android 16), with a signed-in Fold run for the
+    widgets. A Pixel 10 Pro XL (Android 17) ran an earlier owner set.
 - **Read-only.** RepoGlance performs no GitHub writes of any kind.
 
 Not available yet:
 
 - CI state, latest release, and a watched-CI live notification. Live CI is
   not fetched, so the widgets have no CI column.
-- Sample data in the widgets and the Quick Settings tile
-  (`sample-widgets-039`).
 - Account-wide and organization-wide issue navigation with the Mine,
   Mentions and Awaiting-my-review filters. On live data the navigator is per
   repository today.

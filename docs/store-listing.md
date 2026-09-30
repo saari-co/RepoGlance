@@ -6,9 +6,9 @@ closed-testing build. Paste the fenced blocks into the matching Play Console
 fields. Every claim here must stay true of the build being submitted. When
 the app changes, update this file in the same PR.
 
-Everything below is ready to paste except **App access**. That section waits
-on `sample-widgets-039`, or on the maintainer accepting the risk that
-reviewers cannot see the widgets and tile without an account.
+Everything below is ready to paste. Sample mode covers the widgets and the
+Quick Settings tile since `sample-widgets-039` (#45), so a reviewer can reach
+every advertised surface without credentials.
 
 Sources: [PRIVACY.md](PRIVACY.md) (published at
 <https://saari-co.github.io/RepoGlance/privacy/>),
@@ -36,7 +36,7 @@ Read-only GitHub widgets, pinned repos, and open issues and PRs at a glance.
 
 ## Full description
 
-(4,000 characters max; 2,330 used)
+(4,000 characters max; 2,304 used)
 
 ```
 RepoGlance keeps an eye on your GitHub repositories from your Android home screen. It is read-only: it never comments, closes, merges or changes anything on GitHub.
@@ -54,7 +54,7 @@ WIDGETS AND A QUICK SETTINGS TILE
 Every value shows how old it is. When GitHub can't be reached, RepoGlance shows the last good value with its age, or "no data". It never shows a made-up zero. Pinned repositories refresh about every 30 minutes on a network connection, within GitHub's rate limits.
 
 TRY IT WITHOUT AN ACCOUNT
-Tap "Explore with sample data" on the first screen to try the catalog and repository views with made-up repositories, clearly marked SAMPLE. Sample mode makes no network requests. The widgets and the tile show data from a signed-in GitHub account.
+Tap "Explore with sample data" on the first screen to try the catalog, the repository views, the widgets and the Quick Settings tile with made-up repositories, clearly marked sample. Sample mode makes no network requests.
 
 SIGN IN WITH GITHUB'S OWN FLOW
 RepoGlance uses GitHub's device sign-in: you enter a short code on GitHub's own page, so RepoGlance never sees your password. You choose which repositories RepoGlance can read when you install its GitHub App, and you can change that anytime from the app's menu.
@@ -71,10 +71,10 @@ RepoGlance is an independent app. It is not affiliated with or endorsed by GitHu
 
 ## What's new (0.4.0-beta.1)
 
-(500 characters max; 383 used)
+(500 characters max; 385 used)
 
 ```
-First test build. Sign in with GitHub's device flow, pin the repositories you share with RepoGlance, open their issues and pull requests, and add per-repository and stack widgets plus a Quick Settings tile. No account? Tap "Explore with sample data" on the first screen. RepoGlance is read-only and talks only to GitHub. Not yet: a CI column, and sample data in the widgets and tile.
+First test build. Sign in with GitHub's device flow, pin the repositories you share with RepoGlance, open their issues and pull requests, and add per-repository and stack widgets plus a Quick Settings tile. No account? Tap "Explore with sample data" on the first screen to try all of it with made-up repositories. RepoGlance is read-only and talks only to GitHub. Not yet: a CI column.
 ```
 
 ## Graphics
@@ -94,6 +94,8 @@ Capture proof is in
 | Phone screenshot 3 | `phone-03-repository-prs.png` | 1080×1920 |
 | Phone screenshot 4 | `phone-04-owner-filter.png` | 1080×1920 |
 | Phone screenshot 5 | `phone-05-connect-or-explore-sample.png` | 1080×1920 |
+| Phone screenshot 6 | `phone-06-home-widgets.png` | 1080×1920 |
+| Phone screenshot 7 | `phone-07-quick-settings-tile.png` | 1080×1920 |
 
 - **All screenshots are sample mode.** Every one comes from **Explore with
   sample data**, so none shows a real account's repositories. The repository
@@ -112,10 +114,14 @@ Capture proof is in
   are optional, so leave them empty for the closed test. A 16:9 landscape
   render showed only one catalog row under the header, so it was not used
   (see the proof).
-- **Widgets and tile.** There are no screenshots of these yet. Sample mode
-  does not feed the widgets or the Quick Settings tile until GrillTrack
-  `sample-widgets-039` lands. Add widget screenshots from sample mode after
-  that, not from a real account.
+- **Widgets and tile.** Screenshots 6 and 7 come from sample mode on `main`
+  after #45.
+  - Screenshot 6 shows the stack widget with two sample pins, and the repo
+    widget resized tall, on the launcher's second page.
+  - Screenshot 7 shows the Quick Settings panel with the tile widened to
+    show its `Sample · saari-co/rocket · 25m` subtitle; the system cuts it
+    off at the edge.
+  - Every widget's time slot reads `sample`.
 
 ## Store settings
 
@@ -138,26 +144,6 @@ https://saari-co.github.io/RepoGlance/privacy/
 
 ### App access
 
-> **Not ready to paste yet.** GrillTrack `play-app-access-041` (this text
-> and the store screenshots) depends on `sample-widgets-039` and
-> `sample-marker-040`. Until `sample-widgets-039` lands, sample mode shows the
-> catalog, repository view and issue/PR lists, but not the home-screen
-> widgets or the Quick Settings tile. The listing describes those surfaces,
-> so a reviewer on the no-credential path cannot reach everything it
-> advertises. Sending a release for review requires this declaration, so
-> the maintainer chooses one of these:
->
-> 1. **Wait for `sample-widgets-039`** (recommended by the decision map and
->    ClawSweeper). Then re-verify sample mode on the tagged build, drop the
->    last sentence of the text below, and describe the sample widgets and
->    tile as they actually behave.
-> 2. **Submit now and accept the risk.** Paste the interim text below as it
->    stands. It names the gap rather than hiding it. If review asks for
->    credentials, the fallback decided on 2026-09-29 is a dedicated reviewer
->    GitHub account, which is a maintainer action.
-
-Form choices, the same for both options:
-
 - Choose **All or some functionality in my app is restricted**, because live
   data needs a GitHub sign-in.
 - Add one set of instructions.
@@ -170,11 +156,14 @@ Form choices, the same for both options:
   Sample mode (no credentials needed)
   ```
 
-- **Any other information** (interim text, 726 characters):
+- **Any other information** (912 characters):
 
   ```
-  No credentials are needed. On the first screen, tap "Explore with sample data". This opens the app's real catalog, repository view and issue/PR lists on seven made-up repositories, marked SAMPLE on every screen. Sample mode makes no network requests. Things to try: filter "Account or organization" by dinkuskit, search for "rocket", pin a repository, and open saari-co/rocket to switch between Issues, PRs and Both. Tapping a sample item shows "Sample item — not on GitHub". Tap "Sign in with GitHub" to leave sample mode. Signing in with a real GitHub account shows the same screens for that account's repositories. In this version, the home-screen widgets and the Quick Settings tile show data only for a signed-in account.
+  No credentials are needed. On the first screen, tap "Explore with sample data". This opens the app's real catalog, repository view and issue/PR lists on seven made-up repositories, marked SAMPLE, with no network requests. Try: filter "Account or organization" by dinkuskit, search for "rocket", pin saari-co/rocket, and open it to switch between Issues, PRs and Both. Tapping a sample item shows "Sample item — not on GitHub". Widgets: from the home screen's widget picker, add a RepoGlance widget; its setup lists the sample repositories, and the stack widget lists your sample pins. Each widget shows "sample" where a live widget shows its time. Quick Settings: edit the tiles and add RepoGlance; it reads "Sample · <repository> · <age>" and opens the app. Tap "Sign in with GitHub" to leave sample mode. Signing in with a real GitHub account shows the same screens and widgets for that account's repositories.
   ```
+
+If review asks for credentials anyway, the fallback decided on 2026-09-29 is
+a dedicated reviewer GitHub account. That is a maintainer action.
 
 ### Ads
 
@@ -196,6 +185,22 @@ Form choices, the same for both options:
 - **Unrestricted internet access or a web browser:** No. RepoGlance opens
   GitHub's sign-in and access-settings pages in a Custom Tab (the system
   browser) and has no in-app browser.
+- **Online content** (content that isn't in the download but loads in the
+  app): **Yes**. Repository names, and issue and pull request titles, labels
+  and authors, load from GitHub at runtime. The follow-up questions exclude
+  user-generated content and are all No.
+- **Age-restricted products, cash rewards or NFTs, and "primarily news or
+  educational":** No.
+- **Submitted 2026-09-30.** The resulting ratings are ESRB Everyone, PEGI 3,
+  USK 0, ClassInd L and IARC 3+.
+
+### AI asset declaration (store listing)
+
+**Don't label assets** (maintainer decision, 2026-09-30).
+- The screenshots are real app frames.
+- The icon renders the launcher vectors.
+- The feature graphic is a layout of that icon, Roboto text and screenshot 1.
+- No generative image model produced any pixels.
 
 ### Target audience and content
 
