@@ -16,6 +16,8 @@ private val STORE_READS = listOf(
     "RateLimitStore.",
     "RepoWidgetConfigStore.",
     "CatalogNamesStore.",
+    "SampleModeStore.",
+    "SampleWidgetData.",
     "widgetClock(",
     "Instant.now(",
 )

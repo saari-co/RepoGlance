@@ -11,7 +11,11 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import co.saari.repoglance.MainActivity
 import co.saari.repoglance.R
+import co.saari.repoglance.sample.SampleAccount
 import co.saari.repoglance.state.LatestPushStore
+import co.saari.repoglance.state.SampleModeStore
+import co.saari.repoglance.state.latestPushRecordFor
+import co.saari.repoglance.widget.EXTRA_LIVE_CATALOG
 import java.time.Instant
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -24,7 +28,13 @@ class RepoGlanceTileService : TileService() {
         super.onStartListening()
         val locked = isLocked
         io.execute {
-            val text = TileTexts.of(LatestPushStore.load(this), Instant.now(), locked = locked)
+            val now = Instant.now()
+            val text = if (SampleModeStore.isActive(this)) {
+                val latest = latestPushRecordFor(SampleAccount.catalog(now).repositories, now)
+                TileTexts.sample(latest, now, locked = locked)
+            } else {
+                TileTexts.of(LatestPushStore.load(this), now, locked = locked)
+            }
             main.post { render(text) }
         }
     }
@@ -54,6 +64,7 @@ class RepoGlanceTileService : TileService() {
         val intent = Intent(this, MainActivity::class.java).apply {
             action = Intent.ACTION_MAIN
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra(EXTRA_LIVE_CATALOG, true)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val pending = PendingIntent.getActivity(

@@ -176,10 +176,16 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
                 observedAt = now,
                 rateLimit = SampleAccount.RATE_LIMIT,
             )
-            viewModelScope.launch(sessionDispatcher) { SampleModeStore.enter(context) }
+            viewModelScope.launch(sessionDispatcher + NonCancellable) {
+                SampleModeStore.enter(context)
+                withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }
+            }
         } else {
             liveState.value = LiveUiState.SignedOut
-            viewModelScope.launch(sessionDispatcher) { SampleModeStore.leave(context) }
+            viewModelScope.launch(sessionDispatcher + NonCancellable) {
+                SampleModeStore.leave(context)
+                withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }
+            }
         }
     }
 
@@ -313,10 +319,20 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             }
             when {
                 hasSavedSession() -> {
-                    if (storedSample) launch(sessionDispatcher) { SampleModeStore.leave(context) }
+                    if (storedSample) {
+                        launch(sessionDispatcher + NonCancellable) {
+                            SampleModeStore.leave(context)
+                            withContext(Dispatchers.IO) { WidgetRefresh.updateAll(context) }
+                        }
+                    }
                     refreshCatalog()
                 }
-                storedSample -> setSampleMode(true)
+                storedSample -> {
+                    val pending = pendingRepositoryFull
+                    setSampleMode(true)
+                    pendingRepositoryFull = pending
+                    (liveState.value as? LiveUiState.Ready)?.let { openPendingRepository(it.catalog.repositories) }
+                }
                 else -> liveState.value = LiveUiState.SignedOut
             }
         }

@@ -1,5 +1,6 @@
 package co.saari.repoglance.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -48,6 +49,7 @@ import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.LiveRowsStore
 import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
+import co.saari.repoglance.state.SampleModeStore
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -79,7 +81,8 @@ class RepoWidget : GlanceAppWidget() {
                             .background(GlanceTheme.colors.background),
                     ) {
                         when {
-                            config == null || appIntent == null -> UnconfiguredContent()
+                            config == null || appIntent == null ->
+                                UnconfiguredContent(widgetSetupIntent(context, appWidgetId))
                             isTall -> TallContent(config, data.snapshot, data.rows, data.freshness, appIntent)
                             else -> CompactContent(config, data.snapshot, appIntent, data.freshness)
                         }
@@ -104,7 +107,25 @@ internal data class RepoWidgetData(
     val freshness: WidgetFreshness,
 )
 
-internal fun readRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData {
+internal fun readRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData =
+    if (SampleModeStore.isActive(context)) {
+        readSampleRepoWidgetData(context, appWidgetId)
+    } else {
+        readLiveRepoWidgetData(context, appWidgetId)
+    }
+
+internal fun readSampleRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData {
+    val config = SampleModeStore.widgetConfig(context, appWidgetId)
+    val now = Instant.now()
+    return RepoWidgetData(
+        config = config,
+        snapshot = config?.let { SampleWidgetData.snapshot(it.repo, now) },
+        rows = config?.let { rowsForMode(SampleWidgetData.rows(it.repo, now), it.mode) }.orEmpty(),
+        freshness = WidgetFreshness(now = now, clock = widgetClock(context), rateLimitedUntil = null, sample = true),
+    )
+}
+
+internal fun readLiveRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData {
     val config = RepoWidgetConfigStore.load(context, appWidgetId)
     val now = Instant.now()
     return RepoWidgetData(
@@ -131,10 +152,22 @@ internal fun liveRepositoryIntent(context: Context, repo: RepoRef): Intent =
         putExtra(EXTRA_LIVE_REPO_FULL, repo.full)
     }
 
+internal fun widgetSetupIntent(context: Context, appWidgetId: Int): Intent =
+    Intent(context, RepoWidgetConfigActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        data = Uri.Builder()
+            .scheme("repoglance")
+            .authority("widget-setup")
+            .appendPath(appWidgetId.toString())
+            .build()
+        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+    }
+
 internal data class WidgetFreshness(
     val now: Instant,
     val clock: ClockLabel,
     val rateLimitedUntil: Instant?,
+    val sample: Boolean = false,
 )
 
 internal fun widgetClock(context: Context): ClockLabel = ClockLabel(
@@ -153,7 +186,8 @@ internal fun widgetCountSummary(snapshot: RepoSnapshot, mode: NavigatorMode): St
             " · PRS " + SnapshotRendering.countText(snapshot.openPrs, snapshot.valueBasis)
 }
 
-internal const val WIDGET_PREVIEW_LABEL = "FIXTURE PREVIEW"
+internal const val UNCONFIGURED_TITLE = "RepoGlance"
+internal const val UNCONFIGURED_PROMPT = "Tap to choose a repository"
 
 private val LEDGER_REPO_SIZE = 10.sp
 private val LEDGER_LABEL_SIZE = 8.sp
@@ -163,14 +197,21 @@ private val LEDGER_MERGED_SIZE = 9.sp
 private val LEDGER_THIRD_ROW_BREAKPOINT = 84.dp
 
 @Composable
-private fun UnconfiguredContent() {
-    Column(modifier = GlanceModifier.fillMaxSize().padding(10.dp)) {
+private fun UnconfiguredContent(setupIntent: Intent) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .clickable(actionStartActivity(setupIntent))
+            .padding(10.dp),
+    ) {
         Text(
-            WIDGET_PREVIEW_LABEL,
+            UNCONFIGURED_TITLE,
+            maxLines = 1,
             style = TextStyle(color = GlanceTheme.colors.onBackground, fontWeight = FontWeight.Bold),
         )
         Text(
-            "Choose a repository",
+            UNCONFIGURED_PROMPT,
+            maxLines = 2,
             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
         )
     }
@@ -183,6 +224,7 @@ internal fun compactFreshnessLabel(
 ): String {
     val observedAt = snapshot?.observedAt
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
+    if (freshness.sample) return SAMPLE_TIME_LABEL
     val clock = freshness.clock.format(observedAt, freshness.now)
     return when {
         freshness.rateLimitedUntil != null -> (if (short) "limited · " else "rate limited · ") + clock
@@ -402,7 +444,8 @@ private fun TallBody(
                 }
             } else {
                 items(rows.take(MAX_WIDGET_ROWS).size) { index ->
-                    WidgetFeedRow(rows[index], freshness.now)
+                    val row = rows[index]
+                    WidgetFeedRow(row, freshness.now, rowIntent(row, freshness, appIntent))
                 }
             }
         }
@@ -418,6 +461,7 @@ internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, fresh
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) {
         return "no data · open RepoGlance to load"
     }
+    if (freshness.sample) return widgetCountSummary(snapshot, mode) + " · " + SAMPLE_TIME_LABEL
     val limited = freshness.rateLimitedUntil
         ?.let { "rate limited · resets " + freshness.clock.time(it) + " · " }
         .orEmpty()
@@ -426,9 +470,12 @@ internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, fresh
     return limited + basis + widgetCountSummary(snapshot, mode) + age
 }
 
+internal fun rowIntent(row: WidgetRow, freshness: WidgetFreshness, appIntent: Intent): Intent =
+    if (freshness.sample) appIntent else githubIntent(row)
+
 @Composable
-private fun WidgetFeedRow(row: WidgetRow, now: Instant) {
-    val tapAction = actionStartActivity(githubIntent(row))
+private fun WidgetFeedRow(row: WidgetRow, now: Instant, intent: Intent) {
+    val tapAction = actionStartActivity(intent)
     Column(
         modifier = GlanceModifier
             .fillMaxWidth()

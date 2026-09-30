@@ -275,7 +275,8 @@ r = ET.parse(sys.argv[1]).getroot(); dp = int(sys.argv[2]) / 160
 for n in r.iter('node'):
     if not n.get('class', '').endswith('LauncherAppWidgetHostView'): continue
     t = [c.get('text') for c in n.iter('node') if c.get('text')]
-    kind = 'stack' if any(x.startswith('Pinned') for x in t) else 'repo' if any('RepoGlance' in x for x in t) else None
+    ours = any(c.get('package') == 'co.saari.repoglance' for c in n.iter('node'))
+    kind = 'stack' if any(x.startswith('Pinned') for x in t) else 'repo' if (ours and t) or any('RepoGlance' in x for x in t) else None
     if not kind: continue
     x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
     print(kind, n.get('bounds'), f"{round((x2-x1)/dp)}x{round((y2-y1)/dp)}dp", ' | '.join(t[:4]))

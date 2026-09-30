@@ -1,6 +1,7 @@
 # Design contract: RepoGlance
 
-- **Version:** 5 (2026-09-29): compact widget crowding
+- **Version:** 6 (2026-09-30): sample widgets and the unconfigured widget
+  [sample-widgets-039]. Version 5 (2026-09-29): compact widget crowding
   [compact-crowding-034]. Version 4 (2026-09-28): widget freshness and labels
   [widget-look-032]. Version 3 (2026-09-28): shape and control language
   [shape-control-031]. Version 2 (2026-09-28): label typography
@@ -148,6 +149,15 @@
     E tinted header band. C and D survive only as the compact and
     tall/stack halves of the hybrid.
   - **Proof:** `.grilltrack/proof/widget-look-032-verify-20260928.md`.
+  - **Sample widgets [sample-widgets-039]:** wherever a live widget shows
+    the clock time of its data, a sample widget shows the word `sample`:
+    the compact freshness slot, the tall header in place of `as of`, and
+    each stack row. Sample data was never fetched and never refreshes, so
+    no clock is shown. The look is provisional (the plain fresh style, no
+    capsule) until the marker round `sample-marker-040`.
+  - **Unconfigured repo widget [sample-widgets-039]:** `RepoGlance` over
+    `Tap to choose a repository`; a tap opens that widget's setup. It
+    replaced the stale `FIXTURE PREVIEW` label.
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
@@ -192,7 +202,11 @@
 - **CI on widgets:** needs a live CI read first (the live store has no CI).
   Not grilled.
 - **Tile state:** the system draws the tile, so only icon, active state and
-  subtitle wording can change. Not grilled.
+  subtitle wording can change. Not grilled beyond sample mode, where the
+  subtitle reads `Sample · <repo> · <push age>` [sample-widgets-039].
+- **Sample marker look [sample-marker-040]:** the in-app chip, the widget
+  `sample` word and the tile subtitle are provisional; one round of five on
+  the real sample screens decides them.
 - **Shape on the remaining M3 controls:** sort chips, segmented buttons,
   text buttons and list rows kept M3 in round 3. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.

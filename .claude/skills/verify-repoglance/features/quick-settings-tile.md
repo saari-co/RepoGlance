@@ -7,7 +7,8 @@ A RepoGlance tile in the swipe-down Quick Settings shade opens the live catalog 
 - `tile-label` shows `RepoGlance` with the commit-eye mark.
 - `tile-subtitle` reads `owner/name · <push age>` from the last catalog load; `owner/name · open to refresh` when that load is over a day old; `Open to connect` (inactive tile) with no session.
 - `tile-locked` shows `Unlock to see the latest push` instead of any repository name while the phone is locked.
-- `tile-tap` collapses the shade and opens the live catalog; on a locked phone it asks to unlock first.
+- `tile-tap` collapses the shade and opens the live catalog, even when the app was left on a repository; on a locked phone it asks to unlock first.
+- `tile-sample` in sample mode the tile is active with `Sample · <repo> · <push age>` from the sample data (see [Sample mode](./sample-mode.md)).
 
 ## How to get to it (user POV)
 

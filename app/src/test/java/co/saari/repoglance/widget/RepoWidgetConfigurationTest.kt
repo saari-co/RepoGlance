@@ -73,7 +73,15 @@ class RepoWidgetConfigurationTest {
     }
 
     @Test
-    fun persistentFixtureWidgetsCarryAnUnambiguousPreviewLabel() {
-        assertEquals("FIXTURE PREVIEW", WIDGET_PREVIEW_LABEL)
+    fun anUnconfiguredWidgetInvitesSetupInsteadOfClaimingAFixturePreview() {
+        assertEquals("RepoGlance", UNCONFIGURED_TITLE)
+        assertEquals("Tap to choose a repository", UNCONFIGURED_PROMPT)
+    }
+
+    @Test
+    fun setupNotesSayWhetherTheWidgetIsLiveOrSample() {
+        assertTrue(LIVE_SETUP_NOTE.startsWith("Saving pins this repository in RepoGlance"))
+        assertTrue(SAMPLE_SETUP_NOTE.startsWith("Sample data:"))
+        assertTrue(SAMPLE_SETUP_NOTE.contains("never refresh from GitHub"))
     }
 }
