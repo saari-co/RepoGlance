@@ -7,7 +7,7 @@ release-notes body used for that tag's GitHub Release — see
 ## 0.4.0-beta.1
 
 First Google Play candidate (closed testing). Everything merged since
-`v0.3.0-beta.1`, #6 through #43. RepoGlance stays read-only: it never
+`v0.3.0-beta.1`, #6 through #45. RepoGlance stays read-only: it never
 changes anything on GitHub.
 
 **Sign-in**
@@ -48,7 +48,13 @@ changes anything on GitHub.
 - **Explore with sample data** on the sign-in screen opens the real catalog,
   repository view and navigator on seven made-up repositories. It is marked
   `SAMPLE` on every screen, needs no GitHub account and makes no network
-  call. Widgets and the tile do not show sample data yet (#43).
+  call (#43).
+- In sample mode, the repo and stack widgets are set up from the sample
+  repositories and show `sample` where the time would be. The Quick Settings
+  tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, and
+  sample mode never refreshes in the background. Signing in clears the
+  sample widget setups. An unconfigured repo widget now says `Tap to choose
+  a repository` and opens its setup (#45).
 
 **Look**
 - Ringed commit-eye launcher icon, a themed monochrome glyph, and a start
