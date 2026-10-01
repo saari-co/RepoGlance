@@ -137,7 +137,9 @@
   controls are tonal and borderless; there are no outlines on the seam's
   controls. The seam is `ui/theme/ControlShape.kt`: sites call
   `ControlChip`, `StatusPill`, `StatusBanner`, `PrimaryButton`,
-  `SecondaryButton` and `ControlCard`, which read `LocalControlShape`;
+  `SecondaryButton` and `ControlCard`, which read `LocalControlShape`
+  (`StatusPill` is debug-only in `app/src/debug/.../ui/theme/StatusPill.kt`
+  since 2026-10-01, because only the fixture home uses it);
   `ControlShape.Tonal` is the production default and `ControlShape.Material`
   is the pre-lock M3 look.
 
@@ -227,8 +229,9 @@
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /
-  NEUTRAL and `SnapshotRendering.rateLimitRole` maps rate-limit buckets to
-  the same roles (LOW = working, EXHAUSTED = failing).
+  NEUTRAL (debug-only since 2026-10-01: only the fixture home colours CI)
+  and `SnapshotRendering.rateLimitRole` maps rate-limit buckets to the same
+  `render/CiColorRole` roles (LOW = working, EXHAUSTED = failing).
 
   | meaning | role | family hue | source |
   | --- | --- | --- | --- |

@@ -23,6 +23,7 @@ import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.hooks.TransportFault
 import co.saari.repoglance.refresh.BackgroundRefresh
 import co.saari.repoglance.state.AppPrefs
+import co.saari.repoglance.state.setSelectedScenario
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
