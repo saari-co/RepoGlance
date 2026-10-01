@@ -115,6 +115,19 @@ ways (light on the light emulator, dark on the dark XL), so it is not a
 forced theme. Side-by-side `a7179345f391ad0e`. End state: `System default`,
 `bin/verify-repoglance cleanup` run, the maintainer's session intact.
 
+## Final-head smoke (XL)
+
+After rebasing onto `ac1637f` (Settings popup tags, widgets-look-047) and
+switching the dialog to the shared `popupResourceIds()`: `./gradlew check
+assembleDebug` green (`runs/check-runs/theme-check-3.log`), then on the XL
+`doctor` passed with APK
+`e35624906595fb7c89dea056d6dfb21342e5f985a7afb364dcdcda577274a152`.
+`tap repoglance:menu-settings` resolved from the dump (the menu's ids are now
+published); `repoglance:theme-dialog`, `-light`, `-dark`, `-system`,
+`-cancel`, `-ok` all resolved; `Light` + OK gave app notnight on the dark
+phone; `System default` + OK gave app night again. Cleanup run, session
+untouched. Dumps only (`f-*`); no new captures.
+
 ## Not proven here
 
 - API 31–33 devices (the start window there is the approximate fallback
