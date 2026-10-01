@@ -61,3 +61,16 @@ sheet), foreground loss is caught twice without a crash, the setup
 | R3-1 | design.md and INVARIANTS describe only the Glance sheet path, not the preview-less fallback | P3 | required_fix | name the fallback (launcher's own preview, same sample) |
 | R3-2 | the proof says the fallback "was not triggered on a device", which `request` cannot show (both paths return true and look alike) | P3 | required_fix | reword: not distinguishable on the device |
 | R3-3 | the fallback's `runCatching` also swallows `Error`s | nit | required_fix | `try { … } catch (_: Exception) { false }` |
+
+## Round 4 — `git:a36c46b` (round 3 fixes)
+
+Same reviewer, read-only. "Round 4 clean": no findings at any severity.
+R3-1 (docs name the fallback), R3-2 (proof says the path is
+indistinguishable on the device) and R3-3 (`withoutPreview` catches
+`Exception` only) resolved; the pin-support check is still first,
+`WidgetPinning.kt` is still the single pin caller, and the new guard fails
+loudly if `withoutPreview` is renamed.
+
+Deferred across rounds: N1b (debug picker labels any failure "refused:
+launcher cannot pin") and the fixture home's pre-existing "Pin stack widget"
+label (follow-up task).
