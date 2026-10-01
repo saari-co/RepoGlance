@@ -20,6 +20,7 @@ class ScenarioLaunchActivitySourceTest {
         assertTrue("the probe write runs on Dispatchers.IO", io.contains("RefreshProbe.arm("))
         assertTrue("the rate-limit fault arm runs on Dispatchers.IO", io.contains("TransportFault.arm("))
         assertTrue("the one-time refresh is enqueued on Dispatchers.IO", io.contains("BackgroundRefresh.refreshNow("))
+        assertTrue("the showcase flag is written on Dispatchers.IO", io.contains("ShowcaseLaunch.enter("))
         val outsideIo = onCreate.replace(io, "")
         assertTrue(
             !outsideIo.contains("AppPrefs.") &&

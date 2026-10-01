@@ -230,7 +230,8 @@
     the clock time of its data, a sample widget shows the word `sample`:
     the compact freshness slot, the tall header in place of `as of`, and
     each stack row. Sample data was never fetched and never refreshes, so
-    no clock is shown. Its look is the sample marker below.
+    no clock is shown (the debug-only showcase below is the one exception).
+    Its look is the sample marker below.
   - **Unconfigured repo widget [sample-widgets-039]:** `RepoGlance` over
     `Tap to choose a repository`; a tap opens that widget's setup. It
     replaced the stale `FIXTURE PREVIEW` label.

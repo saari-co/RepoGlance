@@ -38,12 +38,20 @@ class SampleMarkerTest {
 
     @Test
     fun theShowcaseIsWrittenOnlyFromTheDebugSourceSet() {
-        val main = repositoryRoot().resolve("app/src/main/java").toFile().walkTopDown()
-            .filter { it.isFile && it.extension == "kt" }
-            .map { it.readText() }
-            .toList()
-        assertTrue("main never writes the showcase key", main.none { it.contains("KEY_SHOWCASE, true") })
-        assertTrue("main never provides NONE itself", main.none { it.contains("provides SampleMarker.NONE") })
+        val shipped = listOf("app/src/main/java", "app/src/release/java").flatMap { dir ->
+            repositoryRoot().resolve(dir).toFile().walkTopDown().filter { it.isFile && it.extension == "kt" }.toList()
+        }
+        for (file in shipped) {
+            val text = file.readText()
+            if (file.name == "SampleModeStore.kt") {
+                val mentions = text.lines().filter { it.contains("KEY_SHOWCASE") || it.contains("\"showcase\"") }
+                assertTrue("the store only declares and reads the key: $mentions", mentions.isNotEmpty() &&
+                    mentions.all { it.contains("const val KEY_SHOWCASE") || it.contains("getBoolean(KEY_SHOWCASE") })
+            } else {
+                assertTrue("${file.name} never mentions the showcase key", !text.contains("KEY_SHOWCASE") && !text.contains("\"showcase\""))
+            }
+            assertTrue("${file.name} never provides NONE itself", !text.contains("provides SampleMarker.NONE"))
+        }
         val launch = source("app/src/debug/java/co/saari/repoglance/devlaunch/ShowcaseLaunch.kt")
         assertTrue(launch.contains("putBoolean(SampleModeStore.KEY_SHOWCASE, true)"))
         val screen = source("app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt")
@@ -104,7 +112,7 @@ class SampleMarkerTest {
         assertTrue(tallHeaderLabel(snapshot, NavigatorMode.BOTH, showcase).endsWith("as of 14:05"))
         assertEquals("the banner still says sample", SAMPLE_TIME_LABEL, compactFreshnessLabel(snapshot, sample))
         assertEquals(
-            "a sample widget without a persisted marker falls back to the composition local",
+            "a sample widget without a persisted marker keeps the sample word (only NONE shows the clock)",
             SAMPLE_TIME_LABEL,
             stackRowAge(snapshot, sample.copy(sampleMarker = null)),
         )
