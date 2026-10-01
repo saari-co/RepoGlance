@@ -197,10 +197,46 @@ earlier runs present and left alone.
   emulator's generated previews stay removed until a start after the
   rate-limit window republishes them.
 
+## Re-verification after review round 1 (`8e8cdcb`)
+
+Review: `.grilltrack/proof/widget-previews-review-20260930.md#round-1`.
+`./gradlew assembleDebug check` on the fixes: BUILD SUCCESSFUL, 355 unit
+tests (adds the `isDue` cases and minimum-size renders), lint no new
+issues, detekt clean. APK
+`2e241a3e789d006ef53253abd1e28331f0085510e99c986ebd49c7475cc7aa95`; `8e8cdcb`
+changes only docs after that build.
+
+Emulator, sample mode, light, run `widget-preview-reverify-emu` (2026-10-01):
+
+- **Real Add on the fixed `WidgetPinning.request`.** Widgets →
+  `widgets-add-repository` → sheet (`Add to home screen` in the dump) →
+  `RepoWidgetConfigActivity` with `saari-co/rocket` → `Save widget`: widget
+  id 9. `widgets-add-pinned` sheet capture `sheet-pinned-light-fixed`
+  `03a5af5ccf598806a0794c510d5176ae1b33f332b62ca9a79fb2edbeac6dc940`.
+- **Tall Repository widget on Glance 1.2.0.** Id 9 dragged to empty space in
+  the left pane and stretched to 189×196 dp: the dump reads
+  `saari-co/rocket`, `ISSUES 5 · PRS 3 · sample`, `ISSUE #415 · 25m`,
+  `PR #412 · 25m`, `ISSUE #416 · 1h` with their titles (lazy rows render).
+  Crop `95ef838d64603c1087c279e6898fca4ac5002f26d878f5fd831d0f37d7406def`
+  (full screen `a4f3b518a1445da37c411fbe941312cdbef5b8ac6473f7e131e23b83502a8f3e`).
+- **Rate-limited retries do not crash.** Every start of the fixed build logged
+  `setWidgetPreview call for …RepoWidgetReceiver / …StackWidgetReceiver with
+  categories 1 was rate-limited` (00:03:27, 00:04:18, 00:04:49) and the app
+  kept running; the stamp stayed `1.1`.
+- **Cleanup.** Id 9 dragged to `Remove`; `dumpsys appwidget` lists 5, 4, 2;
+  Widgets reads `Not set up` (5) and `No pins yet` (4); sample mode exited
+  to the Connect screen with no device code; night mode `no`.
+
+Dependency change (`:app:dependencies --configuration
+releaseRuntimeClasspath`, `origin/main` vs this branch): the Glance group
+(`glance`, `glance-appwidget`, `glance-material3`, `glance-appwidget-proto`,
+`glance-appwidget-external-protobuf`) 1.1.1 → 1.2.0, and the Compose runtime
+group (`runtime`, `runtime-android`, `runtime-saveable`,
+`runtime-saveable-android`) 1.7.3 → 1.7.8. Nothing else moves;
+`core-remoteviews` 1.1.0 was already on the classpath.
+
 ## Not proven
 
 - Android 12–14 (the `previewLayout` path there) — no such device was run.
-- The tall Repository widget on Glance 1.2.0 was not resized on a device; the
-  stack's lazy rows were.
 - The pre-lock app-icon sheet was not re-captured; with `previewLayout`
   declared it can no longer appear.

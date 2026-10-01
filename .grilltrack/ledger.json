@@ -5350,22 +5350,78 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:56:39+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "verified",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "implemented",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
         }
       ],
       "id": "widget-previews-048",
-      "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+      "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
       "question": "Which surfaces get a real widget preview, and does Glance upgrade for generated previews?",
       "rationale": "Maintainer answered AskUserQuestion 2026-09-30: 'Both (Recommended)' and 'Upgrade now (Recommended)'. Facts: Glance 1.2.0 stable needs compileSdk>=35 (36) and AGP>=8.6 (8.10.1), Compose runtime 1.7.8, Kotlin 2.0.21; setWidgetPreview is rate limited (~2 calls/hour/provider).",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T03:56:39+00:00",
+          "source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093"
+        }
+      ],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T03:44:04+00:00",
-      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+      "updated_at": "2026-10-01T04:05:29+00:00",
+      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
     },
     {
       "baseline_ref": null,
@@ -5449,22 +5505,78 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:56:39+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "verified",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "implemented",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
         }
       ],
       "id": "widget-preview-look-049",
-      "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+      "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
       "question": "What does a widget preview show (in-app sheet and launcher picker)?",
       "rationale": "Maintainer first picked B in AskUserQuestion, then wrote 'actually im changing my answer to A' before confirmation (2026-09-30). All five were shown on the real launcher sheet on the Pixel 10 Pro XL (dark, live) and the emulator (light, dark).",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T03:56:39+00:00",
+          "source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093"
+        }
+      ],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T03:44:04+00:00",
-      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+      "updated_at": "2026-10-01T04:05:29+00:00",
+      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
     }
   ],
   "last_activation": {
@@ -5496,5 +5608,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T03:44:04+00:00"
+  "updated_at": "2026-10-01T04:05:29+00:00"
 }
