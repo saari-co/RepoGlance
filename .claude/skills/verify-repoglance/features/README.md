@@ -61,8 +61,9 @@ required state, commands, and observable proof.
 
 - [Compact widget truth states](./compact-widget.md) covers exact, last-good,
   and no-data rendering of the small home-screen widget at three sizes.
-- [Navigator](./navigator.md) covers the fixture issue/PR navigator: scope,
-  mode, filters, row detail, and the Home return.
+- [Navigator](./navigator.md) covers the debug-only fixture issue/PR
+  navigator (a test screen, absent from release builds): scope, mode,
+  filters, row detail, and the Home return.
 - [Find a repository](./find-repository.md) covers the live catalog's owner
   filter and repository search, including the source-blind guard.
 - [Sign in with GitHub](./sign-in.md) covers the device-flow sign-in screen and

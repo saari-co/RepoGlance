@@ -96,7 +96,7 @@ class SettingsGuardTest {
     fun aRecreatedActivityKeepsSettingsOpenAndWidgetTapsCloseIt() {
         assertTrue(activity.contains("outState.putStringArray(\n            STATE_SETTINGS_DESTINATIONS,"))
         assertTrue(activity.contains("?.getStringArray(STATE_SETTINGS_DESTINATIONS)"))
-        val live = section(activity, "private fun handleLiveIntent(intent: Intent?) {", "\n    }\n\n")
+        val live = section(activity, "private fun handleLiveIntent(intent: Intent?) {", "\n    }\n")
         assertEquals(
             "a widget or tile tap shows the repository, not Settings",
             2,

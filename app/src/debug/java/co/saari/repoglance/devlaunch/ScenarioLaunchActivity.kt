@@ -17,12 +17,12 @@ import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetLookVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
+import co.saari.repoglance.hooks.EXTRA_NAVIGATOR_MODE
+import co.saari.repoglance.hooks.EXTRA_REPO_FULL
 import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.hooks.TransportFault
 import co.saari.repoglance.refresh.BackgroundRefresh
 import co.saari.repoglance.state.AppPrefs
-import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
-import co.saari.repoglance.widget.EXTRA_REPO_FULL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

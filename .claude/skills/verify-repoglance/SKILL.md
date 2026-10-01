@@ -27,8 +27,9 @@ bin/verify-repoglance launch <SCENARIO> <screen> [owner/name] [ISSUES|PRS|BOTH]
   `NO_CI`, `EMPTY`, `MIXED`. It is stored as the fixture scenario before the
   screen opens.
 - `screen` is `live` (the real signed-in catalog, or the sign-in screen when
-  there is no session), `navigator` (the fixture navigator for the given
-  repository and mode), or `picker` (the GrillTrack widget picker, which
+  there is no session), `navigator` (the debug-only fixture navigator for
+  the given repository and mode; release builds have no fixture route), or
+  `picker` (the GrillTrack widget picker, which
   renders the production compact widget through the real Glance pipeline).
 - The launcher is a debug-source-set Activity; a release build does not have
   it and `doctor` fails on such a build.

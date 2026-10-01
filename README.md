@@ -80,7 +80,8 @@ Not available yet:
   not fetched, so the widgets have no CI column.
 - Account-wide and organization-wide issue navigation with the Mine,
   Mentions and Awaiting-my-review filters. On live data the navigator is per
-  repository today.
+  repository today. The fixture navigator that prototypes these is a
+  debug-only test screen; release builds do not contain it.
 - Google Play distribution ([#7](https://github.com/saari-co/RepoGlance/issues/7)).
   Revoking the earlier prototype client secret remains maintainer-gated.
 
