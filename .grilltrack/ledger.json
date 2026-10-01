@@ -7,7 +7,7 @@
     "confirmed_at": "2026-10-01T00:51:51+00:00",
     "domain": "theme-choice-046: an in-app theme choice (Light / Dark / System default) for RepoGlance, on the shared Settings screen (settings-044)",
     "started_at": "2026-10-01T00:51:51+00:00",
-    "status": "confirmed",
+    "status": "inspected",
     "summary": "Maintainer 2026-09-30 'confirmed, stack on the settings branch': build theme-choice-046 (ThemeChoice + ThemePrefs + per-app night mode apply, ThemeSettingItem row + Choose theme radio dialog in ui/settings/ThemeSetting.kt for the settings-044 Appearance slot), unit + guard tests, design/invariants/changelog/feature-map updates, ./gradlew check green; stack on claude/settings-widgets-entry once its shell is pushed (PR base = that branch, retarget to main after it merges); prove on the signed-out approved emulator or the 10 Pro XL; exact-source review; PR, CI, @clawsweeper review; merge only with maintainer OK."
   },
   "decisions": [
@@ -4928,13 +4928,21 @@
       "rationale": "Maintainer chose the recommended placement, all four content groups and reach everywhere in frontier batch 1 (2026-09-30); a Widgets item gives his quick path, Settings gives the theme session one home, and reach everywhere lets a signed-out or sample user (and a Play reviewer) change theme or add widgets in-app.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_history": [
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T01:36:56+00:00",
+          "source_identity": "git:ce81aca66da729044777074d022e59d979fefb73"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+      "review_result": "clean",
+      "review_source_identity": "git:ce81aca66da729044777074d022e59d979fefb73",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T01:22:20+00:00",
+      "updated_at": "2026-10-01T01:36:56+00:00",
       "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
     },
     {
@@ -4991,22 +4999,87 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T01:33:45+00:00",
+          "choice": "A Widgets screen with two Add cards, Repository widget (one repository you choose; its latest items when taller) and Pinned repos widget (every repository you pin, newest push first), each with a one-line description and an Add button that calls requestPinAppWidget (the repository widget then opens its setup). Without launcher pin support the cards show a short how-to instead of Add. 'On your home screen' lists every placed RepoGlance widget: Repository with its repository and feed (tap to change it in its setup), Repository not set up (tap to set it up), Pinned repos with its pin count. Removing stays on the launcher with a one-line hint. Works the same in sample mode (setup lists the sample repositories). The same names label both widgets in the launcher's widget picker and in the store listing and reviewer text.",
+          "from": "verified",
+          "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+        },
+        {
+          "at": "2026-10-01T01:33:45+00:00",
+          "choice": "A Widgets screen with two Add cards, Repository widget (one repository you choose; its latest items when taller) and Pinned repos widget (every repository you pin, newest push first), each with a one-line description and an Add button that calls requestPinAppWidget (the repository widget then opens its setup). Without launcher pin support the cards show a short how-to instead of Add. 'On your home screen' lists every placed RepoGlance widget: Repository with its repository and feed (tap to change it in its setup), Repository not set up (tap to set it up), Pinned repos with its pin count. Removing stays on the launcher with a one-line hint. Works the same in sample mode (setup lists the sample repositories). The same names label both widgets in the launcher's widget picker and in the store listing and reviewer text.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "review_ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:b63fd386867acf288aecafa4011a54a0a4e22c71",
+          "to": "implemented",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+        },
+        {
+          "at": "2026-10-01T01:33:45+00:00",
+          "choice": "A Widgets screen with two Add cards, Repository widget (one repository you choose; its latest items when taller) and Pinned repos widget (every repository you pin, newest push first), each with a one-line description and an Add button that calls requestPinAppWidget (the repository widget then opens its setup). Without launcher pin support the cards show a short how-to instead of Add. 'On your home screen' lists every placed RepoGlance widget: Repository with its repository and feed (tap to change it in its setup), Repository not set up (tap to set it up), Pinned repos with its pin count. Removing stays on the launcher with a one-line hint. Works the same in sample mode (setup lists the sample repositories). The same names label both widgets in the launcher's widget picker and in the store listing and reviewer text.",
+          "from": "implemented",
+          "implementation_ref": "git:ce81aca66da729044777074d022e59d979fefb73 (WidgetsScreen.kt Add descriptions and up-front pin support)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
         }
       ],
       "id": "widgets-entry-045",
-      "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+      "implementation_ref": "git:ce81aca66da729044777074d022e59d979fefb73 (WidgetsScreen.kt Add descriptions and up-front pin support)",
       "question": "What does the in-app Widgets entry do, and what are the widgets called?",
       "rationale": "Maintainer took 'add + list + change' but said 'stack widget' means nothing even to the builder; he chose 'Repository' + 'Pinned repos' (matches the thumbtack and the widget's 'Pinned \u00b7 N' header) and to use the names in the launcher and on Play too (2026-09-30).",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T01:33:45+00:00",
+          "source_identity": "git:b63fd386867acf288aecafa4011a54a0a4e22c71"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T01:36:56+00:00",
+          "source_identity": "git:ce81aca66da729044777074d022e59d979fefb73"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+      "review_result": "clean",
+      "review_source_identity": "git:ce81aca66da729044777074d022e59d979fefb73",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T01:22:20+00:00",
-      "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+      "updated_at": "2026-10-01T01:36:56+00:00",
+      "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md (emulator follow-up on ce81aca) + ./gradlew check"
     },
     {
       "baseline_ref": null,
@@ -5062,22 +5135,87 @@
           "review_source_identity": null,
           "to": "verified",
           "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T01:33:45+00:00",
+          "choice": "C preview tiles (round widgets-look-round-1): two side-by-side tonal 24 dp tiles, one per widget, each with a sketch of the widget's shape, its name, a sentence and a full-width tonal Add capsule; 'On your home screen' follows as icon rows (repository widgets open their setup), then the removal hint. A cards-then-list, B settings list, D placed first + Add dialog and E grouped by widget were rejected; their code is removed and the round is recorded in proof.",
+          "from": "verified",
+          "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+        },
+        {
+          "at": "2026-10-01T01:33:45+00:00",
+          "choice": "C preview tiles (round widgets-look-round-1): two side-by-side tonal 24 dp tiles, one per widget, each with a sketch of the widget's shape, its name, a sentence and a full-width tonal Add capsule; 'On your home screen' follows as icon rows (repository widgets open their setup), then the removal hint. A cards-then-list, B settings list, D placed first + Add dialog and E grouped by widget were rejected; their code is removed and the round is recorded in proof.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "review_ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:b63fd386867acf288aecafa4011a54a0a4e22c71",
+          "to": "implemented",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+        },
+        {
+          "at": "2026-10-01T01:33:46+00:00",
+          "choice": "C preview tiles (round widgets-look-round-1): two side-by-side tonal 24 dp tiles, one per widget, each with a sketch of the widget's shape, its name, a sentence and a full-width tonal Add capsule; 'On your home screen' follows as icon rows (repository widgets open their setup), then the removal hint. A cards-then-list, B settings list, D placed first + Add dialog and E grouped by widget were rejected; their code is removed and the round is recorded in proof.",
+          "from": "implemented",
+          "implementation_ref": "git:ce81aca66da729044777074d022e59d979fefb73 (WidgetsScreen.kt Add descriptions and up-front pin support)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
         }
       ],
       "id": "widgets-look-047",
-      "implementation_ref": "git:ac1637f (app/src/main/java/co/saari/repoglance/ui/settings/, MainActivity.kt, LiveRepoGlanceScreen.kt, AndroidManifest.xml labels)",
+      "implementation_ref": "git:ce81aca66da729044777074d022e59d979fefb73 (WidgetsScreen.kt Add descriptions and up-front pin support)",
       "question": "How does the Widgets screen look (Add cards and the placed-widget list) on the existing locks?",
       "rationale": "Maintainer picked C after the live picker on the Pixel 10 Pro XL and light/dark contact sheets (2026-09-30). The question listed A-D with Other open; E was on the picker and both sheets.",
       "repair_required": false,
       "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer",
+            "reject_false_positive"
+          ],
+          "ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T01:33:45+00:00",
+          "source_identity": "git:b63fd386867acf288aecafa4011a54a0a4e22c71"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T01:36:56+00:00",
+          "source_identity": "git:ce81aca66da729044777074d022e59d979fefb73"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/settings-widgets-review-20260930.md#round-2",
+      "review_result": "clean",
+      "review_source_identity": "git:ce81aca66da729044777074d022e59d979fefb73",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T01:22:20+00:00",
-      "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md"
+      "updated_at": "2026-10-01T01:36:56+00:00",
+      "verification_ref": "file:proof/settings-widgets-20260930/PROOF.md (emulator follow-up on ce81aca) + ./gradlew check"
     },
     {
       "baseline_ref": "git:d7421d3",
@@ -5179,16 +5317,16 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "sample-mode follow-ups from the 039/040 reviews: widget setup opened from a widget returns to the app instead of home, main-thread prefs reads in RepoWidgetReceiver.onDeleted, and the debug picker's main-thread Glance rendering",
-      "compact-12h-fit-035: the deferred 12-hour clock truncation on the compact widget"
+      "large-screen Settings, Widgets and catalog: content width and two-pane on the Fold inner display and landscape (both new screens span the full width; the catalog header already fills landscape)",
+      "compact-12h-fit-035 (deferred): the compact widget's 12-hour data age truncates, an open truth-rule-3 risk"
     ],
-    "reason": "The sample-mode map's last node is the Play reviewer path; the in-app, widget and marker slices it depends on are verified",
-    "recommended": "play-app-access-041: the Play Console App access text and store screenshots from sample mode (human-gated Console; map node 4, now unblocked by 038-040)",
-    "recorded_at": "2026-09-30T23:40:45+00:00"
+    "reason": "settings-044/045/047 verified; the in-app Add now leads straight to the launcher sheet, whose icon-only preview is the next visible gap before Play (#7)",
+    "recommended": "widget-previews: what the launcher's Add to home screen sheet and widget picker show for Repository and Pinned repos. Today they show the app icon, because neither widget declares a preview (seen on the emulator sheet, 2026-09-30); a real preview (previewLayout, or Glance generated previews on Android 15+) is what Play reviewers and new users see first when they tap Add",
+    "recorded_at": "2026-10-01T01:34:52+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T01:22:20+00:00"
+  "updated_at": "2026-10-01T01:36:56+00:00"
 }
