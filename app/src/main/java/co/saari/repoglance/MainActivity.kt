@@ -40,6 +40,10 @@ import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.ui.HomeScreen
 import co.saari.repoglance.ui.LiveRepoGlanceScreen
 import co.saari.repoglance.ui.NavigatorScreen
+import co.saari.repoglance.ui.settings.SettingsDestination
+import co.saari.repoglance.ui.settings.SettingsScreen
+import co.saari.repoglance.ui.settings.WidgetsScreen
+import co.saari.repoglance.ui.settings.settingsAccount
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
 import co.saari.repoglance.widget.EXTRA_LIVE_CATALOG
 import co.saari.repoglance.widget.EXTRA_LIVE_REPO_FULL
@@ -55,11 +59,13 @@ private const val STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS =
     "refreshCatalogAfterGitHubAccess"
 private const val STATE_RETURN_AFTER_GITHUB_VERIFICATION =
     "returnAfterGitHubVerification"
+private const val STATE_SETTINGS_DESTINATIONS = "settingsDestinations"
 
 class MainActivity : ComponentActivity() {
     private val fixtureNavigatorScope = mutableStateOf<NavigatorScope?>(null)
     private val fixtureNavigatorMode = mutableStateOf(NavigatorMode.BOTH)
     private val fixtureNavigatorRouteToken = mutableIntStateOf(0)
+    private val settingsDestinations = mutableStateOf<List<SettingsDestination>>(emptyList())
     private lateinit var liveModel: RepoGlanceViewModel
     private var refreshCatalogAfterGitHubAccess = false
     private var returnAfterGitHubVerification = false
@@ -73,6 +79,10 @@ class MainActivity : ComponentActivity() {
             savedInstanceState?.getBoolean(STATE_REFRESH_CATALOG_AFTER_GITHUB_ACCESS) == true
         returnAfterGitHubVerification =
             savedInstanceState?.getBoolean(STATE_RETURN_AFTER_GITHUB_VERIFICATION) == true
+        settingsDestinations.value = savedInstanceState
+            ?.getStringArray(STATE_SETTINGS_DESTINATIONS)
+            ?.mapNotNull { name -> SettingsDestination.entries.firstOrNull { it.name == name } }
+            .orEmpty()
         lifecycleScope.launch {
             liveModel.deviceAuthorizationCommitted.collect { returnFromGitHubVerification() }
         }
@@ -96,28 +106,57 @@ class MainActivity : ComponentActivity() {
                             FixtureRoot(currentFixtureScope, fixtureNavigatorMode.value)
                         }
                     } else {
-                        LiveRepoGlanceScreen(
-                            state = liveModel.liveState.value,
-                            selectedRepository = liveModel.selectedRepository.value,
-                            contentState = liveModel.repositoryContent.value,
-                            connectionReady = liveModel.deviceFlowReady,
-                            sampleMode = liveModel.sampleMode.value,
-                            onConnectGitHub = ::connectGitHub,
-                            onExploreSampleData = { liveModel.setSampleMode(true) },
-                            onLeaveSampleData = { liveModel.setSampleMode(false) },
-                            onCopyCodeAndOpenGitHub = ::copyCodeAndOpenGitHub,
-                            onCancelGitHubAuthorization = liveModel::cancelGitHubAuthorization,
-                            onRetry = liveModel::refreshCatalog,
-                            onSelectRepository = liveModel::selectRepository,
-                            onBackToRepositories = liveModel::backToRepositories,
-                            onRefreshRepository = liveModel::refreshSelectedRepository,
-                            onManageGitHubAccess = ::openInstallationSettings,
-                            onSignOut = liveModel::signOut,
-                        )
+                        LiveRoot()
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun LiveRoot() {
+        when (settingsDestinations.value.lastOrNull()) {
+            SettingsDestination.SETTINGS -> SettingsScreen(
+                account = settingsAccount(liveModel.liveState.value, liveModel.sampleMode.value),
+                versionName = BuildConfig.VERSION_NAME,
+                onBack = ::closeSettingsDestination,
+                onOpenWidgets = { openSettingsDestination(SettingsDestination.WIDGETS) },
+                onManageGitHubAccess = ::openInstallationSettings,
+                onDisconnect = {
+                    settingsDestinations.value = emptyList()
+                    liveModel.signOut()
+                },
+                onOpenLink = ::openLink,
+            )
+            SettingsDestination.WIDGETS -> WidgetsScreen(onBack = ::closeSettingsDestination)
+            null -> LiveRepoGlanceScreen(
+                state = liveModel.liveState.value,
+                selectedRepository = liveModel.selectedRepository.value,
+                contentState = liveModel.repositoryContent.value,
+                connectionReady = liveModel.deviceFlowReady,
+                sampleMode = liveModel.sampleMode.value,
+                onConnectGitHub = ::connectGitHub,
+                onExploreSampleData = { liveModel.setSampleMode(true) },
+                onLeaveSampleData = { liveModel.setSampleMode(false) },
+                onCopyCodeAndOpenGitHub = ::copyCodeAndOpenGitHub,
+                onCancelGitHubAuthorization = liveModel::cancelGitHubAuthorization,
+                onRetry = liveModel::refreshCatalog,
+                onSelectRepository = liveModel::selectRepository,
+                onBackToRepositories = liveModel::backToRepositories,
+                onRefreshRepository = liveModel::refreshSelectedRepository,
+                onManageGitHubAccess = ::openInstallationSettings,
+                onOpenWidgets = { openSettingsDestination(SettingsDestination.WIDGETS) },
+                onOpenSettings = { openSettingsDestination(SettingsDestination.SETTINGS) },
+            )
+        }
+    }
+
+    private fun openSettingsDestination(destination: SettingsDestination) {
+        settingsDestinations.value = settingsDestinations.value + destination
+    }
+
+    private fun closeSettingsDestination() {
+        settingsDestinations.value = settingsDestinations.value.dropLast(1)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -135,6 +174,10 @@ class MainActivity : ComponentActivity() {
         outState.putBoolean(
             STATE_RETURN_AFTER_GITHUB_VERIFICATION,
             returnAfterGitHubVerification,
+        )
+        outState.putStringArray(
+            STATE_SETTINGS_DESTINATIONS,
+            settingsDestinations.value.map { it.name }.toTypedArray(),
         )
         super.onSaveInstanceState(outState)
     }
@@ -192,6 +235,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private fun openLink(url: String) {
+        CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(this, url.toUri())
+    }
+
     private fun resolveFixtureScopeFromIntent(intent: Intent?): NavigatorScope.Repo? {
         return intent
             ?.getStringExtra(EXTRA_REPO_FULL)
@@ -202,11 +249,13 @@ class MainActivity : ComponentActivity() {
     private fun handleLiveIntent(intent: Intent?) {
         if (intent?.getBooleanExtra(EXTRA_LIVE_CATALOG, false) == true) {
             fixtureNavigatorScope.value = null
+            settingsDestinations.value = emptyList()
             liveModel.backToRepositories()
             return
         }
         val full = intent?.getStringExtra(EXTRA_LIVE_REPO_FULL) ?: return
         fixtureNavigatorScope.value = null
+        settingsDestinations.value = emptyList()
         liveModel.openRepositoryByName(full)
     }
 

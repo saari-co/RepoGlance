@@ -1,9 +1,5 @@
 package co.saari.repoglance.ui
 
-import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,6 +45,8 @@ import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
+import co.saari.repoglance.ui.settings.WidgetKind
+import co.saari.repoglance.ui.settings.WidgetPinning
 import co.saari.repoglance.ui.theme.ControlCard
 import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
@@ -59,9 +57,6 @@ import co.saari.repoglance.ui.theme.SecondaryButton
 import co.saari.repoglance.ui.theme.StatusBanner
 import co.saari.repoglance.ui.theme.StatusColors
 import co.saari.repoglance.ui.theme.StatusPill
-import co.saari.repoglance.widget.RepoWidgetConfigActivity
-import co.saari.repoglance.widget.RepoWidgetReceiver
-import co.saari.repoglance.widget.StackWidgetReceiver
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,46 +129,21 @@ fun HomeScreen(
 @Composable
 private fun PinWidgetsRow() {
     val context = LocalContext.current
-    val appWidgetManager = remember { AppWidgetManager.getInstance(context) }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton(
             modifier = Modifier.weight(1f),
-            onClick = {
-                if (appWidgetManager.isRequestPinAppWidgetSupported) {
-                    val configureCallback = PendingIntent.getActivity(
-                        context,
-                        REPO_WIDGET_CONFIG_REQUEST_CODE,
-                        Intent(context, RepoWidgetConfigActivity::class.java),
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-                    )
-                    appWidgetManager.requestPinAppWidget(
-                        ComponentName(context, RepoWidgetReceiver::class.java),
-                        null,
-                        configureCallback,
-                    )
-                }
-            },
+            onClick = { WidgetPinning.request(context, WidgetKind.REPOSITORY) },
         ) {
             LabelText("Pin repo widget", LabelRole.BUTTON)
         }
         SecondaryButton(
             modifier = Modifier.weight(1f),
-            onClick = {
-                if (appWidgetManager.isRequestPinAppWidgetSupported) {
-                    appWidgetManager.requestPinAppWidget(
-                        ComponentName(context, StackWidgetReceiver::class.java),
-                        null,
-                        null,
-                    )
-                }
-            },
+            onClick = { WidgetPinning.request(context, WidgetKind.PINNED_REPOS) },
         ) {
             LabelText("Pin stack widget", LabelRole.BUTTON)
         }
     }
 }
-
-private const val REPO_WIDGET_CONFIG_REQUEST_CODE = 1101
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

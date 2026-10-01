@@ -16,6 +16,7 @@ import co.saari.repoglance.devpicker.SplashVariantPickerActivity
 import co.saari.repoglance.devpicker.StatusColourVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetLookVariantPickerActivity
 import co.saari.repoglance.devpicker.WidgetVariantPickerActivity
+import co.saari.repoglance.devpicker.WidgetsLookPickerActivity
 import co.saari.repoglance.fixtures.FixtureScenario
 import co.saari.repoglance.hooks.RefreshProbe
 import co.saari.repoglance.hooks.TransportFault
@@ -39,6 +40,7 @@ import kotlinx.coroutines.withContext
 //         | splash-picker (extra candidate <mark A..E>/<motion A..E>, extra slot mark|motion)
 //         | status-picker (extra candidate A..E)
 //         | type-picker (extra candidate A..E)
+//         | widgets-look-picker (extra candidate A..E)
 //         | checking (the production Checking screen held open)
 //         | signin-finishing (the production post-token sign-in screens held open)
 //         | none (apply the extras below and stay on the current screen)
@@ -143,6 +145,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_WIDGET_LOOK_PICKER = "widget-look-picker"
         const val SCREEN_COMPACT_PICKER = "compact-picker"
         const val SCREEN_SAMPLE_MARKER_PICKER = "sample-marker-picker"
+        const val SCREEN_WIDGETS_LOOK_PICKER = "widgets-look-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
         const val SCREEN_NONE = "none"
@@ -164,6 +167,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
             SCREEN_WIDGET_LOOK_PICKER to WidgetLookVariantPickerActivity::class.java,
             SCREEN_COMPACT_PICKER to CompactVariantPickerActivity::class.java,
             SCREEN_SAMPLE_MARKER_PICKER to SampleMarkerPickerActivity::class.java,
+            SCREEN_WIDGETS_LOOK_PICKER to WidgetsLookPickerActivity::class.java,
         )
     }
 }

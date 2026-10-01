@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "sequential",
+    "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-09-30T23:18:28+00:00",
-    "domain": "sample-marker-040: the look of the sample marker across the in-app screens, the widgets and the Quick Settings tile (one slot, round of five on the real sample canvas)",
-    "started_at": "2026-09-30T22:29:10+00:00",
-    "status": "inspected",
-    "summary": "Maintainer 2026-09-30 'confirmed, emulator ok, open the PR once clean': B becomes the production default of LocalSampleMarker, A kept as pre-lock reference, C/D/E production code removed and the picker trimmed to A/B (round record kept in proof and design.md), test tags kept, tests/guards/docs/recipes updated; verify with the gate and on the signed-out approved emulator (widgets and add-tile/remove-tile approved), exact-source review, PR once clean."
+    "confirmed_at": "2026-10-01T00:14:21+00:00",
+    "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
+    "started_at": "2026-10-01T00:07:30+00:00",
+    "status": "confirmed",
+    "summary": "Maintainer 2026-09-30 'Confirmed + look round', devices 'Emulator + XL': build settings-044 (three-dot menu = Widgets + Settings on the live catalog, sample catalog and Connect screen (Settings only there); Settings = Widgets row, Appearance slot for theme-choice-046's ThemeSettingItem, GitHub (Manage access, Disconnect with confirm; live session only), About (version, privacy, source; Custom Tab)) and widgets-entry-045 (Widgets screen: Repository widget and Pinned repos widget Add cards via requestPinAppWidget with a how-to fallback, placed-widget list with change-repository taps, removal hint, sample mode alike; launcher picker labels and store-listing copy use the names). Look: run a five-candidate round for widgets-look-047 on the device before locking it. Guards/tests in repo style, ./gradlew check green, feature map updated; prove a real requestPinAppWidget flow on the emulator (signed out, sample mode) and the live path on the 10 Pro XL if it has a session and is free; remove what is placed. PR after an exact-source review; merge only after CI + ClawSweeper on the exact head and the maintainer's OK."
   },
   "decisions": [
     {
@@ -4867,6 +4867,118 @@
       "superseded_by": null,
       "updated_at": "2026-09-30T23:40:45+00:00",
       "verification_ref": "file:.grilltrack/proof/sample-marker-040-verify-20260930.md#review (picker opens on B with no letter on the Fold, APK 1334d0b5; gate check-2 green)"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "The three-dot menu holds exactly two items, Widgets (straight to the Widgets screen) and Settings. One Settings screen: Widgets row; Appearance with the Theme row (built by theme-choice-046 in its own files); GitHub with Manage GitHub access and Disconnect GitHub (today's confirm dialog), shown only with a live session; About with version, privacy policy and source code links (Custom Tab). Manage GitHub access and Disconnect move from the menu into Settings. Reach: live catalog (Widgets + Settings), sample catalog (Widgets + Settings, GitHub section hidden), Connect screen (Settings only: Appearance + About). Read-only per AGENTS.md.",
+      "context_ref": "github:saari-co/RepoGlance#7",
+      "created_at": "2026-10-01T00:13:02+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
+      "history": [
+        {
+          "at": "2026-10-01T00:14:20+00:00",
+          "choice": "The three-dot menu holds exactly two items, Widgets (straight to the Widgets screen) and Settings. One Settings screen: Widgets row; Appearance with the Theme row (built by theme-choice-046 in its own files); GitHub with Manage GitHub access and Disconnect GitHub (today's confirm dialog), shown only with a live session; About with version, privacy policy and source code links (Custom Tab). Manage GitHub access and Disconnect move from the menu into Settings. Reach: live catalog (Widgets + Settings), sample catalog (Widgets + Settings, GitHub section hidden), Connect screen (Settings only: Appearance + About). Read-only per AGENTS.md.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "settings-044",
+      "implementation_ref": null,
+      "question": "Where do Widgets and the other settings live, what does Settings hold now, and where is it reachable?",
+      "rationale": "Maintainer chose the recommended placement, all four content groups and reach everywhere in frontier batch 1 (2026-09-30); a Widgets item gives his quick path, Settings gives the theme session one home, and reach everywhere lets a signed-out or sample user (and a Play reviewer) change theme or add widgets in-app.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T00:14:20+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "A Widgets screen with two Add cards, Repository widget (one repository you choose; its latest items when taller) and Pinned repos widget (every repository you pin, newest push first), each with a one-line description and an Add button that calls requestPinAppWidget (the repository widget then opens its setup). Without launcher pin support the cards show a short how-to instead of Add. 'On your home screen' lists every placed RepoGlance widget: Repository with its repository and feed (tap to change it in its setup), Repository not set up (tap to set it up), Pinned repos with its pin count. Removing stays on the launcher with a one-line hint. Works the same in sample mode (setup lists the sample repositories). The same names label both widgets in the launcher's widget picker and in the store listing and reviewer text.",
+      "context_ref": "github:saari-co/RepoGlance#7",
+      "created_at": "2026-10-01T00:13:03+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "settings-044"
+      ],
+      "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
+      "history": [
+        {
+          "at": "2026-10-01T00:14:20+00:00",
+          "choice": "A Widgets screen with two Add cards, Repository widget (one repository you choose; its latest items when taller) and Pinned repos widget (every repository you pin, newest push first), each with a one-line description and an Add button that calls requestPinAppWidget (the repository widget then opens its setup). Without launcher pin support the cards show a short how-to instead of Add. 'On your home screen' lists every placed RepoGlance widget: Repository with its repository and feed (tap to change it in its setup), Repository not set up (tap to set it up), Pinned repos with its pin count. Removing stays on the launcher with a one-line hint. Works the same in sample mode (setup lists the sample repositories). The same names label both widgets in the launcher's widget picker and in the store listing and reviewer text.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
+      "id": "widgets-entry-045",
+      "implementation_ref": null,
+      "question": "What does the in-app Widgets entry do, and what are the widgets called?",
+      "rationale": "Maintainer took 'add + list + change' but said 'stack widget' means nothing even to the builder; he chose 'Repository' + 'Pinned repos' (matches the thumbtack and the widget's 'Pinned \u00b7 N' header) and to use the names in the launcher and on Play too (2026-09-30).",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "locked",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T00:14:20+00:00",
+      "verification_ref": null
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "Not decided: a round of five materially distinct candidates on the real Widgets screen on the device, under label-typography-030, shape-control-031, status-colour-029 and sample-marker-040.",
+      "context_ref": null,
+      "created_at": "2026-10-01T00:14:21+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widgets-entry-045"
+      ],
+      "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
+      "history": [],
+      "id": "widgets-look-047",
+      "implementation_ref": null,
+      "question": "How does the Widgets screen look (Add cards and the placed-widget list) on the existing locks?",
+      "rationale": "Maintainer asked for a look round before the Widgets look is locked (confirmation 2026-09-30).",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "proposed",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T00:14:21+00:00",
+      "verification_ref": null
     }
   ],
   "last_activation": {
@@ -4898,5 +5010,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-09-30T23:40:45+00:00"
+  "updated_at": "2026-10-01T00:14:21+00:00"
 }
