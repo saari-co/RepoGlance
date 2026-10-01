@@ -5054,14 +5054,26 @@
       "question": "How does a user choose light or dark inside RepoGlance, and which surfaces honour it?",
       "rationale": "Maintainer 2026-09-30: noticed the app already follows the phone, weighed a link-out to Display settings and doing nothing, and chose an in-app choice. Android's dark theme guide recommends in-app Light/Dark/System default with System default as the default; there is no public intent for the system Dark theme page (only ACTION_DISPLAY_SETTINGS). Per-app night mode over a Compose-only override so the start window and system bars never mismatch. Widgets stay with the system because they sit on the system home screen beside other apps.",
       "repair_required": false,
-      "review_classifications": [],
-      "review_history": [],
-      "review_ref": null,
-      "review_result": null,
-      "review_source_identity": null,
+      "review_classifications": [
+        "human_gate"
+      ],
+      "review_history": [
+        {
+          "classifications": [
+            "human_gate"
+          ],
+          "ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md#review",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T01:08:08+00:00",
+          "source_identity": "git:b6fc370cbe21839f0090ac49b526a9c680e4e84d"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md#review",
+      "review_result": "findings",
+      "review_source_identity": "git:b6fc370cbe21839f0090ac49b526a9c680e4e84d",
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T00:51:51+00:00",
+      "updated_at": "2026-10-01T01:08:08+00:00",
       "verification_ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md"
     }
   ],
@@ -5094,5 +5106,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T00:51:51+00:00"
+  "updated_at": "2026-10-01T01:08:08+00:00"
 }

@@ -128,6 +128,28 @@ published); `repoglance:theme-dialog`, `-light`, `-dark`, `-system`,
 phone; `System default` + OK gave app night again. Cleanup run, session
 untouched. Dumps only (`f-*`); no new captures.
 
+## Review (exact source `b6fc370cbe21839f0090ac49b526a9c680e4e84d`)
+
+- **Self-review (standards and source intent):** no required fix. The code
+  follows the comment ban, logs nothing, reads prefs off the main thread,
+  and passes detekt and lint; it matches the lock (per-app night mode,
+  store-then-apply, widgets and tile untouched, the agreed Settings slot).
+  The one deviation from the picked preview (`Cancel` / `OK` as in Google
+  Calculator) is disclosed in the PR.
+- **ClawSweeper** (`saari-clawsweeper[bot]`, PR #50 comment, verdict marker
+  `sha=b6fc370…`, reviewed 2026-10-01T01:03Z): findings none, security none,
+  patch quality and proof 5/6, labels `proof: sufficient`,
+  `status: 👀 ready for maintainer look`, `P3`. Its two open items were
+  process only: P1 "stacked on the settings/widgets branch; wait for that
+  base to land or be retargeted" and P2 "retarget onto main after the
+  settings branch lands". Classified `human_gate`: the maintainer chose to
+  land the theme work on the Settings branch ("merge in 50").
+- **CI:** both `build` checks green on `b6fc370`.
+- **Delivery so far:** PR #50 merged into `claude/settings-widgets-entry`
+  as `c72724c` (2026-10-01T01:07Z), `--match-head-commit b6fc370`. It
+  reaches `main` only with the Settings PR (settings-044 /
+  widgets-entry-045) and that PR's own review rails.
+
 ## Not proven here
 
 - API 31–33 devices (the start window there is the approximate fallback
