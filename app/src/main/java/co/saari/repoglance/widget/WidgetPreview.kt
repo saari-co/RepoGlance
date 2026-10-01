@@ -29,8 +29,8 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.render.ClockLabel
-import kotlinx.coroutines.CancellationException
 import java.time.Instant
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
 enum class WidgetPreviewKind { REPOSITORY, PINNED_REPOS }

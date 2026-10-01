@@ -83,10 +83,7 @@ class WidgetPreviewGuardTest {
             "StackWidget.kt" to "internal fun stackRowAge(",
             "StackWidget.kt" to "internal fun stackRowCounts(",
             "StackWidget.kt" to "internal fun stackHeaderLabel(",
-            "WidgetLook.kt" to "internal fun FreshnessText(",
-            "WidgetLook.kt" to "fun of(context: Context): WidgetTones {",
-            "SampleWidgetMarks.kt" to "internal fun SampleCapsule(",
-            "SampleWidgetData.kt" to "object SampleWidgetData {",
+            "StackWidget.kt" to "object StackRows {",
         )
         for ((file, start) in drawn) {
             val text = source("$widgetDir/$file")
@@ -94,6 +91,15 @@ class WidgetPreviewGuardTest {
             assertTrue("missing anchor in $file: $start", from >= 0)
             val body = text.substring(from).substringBefore("\n}\n")
             stores.forEach { assertFalse("$start in $file draws a preview and must not read $it", body.contains(it)) }
+        }
+        for (file in listOf(
+            "$widgetDir/WidgetLook.kt",
+            "$widgetDir/SampleWidgetMarks.kt",
+            "$widgetDir/SampleWidgetData.kt",
+            "app/src/main/java/co/saari/repoglance/sample/SampleAccount.kt",
+        )) {
+            val text = source(file)
+            stores.forEach { assertFalse("$file feeds the preview and must not read $it", text.contains(it)) }
         }
         assertTrue(preview.contains("freshness = WidgetFreshness(now = now, clock = clock, rateLimitedUntil = null, sample = true)"))
     }
@@ -106,7 +112,14 @@ class WidgetPreviewGuardTest {
         assertEquals(2, Regex("requestPinGlanceAppWidget\\(").findAll(pinning).count())
         assertTrue("the sheet preview is composed off the main thread", pinning.contains("withContext(Dispatchers.Default) { pin(context, glance, kind) }"))
         val request = pinning.substringAfter("suspend fun request(").substringBefore("private suspend fun pin(")
-        assertTrue("a pin request that fails or loses the foreground returns false", request.contains("} catch (_: Exception) {\n            false\n        }"))
+        assertTrue(
+            "a failed sheet request retries without a preview, and that retry cannot throw",
+            request.contains(
+                "} catch (_: Exception) {\n" +
+                    "            runCatching { manager.requestPinAppWidget(provider(context, kind), null, callback(context, kind)) }\n" +
+                    "                .getOrDefault(false)",
+            ),
+        )
         assertTrue(request.contains("} catch (cancelled: CancellationException) {\n            throw cancelled"))
     }
 
@@ -121,7 +134,13 @@ class WidgetPreviewGuardTest {
             publish.contains("if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {\n" +
                 "                prefs.edit { putString(receiver.java.name, stamp()) }"),
         )
-        assertEquals("every system call in the start-up publish is caught", 2, Regex("attempt \\{").findAll(publish).count())
+        assertEquals(
+            "the provider lookup and setWidgetPreviews both run inside attempt",
+            2,
+            Regex("attempt \\{").findAll(publish).count(),
+        )
+        assertTrue(publish.contains("attempt { publishedState(context, receiver) }"))
+        assertTrue(publish.contains("val result = attempt {\n                glance.setWidgetPreviews("))
         val attempt = preview.substringAfter("private suspend fun <T> attempt(").substringBefore("\n\n")
         assertTrue(attempt.contains("catch (cancelled: CancellationException) {\n            throw cancelled"))
         assertTrue(attempt.contains("catch (_: Exception) {\n            null"))
