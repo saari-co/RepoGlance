@@ -88,7 +88,8 @@ The ratings are:
 - **Publishing overview:** "Managed publishing off" and "Changes not yet
   submitted for review". "Send app for review" is locked with "To send
   changes for review, complete the required steps in the app dashboard",
-  because no release exists yet.
+  because no release exists yet. This was before the closed test; see
+  [Closed test started](#closed-test-started-maintainer-approved-2026-09-30).
 
 ## Android developer verification
 
@@ -132,6 +133,79 @@ Notes on the read-back:
   left Save disabled. Console saw no change, so the stored declaration is
   "Don't label assets".
 
+## Closed test started (maintainer-approved, 2026-09-30)
+
+Bobby asked for the closed test to be started and chose each option in the
+session:
+
+- the testers come from a Google Group
+- the test is open in all countries
+- he drags the AAB in himself from Finder
+- the changes are sent for review
+
+Everything else was done through Claude in Chrome. Bobby created the Google
+Group himself, including its CAPTCHA.
+
+**Track "Closed testing - Alpha":**
+
+- **Testers:** Google Groups, `repoglance-testers@googlegroups.com`.
+- **Feedback URL:** `https://github.com/saari-co/RepoGlance/issues`.
+- **Countries / regions:** 177 named, plus "rest of world" (178 in all),
+  unsynced from production.
+- **Group settings, read back:**
+  - Who can see group: Anyone on the web
+  - Who can join group: Anyone on the web can join
+  - Who can post and who can view members: Group managers
+
+**Release:**
+
+- **Signing:** the bundle panel reads "Releases are signed by Google Play"
+  and "Automatic protection is on". No signing choice was offered.
+  Automatic app text translation was left off.
+- **Bundle:** `RepoGlance-0.4.0-beta.1.aab`, 12,395,180 bytes, SHA-256
+  `79b9cea5e29ba93243480eb427f1196d31f5d2955cc15e5ef8374f23c35912c7`. Its
+  SHA-256 was computed locally before the upload and equals the
+  `v0.4.0-beta.1` GitHub Release asset.
+- **Bundle row in Console:** App bundle, Enhanced, `40001 (0.4.0-beta.1)`,
+  API levels 31+, target SDK 36, 4 screen layouts, 4 ABIs, 1 required
+  feature.
+- **Release name:** `40001 (0.4.0-beta.1)`, as Console suggested it.
+- **Release notes:** en-US only. They are the 385-character "What's new"
+  block in `docs/store-listing.md`, read back verbatim from the textarea
+  inside `<en-US>` tags.
+- **Warnings:** Console showed two, and neither blocks the release. Both are
+  tracked in #51:
+  - "There is no deobfuscation file associated with this App Bundle." R8
+    is off for release.
+  - "This App Bundle contains native code, and you've not uploaded debug
+    symbols." The only native code is AndroidX's prebuilt
+    `libandroidx.graphics.path.so`.
+
+**Submission:**
+
+- **Publishing overview** listed 15 changes:
+  - the release, set to "Start full rollout"
+  - the countries (three entries)
+  - "Resume track"
+  - the testers group and the feedback channel
+  - the default store listing
+  - Content Rating, Target audience, Privacy policy, the Ads declaration,
+    Data safety and Health apps
+  - the app category
+- **"What you've told us"** listed Sign in details, Advertising ID,
+  Government apps and Financial features.
+- **Sent:** "Submit 15 changes for review", then "Send changes for review".
+- **After sending:**
+  - The page reads "Changes in review" and "Running quick checks for
+    commonly found issues" ("Up to 14 minutes remaining").
+  - The track summary reads "Active", "Release 40001 (0.4.0-beta.1) in
+    review" and "178 countries / regions".
+  - Managed publishing stays off, so the release goes live to testers as
+    soon as Google approves it.
+- **Opt-in link:** the Testers tab reads "The link will be shown here when
+  you publish your app", so there is no opt-in link yet.
+
 ## Not covered
 
 - Console gives no IARC certificate ID yet; it shows `-`.
+- The review result and the tester opt-in link are not recorded yet.
