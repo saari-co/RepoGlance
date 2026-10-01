@@ -4955,7 +4955,7 @@
     {
       "baseline_ref": null,
       "candidate_refs": [],
-      "choice": "Not decided: a round of five materially distinct candidates on the real Widgets screen on the device, under label-typography-030, shape-control-031, status-colour-029 and sample-marker-040.",
+      "choice": "C preview tiles (round widgets-look-round-1): two side-by-side tonal 24 dp tiles, one per widget, each with a sketch of the widget's shape, its name, a sentence and a full-width tonal Add capsule; 'On your home screen' follows as icon rows (repository widgets open their setup), then the removal hint. A cards-then-list, B settings list, D placed first + Add dialog and E grouped by widget were rejected; their code is removed and the round is recorded in proof.",
       "context_ref": null,
       "created_at": "2026-10-01T00:14:21+00:00",
       "deferred_reason": null,
@@ -4964,20 +4964,35 @@
         "widgets-entry-045"
       ],
       "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
-      "history": [],
+      "history": [
+        {
+          "at": "2026-10-01T00:48:19+00:00",
+          "choice": "Not decided: a round of five materially distinct candidates on the real Widgets screen on the device, under label-typography-030, shape-control-031, status-colour-029 and sample-marker-040.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        }
+      ],
       "id": "widgets-look-047",
       "implementation_ref": null,
       "question": "How does the Widgets screen look (Add cards and the placed-widget list) on the existing locks?",
-      "rationale": "Maintainer asked for a look round before the Widgets look is locked (confirmation 2026-09-30).",
+      "rationale": "Maintainer picked C after the live picker on the Pixel 10 Pro XL and light/dark contact sheets (2026-09-30). The question listed A-D with Other open; E was on the picker and both sheets.",
       "repair_required": false,
       "review_classifications": [],
       "review_history": [],
       "review_ref": null,
       "review_result": null,
       "review_source_identity": null,
-      "status": "proposed",
+      "status": "locked",
       "superseded_by": null,
-      "updated_at": "2026-10-01T00:14:21+00:00",
+      "updated_at": "2026-10-01T00:48:19+00:00",
       "verification_ref": null
     }
   ],
@@ -5010,5 +5025,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T00:14:21+00:00"
+  "updated_at": "2026-10-01T00:48:19+00:00"
 }

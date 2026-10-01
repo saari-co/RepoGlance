@@ -85,6 +85,7 @@ import co.saari.repoglance.sample.SampleAccount
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.ui.brand.CheckingMark
+import co.saari.repoglance.ui.settings.popupResourceIds
 import co.saari.repoglance.ui.theme.ControlCard
 import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
@@ -576,7 +577,11 @@ private fun AppMenu(onOpenWidgets: (() -> Unit)?, onOpenSettings: () -> Unit, mo
         IconButton(onClick = { expanded = true }, modifier = Modifier.testTag(APP_MENU_TEST_TAG)) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.popupResourceIds(),
+        ) {
             if (onOpenWidgets != null) {
                 DropdownMenuItem(
                     text = { Text("Widgets") },

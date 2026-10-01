@@ -20,21 +20,15 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Widgets
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +54,6 @@ import kotlinx.coroutines.withContext
 
 internal const val WIDGETS_TEST_TAG = "repoglance:widgets"
 internal const val WIDGETS_BACK_TEST_TAG = "repoglance:widgets-back"
-internal const val WIDGETS_ADD_TEST_TAG = "repoglance:widgets-add"
 internal const val WIDGETS_PLACED_TEST_TAG = "repoglance:widgets-placed"
 internal const val WIDGETS_PLACED_HEAD = "On your home screen"
 
@@ -91,7 +84,6 @@ fun WidgetsContent(
     onOpenSetup: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val look = LocalWidgetsLook.current
     Scaffold(
         modifier = modifier.fillMaxSize().testTag(WIDGETS_TEST_TAG),
         topBar = { SettingsTopBar("Widgets", WIDGETS_BACK_TEST_TAG, onBack) },
@@ -105,210 +97,60 @@ fun WidgetsContent(
             ),
         ) {
             if (state.sample) item(key = "sample-note") { WidgetsNote(WIDGETS_SAMPLE_NOTE) }
-            when (look) {
-                WidgetsLook.CARDS -> cardsLook(state, onAdd, onOpenSetup)
-                WidgetsLook.LIST -> listLook(state, onAdd, onOpenSetup)
-                WidgetsLook.PREVIEWS -> previewsLook(state, onAdd, onOpenSetup)
-                WidgetsLook.PLACED_FIRST -> placedFirstLook(state, onAdd, onOpenSetup)
-                WidgetsLook.GROUPED -> groupedLook(state, onAdd, onOpenSetup)
-            }
+            if (!state.pinSupported) item(key = "how-to") { WidgetsNote(WIDGETS_HOW_TO) }
+            item(key = "previews") { WidgetTiles(state.pinSupported, onAdd) }
+            item(key = "placed-head") { SettingsSectionHead(WIDGETS_PLACED_HEAD) }
+            placedRows(state.placed, onOpenSetup)
         }
     }
 }
 
-private fun LazyListScope.cardsLook(
-    state: WidgetsUiState,
-    onAdd: (WidgetKind) -> Unit,
-    onOpenSetup: (Int) -> Unit,
-) {
-    if (!state.pinSupported) item(key = "how-to") { WidgetsNote(WIDGETS_HOW_TO) }
-    WidgetKind.entries.forEach { kind ->
-        item(key = "add-${kind.name}") {
-            TonalCard(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(kind.title, style = MaterialTheme.typography.titleMedium)
+@Composable
+private fun WidgetTiles(pinSupported: Boolean, onAdd: (WidgetKind) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        WidgetKind.entries.forEach { kind ->
+            Surface(
+                shape = LocalControlShape.current.card,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                modifier = Modifier.weight(1f),
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Box(modifier = Modifier.fillMaxWidth().height(112.dp), contentAlignment = Alignment.Center) {
+                        WidgetSketch(kind)
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Text(kind.title, style = MaterialTheme.typography.titleSmall)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         kind.description,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    if (state.pinSupported) {
+                    if (pinSupported) {
                         Spacer(Modifier.height(12.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            AddButton(kind, onAdd)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    item(key = "placed-head") { SettingsSectionHead(WIDGETS_PLACED_HEAD) }
-    placedRows(state.placed, onOpenSetup, withIcons = false)
-}
-
-private fun LazyListScope.listLook(
-    state: WidgetsUiState,
-    onAdd: (WidgetKind) -> Unit,
-    onOpenSetup: (Int) -> Unit,
-) {
-    item(key = "add-head") { SettingsSectionHead("Add a widget") }
-    if (!state.pinSupported) {
-        item(key = "how-to") {
-            SettingsRow(headline = "Add from your home screen", supporting = WIDGETS_HOW_TO, icon = Icons.Outlined.Info)
-        }
-    }
-    WidgetKind.entries.forEach { kind ->
-        item(key = "add-${kind.name}") {
-            ListItem(
-                headlineContent = { Text(kind.title) },
-                supportingContent = { Text(kind.description) },
-                leadingContent = { Icon(kind.icon(), contentDescription = null) },
-                trailingContent = if (state.pinSupported) {
-                    {
-                        IconButton(onClick = { onAdd(kind) }, modifier = Modifier.testTag(kind.testTag)) {
-                            Icon(Icons.Outlined.Add, contentDescription = "Add ${kind.title}")
-                        }
-                    }
-                } else {
-                    null
-                },
-                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
-                modifier = if (state.pinSupported) Modifier.clickable { onAdd(kind) } else Modifier,
-            )
-        }
-    }
-    item(key = "placed-head") { SettingsSectionHead(WIDGETS_PLACED_HEAD) }
-    placedRows(state.placed, onOpenSetup, withIcons = true)
-}
-
-private fun LazyListScope.previewsLook(
-    state: WidgetsUiState,
-    onAdd: (WidgetKind) -> Unit,
-    onOpenSetup: (Int) -> Unit,
-) {
-    if (!state.pinSupported) item(key = "how-to") { WidgetsNote(WIDGETS_HOW_TO) }
-    item(key = "previews") {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            WidgetKind.entries.forEach { kind ->
-                TonalCard(modifier = Modifier.weight(1f)) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(112.dp),
-                            contentAlignment = Alignment.Center,
+                        PrimaryButton(
+                            onClick = { onAdd(kind) },
+                            modifier = Modifier.fillMaxWidth().testTag(kind.testTag),
                         ) {
-                            WidgetSketch(kind)
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        Text(kind.title, style = MaterialTheme.typography.titleSmall)
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            kind.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        if (state.pinSupported) {
-                            Spacer(Modifier.height(12.dp))
-                            AddButton(kind, onAdd, modifier = Modifier.fillMaxWidth())
+                            LabelText("Add", LabelRole.BUTTON)
                         }
                     }
                 }
             }
         }
     }
-    item(key = "placed-head") { SettingsSectionHead(WIDGETS_PLACED_HEAD) }
-    placedRows(state.placed, onOpenSetup, withIcons = true)
 }
 
-private fun LazyListScope.placedFirstLook(
-    state: WidgetsUiState,
-    onAdd: (WidgetKind) -> Unit,
-    onOpenSetup: (Int) -> Unit,
-) {
-    item(key = "placed-head") { SettingsSectionHead(WIDGETS_PLACED_HEAD) }
-    placedRows(state.placed, onOpenSetup, withIcons = true)
-    item(key = "add") {
-        if (state.pinSupported) {
-            var choosing by remember { mutableStateOf(false) }
-            PrimaryButton(
-                onClick = { choosing = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-                    .testTag(WIDGETS_ADD_TEST_TAG),
-            ) {
-                Icon(Icons.Outlined.Add, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                LabelText("Add a widget", LabelRole.BUTTON)
-            }
-            if (choosing) {
-                AddWidgetDialog(
-                    onDismiss = { choosing = false },
-                    onChoose = { kind ->
-                        choosing = false
-                        onAdd(kind)
-                    },
-                )
-            }
-        } else {
-            WidgetsNote(WIDGETS_HOW_TO)
-        }
-    }
-}
-
-private fun LazyListScope.groupedLook(
-    state: WidgetsUiState,
-    onAdd: (WidgetKind) -> Unit,
-    onOpenSetup: (Int) -> Unit,
-) {
-    if (!state.pinSupported) item(key = "how-to") { WidgetsNote(WIDGETS_HOW_TO) }
-    WidgetKind.entries.forEach { kind ->
-        item(key = "group-${kind.name}") {
-            TonalCard(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(kind.title, style = MaterialTheme.typography.titleMedium)
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                kind.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (state.pinSupported) {
-                            Spacer(Modifier.width(12.dp))
-                            AddButton(kind, onAdd)
-                        }
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
-                    val ofKind = state.placed?.filter { it.kind == kind }
-                    when {
-                        ofKind == null -> GroupLine("Checking your home screen…")
-                        ofKind.isEmpty() -> GroupLine("None on your home screen yet")
-                        else -> ofKind.forEach { PlacedRow(it, onOpenSetup, withIcon = false, onCard = true) }
-                    }
-                }
-            }
-        }
-    }
-    if (state.placed?.isNotEmpty() == true) item(key = "remove-hint") { WidgetsNote(WIDGETS_REMOVE_HINT) }
-}
-
-private fun LazyListScope.placedRows(placed: List<PlacedWidget>?, onOpenSetup: (Int) -> Unit, withIcons: Boolean) {
+private fun LazyListScope.placedRows(placed: List<PlacedWidget>?, onOpenSetup: (Int) -> Unit) {
     when {
         placed == null -> item(key = "placed-loading") { WidgetsNote("Checking your home screen…") }
         placed.isEmpty() -> item(key = "placed-empty") { WidgetsNote(WIDGETS_EMPTY_TEXT) }
         else -> {
             placed.forEach { widget ->
-                item(key = "placed-${widget.appWidgetId}") { PlacedRow(widget, onOpenSetup, withIcons) }
+                item(key = "placed-${widget.appWidgetId}") { PlacedRow(widget, onOpenSetup) }
             }
             item(key = "remove-hint") { WidgetsNote(WIDGETS_REMOVE_HINT) }
         }
@@ -316,73 +158,21 @@ private fun LazyListScope.placedRows(placed: List<PlacedWidget>?, onOpenSetup: (
 }
 
 @Composable
-private fun PlacedRow(widget: PlacedWidget, onOpenSetup: (Int) -> Unit, withIcon: Boolean, onCard: Boolean = false) {
+private fun PlacedRow(widget: PlacedWidget, onOpenSetup: (Int) -> Unit) {
     val opensSetup = widget is PlacedWidget.Repository
     ListItem(
         headlineContent = { Text(widget.headline()) },
         supportingContent = { Text(widget.supporting()) },
-        leadingContent = if (withIcon) {
-            { Icon(widget.kind.icon(), contentDescription = null) }
-        } else {
-            null
-        },
+        leadingContent = { Icon(widget.kind.icon(), contentDescription = null) },
         trailingContent = if (opensSetup) {
             { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Change this widget") }
         } else {
             null
         },
-        colors = ListItemDefaults.colors(
-            containerColor = if (onCard) {
-                MaterialTheme.colorScheme.surfaceContainer
-            } else {
-                MaterialTheme.colorScheme.background
-            },
-        ),
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
         modifier = Modifier
             .testTag("$WIDGETS_PLACED_TEST_TAG-${widget.appWidgetId}")
             .then(if (opensSetup) Modifier.clickable { onOpenSetup(widget.appWidgetId) } else Modifier),
-    )
-}
-
-@Composable
-private fun AddButton(kind: WidgetKind, onAdd: (WidgetKind) -> Unit, modifier: Modifier = Modifier) {
-    PrimaryButton(onClick = { onAdd(kind) }, modifier = modifier.testTag(kind.testTag)) {
-        LabelText("Add", LabelRole.BUTTON)
-    }
-}
-
-@Composable
-private fun AddWidgetDialog(onDismiss: () -> Unit, onChoose: (WidgetKind) -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Add a widget") },
-        text = {
-            Column {
-                WidgetKind.entries.forEach { kind ->
-                    ListItem(
-                        headlineContent = { Text(kind.title) },
-                        supportingContent = { Text(kind.description) },
-                        leadingContent = { Icon(kind.icon(), contentDescription = null) },
-                        colors = ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        ),
-                        modifier = Modifier.clickable { onChoose(kind) }.testTag(kind.testTag),
-                    )
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { LabelText("Cancel", LabelRole.BUTTON) } },
-    )
-}
-
-@Composable
-private fun TonalCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Surface(
-        shape = LocalControlShape.current.card,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = modifier.fillMaxWidth(),
-        content = content,
     )
 }
 
@@ -393,16 +183,6 @@ private fun WidgetsNote(text: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    )
-}
-
-@Composable
-private fun GroupLine(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
     )
 }
 

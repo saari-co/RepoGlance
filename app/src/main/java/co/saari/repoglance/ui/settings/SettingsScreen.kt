@@ -40,6 +40,7 @@ internal const val SETTINGS_BACK_TEST_TAG = "repoglance:settings-back"
 internal const val SETTINGS_WIDGETS_TEST_TAG = "repoglance:settings-widgets"
 internal const val SETTINGS_MANAGE_ACCESS_TEST_TAG = "repoglance:settings-manage-access"
 internal const val SETTINGS_DISCONNECT_TEST_TAG = "repoglance:settings-disconnect"
+internal const val DISCONNECT_CONFIRM_TEST_TAG = "repoglance:disconnect-confirm"
 internal const val SETTINGS_VERSION_TEST_TAG = "repoglance:settings-version"
 internal const val SETTINGS_PRIVACY_TEST_TAG = "repoglance:settings-privacy"
 internal const val SETTINGS_SOURCE_TEST_TAG = "repoglance:settings-source"
@@ -167,10 +168,13 @@ fun SettingsScreen(
 private fun DisconnectDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.popupResourceIds(),
         title = { Text("Disconnect RepoGlance?") },
         text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
         confirmButton = {
-            TextButton(onClick = onConfirm) { LabelText("Disconnect GitHub", LabelRole.BUTTON) }
+            TextButton(onClick = onConfirm, modifier = Modifier.testTag(DISCONNECT_CONFIRM_TEST_TAG)) {
+                LabelText("Disconnect GitHub", LabelRole.BUTTON)
+            }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { LabelText("Cancel", LabelRole.BUTTON) }

@@ -114,14 +114,16 @@ class SettingsGuardTest {
     }
 
     @Test
-    fun theWidgetsLookPickerIsDebugOnly() {
-        val main = repositoryRoot().resolve("app/src/main")
-        val leaks = Files.walk(main).use { paths ->
-            paths.filter { Files.isRegularFile(it) }
-                .filter { Files.readAllBytes(it).toString(Charsets.UTF_8).contains("WidgetsLookPicker") }
-                .toList()
-        }
-        assertEquals(emptyList<Path>(), leaks)
+    fun theWidgetsScreenShowsTheLockedPreviewTiles() {
+        val content = section(widgets, "fun WidgetsContent(", "\n@Composable\nprivate fun WidgetTiles(")
+        assertTrue("widgets-look-047 locked C preview tiles", content.contains("item(key = \"previews\") { WidgetTiles(state.pinSupported, onAdd) }"))
+        assertTrue(content.indexOf("WidgetTiles(") < content.indexOf("SettingsSectionHead(WIDGETS_PLACED_HEAD)"))
+        val tiles = section(widgets, "private fun WidgetTiles(", "\nprivate fun LazyListScope.placedRows(")
+        assertTrue(tiles.contains("WidgetKind.entries.forEach"))
+        assertTrue(tiles.contains("WidgetSketch(kind)"))
+        assertTrue("Add is hidden where the launcher cannot pin; the how-to shows instead", tiles.contains("if (pinSupported) {"))
+        assertTrue(content.contains("if (!state.pinSupported) item(key = \"how-to\") { WidgetsNote(WIDGETS_HOW_TO) }"))
+        assertFalse("the round's seam is gone once locked", widgets.contains("LocalWidgetsLook"))
     }
 
     private fun section(text: String, start: String, end: String): String {
