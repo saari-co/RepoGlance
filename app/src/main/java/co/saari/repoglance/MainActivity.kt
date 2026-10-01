@@ -130,7 +130,10 @@ class MainActivity : ComponentActivity() {
                 onOpenLink = ::openLink,
                 appearance = { ThemeSettingItem() },
             )
-            SettingsDestination.WIDGETS -> WidgetsScreen(onBack = ::closeSettingsDestination)
+            SettingsDestination.WIDGETS -> WidgetsScreen(
+                sampleMode = liveModel.sampleMode.value,
+                onBack = ::closeSettingsDestination,
+            )
             null -> LiveRepoGlanceScreen(
                 state = liveModel.liveState.value,
                 selectedRepository = liveModel.selectedRepository.value,

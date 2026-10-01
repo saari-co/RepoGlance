@@ -82,6 +82,10 @@ class SettingsGuardTest {
             "placed widgets are unknown until read, never an empty list",
             screenBody.contains("placed = null"),
         )
+        assertTrue(
+            "pin support is known before the first frame, so Add never flashes on a launcher that cannot pin",
+            screenBody.contains("pinSupported = WidgetPinning.isSupported(context)"),
+        )
         assertTrue(widgets.contains("placed == null -> item(key = \"placed-loading\")"))
         val loader = section(placed, "internal fun loadWidgetsUiState(context: Context): WidgetsUiState {", "\n}\n")
         assertTrue("sample widgets list their sample setups", loader.contains("if (sample) SampleModeStore.widgetConfig(context, id)"))
@@ -121,6 +125,7 @@ class SettingsGuardTest {
         val tiles = section(widgets, "private fun WidgetTiles(", "\nprivate fun LazyListScope.placedRows(")
         assertTrue(tiles.contains("WidgetKind.entries.forEach"))
         assertTrue(tiles.contains("WidgetSketch(kind)"))
+        assertTrue("each Add names its widget for TalkBack", tiles.contains("contentDescription = \"Add \${kind.title}\""))
         assertTrue("Add is hidden where the launcher cannot pin; the how-to shows instead", tiles.contains("if (pinSupported) {"))
         assertTrue(content.contains("if (!state.pinSupported) item(key = \"how-to\") { WidgetsNote(WIDGETS_HOW_TO) }"))
         assertFalse("the round's seam is gone once locked", widgets.contains("LocalWidgetsLook"))

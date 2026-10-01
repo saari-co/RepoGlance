@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -58,10 +60,14 @@ internal const val WIDGETS_PLACED_TEST_TAG = "repoglance:widgets-placed"
 internal const val WIDGETS_PLACED_HEAD = "On your home screen"
 
 @Composable
-fun WidgetsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun WidgetsScreen(sampleMode: Boolean, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var state by remember { mutableStateOf(WidgetsUiState(pinSupported = true, placed = null, sample = false)) }
+    var state by remember {
+        mutableStateOf(
+            WidgetsUiState(pinSupported = WidgetPinning.isSupported(context), placed = null, sample = sampleMode),
+        )
+    }
     LifecycleResumeEffect(Unit) {
         val job = scope.launch { state = withContext(Dispatchers.IO) { loadWidgetsUiState(context) } }
         onPauseOrDispose { job.cancel() }
@@ -133,7 +139,10 @@ private fun WidgetTiles(pinSupported: Boolean, onAdd: (WidgetKind) -> Unit) {
                         Spacer(Modifier.height(12.dp))
                         PrimaryButton(
                             onClick = { onAdd(kind) },
-                            modifier = Modifier.fillMaxWidth().testTag(kind.testTag),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(kind.testTag)
+                                .semantics { contentDescription = "Add ${kind.title}" },
                         ) {
                             LabelText("Add", LabelRole.BUTTON)
                         }

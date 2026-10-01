@@ -184,6 +184,14 @@ America/New_York (EDT).
   cannot pin (Pixel Launcher always can). It is covered by
   `SettingsGuardTest` only.
 
+- **Follow-up on the emulator** (after self-review, branch head after
+  `b63fd38`): each tile's `Add` now names its widget for TalkBack. The dump
+  shows `Add Repository widget` and `Add Pinned repos widget` under
+  `repoglance:widgets-add-repository` and `repoglance:widgets-add-pinned`,
+  the same exposure as the app's icon buttons. Pin support is also read
+  before the first frame, so on a launcher that cannot pin, `Add` never
+  flashes before the how-to.
+
 ## Checks
 
 - `./gradlew check` passed at `ac1637f`: Lint "no new issues", detekt, unit
