@@ -93,6 +93,9 @@ class RepoWidget : GlanceAppWidget() {
         }
     }
 
+    override suspend fun providePreview(context: Context, widgetCategory: Int) =
+        provideWidgetPreview(context, WidgetPreviewKind.REPOSITORY)
+
     companion object {
         private val COMPACT_SIZE = DpSize(140.dp, 64.dp)
         private val NARROW_TALL_SIZE = DpSize(120.dp, 120.dp)

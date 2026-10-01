@@ -2,8 +2,6 @@ package co.saari.repoglance.render
 
 import co.saari.repoglance.model.CiState
 
-enum class CiColorRole { POSITIVE, NEGATIVE, IN_PROGRESS, NEUTRAL }
-
 object CiSemanticRole {
     fun of(ci: CiState): CiColorRole = when (ci) {
         CiState.PASSING -> CiColorRole.POSITIVE

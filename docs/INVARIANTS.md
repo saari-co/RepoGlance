@@ -81,11 +81,13 @@ Seeded from the accepted review findings on RepoGlance pull requests #2, #4,
 | Repository metadata is requested only when it can complete an exact count | ClawSweeper P2 on PR #12 | `LiveSnapshotFactoryTest` (`needsRepositoryMetadata` cases) | 2 |
 | Interactive elements carry a content description | Play tracker #7 | Android Lint `ContentDescription` at error for View/XML; **unguarded for Compose** until the Grill C emulator tier runs `enableAccessibilityChecks()` | 2 (partial) |
 | Release builds contain no debug tooling | `AGENTS.md`; PR #12 picker | debug source set only (`app/src/debug`); no lint guard yet | 3 |
+| Release builds carry no fixture route: the fixture home (`HomeScreen`), the fixture navigator (`NavigatorScreen`) and `FixtureRoot` live in `app/src/debug`, `MainActivity` reaches them only through `hooks.FixtureRoute`, and the release `FixtureRoute` is a no-op, so an intent with `repo_full` opens the live entry. `repo_full` and `navigator_mode` are debug-only extras. The helpers only the route uses live in `app/src/debug` too: `state/NavigatorScopeCodec`, `render/CiSemanticRole` (`CiColorRole` stays in main for the widgets and `StatusColors`), `ui/theme/StatusPill`, and the fixture prefs (`selectedScenario`, `setSelectedScenario`, `pinnedRepos`, `togglePin`, `rememberScenario`, `rememberPinnedRepos`, keys `selected_scenario` and `pinned_repos`) as `AppPrefs` extensions in `state/FixturePrefs.kt` | Maintainer decision 2026-10-01 (follow-up to #55): the fixture home is a test screen, not a user surface; helpers follow-up to #56 | `FixtureRouteGuardTest` (no fixture extra, screen, helper or fixture prefs key named in `app/src/main` or `app/src/release`; the helper files exist in `app/src/debug`; the release hook reads no intent), `FixtureRouteReleaseTest` (the release unit-test classpath has none of `HomeScreenKt`, `NavigatorScreenKt`, `FixtureRouteKt`, `NavigatorScopeCodec`, `FixturePrefsKt`, `CiSemanticRole` or `StatusPillKt`, and neither `AppPrefs` nor `ControlShapeKt` declares a moved member), `FixtureRouteDebugTest` (the debug classpath has all seven classes and `FixturePrefsKt`/`StatusPillKt` declare the moved members, so the names stay true) | 2 |
 | Screen-level composables expose a `modifier` parameter | Compose rules `ModifierMissing` | six existing screens are frozen in `app/detekt-baseline-debug.xml`; any new emitting composable without a modifier fails detekt | 2 (ratchet) |
 | Cover-display app shell must not overlap the status bar | Fold proof run 2026-08-11 | unguarded until the device verifier tier (Grill C) captures the `CLOSED` posture | 4 |
 | Sample mode never reaches GitHub, the session, or the live and widget stores (it may only redraw widgets); sample rows never open GitHub, in the app or on a widget; sample repositories are a fixed list under the maintainer's own accounts (saari-co, dinkuskit, saariuslystoned) and never reuse a real repository name; every sample author and assignee is the maintainer's own handle; a repository outside the sample set renders as unavailable, never as empty; sample pins and sample widget setups stay apart from live pins and widget setups and clear when sample mode ends; widgets read sample data only while sample mode is on and show `sample` where a live widget shows its clock time; sample mode never schedules or feeds background refresh; sample-mode prefs load off the main thread, except in `RepoWidgetReceiver.onDeleted`, which reads the sample and live widget setups and pins on the main thread (debt recorded 2026-09-30, `sample-widgets-039` review) | GrillTrack `sample-app-038`, `sample-mode-042`, `sample-people-043`, `sample-widgets-039` (reviewer access, #7) | `SampleModeGuardTest`, `SampleAccountTest` (pins the exact list and a denylist of real repositories), `SampleWidgetsGuardTest`, `SampleWidgetsTest`, `TileTextTest`. That the listed names do not exist on GitHub is an API observation (404 on 2026-09-29, `.grilltrack/proof/sample-app-038-verify-20260929.md`), not a guard: changing the list needs a fresh check. | 2 |
-| Settings and the Widgets screen are read-only: they never call GitHub, write a store or sign out; Disconnect is the activity's one session action, behind a confirm. The menu holds exactly Widgets and Settings; Manage GitHub access and Disconnect appear only in Settings with a live session; signed out there is no Widgets row. Every widget pin request goes through `WidgetPinning.request`, which checks `isRequestPinAppWidgetSupported` first. The Widgets screen reads placed widgets and their setups off the main thread on every resume, shows them as unknown until read (never an empty list), and reads the sample setups and pins in sample mode. The Settings destination survives recreation and a widget or tile tap clears it. Both widgets carry launcher labels with the user-facing names, and no user-facing string says "stack": not the widget resources, and not any Kotlin string literal in `app/src/main` (tags and keys such as `stack-header` excepted) | GrillTrack `settings-044`, `widgets-entry-045`, `widgets-look-047` (#7) | `SettingsGuardTest`, `PlacedWidgetsTest`, `GitHubAccessUiSourceWiringTest`, `SampleModeGuardTest` | 2 |
+| Settings and the Widgets screen are read-only: they never call GitHub, write a store or sign out; Disconnect is the activity's one session action, behind a confirm. The menu holds exactly Widgets and Settings; Manage GitHub access and Disconnect appear only in Settings with a live session; signed out there is no Widgets row. Every widget pin request goes through `WidgetPinning.request`, which checks `isRequestPinAppWidgetSupported` first and is the only caller of `requestPinAppWidget` or `requestPinGlanceAppWidget` in `app/src/main`. The Widgets screen reads placed widgets and their setups off the main thread on every resume, shows them as unknown until read (never an empty list), and reads the sample setups and pins in sample mode. The Settings destination survives recreation and a widget or tile tap clears it. Both widgets carry launcher labels with the user-facing names, and no user-facing string says "stack": not the widget resources, and not any Kotlin string literal in `app/src/main` (tags and keys such as `stack-header` excepted) | GrillTrack `settings-044`, `widgets-entry-045`, `widgets-look-047` (#7) | `SettingsGuardTest`, `PlacedWidgetsTest`, `GitHubAccessUiSourceWiringTest`, `SampleModeGuardTest` | 2 |
 | The in-app theme choice is applied only as per-app night mode, stored before it is applied: `Theme.kt` and `MainActivity` never read it, no activity handles `uiMode` itself (so the screen recreates and the system bars follow), widgets and the tile never read it, sign-out and leaving sample mode never clear it, and the Settings row reads it off the main thread | GrillTrack `theme-choice-046` (#7) | `ThemeChoiceGuardTest`, `ThemeChoiceTest` | 2 |
+| Widget previews are the marked sample, never the user's data or a clock: both widgets' `providePreview`, the in-app `Add` sheet (`WidgetSheetPreview` through `requestPinGlanceAppWidget`, or, when that request fails, a plain `requestPinAppWidget` that shows the launcher's own preview) and the static `previewLayout` fallback show the fixed sample widgets with `sample` in the time slot; the preview code reads no store; the fallback layouts take every text from `widget_preview_*` strings that match what the sample data renders and use only RemoteViews-safe views; generated previews are published for the home-screen category only, once per `versionCode.LOOK_VERSION` stamp and only after a successful call, off the main thread, and no failure of that start-up publish or of an `Add` request escapes (cancellation still propagates). Bump `WidgetPreviews.LOOK_VERSION` whenever the preview content changes: builds without a release tag all have versionCode 1, so only `LOOK_VERSION` republishes them (unguarded) | GrillTrack `widget-previews-048`, `widget-preview-look-049` (#7) | `WidgetPreviewTest`, `WidgetPreviewGuardTest`, `SettingsGuardTest` | 2 |
 
 ## Migrated rationale
 
@@ -366,6 +368,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 ### `co/saari/repoglance/render/CiSemanticRole.kt`
 
+Split on 2026-10-01: the `CiSemanticRole` mapping moved to `app/src/debug`
+with the rest of the fixture route (only the fixture home used it).
+`CiColorRole` stays in `app/src/main` as `render/CiColorRole.kt` because the
+widgets, `StatusColors` and `SnapshotRendering.rateLimitRole` use it.
+
 - Semantic color role for a [CiState], decoupled from any concrete Color —
   the Compose and Glance layers each map a role to their own theme color
   (`MaterialTheme.colorScheme.*` / `GlanceTheme.colors.*`); no hardcoded hex
@@ -386,6 +393,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/state/AppPrefs.kt`
+
+The fixture-scenario and fixture-pin members (and their keys) moved to
+`app/src/debug/.../state/FixturePrefs.kt` as `AppPrefs` extensions on
+2026-10-01 with the rest of the fixture route. Release `AppPrefs` keeps the
+live pins, the catalog sort and `preload`.
 
 - Thin SharedPreferences wrapper for Slice 2's on-device state: the
   fixture-scenario switcher and the pinned-repo set (repos stored as
@@ -416,6 +428,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/state/NavigatorScopeCodec.kt`
+
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
 
 - Encodes/decodes [NavigatorScope] to a (kind, value) pair of primitive
   `String`s. A sealed interface holding a [RepoRef] is not directly
@@ -476,6 +491,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 ### `co/saari/repoglance/ui/HomeScreen.kt`
 
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
+
 - Home screen (fixture mode): scenario switcher, pin-aware repo list, and
   the widget-pinning debug/user affordance. All display strings read
   through [SnapshotRendering] / [Ages] — nothing here re-derives a rule.
@@ -497,6 +515,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/ui/NavigatorScreen.kt`
+
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
 
 - Navigator screen with a compact app-owned control block that scrolls away
   as part of the real result list. The mode selector is the only sticky app
@@ -600,6 +621,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/widget/WidgetActions.kt`
+
+Superseded: the widgets open the live repository through
+`EXTRA_LIVE_REPO_FULL` (`WidgetPinsTest`). `EXTRA_REPO_FULL` and
+`EXTRA_NAVIGATOR_MODE` moved to the debug `hooks/FixtureRoute.kt` on
+2026-10-01; the rationale below is kept as history.
 
 - Shared repo Intent-extra contract between the widgets' tap actions and
   [co.saari.repoglance.MainActivity], which reads this extra to pre-scope

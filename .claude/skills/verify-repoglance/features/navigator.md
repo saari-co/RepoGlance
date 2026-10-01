@@ -1,6 +1,6 @@
 # Navigator
 
-The navigator lists open issues and pull requests for an account, an organization, or one repository, with mode (issues, PRs, both), filters, cached-row search, and a row detail that deep-links to the GitHub app.
+The fixture navigator lists open issues and pull requests for an account, an organization, or one repository, with mode (issues, PRs, both), filters, cached-row search, and a row detail that deep-links to the GitHub app. It runs on fixture data and is a test screen, not a user surface: it exists only in debug builds, and a release build has no fixture home or fixture navigator. The live per-repository issue and PR list is the repository view (see Find a repository).
 
 ## Sub-features
 
@@ -15,8 +15,8 @@ The navigator lists open issues and pull requests for an account, an organizatio
 
 ## How to get to it (user POV)
 
-- Tap a repo widget's header or a row: opens the navigator for that repository and mode.
-- From the fixture home screen, tap `Navigator` (account scope) or a repository card (repo scope).
+- No user entry point: no widget, tile, menu or app screen opens it.
+- On a debug build only, `bin/verify-repoglance launch <SCENARIO> navigator [owner/name] [ISSUES|PRS|BOTH]` opens it. From the fixture home it reaches, `Navigator` opens account scope and a repository card opens repo scope.
 
 ## Driving it with verify-repoglance
 
@@ -38,6 +38,7 @@ Preconditions:
 ## Gotchas
 
 - `launch … navigator` always opens the fixture navigator, even when the phone holds a live session; the live repository view is a different surface (see Find a repository).
+- Only a debug build has this screen. On a release build, `adb shell am start -n co.saari.repoglance/.MainActivity -a android.intent.action.VIEW --es repo_full acme/rocket` opens the normal live entry (Connect screen, sample catalog or live catalog), and `doctor` fails anyway because the debug launcher is missing.
 - The launcher's scenario sets the fixture home and widget snapshots; the navigator list state is a separate `Filters → Fixture state` choice and defaults to `Loaded` regardless of scenario.
 - Layout follows width, not posture: 600dp and wider (inner display) is the two-pane form where a tap fills the pane and a second tap on the same row hands off to GitHub; narrower (cover display) is single-pane where a tap raises the detail sheet. `adb shell cmd device_state state` reports posture; emulating `CLOSED` locks the phone, so the cover layout is reached by physically folding and unlocking, not by the command.
 - `BACK` with a row selected clears the selection (and dismisses the sheet on the cover display) first; a second `BACK` goes home. Use the `repoglance:fixture-home` control for a deterministic return.

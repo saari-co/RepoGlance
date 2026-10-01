@@ -16,30 +16,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import co.saari.repoglance.model.NavigatorMode
-import co.saari.repoglance.model.NavigatorScope
-import co.saari.repoglance.state.AppPrefs
-import co.saari.repoglance.state.NavigatorScopeCodec
-import co.saari.repoglance.ui.HomeScreen
+import co.saari.repoglance.hooks.FixtureRoute
 import co.saari.repoglance.ui.LiveRepoGlanceScreen
-import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.settings.SettingsDestination
 import co.saari.repoglance.ui.settings.SettingsScreen
 import co.saari.repoglance.ui.settings.ThemeSettingItem
@@ -48,10 +35,6 @@ import co.saari.repoglance.ui.settings.settingsAccount
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
 import co.saari.repoglance.widget.EXTRA_LIVE_CATALOG
 import co.saari.repoglance.widget.EXTRA_LIVE_REPO_FULL
-import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
-import co.saari.repoglance.widget.EXTRA_REPO_FULL
-import co.saari.repoglance.widget.WidgetRefresh
-import co.saari.repoglance.widget.navigatorModeFromExtra
 import kotlinx.coroutines.launch
 
 internal const val REPOGLANCE_INSTALLATION_SETTINGS_URL =
@@ -63,9 +46,7 @@ private const val STATE_RETURN_AFTER_GITHUB_VERIFICATION =
 private const val STATE_SETTINGS_DESTINATIONS = "settingsDestinations"
 
 class MainActivity : ComponentActivity() {
-    private val fixtureNavigatorScope = mutableStateOf<NavigatorScope?>(null)
-    private val fixtureNavigatorMode = mutableStateOf(NavigatorMode.BOTH)
-    private val fixtureNavigatorRouteToken = mutableIntStateOf(0)
+    private val fixtureRoute = FixtureRoute()
     private val settingsDestinations = mutableStateOf<List<SettingsDestination>>(emptyList())
     private lateinit var liveModel: RepoGlanceViewModel
     private var refreshCatalogAfterGitHubAccess = false
@@ -88,8 +69,7 @@ class MainActivity : ComponentActivity() {
             liveModel.deviceAuthorizationCommitted.collect { returnFromGitHubVerification() }
         }
 
-        fixtureNavigatorScope.value = resolveFixtureScopeFromIntent(intent)
-        fixtureNavigatorMode.value = navigatorModeFromExtra(intent?.getStringExtra(EXTRA_NAVIGATOR_MODE))
+        fixtureRoute.onCreate(intent)
         if (savedInstanceState == null) handleLiveIntent(intent)
 
         setContent {
@@ -101,14 +81,7 @@ class MainActivity : ComponentActivity() {
                         .semantics { testTagsAsResourceId = true },
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val currentFixtureScope = fixtureNavigatorScope.value
-                    if (currentFixtureScope != null) {
-                        key(fixtureNavigatorRouteToken.intValue) {
-                            FixtureRoot(currentFixtureScope, fixtureNavigatorMode.value)
-                        }
-                    } else {
-                        LiveRoot()
-                    }
+                    if (fixtureRoute.isOpen) fixtureRoute.Content() else LiveRoot()
                 }
             }
         }
@@ -167,7 +140,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleFixtureIntent(intent)
+        fixtureRoute.onNewIntent(intent)
         handleLiveIntent(intent)
     }
 
@@ -244,85 +217,16 @@ class MainActivity : ComponentActivity() {
         CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(this, url.toUri())
     }
 
-    private fun resolveFixtureScopeFromIntent(intent: Intent?): NavigatorScope.Repo? {
-        return intent
-            ?.getStringExtra(EXTRA_REPO_FULL)
-            ?.let { NavigatorScopeCodec.decode("REPO", it) }
-            ?.takeIf { it is NavigatorScope.Repo } as? NavigatorScope.Repo
-    }
-
     private fun handleLiveIntent(intent: Intent?) {
         if (intent?.getBooleanExtra(EXTRA_LIVE_CATALOG, false) == true) {
-            fixtureNavigatorScope.value = null
+            fixtureRoute.close()
             settingsDestinations.value = emptyList()
             liveModel.backToRepositories()
             return
         }
         val full = intent?.getStringExtra(EXTRA_LIVE_REPO_FULL) ?: return
-        fixtureNavigatorScope.value = null
+        fixtureRoute.close()
         settingsDestinations.value = emptyList()
         liveModel.openRepositoryByName(full)
-    }
-
-    private fun handleFixtureIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_MAIN) {
-            fixtureNavigatorScope.value = null
-            fixtureNavigatorRouteToken.intValue += 1
-            return
-        }
-        val nextScope = resolveFixtureScopeFromIntent(intent) ?: return
-        fixtureNavigatorScope.value = nextScope
-        fixtureNavigatorMode.value = navigatorModeFromExtra(intent.getStringExtra(EXTRA_NAVIGATOR_MODE))
-        fixtureNavigatorRouteToken.intValue += 1
-    }
-}
-
-@Composable
-private fun FixtureRoot(initialNavigatorScope: NavigatorScope, initialNavigatorMode: NavigatorMode) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    var isHome by rememberSaveable { mutableStateOf(false) }
-    var scopeKind by rememberSaveable { mutableStateOf(NavigatorScopeCodec.kindOf(initialNavigatorScope)) }
-    var scopeValue by rememberSaveable { mutableStateOf(NavigatorScopeCodec.valueOf(initialNavigatorScope)) }
-    var modeName by rememberSaveable { mutableStateOf(initialNavigatorMode.name) }
-
-    val scenarioState = AppPrefs.rememberScenario(context)
-    val pinnedState = AppPrefs.rememberPinnedRepos(context)
-
-    fun refreshWidgets() {
-        coroutineScope.launch { WidgetRefresh.updateAll(context) }
-    }
-
-    fun openNavigator(scope: NavigatorScope, mode: NavigatorMode = NavigatorMode.BOTH) {
-        scopeKind = NavigatorScopeCodec.kindOf(scope)
-        scopeValue = NavigatorScopeCodec.valueOf(scope)
-        modeName = mode.name
-        isHome = false
-    }
-
-    if (isHome) {
-        HomeScreen(
-            scenario = scenarioState.value,
-            onScenarioChange = { newScenario ->
-                AppPrefs.setSelectedScenario(context, newScenario)
-                refreshWidgets()
-            },
-            pinnedRepos = pinnedState.value,
-            onTogglePin = { repoFull ->
-                AppPrefs.togglePin(context, repoFull)
-                refreshWidgets()
-            },
-            onOpenNavigator = { openNavigator(NavigatorScope.Account) },
-            onOpenRepo = { ref -> openNavigator(NavigatorScope.Repo(ref)) },
-        )
-    } else {
-        val scope = remember(scopeKind, scopeValue) { NavigatorScopeCodec.decode(scopeKind, scopeValue) }
-        NavigatorScreen(
-            scenario = scenarioState.value,
-            initialScope = scope,
-            initialMode = navigatorModeFromExtra(modeName),
-            onBackToHome = { isHome = true },
-        )
     }
 }

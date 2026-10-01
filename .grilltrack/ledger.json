@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-10-01T10:07:54+00:00",
+    "confirmed_at": "2026-10-01T13:44:09+00:00",
     "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
-    "started_at": "2026-10-01T10:02:58+00:00",
+    "started_at": "2026-10-01T13:44:09+00:00",
     "status": "inspected",
-    "summary": "Maintainer 2026-10-01 took all three recommendations in frontier batch 1: (048) create public MIT saari-co/repoglance-site at ~/Developer/side-quests/repoglance-site laid out like dinkuskit; (049) two pages, / and /testers, privacy stays a link to the GitHub Pages policy Play points at; (050) the signup link is https://groups.google.com/g/repoglance-testers, with the Play opt-in link added when Console shows it. Bounded implementation: the site foundation on branch claude/site-foundation in an isolated worktree (Astro + EmDash + Cloudflare adapter, seeded content for both pages from docs/store-listing.md and README facts only, sample-mode screenshots from the repoglance-play-listing-20260930-040 release, fail-closed /_emdash in production builds, verify scripts, CI, AGENTS/REPO_HYGIENE/docs/proof/.grilltrack, design.md with the look unresolved). Verification: npm run verify (build, typecheck, workerd smoke of both routes and the denied namespace) plus browser captures. The look is the next grill: five candidates on the live preview, recorded in the site repo's own ledger. Delivery stays separate: PR only; merge after green CI, a clean exact-head review and the maintainer's OK; no Cloudflare, DNS, Access or deploy action."
+    "summary": "Maintainer 2026-10-01 took all three recommendations in frontier batch 1: (048) create public MIT saari-co/repoglance-site laid out like dinkuskit; (049) two pages, / and /testers, privacy stays a link to the GitHub Pages policy Play points at; (050) the signup link is https://groups.google.com/g/repoglance-testers, with the Play opt-in link added when Console shows it. Bounded implementation: the site foundation in saari-co/repoglance-site; the look and hosting followed in that repository's ledger. Delivery separate: PRs; merges, Cloudflare, DNS, Access and deploys only with the maintainer's OK."
   },
   "decisions": [
     {
@@ -5299,19 +5299,19 @@
       "verification_ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md"
     },
     {
-      "baseline_ref": "git:1606d04",
+      "baseline_ref": null,
       "candidate_refs": [],
-      "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needs the maintainer's explicit OK.",
-      "context_ref": "github:dinkuskit/dinkuskit@e4d645e3c03d3044d304f1f33ff9526fb7098156",
-      "created_at": "2026-10-01T10:02:58+00:00",
+      "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+      "context_ref": "file:docs/design.md",
+      "created_at": "2026-10-01T02:17:15+00:00",
       "deferred_reason": null,
       "delivery_ref": null,
       "dependencies": [],
-      "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
+      "domain": "widget-previews-048 + widget-preview-look-049: what the launcher's Add to home screen sheet and widget picker show for the Repository and Pinned repos widgets (today the app icon; no previewLayout/previewImage/generated preview)",
       "history": [
         {
-          "at": "2026-10-01T10:07:54+00:00",
-          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needs the maintainer's explicit OK.",
+          "at": "2026-10-01T02:17:15+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
           "from": "proposed",
           "implementation_ref": null,
           "note": "user accepted the scoped decision",
@@ -5324,8 +5324,8 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:23:18+00:00",
-          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needs the maintainer's explicit OK.",
+          "at": "2026-10-01T03:44:04+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
           "from": "locked",
           "implementation_ref": null,
           "note": "bounded implementation recorded",
@@ -5338,10 +5338,520 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:36:02+00:00",
-          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needs the maintainer's explicit OK.",
+          "at": "2026-10-01T03:44:04+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
           "from": "implemented",
-          "implementation_ref": "github:saari-co/repoglance-site (created 2026-10-01, public, MIT; branch claude/site-foundation in worktree ~/Developer/side-quests/repoglance-site-foundation)",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:56:39+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "verified",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "implemented",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:10:18+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "verified",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:15:07+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-2",
+          "review_result": "findings",
+          "review_source_identity": "git:8e8cdcb4066ed26306611afd51e338103a272ce0",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:15:07+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "implemented",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:01+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "verified",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:01+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-3",
+          "review_result": "findings",
+          "review_source_identity": "git:d3f6a7652f11a3e2a4d55f578d79663247961819",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:01+00:00",
+          "choice": "Both surfaces: the in-app Add sheet gets a Glance-rendered preview through GlanceAppWidgetManager.requestPinGlanceAppWidget, and the launcher's widget picker gets a generated preview (Glance 1.2.0 providePreview + setWidgetPreviews, Android 15+) with a static android:previewLayout as the Android 12-14 and not-yet-published fallback. Upgrade androidx.glance 1.1.1 -> 1.2.0 now; both live widgets are regression-checked on a device.",
+          "from": "implemented",
+          "implementation_ref": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef (review round 3 fixes: withoutPreview catches Exception, docs name the fallback)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        }
+      ],
+      "id": "widget-previews-048",
+      "implementation_ref": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef (review round 3 fixes: withoutPreview catches Exception, docs name the fallback)",
+      "question": "Which surfaces get a real widget preview, and does Glance upgrade for generated previews?",
+      "rationale": "Maintainer answered AskUserQuestion 2026-09-30: 'Both (Recommended)' and 'Upgrade now (Recommended)'. Facts: Glance 1.2.0 stable needs compileSdk>=35 (36) and AGP>=8.6 (8.10.1), Compose runtime 1.7.8, Kotlin 2.0.21; setWidgetPreview is rate limited (~2 calls/hour/provider).",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T03:56:39+00:00",
+          "source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093"
+        },
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-2",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T04:10:18+00:00",
+          "source_identity": "git:8e8cdcb4066ed26306611afd51e338103a272ce0"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-3",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T04:20:01+00:00",
+          "source_identity": "git:d3f6a7652f11a3e2a4d55f578d79663247961819"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-4",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T04:20:21+00:00",
+          "source_identity": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-4",
+      "review_result": "clean",
+      "review_source_identity": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T04:20:21+00:00",
+      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#final-head-check-review-round-3-fixes + ./gradlew assembleDebug check (355 tests)"
+    },
+    {
+      "baseline_ref": null,
+      "candidate_refs": [],
+      "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+      "context_ref": "file:docs/design.md",
+      "created_at": "2026-10-01T02:17:15+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "widget-previews-048"
+      ],
+      "domain": "widget-previews-048 + widget-preview-look-049: what the launcher's Add to home screen sheet and widget picker show for the Repository and Pinned repos widgets (today the app icon; no previewLayout/previewImage/generated preview)",
+      "history": [
+        {
+          "at": "2026-10-01T03:01:45+00:00",
+          "choice": "Not decided: a round of five materially distinct candidates on the real launcher Add to home screen sheet (debug picker, requestPinGlanceAppWidget per candidate), light and dark, under widget-look-032, compact-crowding-034, sample-widgets-039 and sample-marker-040.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:02:16+00:00",
+          "choice": "B skeleton (round widget-preview-round-1): both previews show the widget's real frame on the widget background with placeholder bars where text and numbers go (a primary name bar, surfaceVariant lines; Repository 2x1 ledger rows, Pinned repos a header band and three two-line rows), no words and no numbers, on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. A sample widget, C your data, D annotated and E poster were rejected.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "Maintainer changed the answer from B skeleton to A sample widget before shared-understanding confirmation (2026-09-30).",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "reopened",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:02:16+00:00",
+          "choice": "B skeleton (round widget-preview-round-1): both previews show the widget's real frame on the widget background with placeholder bars where text and numbers go (a primary name bar, surfaceVariant lines; Repository 2x1 ledger rows, Pinned repos a header band and three two-line rows), no words and no numbers, on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. A sample widget, C your data, D annotated and E poster were rejected.",
+          "from": "reopened",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:44:04+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:44:04+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "implemented",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T03:56:39+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "verified",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:54b95f6aa356d78f14c6668373251b6d6c764093 (widget/WidgetPreview.kt, ui/settings/WidgetPinning.kt, res/layout/widget_preview_*.xml, Glance 1.2.0)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:05:29+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "implemented",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md + ./gradlew assembleDebug check (354 tests)"
+        },
+        {
+          "at": "2026-10-01T04:10:18+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "verified",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:15:07+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:8e8cdcb4066ed26306611afd51e338103a272ce0 (review round 1 fixes: WidgetPinning catch, publish attempt/isDue, min-size tests, store guard, docs)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-2",
+          "review_result": "findings",
+          "review_source_identity": "git:8e8cdcb4066ed26306611afd51e338103a272ce0",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:15:07+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "implemented",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-1-8e8cdcb + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:01+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "verified",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:02+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:d3f6a7652f11a3e2a4d55f578d79663247961819 (review round 2 fixes: plain-request fallback, kotlin CancellationException, wider store guard)",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix"
+          ],
+          "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-3",
+          "review_result": "findings",
+          "review_source_identity": "git:d3f6a7652f11a3e2a4d55f578d79663247961819",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        },
+        {
+          "at": "2026-10-01T04:20:02+00:00",
+          "choice": "A sample widget (round widget-preview-round-1): both previews show the real widget filled with the sample repositories and the locked sample-marker-040 marker: Repository is the compact widget for saari-co/rocket (issues 5, PRs 3) with 'sample' in the tertiary capsule where a live widget shows its clock time; Pinned repos is the stack with a tertiary header band 'Pinned \u00b7 3' over three sample pins, each row reading 'sample' in its time slot. Same content on the in-app Add sheet and the launcher's widget picker, following dynamic colour and light/dark. B skeleton (briefly locked, then changed by the maintainer), C your data, D annotated and E poster were rejected.",
+          "from": "implemented",
+          "implementation_ref": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef (review round 3 fixes: withoutPreview catches Exception, docs name the fallback)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#re-verification-after-review-round-2-d3f6a76 + ./gradlew assembleDebug check (355 tests)"
+        }
+      ],
+      "id": "widget-preview-look-049",
+      "implementation_ref": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef (review round 3 fixes: withoutPreview catches Exception, docs name the fallback)",
+      "question": "What does a widget preview show (in-app sheet and launcher picker)?",
+      "rationale": "Maintainer first picked B in AskUserQuestion, then wrote 'actually im changing my answer to A' before confirmation (2026-09-30). All five were shown on the real launcher sheet on the Pixel 10 Pro XL (dark, live) and the emulator (light, dark).",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T03:56:39+00:00",
+          "source_identity": "git:54b95f6aa356d78f14c6668373251b6d6c764093"
+        },
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-2",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T04:10:18+00:00",
+          "source_identity": "git:8e8cdcb4066ed26306611afd51e338103a272ce0"
+        },
+        {
+          "classifications": [
+            "required_fix"
+          ],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-3",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T04:20:01+00:00",
+          "source_identity": "git:d3f6a7652f11a3e2a4d55f578d79663247961819"
+        },
+        {
+          "classifications": [],
+          "ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-4",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T04:20:21+00:00",
+          "source_identity": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef"
+        }
+      ],
+      "review_ref": "file:.grilltrack/proof/widget-previews-review-20260930.md#round-4",
+      "review_result": "clean",
+      "review_source_identity": "git:a36c46bdd51af6c065610fdc6c25fa96dca657ef",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T04:20:21+00:00",
+      "verification_ref": "file:.grilltrack/proof/widget-preview-look-049-verify-20260930.md#final-head-check-review-round-3-fixes + ./gradlew assembleDebug check (355 tests)"
+    },
+    {
+      "baseline_ref": "git:1606d04",
+      "candidate_refs": [],
+      "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needed the maintainer's explicit OK, given 2026-10-01.",
+      "context_ref": "github:dinkuskit/dinkuskit@e4d645e3c03d3044d304f1f33ff9526fb7098156",
+      "created_at": "2026-10-01T13:44:09+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
+      "history": [
+        {
+          "at": "2026-10-01T13:44:09+00:00",
+          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needed the maintainer's explicit OK, given 2026-10-01.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T13:44:10+00:00",
+          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needed the maintainer's explicit OK, given 2026-10-01.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T13:44:10+00:00",
+          "choice": "A new public MIT repository saari-co/repoglance-site, checkout ~/Developer/side-quests/repoglance-site, laid out like dinkuskit/dinkuskit (AGENTS, REPO_HYGIENE, docs/, proof/, .grilltrack/, Astro + EmDash + Cloudflare adapter at the root). Creating it needed the maintainer's explicit OK, given 2026-10-01.",
+          "from": "implemented",
+          "implementation_ref": "github:saari-co/repoglance-site (created 2026-10-01, public, MIT; foundation merged as #1, hosting and Access-gated CMS merged as #2)",
           "note": "verification recorded in cumulative context",
           "repair_required": false,
           "review_classifications": [],
@@ -5353,9 +5863,9 @@
         }
       ],
       "id": "site-home-048",
-      "implementation_ref": "github:saari-co/repoglance-site (created 2026-10-01, public, MIT; branch claude/site-foundation in worktree ~/Developer/side-quests/repoglance-site-foundation)",
+      "implementation_ref": "github:saari-co/repoglance-site (created 2026-10-01, public, MIT; foundation merged as #1, hosting and Access-gated CMS merged as #2)",
       "question": "Where does the repoglance.com site source live?",
-      "rationale": "Keeps the Node/wrangler toolchain and Cloudflare deploy config out of the Android repo (Gradle CI, lint/detekt, ./gradlew check); matches the maintainer's own precedent (the DinkusKit website is its own repo); EmDash expects package.json, astro.config.mjs and wrangler.jsonc at the repo root; the site gets its own ledger, design.md, CI and review trail. Alternative: a site/ subdirectory in saari-co/RepoGlance (one repo, mixed toolchains and CI, Workers Builds root-dir setting, hygiene contract is Android-specific).",
+      "rationale": "Keeps the Node/wrangler toolchain and Cloudflare deploy config out of the Android repo (Gradle CI, lint/detekt, ./gradlew check); matches the maintainer's own precedent (the DinkusKit website is its own repo); EmDash expects package.json, astro.config.mjs and wrangler.jsonc at the repo root; the site gets its own ledger, design.md, CI and review trail. Alternative: a site/ subdirectory in saari-co/RepoGlance. The id numbers 048 and 049 also appear on the widget-preview decisions recorded in parallel; the ids themselves are distinct.",
       "repair_required": false,
       "review_classifications": [],
       "review_history": [],
@@ -5364,15 +5874,15 @@
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T10:36:02+00:00",
-      "verification_ref": "github:saari-co/repoglance-site#1 (head ffe343ebf85daee2d4c2d6df02a165ade9ea2bea); proof/site-foundation/PROOF.md in that repository"
+      "updated_at": "2026-10-01T13:44:10+00:00",
+      "verification_ref": "github:saari-co/repoglance-site#1 and #2 (merged 2026-10-01); proof/site-foundation/PROOF.md, proof/hosting-20261001/PROOF.md, proof/cms-access-20261001/PROOF.md in that repository; live at https://repoglance.com"
     },
     {
       "baseline_ref": null,
       "candidate_refs": [],
       "choice": "Two pages: / (Home: what RepoGlance is, the proven surfaces, read-only/no-server honesty, sample-mode screenshots, a Join-the-test call to action) and /testers (how to join the closed test: the Google Group, the Play opt-in link once it exists, what to expect, feedback via GitHub issues). Privacy stays a footer link to https://saari-co.github.io/RepoGlance/privacy/, which the Play listing points at; no copy is served on repoglance.com.",
       "context_ref": "file:docs/store-listing.md",
-      "created_at": "2026-10-01T10:02:58+00:00",
+      "created_at": "2026-10-01T13:44:09+00:00",
       "deferred_reason": null,
       "delivery_ref": null,
       "dependencies": [
@@ -5381,7 +5891,7 @@
       "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
       "history": [
         {
-          "at": "2026-10-01T10:07:54+00:00",
+          "at": "2026-10-01T13:44:09+00:00",
           "choice": "Two pages: / (Home: what RepoGlance is, the proven surfaces, read-only/no-server honesty, sample-mode screenshots, a Join-the-test call to action) and /testers (how to join the closed test: the Google Group, the Play opt-in link once it exists, what to expect, feedback via GitHub issues). Privacy stays a footer link to https://saari-co.github.io/RepoGlance/privacy/, which the Play listing points at; no copy is served on repoglance.com.",
           "from": "proposed",
           "implementation_ref": null,
@@ -5395,7 +5905,7 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:23:18+00:00",
+          "at": "2026-10-01T13:44:10+00:00",
           "choice": "Two pages: / (Home: what RepoGlance is, the proven surfaces, read-only/no-server honesty, sample-mode screenshots, a Join-the-test call to action) and /testers (how to join the closed test: the Google Group, the Play opt-in link once it exists, what to expect, feedback via GitHub issues). Privacy stays a footer link to https://saari-co.github.io/RepoGlance/privacy/, which the Play listing points at; no copy is served on repoglance.com.",
           "from": "locked",
           "implementation_ref": null,
@@ -5409,10 +5919,10 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:36:02+00:00",
+          "at": "2026-10-01T13:44:10+00:00",
           "choice": "Two pages: / (Home: what RepoGlance is, the proven surfaces, read-only/no-server honesty, sample-mode screenshots, a Join-the-test call to action) and /testers (how to join the closed test: the Google Group, the Play opt-in link once it exists, what to expect, feedback via GitHub issues). Privacy stays a footer link to https://saari-co.github.io/RepoGlance/privacy/, which the Play listing points at; no copy is served on repoglance.com.",
           "from": "implemented",
-          "implementation_ref": "github:saari-co/repoglance-site@claude/site-foundation:seed/seed.json (pages home and testers)",
+          "implementation_ref": "github:saari-co/repoglance-site seed/seed.json (pages home and testers), rendered through EmDash's native Blocks",
           "note": "verification recorded in cumulative context",
           "repair_required": false,
           "review_classifications": [],
@@ -5424,7 +5934,7 @@
         }
       ],
       "id": "site-pages-049",
-      "implementation_ref": "github:saari-co/repoglance-site@claude/site-foundation:seed/seed.json (pages home and testers)",
+      "implementation_ref": "github:saari-co/repoglance-site seed/seed.json (pages home and testers), rendered through EmDash's native Blocks",
       "question": "Which pages does the site have (1-3)?",
       "rationale": "Alternatives: one page with the tester steps inline; three pages adding a /privacy copy (two sources of truth for a document Play points at).",
       "repair_required": false,
@@ -5435,15 +5945,15 @@
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T10:36:02+00:00",
-      "verification_ref": "github:saari-co/repoglance-site#1 proof/site-foundation/PROOF.md (smoke: / and /testers 200 from the seed; privacy link to the GitHub Pages policy; captures in swarm-pr-assets repoglance-site-foundation-20261001)"
+      "updated_at": "2026-10-01T13:44:10+00:00",
+      "verification_ref": "github:saari-co/repoglance-site proof/hosting-20261001/PROOF.md (live / and /testers 200; privacy link to the GitHub Pages policy)"
     },
     {
       "baseline_ref": null,
       "candidate_refs": [],
       "choice": "The Google Group join page https://groups.google.com/g/repoglance-testers (resolves publicly, title 'RepoGlance testers - Google Groups', checked 2026-10-01) now; the Play opt-in link is added when Console shows it (not available as of 2026-09-30 per proof/play-console-20260930/PROOF.md). The maintainer confirms the URL; it is never guessed.",
       "context_ref": "file:proof/play-console-20260930/PROOF.md",
-      "created_at": "2026-10-01T10:02:58+00:00",
+      "created_at": "2026-10-01T13:44:09+00:00",
       "deferred_reason": null,
       "delivery_ref": null,
       "dependencies": [
@@ -5452,7 +5962,7 @@
       "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
       "history": [
         {
-          "at": "2026-10-01T10:07:54+00:00",
+          "at": "2026-10-01T13:44:09+00:00",
           "choice": "The Google Group join page https://groups.google.com/g/repoglance-testers (resolves publicly, title 'RepoGlance testers - Google Groups', checked 2026-10-01) now; the Play opt-in link is added when Console shows it (not available as of 2026-09-30 per proof/play-console-20260930/PROOF.md). The maintainer confirms the URL; it is never guessed.",
           "from": "proposed",
           "implementation_ref": null,
@@ -5466,7 +5976,7 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:23:18+00:00",
+          "at": "2026-10-01T13:44:10+00:00",
           "choice": "The Google Group join page https://groups.google.com/g/repoglance-testers (resolves publicly, title 'RepoGlance testers - Google Groups', checked 2026-10-01) now; the Play opt-in link is added when Console shows it (not available as of 2026-09-30 per proof/play-console-20260930/PROOF.md). The maintainer confirms the URL; it is never guessed.",
           "from": "locked",
           "implementation_ref": null,
@@ -5480,10 +5990,10 @@
           "verification_ref": null
         },
         {
-          "at": "2026-10-01T10:36:02+00:00",
+          "at": "2026-10-01T13:44:10+00:00",
           "choice": "The Google Group join page https://groups.google.com/g/repoglance-testers (resolves publicly, title 'RepoGlance testers - Google Groups', checked 2026-10-01) now; the Play opt-in link is added when Console shows it (not available as of 2026-09-30 per proof/play-console-20260930/PROOF.md). The maintainer confirms the URL; it is never guessed.",
           "from": "implemented",
-          "implementation_ref": "github:saari-co/repoglance-site@claude/site-foundation:seed/seed.json (testers hero and step 1 link to https://groups.google.com/g/repoglance-testers)",
+          "implementation_ref": "github:saari-co/repoglance-site seed/seed.json (testers hero and step 1 link to https://groups.google.com/g/repoglance-testers)",
           "note": "verification recorded in cumulative context",
           "repair_required": false,
           "review_classifications": [],
@@ -5495,7 +6005,7 @@
         }
       ],
       "id": "site-signup-link-050",
-      "implementation_ref": "github:saari-co/repoglance-site@claude/site-foundation:seed/seed.json (testers hero and step 1 link to https://groups.google.com/g/repoglance-testers)",
+      "implementation_ref": "github:saari-co/repoglance-site seed/seed.json (testers hero and step 1 link to https://groups.google.com/g/repoglance-testers)",
       "question": "Which closed-test signup link does the site use today?",
       "rationale": "",
       "repair_required": false,
@@ -5506,12 +6016,12 @@
       "review_source_identity": null,
       "status": "verified",
       "superseded_by": null,
-      "updated_at": "2026-10-01T10:36:02+00:00",
-      "verification_ref": "github:saari-co/repoglance-site#1 proof/site-foundation/PROOF.md (Group link on /testers; no Play URL; opt-in link stated as not published)"
+      "updated_at": "2026-10-01T13:44:10+00:00",
+      "verification_ref": "github:saari-co/repoglance-site proof/cms-access-20261001/PROOF.md (Group link on /testers; no Play URL; opt-in link stated as not published)"
     }
   ],
   "last_activation": {
-    "at": "2026-09-29T22:24:22+00:00",
+    "at": "2026-10-01T03:02:16+00:00",
     "mechanism": "implicit"
   },
   "last_pause": {
@@ -5528,15 +6038,15 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "Return to the app: the remaining RepoGlance unresolved slots (compact 12-hour capsule fit, static brand fallback scheme, shape on the remaining M3 controls)."
+      "Point the Play listing's website field and the README at https://repoglance.com (a Play Console change is maintainer-only)."
     ],
-    "reason": "The website decisions 048-050 are implemented and verified in their own repository; its look is the open question the maintainer asked for, and app-side slots are unchanged by it.",
-    "recommended": "The site's first look round, run in saari-co/repoglance-site's own ledger (site-look-005): five layout and visual-language candidates on the real pages in a dev-only picker on the live preview; the pick becomes that repo's design.md v1.",
-    "recorded_at": "2026-10-01T10:36:02+00:00"
+    "reason": "The website decisions 048-050 are implemented, verified and live from their own repository; app-side slots are unchanged by them.",
+    "recommended": "Return to the app: the unresolved RepoGlance slots (compact 12-hour capsule fit, static brand fallback scheme, shape on the remaining M3 controls) and the widget-preview decisions' follow-ups.",
+    "recorded_at": "2026-10-01T13:44:10+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T10:36:02+00:00"
+  "updated_at": "2026-10-01T13:44:10+00:00"
 }
