@@ -64,7 +64,7 @@ Available on `main`, with device proof in [`proof/`](proof/) and
 - **Settings and Widgets.** The three-dot menu holds **Widgets** and
   **Settings** on the live and sample catalogs, and **Settings** alone on the
   Connect screen. **Widgets** adds either widget through the launcher's own
-  *Add to home screen* sheet (`requestPinAppWidget`), lists the widgets
+  *Add to home screen* sheet (`requestPinGlanceAppWidget`), lists the widgets
   already placed, and opens a repository widget's setup to change it.
   Settings holds Widgets, Appearance (theme), GitHub access (**Manage GitHub
   access** and **Disconnect GitHub**, moved here from the menu, with a
@@ -72,6 +72,14 @@ Available on `main`, with device proof in [`proof/`](proof/) and
   emulator (Android 16) signed out and in sample mode, adding, changing and
   removing both widgets, and on a Pixel 10 Pro XL (Android 17) with a live
   session for a repository widget.
+- **Widget previews.** The launcher's *Add to home screen* sheet and its
+  widget picker show each widget as its sample: Repository with `sample` in
+  its time slot, Pinned repos with three sample pins under a `Pinned · 3`
+  band. They show no clock time and none of the user's data. Android 15+
+  gets a preview generated from the widgets; earlier versions get a static
+  copy. Verified on a Pixel 10 Pro XL (Android 17, dark, live session) and
+  on the emulator (Android 16, light and dark, sample mode), including the
+  static copy.
 - **Read-only.** RepoGlance performs no GitHub writes of any kind.
 
 Not available yet:

@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,7 @@ import co.saari.repoglance.ui.theme.SecondaryButton
 import co.saari.repoglance.ui.theme.StatusBanner
 import co.saari.repoglance.ui.theme.StatusColors
 import co.saari.repoglance.ui.theme.StatusPill
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,16 +131,17 @@ fun HomeScreen(
 @Composable
 private fun PinWidgetsRow() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton(
             modifier = Modifier.weight(1f),
-            onClick = { WidgetPinning.request(context, WidgetKind.REPOSITORY) },
+            onClick = { scope.launch { WidgetPinning.request(context, WidgetKind.REPOSITORY) } },
         ) {
             LabelText("Pin repo widget", LabelRole.BUTTON)
         }
         SecondaryButton(
             modifier = Modifier.weight(1f),
-            onClick = { WidgetPinning.request(context, WidgetKind.PINNED_REPOS) },
+            onClick = { scope.launch { WidgetPinning.request(context, WidgetKind.PINNED_REPOS) } },
         ) {
             LabelText("Pin stack widget", LabelRole.BUTTON)
         }

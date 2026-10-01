@@ -1,6 +1,8 @@
 # Design contract: RepoGlance
 
-- **Version:** 9 (2026-09-30): Settings and the Widgets screen
+- **Version:** 10 (2026-09-30): widget previews on the launcher's
+  sheet and widget picker [widget-previews-048, widget-preview-look-049].
+  Version 9 (2026-09-30): Settings and the Widgets screen
   [settings-044, widgets-entry-045, widgets-look-047]. Version 8
   (2026-09-30): in-app theme choice [theme-choice-046].
   Version 7 (2026-09-30): sample marker, tonal banner
@@ -108,6 +110,33 @@
     first with one Add button and a chooser dialog; E a card per widget kind
     holding its placed widgets.
   - **Proof:** `.grilltrack/proof/widgets-look-047-verify-20260930.md`.
+- **Widget previews [widget-previews-048, widget-preview-look-049, "A
+  sample widget"]:** the launcher's `Add to home screen` sheet and its
+  widget picker show each widget as it looks in sample mode, never the app
+  icon. Repository is the compact widget for `saari-co/rocket` (`issues 5`,
+  `PRs 3`) with `sample` in the tertiary capsule where a live widget shows
+  its time; Pinned repos is the stack's tertiary `Pinned · 3` band over
+  `saari-co/rocket`, `saari-co/api-server` and `dinkuskit/infra`, each row
+  reading `sample` and its counts. A preview never shows a clock time or
+  the user's data, so a preview published once cannot go stale or pass for
+  live numbers. Colours are the widgets' own dynamic Glance roles and
+  follow light and dark.
+
+  | surface | source |
+  | --- | --- |
+  | in-app `Add` sheet | `WidgetPinning.request` → `requestPinGlanceAppWidget` with `WidgetSheetPreview` |
+  | launcher picker, Android 15+ | generated preview: `providePreview` on both widgets, published by `WidgetPreviews.publishIfNeeded` (home-screen category) at app start when missing or when the `versionCode.LOOK_VERSION` stamp changes; a rate-limited call (about two per hour per widget) retries on a later start |
+  | launcher picker, Android 12–14 or not yet published | `android:previewLayout` (`widget_preview_repository`, `widget_preview_pinned`): a static copy with the same strings and the same system-palette colours in `values` / `values-night` |
+
+  - The seam is `widget/WidgetPreview.kt` (`WidgetPreviews`,
+    `WidgetPreviewContent`), built from the production `CompactContent`,
+    `StackHeader` and `StackRow`. Glance is 1.2.0.
+  - **Rejected (round 1, do not reintroduce without a new grill):** B
+    skeleton (frame and bars only; briefly picked, then changed to A
+    before confirmation); C your data (the user's own widget on the sheet);
+    D annotated (slots named instead of filled); E poster (mark, name and a
+    sentence).
+  - **Proof:** `.grilltrack/proof/widget-preview-look-049-verify-20260930.md`.
 - **Typography, body:** M3 default type scale on the system font for
   titles, row text and reading text.
 - **Typography, labels [label-typography-030, "mono labels"]:** every label

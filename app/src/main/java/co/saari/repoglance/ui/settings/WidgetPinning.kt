@@ -2,12 +2,16 @@ package co.saari.repoglance.ui.settings
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import co.saari.repoglance.widget.RepoWidgetConfigActivity
 import co.saari.repoglance.widget.RepoWidgetReceiver
 import co.saari.repoglance.widget.StackWidgetReceiver
+import co.saari.repoglance.widget.WidgetPreviewKind
+import co.saari.repoglance.widget.WidgetSheetPreview
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object WidgetPinning {
     private const val REPO_WIDGET_CONFIG_REQUEST_CODE = 1101
@@ -15,25 +19,30 @@ object WidgetPinning {
     fun isSupported(context: Context): Boolean =
         AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported
 
-    fun request(context: Context, kind: WidgetKind): Boolean {
+    suspend fun request(context: Context, kind: WidgetKind): Boolean {
         val manager = AppWidgetManager.getInstance(context)
         if (!manager.isRequestPinAppWidgetSupported) return false
-        return when (kind) {
-            WidgetKind.REPOSITORY -> manager.requestPinAppWidget(
-                ComponentName(context, RepoWidgetReceiver::class.java),
-                null,
-                PendingIntent.getActivity(
-                    context,
-                    REPO_WIDGET_CONFIG_REQUEST_CODE,
-                    Intent(context, RepoWidgetConfigActivity::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-                ),
-            )
-            WidgetKind.PINNED_REPOS -> manager.requestPinAppWidget(
-                ComponentName(context, StackWidgetReceiver::class.java),
-                null,
-                null,
-            )
+        val glance = GlanceAppWidgetManager(context)
+        return withContext(Dispatchers.Default) {
+            when (kind) {
+                WidgetKind.REPOSITORY -> glance.requestPinGlanceAppWidget(
+                    receiver = RepoWidgetReceiver::class.java,
+                    preview = WidgetSheetPreview(WidgetPreviewKind.REPOSITORY),
+                    previewState = null,
+                    successCallback = PendingIntent.getActivity(
+                        context,
+                        REPO_WIDGET_CONFIG_REQUEST_CODE,
+                        Intent(context, RepoWidgetConfigActivity::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+                    ),
+                )
+                WidgetKind.PINNED_REPOS -> glance.requestPinGlanceAppWidget(
+                    receiver = StackWidgetReceiver::class.java,
+                    preview = WidgetSheetPreview(WidgetPreviewKind.PINNED_REPOS),
+                    previewState = null,
+                    successCallback = null,
+                )
+            }
         }
     }
 
