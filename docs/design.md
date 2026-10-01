@@ -1,6 +1,7 @@
 # Design contract: RepoGlance
 
-- **Version:** 7 (2026-09-30): sample marker, tonal banner
+- **Version:** 8 (2026-09-30): in-app theme choice [theme-choice-046].
+  Version 7 (2026-09-30): sample marker, tonal banner
   [sample-marker-040]. Version 6 (2026-09-30): sample widgets and the
   unconfigured widget [sample-widgets-039]. Version 5 (2026-09-29): compact widget crowding
   [compact-crowding-034]. Version 4 (2026-09-28): widget freshness and labels
@@ -63,6 +64,24 @@
   is checked; still under reduced motion.
 - **App start [cold-start-icon-028]:** the start window matches the M3
   dynamic background on API 34+; API 31–33 is an approximate fallback.
+- **Theme choice [theme-choice-046]:** Settings → Appearance → `Theme` shows
+  the current choice; a tap opens `Choose theme` with radio buttons `Light`,
+  `Dark`, `System default` and `Cancel` / `OK`, the wording and buttons of
+  Google Calculator's dialog (seen on the Pixel 10 Pro XL, 2026-09-30).
+  `System default` is the default. `OK` stores the choice and applies it as
+  Android 12+ per-app night mode (`UiModeManager.setApplicationNightMode`;
+  `System default` is `MODE_NIGHT_AUTO`, which follows the phone), so the
+  app, its start window, status-bar icons, dialogs and the widget setup
+  screen all follow it; `Theme.kt` still reads the configuration. Home-screen
+  widgets and the Quick Settings tile stay on the phone's theme. The seam is
+  `state/ThemePrefs.kt` and `ui/settings/ThemeSetting.kt`; Settings itself
+  is [settings-044].
+  - **Rejected (do not reintroduce without a new grill):** a link to the
+    phone's Display settings (changes the whole phone; there is no public
+    intent for the Dark theme page); no control (the app already followed
+    the phone); a Compose-only override (start window and system bars would
+    not follow); widgets following the app; inline segmented buttons.
+  - **Proof:** `.grilltrack/proof/theme-choice-046-verify-20260930.md`.
 - **Typography, body:** M3 default type scale on the system font for
   titles, row text and reading text.
 - **Typography, labels [label-typography-030, "mono labels"]:** every label

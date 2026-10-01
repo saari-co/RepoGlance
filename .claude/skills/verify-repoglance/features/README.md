@@ -78,3 +78,7 @@ required state, commands, and observable proof.
 - [Sample mode](./sample-mode.md) covers `Explore with sample data`: the
   made-up repositories on the real screens, its marker, pins, row note, restart
   persistence, the sample widgets and tile, and the exit to sign-in.
+- [Theme choice](./theme.md) covers Settings → `Theme`: the `Choose theme`
+  dialog, applying `Light`, `Dark` or `System default` to RepoGlance only,
+  its start window and restart persistence, and widgets staying on the
+  phone's theme.

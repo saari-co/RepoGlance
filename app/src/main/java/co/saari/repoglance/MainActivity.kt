@@ -42,6 +42,7 @@ import co.saari.repoglance.ui.LiveRepoGlanceScreen
 import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.ui.settings.SettingsDestination
 import co.saari.repoglance.ui.settings.SettingsScreen
+import co.saari.repoglance.ui.settings.ThemeSettingItem
 import co.saari.repoglance.ui.settings.WidgetsScreen
 import co.saari.repoglance.ui.settings.settingsAccount
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
@@ -127,6 +128,7 @@ class MainActivity : ComponentActivity() {
                     liveModel.signOut()
                 },
                 onOpenLink = ::openLink,
+                appearance = { ThemeSettingItem() },
             )
             SettingsDestination.WIDGETS -> WidgetsScreen(onBack = ::closeSettingsDestination)
             null -> LiveRepoGlanceScreen(

@@ -55,6 +55,11 @@ Available on `main`, with device proof in [`proof/`](proof/) and
     also clears the sample widget setups.
   - Verified on the emulator (Android 16), with a signed-in Fold run for the
     widgets. A Pixel 10 Pro XL (Android 17) ran an earlier owner set.
+- **Theme.** Settings → Theme chooses `Light`, `Dark` or `System default`
+  (the default) for RepoGlance alone, including its start window and status
+  bar; widgets and the Quick Settings tile keep the phone's theme. Verified
+  on the emulator (Android 16) with the phone light and on a Pixel 10 Pro
+  XL (Android 17) with the phone dark.
 - **Read-only.** RepoGlance performs no GitHub writes of any kind.
 
 Not available yet:

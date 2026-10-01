@@ -62,6 +62,9 @@ changes anything on GitHub.
   checks for a saved session (#18).
 - Tonal status pills, mono label type, and Google-style shapes and controls
   (#36, #37, #38).
+- **Settings → Theme** chooses `Light`, `Dark` or `System default` (the
+  default) for RepoGlance alone, start window and status bar included.
+  Widgets and the Quick Settings tile keep the phone's theme (#50).
 
 **Platform and build**
 - Targets and compiles against Android 16 (API 36) on AGP 8.10.1. The
