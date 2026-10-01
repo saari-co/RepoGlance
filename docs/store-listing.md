@@ -148,7 +148,9 @@ Capture proof is in
   Console's list
 - **Email:** `smokyproductcompany@gmail.com` (Play shows it publicly; it is
   already public in the privacy policy)
-- **Website:** `https://github.com/saari-co/RepoGlance`
+- **Website:** `https://repoglance.com` (changed from the GitHub URL on
+  2026-10-01, once the site was live; proof in
+  [proof/play-console-20261001/PROOF.md](../proof/play-console-20261001/PROOF.md))
 - **Phone:** leave empty
 
 ## App content declarations
