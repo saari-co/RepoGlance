@@ -67,11 +67,14 @@ keeps its own ledger from here on (decisions `site-home-001` onward).
 
 | id | decision | status |
 | --- | --- | --- |
-| `site-home-048` | The repoglance.com source lives in a new public MIT repository, `saari-co/repoglance-site`, laid out like the DinkusKit website (Astro + EmDash on the Cloudflare adapter). Keeps the Node/Wrangler toolchain out of this Android repo. | verified at [repoglance-site#1](https://github.com/saari-co/repoglance-site/pull/1) |
-| `site-pages-049` | Two pages: `/` (overview with sample-mode screenshots and a Join-the-test call to action) and `/testers` (how to join). The privacy policy stays at `https://saari-co.github.io/RepoGlance/privacy/`, where the Play listing points; the site links to it and serves no copy. | verified at repoglance-site#1 |
-| `site-signup-link-050` | The signup link today is the testers Google Group, `https://groups.google.com/g/repoglance-testers`; the Play opt-in link is added when Play Console shows it, never guessed. | verified at repoglance-site#1 |
+| `site-home-048` | The repoglance.com source lives in a new public MIT repository, `saari-co/repoglance-site`, laid out like the DinkusKit website (Astro + EmDash on the Cloudflare adapter). Keeps the Node/Wrangler toolchain out of this Android repo. | verified; [repoglance-site#1](https://github.com/saari-co/repoglance-site/pull/1) and [#2](https://github.com/saari-co/repoglance-site/pull/2) merged 2026-10-01, live at <https://repoglance.com> |
+| `site-pages-049` | Two pages: `/` (overview with sample-mode screenshots and a Join-the-test call to action) and `/testers` (how to join). The privacy policy stays at `https://saari-co.github.io/RepoGlance/privacy/`, where the Play listing points; the site links to it and serves no copy. | verified; live |
+| `site-signup-link-050` | The signup link today is the testers Google Group, `https://groups.google.com/g/repoglance-testers`; the Play opt-in link is added when Play Console shows it, never guessed. | verified; live |
 
-Nothing is deployed: creating the Cloudflare Worker, databases, DNS, custom
-domain and Access application for repoglance.com, and any deploy, are
-maintainer steps (`docs/cms-access.md` in the site repository). The site's
-look is provisional and is the next grill there.
+The site went live on 2026-10-01 after the maintainer approved each
+Cloudflare gate (resources, custom domains, the Access-gated EmDash editor);
+the look was decided in four rounds the same day. All of it is recorded in
+the site repository's ledger and proof. Note on ids: `site-home-048` and
+`site-pages-049` share their numbers with `widget-previews-048` and
+`widget-preview-look-049`, recorded in parallel on another branch; the ids
+are distinct strings and both sets stand.
