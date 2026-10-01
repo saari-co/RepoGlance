@@ -89,6 +89,14 @@ class ThemeChoiceGuardTest {
     }
 
     @Test
+    fun theSettingSitsInTheSharedSettingsAppearanceSlot() {
+        val activity = source("$main/MainActivity.kt")
+        assertEquals(1, Regex(Regex.escape("appearance = { ThemeSettingItem() }")).findAll(activity).count())
+        val screen = source("$main/ui/settings/SettingsScreen.kt")
+        assertTrue(screen.contains("SettingsSectionHead(\"Appearance\")"))
+    }
+
+    @Test
     fun theSettingReadsTheStoredChoiceOffTheMainThread() {
         assertEquals(1, Regex(Regex.escape("ThemePrefs.choice(context)")).findAll(setting).count())
         assertTrue(setting.contains("withContext(Dispatchers.IO) { ThemePrefs.choice(context) }"))
@@ -105,7 +113,7 @@ class ThemeChoiceGuardTest {
         )) {
             assertTrue("missing $tag", setting.contains("\"$tag\""))
         }
-        assertTrue(setting.contains("Text(\"Theme\")"))
+        assertTrue(setting.contains("headline = \"Theme\""))
         assertTrue(setting.contains("Text(\"Choose theme\")"))
         assertTrue(setting.contains("role = Role.RadioButton"))
         assertTrue(

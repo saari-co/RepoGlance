@@ -1,6 +1,5 @@
 package co.saari.repoglance.ui.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -45,12 +43,11 @@ fun ThemeSettingItem(modifier: Modifier = Modifier) {
         choice = withContext(Dispatchers.IO) { ThemePrefs.choice(context) }
     }
     var choosing by rememberSaveable { mutableStateOf(false) }
-    ListItem(
-        headlineContent = { Text("Theme") },
-        supportingContent = { Text(choice?.label.orEmpty()) },
-        modifier = modifier
-            .clickable(enabled = choice != null, role = Role.Button) { choosing = true }
-            .testTag("repoglance:settings-theme"),
+    SettingsRow(
+        headline = "Theme",
+        supporting = choice?.label.orEmpty(),
+        onClick = { if (choice != null) choosing = true },
+        modifier = modifier.testTag("repoglance:settings-theme"),
     )
     val current = choice
     if (choosing && current != null) {
