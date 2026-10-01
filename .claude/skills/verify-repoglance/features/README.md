@@ -84,6 +84,10 @@ required state, commands, and observable proof.
   the Settings screen in each session state, and the Widgets screen: adding
   both widgets through the launcher, the placed-widget list, changing a
   widget's repository, and removal.
+- [Widget previews](./widget-previews.md) covers what the launcher's
+  `Add to home screen` sheet and its widget picker show before a widget is
+  placed: the sample widgets marked `sample`, generated on Android 15+ with a
+  static fallback, in light and dark.
 - [Theme choice](./theme.md) covers Settings → `Theme`: the `Choose theme`
   dialog, applying `Light`, `Dark` or `System default` to RepoGlance only,
   its start window and restart persistence, and widgets staying on the
