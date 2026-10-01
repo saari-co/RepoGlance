@@ -219,3 +219,88 @@ These were taken after `sample-widgets-039` merged in #45 (`main` at
 - `saari-co/RepoGlance` does not appear.
 - The asset digests GitHub reports equal the local SHA-256s.
 - The screenshots still show the provisional marker (`sample-marker-040`).
+
+## Addendum: retake after `sample-marker-040` (#49), 2026-09-30
+
+#49 locked the sample marker: a tonal banner in the app, tertiary widget
+bands, and a `Sample data · …` tile. So every listing asset was retaken from
+`main` `d7421d3`.
+
+**Device and run**
+
+- The approved emulator `EMULATOR37X1X11X0`, running the debug build of
+  branch `claude/play-console-sync`. That branch is `main` `d7421d3` plus
+  docs only, so the app source is identical.
+- Doctor reported `apk_local` = `apk_device` =
+  `24d50effd809c4fbc51c5fa759d538e1403d260a8ffdbaa72c74c80106e9001c`.
+- Capture conditions matched the earlier sets: dark theme, demo-mode status
+  bar, cover display at `wm size 1080x1920`, and native inner display for
+  the fold references. Run id: `play-screens-040`.
+
+**What the dumps show**
+
+- **Banner.** The catalog dump shows `repoglance:sample-bar`, `SAMPLE`,
+  "These repositories are made up. Sign in to see your own GitHub." and
+  `Sign in with GitHub`.
+- **Pins.** The pinned set is `saari-co/rocket` and `saari-co/api-server`.
+  The taller banner pushed `dinkuskit/infra` below the fold.
+- **Widgets.** The launcher dump for screenshot 6 reads:
+  - stack: `Pinned · 2`, `saari-co/rocket` `sample` `issues 5 · PRs 3 ·
+    review 0`, `saari-co/api-server` `sample` `issues 3 · PRs 2 · review 0`;
+  - repo widget: `saari-co/rocket`, `ISSUES 5 · PRS 3 · sample`, `ISSUE #415
+    · 25m`, `PR #412 · 25m`, `ISSUE #416 · 1h`.
+
+  This repo widget is launcher-resized and tall. It was set up again by
+  tapping its `Tap to choose a repository` state, which opened
+  `RepoWidgetConfigActivity` with the sample note, then saving.
+  - So this run covers the case the #49 proof listed as not directly proven:
+    a tall repo widget resized on a real launcher.
+- **Tile.** The tile, widened in QS edit mode, reads `RepoGlance` / `Sample
+  data · saari-co/rocket · 25m`. Its content-desc is `RepoGlance, sample
+  data, latest push to saari-co/rocket updated 25m ago`, and `click-tile`
+  opened the sample catalog.
+- **Exit.** `Sign in with GitHub` led to the Connect screen with zero `Enter
+  this code`. The widgets then read `Pinned · 0`, `Pin repositories in
+  RepoGlance` and `Tap to choose a repository`.
+- **Screenshot 5.** The Connect-screen capture is byte-identical to the first
+  set (`3687ce38…`), because #49 does not touch that screen.
+
+**Correction to the previous addendum.** The two widgets placed in the first
+widget run *did* persist across the emulator restart, despite
+`-no-snapshot-save`. They were reused here, and they are still on the
+emulator launcher's second page.
+
+**Assets** are in the private release
+[`saari-co/swarm-pr-assets@repoglance-play-listing-20260930-040`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930-040).
+The earlier release is kept unchanged. Asset digests reported by GitHub equal
+the local SHA-256s.
+
+| Asset | Size | SHA-256 | Raw capture (SHA-256 prefix) |
+| --- | --- | --- | --- |
+| `phone-01-catalog-pinned.png` | 1080×1920 | `a2125e1d90bdb976c2cc16aef891bc30bc524d62302af1afad85e9bb4dc85f12` | `phone-1-catalog` `305889d08667` |
+| `phone-02-repository-issues-and-prs.png` | 1080×1920 | `af4ca3a87071670272eb017ac9ebf6d88c900e1d6d9b8e75bef40abe31af83f5` | `phone-2-repo-both` `ada166addb50` |
+| `phone-03-repository-prs.png` | 1080×1920 | `15a1c1b5e4af8212587326d66b4cad867c153a3b74b393d59c4ec2ae79fc1c1a` | `phone-3-repo-prs` `b2389dcd8530` |
+| `phone-04-owner-filter.png` | 1080×1920 | `96b1004710e2253b1bfb9d801d6df5da953513b12c42d6d984739391dd4fd974` | `phone-4-owner-filter` `a4d170af9b1c` |
+| `phone-05-connect-or-explore-sample.png` | 1080×1920 | `e26d3dc08f4da4308d43c376b1b99b6d0ea8f6f3eaaee897ebf40d660b186127` | `phone-5-connect` `3687ce3830ed` |
+| `phone-06-home-widgets.png` | 1080×1920 | `96d3239897c6f10d445d9451ebc86373ebef58058f8747191b6e1e132c415f45` | `phone-6-home-widgets` `a4f91dcb94a9` |
+| `phone-07-quick-settings-tile.png` | 1080×1920 | `ca2e02569ddd77b83216da357a1e17a63810b38009ba2cb828f6de741adf543c` | `phone-7-qs-tile` `0ae2b824168f` |
+| `fold-reference-01-catalog-pinned-inner.png` | 2076×2152 | `a64e1b099b51cf4aa1656e8da8fb4a5812169993dd400885d0f6c0f33370b9a0` | `fold-catalog-pinned` `4876da66aeac` |
+| `fold-reference-02-repository-inner.png` | 2076×2152 | `27e2173280c884fa2adee767a5eee02267f5b008da963304b8e1baa944fd8e58` | `fold-repo` `0ff3d06ccce9` |
+| `fold-reference-03-repository-prs-inner.png` | 2076×2152 | `a1b806127ca37bd368ccfbe000e314c3d43fd6f9edbb008dea3a406e81bd5eb9` | `fold-prs` `ea8936dcb2ed` |
+| `feature-graphic-1024x500.png` | 1024×500 | `68a0ffa50e5d48fb3bf792664746d1594e4063b477bcc98b962ee5314258b1b8` | rendered from the new screenshot 1 |
+| `playstore-icon-512.png` | 512×512 | `ca169a39b067de4abea1c8a13a41e7b63f7cf280761dd333ae1c80def8710f59` | unchanged |
+
+**Guard on every asset.** A script asserted that:
+
+- every repository label in the paired dump(s) is a sample name;
+- `repoglance:sample-bar` is present on the app screenshots;
+- `explore-sample` is present on the Connect screenshot;
+- `ISSUES 5 · PRS 3 · sample` is present for the widgets;
+- `Sample data · saari-co/rocket · 25m` is present for the tile;
+- `saari-co/RepoGlance` appears in none of them.
+
+**Console.** When this retake was made, Console still showed the
+pre-#49 assets. The maintainer then approved the swap. These files are now
+live in the listing; see "Asset swap after #49" in
+`proof/play-console-20260930/PROOF.md` for the saved slots, read back in
+order.

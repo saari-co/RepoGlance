@@ -49,9 +49,9 @@ Available on `main`, with device proof in [`proof/`](proof/) and
   repositories under RepoGlance's own accounts, marked `SAMPLE` on every
   screen, with no GitHub account and no network call.
   - The Repository and Pinned repos widgets can be set up from the sample
-    repositories and show `sample` where a live widget shows its time. The Quick Settings
-    tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, never
-    GitHub.
+    repositories and show `sample` where a live widget shows its time. The
+    Quick Settings tile reads `Sample data · <repo> · <age>`. Their taps open
+    RepoGlance, never GitHub.
   - Sample mode stays until the user chooses **Sign in with GitHub**, which
     also clears the sample widget setups.
   - Verified on the emulator (Android 16), with a signed-in Fold run for the
