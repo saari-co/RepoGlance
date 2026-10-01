@@ -30,12 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.fixtures.FixtureScenario
@@ -46,19 +44,15 @@ import co.saari.repoglance.render.Ages
 import co.saari.repoglance.render.CiSemanticRole
 import co.saari.repoglance.render.SnapshotRendering
 import co.saari.repoglance.state.SnapshotStore
-import co.saari.repoglance.ui.settings.WidgetKind
-import co.saari.repoglance.ui.settings.WidgetPinning
 import co.saari.repoglance.ui.theme.ControlCard
 import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
 import co.saari.repoglance.ui.theme.LabelRole
 import co.saari.repoglance.ui.theme.LabelText
 import co.saari.repoglance.ui.theme.PrimaryButton
-import co.saari.repoglance.ui.theme.SecondaryButton
 import co.saari.repoglance.ui.theme.StatusBanner
 import co.saari.repoglance.ui.theme.StatusColors
 import co.saari.repoglance.ui.theme.StatusPill
-import kotlinx.coroutines.launch
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,28 +116,6 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth().testTag("repoglance:fixture-navigator"),
         ) {
             LabelText("Navigator", LabelRole.BUTTON)
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        PinWidgetsRow()
-    }
-}
-
-@Composable
-private fun PinWidgetsRow() {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton(
-            modifier = Modifier.weight(1f),
-            onClick = { scope.launch { WidgetPinning.request(context, WidgetKind.REPOSITORY) } },
-        ) {
-            LabelText("Pin repo widget", LabelRole.BUTTON)
-        }
-        SecondaryButton(
-            modifier = Modifier.weight(1f),
-            onClick = { scope.launch { WidgetPinning.request(context, WidgetKind.PINNED_REPOS) } },
-        ) {
-            LabelText("Pin stack widget", LabelRole.BUTTON)
         }
     }
 }
