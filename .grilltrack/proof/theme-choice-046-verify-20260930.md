@@ -94,10 +94,30 @@ before the stacked build): same results for Dark, System default and the
 dark cold start (`63366fc8349ec276`). It also found that the dialog's tags
 were missing from dumps, fixed in `6335006`.
 
+## Device verification (Pixel 10 Pro XL, phone dark)
+
+Device `63310DLCQ000RV` (Android 17, API 37), holding the maintainer's live
+session, lent by the Settings session after its look round. Same APK
+(`doctor` passed, `9bf2648c…`). The phone's own mode stayed
+`Night mode: yes`; no sign-in, sign-out or GitHub access setting was
+touched, and no catalog capture was taken (Settings only; the unfiltered
+catalog was dumped, never captured).
+
+| step | observed | evidence (SHA-256, 16) |
+| --- | --- | --- |
+| Settings from the live catalog menu | `Widgets`, `Appearance` → `Theme` `System default`, `GitHub` (`Manage GitHub access`, `Disconnect GitHub`), `About`; phone yes, app night | `3e6aad5c438774e9` |
+| Light + OK | still on Settings, row `Light`; phone yes, app notnight; dark status-bar icons on the light screen | `071e90dd51311133` |
+| System default + OK | row `System default`; phone yes, app night again | `d7cb754ee885a0b6` |
+| Force-stop, cold start | app night (still following the dark phone) | `dumpsys` line |
+
+With the emulator run, `System default` is shown to follow the phone both
+ways (light on the light emulator, dark on the dark XL), so it is not a
+forced theme. Side-by-side `a7179345f391ad0e`. End state: `System default`,
+`bin/verify-repoglance cleanup` run, the maintainer's session intact.
+
 ## Not proven here
 
-- `System default` following a **dark** phone: on the light emulator it
-  gives light, which a forced-light bug would also give. The phone's Dark
-  theme is never changed by an agent; see the XL row below once run.
-- `Light` overriding a dark phone (the mirror of the Dark proof).
-- API 31–33 devices.
+- API 31–33 devices (the start window there is the approximate fallback
+  from `cold-start-icon-028`).
+- A cold-start recording on the dark XL with `Light`: skipped, because the
+  cold start lands on the unfiltered live catalog.
