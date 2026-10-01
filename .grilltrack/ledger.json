@@ -4,11 +4,11 @@
   "current_focus": {
     "cadence": "frontier-batch",
     "confirmed": true,
-    "confirmed_at": "2026-10-01T00:14:21+00:00",
-    "domain": "settings-044 + widgets-entry-045: an in-app Widgets entry (add via requestPinAppWidget, list placed widgets, change a widget's repository) and the one Settings surface it lives on, shared with theme-choice-046 (parallel session); read-only per AGENTS.md",
-    "started_at": "2026-10-01T00:07:30+00:00",
+    "confirmed_at": "2026-10-01T00:51:51+00:00",
+    "domain": "theme-choice-046: an in-app theme choice (Light / Dark / System default) for RepoGlance, on the shared Settings screen (settings-044)",
+    "started_at": "2026-10-01T00:51:51+00:00",
     "status": "confirmed",
-    "summary": "Maintainer 2026-09-30 'Confirmed + look round', devices 'Emulator + XL': build settings-044 (three-dot menu = Widgets + Settings on the live catalog, sample catalog and Connect screen (Settings only there); Settings = Widgets row, Appearance slot for theme-choice-046's ThemeSettingItem, GitHub (Manage access, Disconnect with confirm; live session only), About (version, privacy, source; Custom Tab)) and widgets-entry-045 (Widgets screen: Repository widget and Pinned repos widget Add cards via requestPinAppWidget with a how-to fallback, placed-widget list with change-repository taps, removal hint, sample mode alike; launcher picker labels and store-listing copy use the names). Look: run a five-candidate round for widgets-look-047 on the device before locking it. Guards/tests in repo style, ./gradlew check green, feature map updated; prove a real requestPinAppWidget flow on the emulator (signed out, sample mode) and the live path on the 10 Pro XL if it has a session and is free; remove what is placed. PR after an exact-source review; merge only after CI + ClawSweeper on the exact head and the maintainer's OK."
+    "summary": "Maintainer 2026-09-30 'confirmed, stack on the settings branch': build theme-choice-046 (ThemeChoice + ThemePrefs + per-app night mode apply, ThemeSettingItem row + Choose theme radio dialog in ui/settings/ThemeSetting.kt for the settings-044 Appearance slot), unit + guard tests, design/invariants/changelog/feature-map updates, ./gradlew check green; stack on claude/settings-widgets-entry once its shell is pushed (PR base = that branch, retarget to main after it merges); prove on the signed-out approved emulator or the 10 Pro XL; exact-source review; PR, CI, @clawsweeper review; merge only with maintainer OK."
   },
   "decisions": [
     {
@@ -4994,6 +4994,75 @@
       "superseded_by": null,
       "updated_at": "2026-10-01T00:48:19+00:00",
       "verification_ref": null
+    },
+    {
+      "baseline_ref": "git:d7421d3",
+      "candidate_refs": [],
+      "choice": "In-app theme choice on the shared Settings screen (settings-044): an Appearance section with a 'Theme' row showing the current value; tapping opens a 'Choose theme' radio dialog with Light, Dark, System default. Default System default. Applied with Android 12+ per-app night mode (UiModeManager.setApplicationNightMode: Light=MODE_NIGHT_NO, Dark=MODE_NIGHT_YES, System default=MODE_NIGHT_AUTO, which the platform treats as follow-system), so the app, start window, status-bar icons, widget setup screen and dialogs all follow; Theme.kt keeps reading the configuration. Home-screen widgets and the Quick Settings tile stay on the system theme. Android persists the mode until app data is cleared; the app also stores the choice in prefs to show it, independent of sign-in and sample mode.",
+      "context_ref": "github:saari-co/RepoGlance#7",
+      "created_at": "2026-10-01T00:51:51+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [],
+      "domain": "theme-choice-046: an in-app theme choice (Light / Dark / System default) for RepoGlance, on the shared Settings screen (settings-044)",
+      "history": [
+        {
+          "at": "2026-10-01T00:51:51+00:00",
+          "choice": "In-app theme choice on the shared Settings screen (settings-044): an Appearance section with a 'Theme' row showing the current value; tapping opens a 'Choose theme' radio dialog with Light, Dark, System default. Default System default. Applied with Android 12+ per-app night mode (UiModeManager.setApplicationNightMode: Light=MODE_NIGHT_NO, Dark=MODE_NIGHT_YES, System default=MODE_NIGHT_AUTO, which the platform treats as follow-system), so the app, start window, status-bar icons, widget setup screen and dialogs all follow; Theme.kt keeps reading the configuration. Home-screen widgets and the Quick Settings tile stay on the system theme. Android persists the mode until app data is cleared; the app also stores the choice in prefs to show it, independent of sign-in and sample mode.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T00:51:51+00:00",
+          "choice": "In-app theme choice on the shared Settings screen (settings-044): an Appearance section with a 'Theme' row showing the current value; tapping opens a 'Choose theme' radio dialog with Light, Dark, System default. Default System default. Applied with Android 12+ per-app night mode (UiModeManager.setApplicationNightMode: Light=MODE_NIGHT_NO, Dark=MODE_NIGHT_YES, System default=MODE_NIGHT_AUTO, which the platform treats as follow-system), so the app, start window, status-bar icons, widget setup screen and dialogs all follow; Theme.kt keeps reading the configuration. Home-screen widgets and the Quick Settings tile stay on the system theme. Android persists the mode until app data is cleared; the app also stores the choice in prefs to show it, independent of sign-in and sample mode.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T00:51:51+00:00",
+          "choice": "In-app theme choice on the shared Settings screen (settings-044): an Appearance section with a 'Theme' row showing the current value; tapping opens a 'Choose theme' radio dialog with Light, Dark, System default. Default System default. Applied with Android 12+ per-app night mode (UiModeManager.setApplicationNightMode: Light=MODE_NIGHT_NO, Dark=MODE_NIGHT_YES, System default=MODE_NIGHT_AUTO, which the platform treats as follow-system), so the app, start window, status-bar icons, widget setup screen and dialogs all follow; Theme.kt keeps reading the configuration. Home-screen widgets and the Quick Settings tile stay on the system theme. Android persists the mode until app data is cleared; the app also stores the choice in prefs to show it, independent of sign-in and sample mode.",
+          "from": "implemented",
+          "implementation_ref": "git:595ed65+6335006+99becf9 (claude/theme-choice-046 on claude/settings-widgets-entry 3db76ca)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        }
+      ],
+      "id": "theme-choice-046",
+      "implementation_ref": "git:595ed65+6335006+99becf9 (claude/theme-choice-046 on claude/settings-widgets-entry 3db76ca)",
+      "question": "How does a user choose light or dark inside RepoGlance, and which surfaces honour it?",
+      "rationale": "Maintainer 2026-09-30: noticed the app already follows the phone, weighed a link-out to Display settings and doing nothing, and chose an in-app choice. Android's dark theme guide recommends in-app Light/Dark/System default with System default as the default; there is no public intent for the system Dark theme page (only ACTION_DISPLAY_SETTINGS). Per-app night mode over a Compose-only override so the start window and system bars never mismatch. Widgets stay with the system because they sit on the system home screen beside other apps.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [],
+      "review_ref": null,
+      "review_result": null,
+      "review_source_identity": null,
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T00:51:51+00:00",
+      "verification_ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md"
     }
   ],
   "last_activation": {
@@ -5025,5 +5094,5 @@
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T00:48:19+00:00"
+  "updated_at": "2026-10-01T00:51:51+00:00"
 }
