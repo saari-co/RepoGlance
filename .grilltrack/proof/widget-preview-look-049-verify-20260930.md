@@ -274,8 +274,58 @@ preview, capture
 `56ec6e25d36ea472d354c9ea8baf950f844a598c55c4d4bbc3386d25d99f5b6c`; nothing
 added (`dumpsys appwidget`: 5, 4, 2); `cleanup` afterwards.
 
+## Android 14 smoke (ClawSweeper merge risk, 2026-10-01)
+
+ClawSweeper's review of `64e229e` left one merge risk: the static preview had
+not run on Android 12–14. The maintainer approved downloading
+`system-images;android-34;google_apis;arm64-v8a` (`arm64-v8a-34_r14.zip`,
+1.61 GB, dl.google.com) and an AVD `RepoGlance_API34` (Pixel 7 profile).
+The Fold emulator was stopped first; the serial stays `EMULATOR37X1X11X0`
+(`devices.tsv` notes the AVD). Android 14 (API 34), launcher
+`com.google.android.apps.nexuslauncher`, no RepoGlance widgets placed
+before. Build: merge commit `a9a04fe` (origin/main #55 merged in), APK
+`29bbdba96ef3e439148d3fd062270414eac0742a55e2fcee6891d2c650b85a05`; doctor
+passed. Run `widget-preview-api34`.
+
+- **No generated-preview publish below API 35.** `shared_prefs` holds no
+  `widget_previews.xml` after starts (the `VANILLA_ICE_CREAM` guard).
+- **Real Add, sample mode, light.** Widgets → `widgets-add-repository`:
+  `com.android.launcher3.dragndrop.AddItemActivity`; on Android 14 the dump
+  exposes the preview: `rocket;sample;issues;5;PRs;3;Repository;2 × 1;…;Add
+  to home screen`. `Add to home screen` → `RepoWidgetConfigActivity`
+  (`saari-co/rocket`) → `Save widget` → row `widgets-placed-2`.
+  `widgets-add-pinned`: dump `Pinned · 3;saari-co/rocket;sample;issues 5 ·
+  PRs 3 · review 0;saari-co/api-server;sample;issues 3 · PRs 2 · review
+  0;dinkuskit/infra;sample;issues 2 · PRs 1 · review 0;Pinned repos;4 × 3` →
+  `Add to home screen` → row `widgets-placed-3` (`1 pinned repository`).
+- **Launcher picker = the static copy.** Long-press empty home → `Widgets` →
+  search `RepoGlance` → expand: the dump reads `rocket;sample;issues;5;PRs;3`
+  and `Pinned · 3` over the three sample rows. API 34 has no generated
+  previews, so this is `previewLayout`.
+- **Glance 1.2.0 widgets on Android 14.** `widget-bounds`: `repo 176x104dp
+  rocket | sample | issues | 5` and `stack 368x343dp Pinned · 1 |
+  saari-co/rocket | sample | issues 5 · PRs 3 · review 0` (lazy list rows).
+- **Dark.** `cmd uimode night yes`: sheet, picker and home again, all
+  following the dark dynamic colours; restored to `no`.
+
+| capture | light | dark |
+| --- | --- | --- |
+| sheet, Repository | `87d3bcb623cf36b7612004dde4781c18b323493109f1008de22ff240e8755668` | `a693eabe6c148c6a36038e80e21bf7fb886ec56a8854c616745bcefa6e7752da` |
+| sheet, Pinned repos | `2d8e84dff7736c38ac1157d9b01c66b75eaeab44c9f1c4248eedfe941dc102ed` | `787aa928915776d3616f3c0d3e1cd039484927e03a87ff1fe4b7f73c8df19924` |
+| launcher picker (static copy) | `a9d9f1032c79040309c52196a229c1fdaa0b0998807ee6fc9ea953523127b08f` | `ff887985912ae5075f5426a6e3ce7b738bf4f6db2261e1f5abe2ea1c8302e11c` |
+| home with both widgets | `8e9265c376412c1443bfc25e4d2c291ca333ce7d44c6d02e53d5f02536ec3322` | `11a705cdee394338e43b2db4dde6cf02c302eb4f475f9b1e059ae625973e12df` |
+
+Contact sheet `c449ddbead2c93143037ecd09b50967d3d07f38e0f8c37b4bba5977d8622b2f2`.
+
+- **Cleanup.** Both widgets dragged to `Remove` (a first scripted attempt
+  passed bad coordinates and only shuffled them; the second removed both);
+  `dumpsys appwidget` lists no widgets. `Sign in with GitHub` left sample
+  mode for the Connect screen with no device code; night mode `no`;
+  `cleanup`; the API 34 emulator was shut down. The Fold emulator was left
+  off (it was off before this task).
+
 ## Not proven
 
-- Android 12–14 (the `previewLayout` path there) — no such device was run.
+- Android 12–13 (the `previewLayout` path there) — not run; Android 14 above.
 - The pre-lock app-icon sheet was not re-captured; with `previewLayout`
   declared it can no longer appear.

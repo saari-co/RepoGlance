@@ -37,4 +37,4 @@ Preconditions:
 - `Add to home screen` on a sheet the debug picker opened places a real widget (entry `A` also opens the Repository setup); swipe the sheet away instead.
 - On the Pixel 10 Pro XL a 2 × 1 preview leaves blank space under `PRs`, as a placed compact widget does at that cell height.
 - Local debug builds all carry versionCode 1, so the publish stamp reads `1.<look>` on every build. After changing the preview, bump `WidgetPreviews.LOOK_VERSION` or `Remove generated previews` in the debug picker, or the launcher picker can keep an older generated preview.
-- The static copy was seen only on API 36 after removing the generated previews; no Android 12–14 device has been run.
+- The static copy was seen on API 36 after removing the generated previews and on the approved Android 14 AVD (`RepoGlance_API34`, same emulator serial; run one emulator at a time), where it is the only picker preview. On Android 14 the launcher exposes the sheet and picker preview text to `uiautomator dump`, so it can be asserted from a dump there. Android 12–13 have not been run.

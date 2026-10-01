@@ -79,8 +79,9 @@ Available on `main`, with device proof in [`proof/`](proof/) and
   gets a preview generated from the widgets; without one the launcher falls
   back to a static copy. Verified on a Pixel 10 Pro XL (Android 17, dark,
   live session) and on the emulator (Android 16, light and dark, sample
-  mode), including the static copy after removing the generated preview.
-  Android 12–14, where only the static copy applies, has not been run.
+  mode), including the static copy after removing the generated preview,
+  and on an Android 14 emulator (light and dark), where the static copy is
+  the only picker preview. Android 12–13 have not been run.
 - **Read-only.** RepoGlance performs no GitHub writes of any kind.
 
 Not available yet:
