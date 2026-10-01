@@ -49,7 +49,7 @@ Available on `main`, with device proof in [`proof/`](proof/) and
   screen, with no GitHub account and no network call.
   - The repo and stack widgets can be set up from the sample repositories
     and show `sample` where a live widget shows its time. The Quick Settings
-    tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, never
+    tile reads `Sample data · <repo> · <age>`. Their taps open RepoGlance, never
     GitHub.
   - Sample mode stays until the user chooses **Sign in with GitHub**, which
     also clears the sample widget setups.
@@ -64,6 +64,8 @@ Not available yet:
 - Account-wide and organization-wide issue navigation with the Mine,
   Mentions and Awaiting-my-review filters. On live data the navigator is per
   repository today.
+- An in-app light/dark/system theme choice, and a Settings screen with a
+  Widgets entry. The app follows the system theme today.
 - Google Play distribution ([#7](https://github.com/saari-co/RepoGlance/issues/7)).
   Revoking the earlier prototype client secret remains maintainer-gated.
 

@@ -81,7 +81,11 @@ First test build. Sign in with GitHub's device flow, pin the repositories you sh
 
 Nothing here is committed as an image (AGENTS.md). The Play-ready files and
 their SHA-256s are in the private asset release
-[`repoglance-play-listing-20260930`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930).
+[`repoglance-play-listing-20260930-040`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930-040).
+It holds the retake after `sample-marker-040` (#49), and those files are
+live in Console since 2026-09-30. The earlier release
+`repoglance-play-listing-20260930` is kept unchanged as evidence, and the
+first two proof sections hash its files.
 Capture proof is in
 [proof/play-listing-20260930/PROOF.md](../proof/play-listing-20260930/PROOF.md).
 
@@ -100,11 +104,15 @@ Capture proof is in
 - **All screenshots are sample mode.** Every one comes from **Explore with
   sample data**, so none shows a real account's repositories. The repository
   names sit under the maintainer's own accounts (`saari-co`, `dinkuskit`,
-  `saariuslystoned`), and each screenshot carries the `SAMPLE` bar.
-- **The marker is provisional.** The screenshots show today's `SAMPLE`
-  marker, whose look is still provisional (`sample-marker-040`). If that
-  round changes it, retake the screenshots before `play-app-access-041` is
-  closed.
+  `saariuslystoned`).
+  - Screenshots 1–4 and the fold references carry the `SAMPLE` banner.
+  - Screenshot 5 is the signed-out Connect screen, showing the **Explore
+    with sample data** entry. It has no banner because sample mode is not
+    on yet.
+  - Screenshots 6 and 7 show the sample widgets and the tile.
+- **The marker is locked.** The screenshots show the `sample-marker-040`
+  look (#49): the tonal banner in the app, and tertiary `sample` bands on the
+  widgets.
 - **Icon.** The icon is the ringed commit-eye, rendered from the adaptive
   launcher icon's background and foreground vectors over the full 108 dp
   canvas. This is what Android Studio's Play Store icon export does.
@@ -115,11 +123,11 @@ Capture proof is in
   render showed only one catalog row under the header, so it was not used
   (see the proof).
 - **Widgets and tile.** Screenshots 6 and 7 come from sample mode on `main`
-  after #45.
+  after #49.
   - Screenshot 6 shows the stack widget with two sample pins, and the repo
     widget resized tall, on the launcher's second page.
   - Screenshot 7 shows the Quick Settings panel with the tile widened to
-    show its `Sample · saari-co/rocket · 25m` subtitle; the system cuts it
+    show its `Sample data · saari-co/rocket · 25m` subtitle; the system cuts it
     off at the edge.
   - Every widget's time slot reads `sample`.
 
@@ -144,23 +152,35 @@ https://saari-co.github.io/RepoGlance/privacy/
 
 ### App access
 
-- Choose **All or some functionality in my app is restricted**, because live
-  data needs a GitHub sign-in.
-- Add one set of instructions.
-- Leave the username and password empty. If the form requires them, put
-  `Not required` in both.
+In Console this is now **Sign in details** ("previously called App access").
+Saved 2026-09-30.
 
+- **Is any part of your app restricted?** Yes, because live data needs a
+  GitHub sign-in.
+- **One set of sign in details.** Username and password are left empty.
 - **Name:**
 
   ```
   Sample mode (no credentials needed)
   ```
 
-- **Any other information** (912 characters):
+- **Any other information required to access your app** (Console caps this
+  at 500 characters; 442 used):
 
   ```
-  No credentials are needed. On the first screen, tap "Explore with sample data". This opens the app's real catalog, repository view and issue/PR lists on seven made-up repositories, marked SAMPLE, with no network requests. Try: filter "Account or organization" by dinkuskit, search for "rocket", pin saari-co/rocket, and open it to switch between Issues, PRs and Both. Tapping a sample item shows "Sample item — not on GitHub". Widgets: from the home screen's widget picker, add a RepoGlance widget; its setup lists the sample repositories, and the stack widget lists your sample pins. Each widget shows "sample" where a live widget shows its time. Quick Settings: edit the tiles and add RepoGlance; it reads "Sample · <repository> · <age>" and opens the app. Tap "Sign in with GitHub" to leave sample mode. Signing in with a real GitHub account shows the same screens and widgets for that account's repositories.
+  No credentials needed. On the first screen tap "Explore with sample data": the real catalog, repository view and issue/PR lists open on 7 made-up repositories marked SAMPLE, with no network use. Widgets: add a RepoGlance widget from the widget picker; its setup lists the sample repositories and it shows "sample" as its time. Quick Settings: add the RepoGlance tile; it shows the latest sample push. "Sign in with GitHub" leaves sample mode.
   ```
+
+- **"Sign in details in this declaration provide full access to all the
+  features and content within this app, including premium or paid
+  content":** ticked (maintainer decision).
+  - Sample mode reaches every screen, both widgets and the tile.
+  - Nothing is paid.
+  - What it cannot show is completing GitHub sign-in or a real account's
+    live data.
+- **"Allowing Google to use these sign-in details for testing on Google and
+  trusted partner devices":** left on, the default (maintainer decision). The
+  details hold no credentials.
 
 If review asks for credentials anyway, the fallback decided on 2026-09-29 is
 a dedicated reviewer GitHub account. That is a maintainer action.
@@ -206,7 +226,10 @@ a dedicated reviewer GitHub account. That is a maintainer action.
 
 - **Target age groups:** 18 and over only. This is a developer utility; the
   privacy policy says it is not directed at children.
-- **Could the store listing unintentionally appeal to children:** No
+- **Saved 2026-09-30.** The target age is 18 and over only. The optional
+  "Restrict users that Google has determined to be minors" was left
+  unticked. With 18+ only, Console skipped the App details, Ads and Store
+  presence steps, so it never asked the "appeals to children" question.
 
 ### Data safety
 

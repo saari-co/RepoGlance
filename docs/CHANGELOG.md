@@ -7,7 +7,7 @@ release-notes body used for that tag's GitHub Release — see
 ## 0.4.0-beta.1
 
 First Google Play candidate (closed testing). Everything merged since
-`v0.3.0-beta.1`, #6 through #45. RepoGlance stays read-only: it never
+`v0.3.0-beta.1`, #6 through #49. RepoGlance stays read-only: it never
 changes anything on GitHub.
 
 **Sign-in**
@@ -39,6 +39,8 @@ changes anything on GitHub.
 - Pinned repositories refresh about every 30 minutes while a network is
   available, through WorkManager, within a visible GitHub rate-limit budget.
   There is no wake lock and no foreground service (#22, #29).
+- Disconnecting GitHub or cancelling sign-in now always redraws placed
+  widgets, so they never keep the previous live counts after sign-out (#46).
 - Widgets redraw from saved data after an app update and read their stores
   off the main thread (#24, #26). Their look now matches the app (#39), and
   the widget picker describes only what the widget shows (#40).
@@ -51,10 +53,14 @@ changes anything on GitHub.
   call (#43).
 - In sample mode, the repo and stack widgets are set up from the sample
   repositories and show `sample` where the time would be. The Quick Settings
-  tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, and
+  tile reads `Sample data · <repo> · <age>`. Their taps open RepoGlance, and
   sample mode never refreshes in the background. Signing in clears the
   sample widget setups. An unconfigured repo widget now says `Tap to choose
   a repository` and opens its setup (#45).
+- The sample marker is a tonal banner under the header. It reads `SAMPLE`,
+  "These repositories are made up. Sign in to see your own GitHub." and has
+  a **Sign in with GitHub** button. Sample widgets carry a tertiary `sample`
+  capsule or header band; live widgets are unchanged (#49).
 
 **Look**
 - Ringed commit-eye launcher icon, a themed monochrome glyph, and a start
@@ -80,6 +86,9 @@ changes anything on GitHub.
 - The return over the GitHub tab can need a manual switch back after a slow
   authorization (#32).
 - The start-window colour on Android 12 and 13 is approximate and unverified.
+- There is no in-app light/dark choice (the app follows the system theme)
+  and no Settings screen with a Widgets entry yet. Both are planned before
+  production.
 
 ## 0.3.0
 
