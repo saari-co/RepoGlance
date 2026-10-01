@@ -299,5 +299,8 @@ the local SHA-256s.
 - `Sample data · saari-co/rocket · 25m` is present for the tile;
 - `saari-co/RepoGlance` appears in none of them.
 
-**Console still shows the pre-#49 assets.** Swapping in these files is a
-separate, maintainer-approved step (see `proof/play-console-20260930`).
+**Console.** When this retake was made, Console still showed the
+pre-#49 assets. The maintainer then approved the swap. These files are now
+live in the listing; see "Asset swap after #49" in
+`proof/play-console-20260930/PROOF.md` for the saved slots, read back in
+order.
