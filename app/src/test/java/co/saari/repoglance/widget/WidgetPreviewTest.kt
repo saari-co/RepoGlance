@@ -2,6 +2,8 @@ package co.saari.repoglance.widget
 
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.testing.unit.runGlanceAppWidgetUnitTest
 import androidx.glance.color.ColorProvider
 import androidx.glance.testing.unit.assertHasTextEqualTo
@@ -17,6 +19,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.util.Locale
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -46,6 +49,7 @@ class WidgetPreviewTest {
 
     @Test
     fun theRepositoryPreviewIsTheCompactSampleWidgetWithoutAClock() = runGlanceAppWidgetUnitTest {
+        setAppWidgetSize(REPOSITORY_MIN)
         provideComposable { WidgetPreviewContent(WidgetPreviewKind.REPOSITORY, data, tones, Intent()) }
         onNode(hasTestTag(SAMPLE_CAPSULE_TAG)).assertHasTextEqualTo(SAMPLE_TIME_LABEL)
         onNode(hasTextEqualTo("rocket")).assertExists()
@@ -53,10 +57,12 @@ class WidgetPreviewTest {
         onNode(hasTextEqualTo("3")).assertExists()
         onAllNodes(hasText("14:05")).assertCountEquals(0)
         onAllNodes(hasTestTag(LEDGER_FRESHNESS_TAG)).assertCountEquals(0)
+        onAllNodes(hasTextEqualTo("to review")).assertCountEquals(0)
     }
 
     @Test
     fun thePinnedPreviewIsTheSampleStackWithSampleInEveryRow() = runGlanceAppWidgetUnitTest {
+        setAppWidgetSize(PINNED_MIN)
         provideComposable { WidgetPreviewContent(WidgetPreviewKind.PINNED_REPOS, data, tones, Intent()) }
         onNode(hasTestTag(STACK_HEADER_TAG)).assertHasTextEqualTo("Pinned · 3")
         onAllNodes(hasTestTag(STACK_AGE_TAG)).assertCountEquals(3)
@@ -71,10 +77,20 @@ class WidgetPreviewTest {
             Instant.parse("2026-10-09T21:40:00Z"),
             ClockLabel(ZoneOffset.UTC, is24Hour = false, locale = Locale.US),
         )
+        setAppWidgetSize(PINNED_MIN)
         provideComposable { WidgetPreviewContent(WidgetPreviewKind.PINNED_REPOS, later, tones, Intent()) }
         onAllNodes(hasText("PM")).assertCountEquals(0)
         onAllNodes(hasText("as of")).assertCountEquals(0)
         onAllNodes(hasTextEqualTo(SAMPLE_TIME_LABEL)).assertCountEquals(3)
+    }
+
+    @Test
+    fun aPreviewIsPublishedWhenMissingOrWhenTheStampMoves() {
+        assertTrue(WidgetPreviews.isDue(published = false, stored = "1.1", stamp = "1.1"))
+        assertTrue(WidgetPreviews.isDue(published = true, stored = null, stamp = "1.1"))
+        assertTrue(WidgetPreviews.isDue(published = true, stored = "1.1", stamp = "2.1"))
+        assertTrue(WidgetPreviews.isDue(published = true, stored = "1.1", stamp = "1.2"))
+        assertFalse(WidgetPreviews.isDue(published = true, stored = "1.1", stamp = "1.1"))
     }
 
     @Test
@@ -94,6 +110,11 @@ class WidgetPreviewTest {
             assertEquals(SAMPLE_TIME_LABEL, stackRowAge(entry.snapshot, data.freshness))
         }
         assertEquals(data.entries.size, strings.keys.count { Regex("widget_preview_pin_[0-9]+").matches(it) })
+    }
+
+    private companion object {
+        val REPOSITORY_MIN = DpSize(140.dp, 40.dp)
+        val PINNED_MIN = DpSize(250.dp, 180.dp)
     }
 
     private fun source(relative: String): String =

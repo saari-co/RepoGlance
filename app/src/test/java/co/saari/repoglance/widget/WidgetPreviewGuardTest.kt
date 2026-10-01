@@ -70,6 +70,31 @@ class WidgetPreviewGuardTest {
             "AppPrefs",
         )
         stores.forEach { assertFalse("previews are sample data only: $it", preview.contains(it)) }
+        val drawn = listOf(
+            "RepoWidget.kt" to "internal fun CompactContent(",
+            "RepoWidget.kt" to "private fun CompactSlot(",
+            "RepoWidget.kt" to "private fun CompactCounts(",
+            "RepoWidget.kt" to "private fun MergedCounts(",
+            "RepoWidget.kt" to "internal fun LedgerRow(",
+            "RepoWidget.kt" to "internal fun compactFreshnessLabel(",
+            "RepoWidget.kt" to "internal fun widgetClock(",
+            "StackWidget.kt" to "internal fun StackHeader(",
+            "StackWidget.kt" to "internal fun StackRow(",
+            "StackWidget.kt" to "internal fun stackRowAge(",
+            "StackWidget.kt" to "internal fun stackRowCounts(",
+            "StackWidget.kt" to "internal fun stackHeaderLabel(",
+            "WidgetLook.kt" to "internal fun FreshnessText(",
+            "WidgetLook.kt" to "fun of(context: Context): WidgetTones {",
+            "SampleWidgetMarks.kt" to "internal fun SampleCapsule(",
+            "SampleWidgetData.kt" to "object SampleWidgetData {",
+        )
+        for ((file, start) in drawn) {
+            val text = source("$widgetDir/$file")
+            val from = text.indexOf(start)
+            assertTrue("missing anchor in $file: $start", from >= 0)
+            val body = text.substring(from).substringBefore("\n}\n")
+            stores.forEach { assertFalse("$start in $file draws a preview and must not read $it", body.contains(it)) }
+        }
         assertTrue(preview.contains("freshness = WidgetFreshness(now = now, clock = clock, rateLimitedUntil = null, sample = true)"))
     }
 
@@ -79,16 +104,27 @@ class WidgetPreviewGuardTest {
         assertTrue(pinning.contains("preview = WidgetSheetPreview(WidgetPreviewKind.REPOSITORY)"))
         assertTrue(pinning.contains("preview = WidgetSheetPreview(WidgetPreviewKind.PINNED_REPOS)"))
         assertEquals(2, Regex("requestPinGlanceAppWidget\\(").findAll(pinning).count())
-        assertTrue("the sheet preview is composed off the main thread", pinning.contains("withContext(Dispatchers.Default)"))
+        assertTrue("the sheet preview is composed off the main thread", pinning.contains("withContext(Dispatchers.Default) { pin(context, glance, kind) }"))
+        val request = pinning.substringAfter("suspend fun request(").substringBefore("private suspend fun pin(")
+        assertTrue("a pin request that fails or loses the foreground returns false", request.contains("} catch (_: Exception) {\n            false\n        }"))
+        assertTrue(request.contains("} catch (cancelled: CancellationException) {\n            throw cancelled"))
     }
 
     @Test
     fun generatedPreviewsArePublishedOncePerStampForTheHomeScreenOnly() {
         val publish = preview.substringAfter("suspend fun publishIfNeeded(context: Context) {").substringBefore("\n    }\n")
         assertTrue(publish.contains("Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) return"))
-        assertTrue(publish.contains("isPublished(info) && prefs.getString(receiver.java.name, null) == stamp()"))
+        assertTrue(publish.contains("isDue(published, prefs.getString(receiver.java.name, null), stamp())"))
         assertTrue(publish.contains("intSetOf(AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN)"))
-        assertTrue("a rate-limited call stores nothing and retries on the next start", publish.contains("if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {"))
+        assertTrue(
+            "a rate-limited or failed call stores nothing and retries on the next start",
+            publish.contains("if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {\n" +
+                "                prefs.edit { putString(receiver.java.name, stamp()) }"),
+        )
+        assertEquals("every system call in the start-up publish is caught", 2, Regex("attempt \\{").findAll(publish).count())
+        val attempt = preview.substringAfter("private suspend fun <T> attempt(").substringBefore("\n\n")
+        assertTrue(attempt.contains("catch (cancelled: CancellationException) {\n            throw cancelled"))
+        assertTrue(attempt.contains("catch (_: Exception) {\n            null"))
         assertTrue(preview.contains("fun stamp(): String = \"\${BuildConfig.VERSION_CODE}.\$LOOK_VERSION\""))
         val app = source("app/src/main/java/co/saari/repoglance/RepoGlanceApplication.kt")
         assertTrue(app.contains("CoroutineScope(SupervisorJob() + Dispatchers.IO).launch { WidgetPreviews.publishIfNeeded(app) }"))

@@ -13,8 +13,9 @@ not a version, so the release workflow does not read it.
 - The launcher's *Add to home screen* sheet and its widget picker show a
   preview of each widget instead of the app icon: the sample Repository and
   Pinned repos widgets, marked `sample`, with no clock time. On Android 15+
-  the picker uses a preview generated from the widgets themselves; earlier
-  versions use a static copy. Both follow dynamic colour and light/dark.
+  the picker uses a preview generated from the widgets themselves, with a
+  static copy as the fallback (seen on Android 16; Android 12–14 not yet
+  run). Both follow dynamic colour and light/dark.
 - Built on Glance 1.2.0 (from 1.1.1).
 
 ## 0.4.0-beta.1

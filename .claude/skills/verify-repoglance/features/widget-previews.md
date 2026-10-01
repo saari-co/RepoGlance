@@ -36,3 +36,5 @@ Preconditions:
 - The sheet and picker preview are the same sample on a live session; they never show the maintainer's repositories, so a capture of them is safe to keep.
 - `Add to home screen` on a sheet the debug picker opened places a real widget (entry `A` also opens the Repository setup); swipe the sheet away instead.
 - On the Pixel 10 Pro XL a 2 × 1 preview leaves blank space under `PRs`, as a placed compact widget does at that cell height.
+- Local debug builds all carry versionCode 1, so the publish stamp reads `1.<look>` on every build. After changing the preview, bump `WidgetPreviews.LOOK_VERSION` or `Remove generated previews` in the debug picker, or the launcher picker can keep an older generated preview.
+- The static copy was seen only on API 36 after removing the generated previews; no Android 12–14 device has been run.

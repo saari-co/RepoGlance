@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.collection.intSetOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,6 +29,7 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.RepoRef
 import co.saari.repoglance.model.RepoSnapshot
 import co.saari.repoglance.render.ClockLabel
+import kotlinx.coroutines.CancellationException
 import java.time.Instant
 import kotlin.reflect.KClass
 
@@ -61,26 +63,43 @@ object WidgetPreviews {
 
     fun stamp(): String = "${BuildConfig.VERSION_CODE}.$LOOK_VERSION"
 
+    internal fun isDue(published: Boolean, stored: String?, stamp: String): Boolean = !published || stored != stamp
+
     suspend fun publishIfNeeded(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) return
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val providers = AppWidgetManager.getInstance(context).getInstalledProvidersForPackage(context.packageName, null)
         val glance = GlanceAppWidgetManager(context)
         val due = RECEIVERS.filter { receiver ->
-            val info = providers.firstOrNull { it.provider == ComponentName(context, receiver.java) }
-            info != null && !(isPublished(info) && prefs.getString(receiver.java.name, null) == stamp())
+            val published = attempt { publishedState(context, receiver) }
+            published != null && isDue(published, prefs.getString(receiver.java.name, null), stamp())
         }
-        for (receiver in due) {
-            val result = glance.setWidgetPreviews(receiver, intSetOf(AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN))
+        due.forEach { receiver ->
+            val result = attempt {
+                glance.setWidgetPreviews(receiver, intSetOf(AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN))
+            }
             if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {
                 prefs.edit { putString(receiver.java.name, stamp()) }
             }
         }
     }
 
-    private fun isPublished(info: AppWidgetProviderInfo): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM &&
-            info.generatedPreviewCategories and AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN != 0
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private fun publishedState(context: Context, receiver: KClass<out GlanceAppWidgetReceiver>): Boolean? {
+        val info = AppWidgetManager.getInstance(context)
+            .getInstalledProvidersForPackage(context.packageName, null)
+            .firstOrNull { it.provider == ComponentName(context, receiver.java) }
+            ?: return null
+        return info.generatedPreviewCategories and AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN != 0
+    }
+
+    private suspend fun <T> attempt(block: suspend () -> T): T? =
+        try {
+            block()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
 
     private const val PREFS_NAME = "widget_previews"
     private val RECEIVERS: List<KClass<out GlanceAppWidgetReceiver>> =
