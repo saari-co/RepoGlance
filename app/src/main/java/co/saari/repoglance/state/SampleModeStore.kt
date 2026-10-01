@@ -8,12 +8,15 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.core.content.edit
+import co.saari.repoglance.sample.SamplePersona
+import co.saari.repoglance.ui.theme.SampleMarker
 import co.saari.repoglance.widget.RepoWidgetConfig
 import co.saari.repoglance.widget.RepoWidgetConfigStore
 
 object SampleModeStore {
     internal const val PREFS_NAME = "repoglance_sample"
-    private const val KEY_ACTIVE = "active"
+    internal const val KEY_ACTIVE = "active"
+    internal const val KEY_SHOWCASE = "showcase"
     private const val KEY_PINS = "pins"
     private const val WIDGET_PREFIX = "widget."
     private const val REPO_SUFFIX = ".repo"
@@ -23,6 +26,15 @@ object SampleModeStore {
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun isActive(context: Context): Boolean = prefs(context).getBoolean(KEY_ACTIVE, false)
+
+    fun isShowcase(context: Context): Boolean =
+        isActive(context) && prefs(context).getBoolean(KEY_SHOWCASE, false)
+
+    fun marker(context: Context): SampleMarker =
+        if (isShowcase(context)) SampleMarker.NONE else SampleMarker.Default
+
+    fun persona(context: Context): SamplePersona =
+        if (isShowcase(context)) SamplePersona.SHOWCASE else SamplePersona.SAMPLE
 
     fun enter(context: Context) {
         prefs(context).edit { putBoolean(KEY_ACTIVE, true) }

@@ -30,8 +30,9 @@ class RepoGlanceTileService : TileService() {
         io.execute {
             val now = Instant.now()
             val text = if (SampleModeStore.isActive(this)) {
-                val latest = latestPushRecordFor(SampleAccount.catalog(now).repositories, now)
-                TileTexts.sample(latest, now, locked = locked)
+                val latest =
+                    latestPushRecordFor(SampleAccount.catalog(now, SampleModeStore.persona(this)).repositories, now)
+                TileTexts.sample(latest, now, locked = locked, marker = SampleModeStore.marker(this))
             } else {
                 TileTexts.of(LatestPushStore.load(this), now, locked = locked)
             }

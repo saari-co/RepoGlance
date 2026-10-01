@@ -19,7 +19,7 @@ internal const val SAMPLE_CAPSULE_TAG = "sample-capsule"
 
 @Composable
 internal fun sampleMarker(freshness: WidgetFreshness): SampleMarker? =
-    if (freshness.sample) LocalSampleMarker.current else null
+    if (freshness.sample) freshness.sampleMarker ?: LocalSampleMarker.current else null
 
 @Composable
 internal fun SampleCapsule(text: String, modifier: GlanceModifier = GlanceModifier) {

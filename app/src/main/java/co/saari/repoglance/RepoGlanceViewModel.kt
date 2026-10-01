@@ -29,6 +29,7 @@ import co.saari.repoglance.state.LiveSnapshotStore
 import co.saari.repoglance.state.RateLimitStore
 import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.state.latestPushRecordFor
+import co.saari.repoglance.ui.theme.SampleMarker
 import co.saari.repoglance.widget.RepoWidgetConfigStore
 import co.saari.repoglance.widget.WidgetRefresh
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +54,7 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
     val selectedRepository = mutableStateOf<LiveRepository?>(null)
     val repositoryContent = mutableStateOf<ContentUiState>(ContentUiState.Idle)
     val sampleMode = mutableStateOf(false)
+    val sampleMarker = mutableStateOf(SampleMarker.Default)
     private var pendingRepositoryFull: String? = null
 
     private val services = LiveGitHub.services(application)
@@ -169,10 +171,11 @@ class RepoGlanceViewModel(application: Application) : AndroidViewModel(applicati
             pendingRepositoryFull = null
         }
         sampleMode.value = active
+        sampleMarker.value = if (active) SampleModeStore.marker(context) else SampleMarker.Default
         if (active) {
             val now = Instant.now()
             liveState.value = LiveUiState.Ready(
-                catalog = SampleAccount.catalog(now),
+                catalog = SampleAccount.catalog(now, SampleModeStore.persona(context)),
                 observedAt = now,
                 rateLimit = SampleAccount.RATE_LIMIT,
             )

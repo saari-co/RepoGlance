@@ -88,7 +88,9 @@ class SampleWidgetsGuardTest {
     fun sampleSetupListsSampleReposPinsSampleAndNeverRefreshesFromGitHub() {
         val load = section(setup, "internal fun loadWidgetSetup(", "\ninternal const val")
         val sampleLoad = section(load, "if (SampleModeStore.isActive(context)) {", "} else {")
-        assertTrue(sampleLoad.contains("SampleWidgetData.configurationList(SampleModeStore.pins(context)"))
+        assertTrue(sampleLoad.contains("SampleWidgetData.configurationList("))
+        assertTrue(sampleLoad.contains("SampleModeStore.pins(context),"))
+        assertTrue("the setup lists the phone's persona (showcase-048)", sampleLoad.contains("SampleModeStore.persona(context),"))
         assertTrue(sampleLoad.contains("SampleModeStore.widgetConfig(context, appWidgetId)"))
         for (store in liveStores) assertFalse("sample setup must not read $store", sampleLoad.contains(store))
 

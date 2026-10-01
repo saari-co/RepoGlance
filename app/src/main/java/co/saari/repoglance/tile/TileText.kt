@@ -42,12 +42,13 @@ object TileTexts {
         locked: Boolean = false,
         marker: SampleMarker = SampleMarker.Default,
     ): TileText {
+        if (marker == SampleMarker.NONE) return of(latest, now, locked)
         if (locked) return TileText(LOCKED, active = true, contentDescription = "$LABEL, $LOCKED")
         if (latest == null) return TileText(SAMPLE, active = true, contentDescription = "$LABEL, sample data")
         val repo = Sanitize.displayText(latest.repoFull)
         val prefix = when (marker) {
             SampleMarker.CHIP_ROW -> SAMPLE
-            SampleMarker.BANNER -> SAMPLE_DATA
+            SampleMarker.BANNER, SampleMarker.NONE -> SAMPLE_DATA
         }
         return TileText(
             "$prefix · $repo · ${Ages.format(latest.pushedAt, now)}",

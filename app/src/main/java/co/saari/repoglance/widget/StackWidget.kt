@@ -98,12 +98,19 @@ internal fun readStackWidgetData(context: Context): StackWidgetData =
 
 internal fun readSampleStackWidgetData(context: Context): StackWidgetData {
     val now = Instant.now()
+    val persona = SampleModeStore.persona(context)
     return StackWidgetData(
         entries = StackRows.order(
             pins = SampleModeStore.pins(context),
-            catalogPushedAt = SampleWidgetData.pushedAt(now),
-        ) { SampleWidgetData.snapshot(it, now) },
-        freshness = WidgetFreshness(now = now, clock = widgetClock(context), rateLimitedUntil = null, sample = true),
+            catalogPushedAt = SampleWidgetData.pushedAt(now, persona),
+        ) { SampleWidgetData.snapshot(it, now, persona) },
+        freshness = WidgetFreshness(
+            now = now,
+            clock = widgetClock(context),
+            rateLimitedUntil = null,
+            sample = true,
+            sampleMarker = SampleModeStore.marker(context),
+        ),
     )
 }
 
@@ -174,7 +181,7 @@ internal fun stackRowCounts(snapshot: RepoSnapshot?): String? {
 internal fun stackRowAge(snapshot: RepoSnapshot?, freshness: WidgetFreshness): String {
     val observedAt = snapshot?.observedAt
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
-    if (freshness.sample) return SAMPLE_TIME_LABEL
+    if (freshness.showsSampleLabel) return SAMPLE_TIME_LABEL
     val clock = freshness.clock.format(observedAt, freshness.now)
     return if (snapshot.valueBasis == ValueBasis.LAST_GOOD) "last good $clock" else clock
 }

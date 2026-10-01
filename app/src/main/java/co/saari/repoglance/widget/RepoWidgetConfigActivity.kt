@@ -182,7 +182,11 @@ internal fun loadWidgetSetup(context: Context, appWidgetId: Int): WidgetSetup =
     if (SampleModeStore.isActive(context)) {
         WidgetSetup(
             sample = true,
-            repos = SampleWidgetData.configurationList(SampleModeStore.pins(context), Instant.now()),
+            repos = SampleWidgetData.configurationList(
+                SampleModeStore.pins(context),
+                Instant.now(),
+                SampleModeStore.persona(context),
+            ),
             saved = SampleModeStore.widgetConfig(context, appWidgetId),
         )
     } else {

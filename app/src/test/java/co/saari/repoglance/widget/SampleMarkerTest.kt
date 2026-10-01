@@ -29,7 +29,26 @@ class SampleMarkerTest {
     @Test
     fun theLockedTonalBannerIsTheProductionMarker() {
         assertEquals(SampleMarker.BANNER, SampleMarker.Default)
-        assertEquals(listOf(SampleMarker.CHIP_ROW, SampleMarker.BANNER), SampleMarker.entries.toList())
+        assertEquals(
+            "NONE is the debug-only showcase (showcase-048), never the default",
+            listOf(SampleMarker.CHIP_ROW, SampleMarker.BANNER, SampleMarker.NONE),
+            SampleMarker.entries.toList(),
+        )
+    }
+
+    @Test
+    fun theShowcaseIsWrittenOnlyFromTheDebugSourceSet() {
+        val main = repositoryRoot().resolve("app/src/main/java").toFile().walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .map { it.readText() }
+            .toList()
+        assertTrue("main never writes the showcase key", main.none { it.contains("KEY_SHOWCASE, true") })
+        assertTrue("main never provides NONE itself", main.none { it.contains("provides SampleMarker.NONE") })
+        val launch = source("app/src/debug/java/co/saari/repoglance/devlaunch/ShowcaseLaunch.kt")
+        assertTrue(launch.contains("putBoolean(SampleModeStore.KEY_SHOWCASE, true)"))
+        val screen = source("app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt")
+        val bar = screen.substringAfter("private fun SampleModeBar(").substringBefore("\n}\n")
+        assertTrue("the showcase draws no bar", bar.contains("SampleMarker.NONE -> Unit"))
     }
 
     @Test
@@ -60,6 +79,35 @@ class SampleMarkerTest {
     fun aSampleCompactWidgetPutsSampleInATertiaryCapsule() = runGlanceAppWidgetUnitTest {
         provideComposable { CompactContent(config, SampleWidgetData.snapshot(rocket, now), Intent(), sample) }
         onNode(hasTestTag(SAMPLE_CAPSULE_TAG)).assertHasTextEqualTo(SAMPLE_TIME_LABEL)
+    }
+
+    @Test
+    fun aShowcaseCompactWidgetReadsLikeALiveOne() = runGlanceAppWidgetUnitTest {
+        provideComposable {
+            CompactContent(
+                config,
+                SampleWidgetData.snapshot(rocket, now),
+                Intent(),
+                sample.copy(sampleMarker = SampleMarker.NONE),
+            )
+        }
+        onNode(hasTestTag(LEDGER_FRESHNESS_TAG)).assertHasTextEqualTo("14:05")
+    }
+
+    @Test
+    fun showcaseLabelsCarryNoSampleWord() {
+        val showcase = sample.copy(sampleMarker = SampleMarker.NONE)
+        val snapshot = SampleWidgetData.snapshot(rocket, now)!!
+        assertEquals("14:05", compactFreshnessLabel(snapshot, showcase))
+        assertEquals("14:05", stackRowAge(snapshot, showcase))
+        assertFalse(tallHeaderLabel(snapshot, NavigatorMode.BOTH, showcase).contains(SAMPLE_TIME_LABEL))
+        assertTrue(tallHeaderLabel(snapshot, NavigatorMode.BOTH, showcase).endsWith("as of 14:05"))
+        assertEquals("the banner still says sample", SAMPLE_TIME_LABEL, compactFreshnessLabel(snapshot, sample))
+        assertEquals(
+            "a sample widget without a persisted marker falls back to the composition local",
+            SAMPLE_TIME_LABEL,
+            stackRowAge(snapshot, sample.copy(sampleMarker = null)),
+        )
     }
 
     @Test

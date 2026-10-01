@@ -7,6 +7,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 enum class SampleMarker {
     CHIP_ROW,
     BANNER,
+    NONE,
     ;
 
     companion object {
