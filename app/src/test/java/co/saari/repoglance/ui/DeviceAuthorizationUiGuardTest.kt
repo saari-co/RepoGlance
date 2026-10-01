@@ -15,7 +15,7 @@ class DeviceAuthorizationUiGuardTest {
         val screenSource = readText(
             root.resolve("app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt"),
         )
-        val authorizationScreen = screenSource.substringAfter("private fun AwaitingGitHubScreen(")
+        val authorizationScreen = screenSource.substringAfter("internal fun AwaitingGitHubScreen(")
             .substringBefore("private fun ConnectGitHubScreen(")
 
         assertFalse(

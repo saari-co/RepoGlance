@@ -541,6 +541,14 @@ release builds no longer contain it.
 
 ### `co/saari/repoglance/ui/LiveRepoGlanceScreen.kt`
 
+- `AwaitingGitHubScreen` is `internal` so the debug-only
+  `SignInCodePreviewActivity` can hold the real device-code screen open
+  with a made-up code for repoglance.com's imagery (showcase-048). The
+  production path still reaches it only through
+  `LiveUiState.AwaitingDeviceAuthorization`. Guard:
+  `SignInCodePreviewTest` pins the fixture and the absence of any device
+  flow call in the preview (layer 2).
+
 - Accessibility resource id for the repository search field on the loaded home.
 
 - Accessibility resource id for the owner (account/organization) filter on the loaded home.

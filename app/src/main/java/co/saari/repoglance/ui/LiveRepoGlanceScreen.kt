@@ -190,7 +190,7 @@ fun LiveRepoGlanceScreen(
 }
 
 @Composable
-private fun AwaitingGitHubScreen(
+internal fun AwaitingGitHubScreen(
     userCode: String,
     verificationUri: String,
     expiresAt: Instant,
