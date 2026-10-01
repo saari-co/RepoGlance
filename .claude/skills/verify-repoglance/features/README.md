@@ -73,11 +73,16 @@ required state, commands, and observable proof.
   latest-push subtitle, and the tap that opens the live catalog.
 - [Refresh and freshness](./refresh-freshness.md) covers refresh controls,
   data-age labels, rate-limit state, and a real failed refresh.
-- [Stack widget](./stack-widget.md) covers the large widget over the live
-  pinned set: order, per-row clock times, empty state, and taps.
+- [Pinned repos widget](./stack-widget.md) covers the large widget over the
+  live pinned set (the stack widget in code): order, per-row clock times,
+  empty state, and taps.
 - [Sample mode](./sample-mode.md) covers `Explore with sample data`: the
   made-up repositories on the real screens, its marker, pins, row note, restart
   persistence, the sample widgets and tile, and the exit to sign-in.
+- [Settings and Widgets](./settings-widgets.md) covers the three-dot menu,
+  the Settings screen in each session state, and the Widgets screen: adding
+  both widgets through the launcher, the placed-widget list, changing a
+  widget's repository, and removal.
 - [Theme choice](./theme.md) covers Settings → `Theme`: the `Choose theme`
   dialog, applying `Light`, `Dark` or `System default` to RepoGlance only,
   its start window and restart persistence, and widgets staying on the

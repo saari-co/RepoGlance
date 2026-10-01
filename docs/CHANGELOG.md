@@ -17,7 +17,8 @@ changes anything on GitHub.
   loads. This was proven on a Pixel Fold running Android 17; elsewhere the
   code screen tells you to close the tab (#31).
 - Session start-up and token storage run off the main thread (#16, #28).
-- **Manage GitHub access** is in the header menu (#6).
+- **Manage GitHub access** and **Disconnect GitHub** are in Settings, from
+  the app's menu (#6, #53).
 
 **Catalog and repositories**
 - The live catalog can be filtered by account or organization and searched
@@ -29,11 +30,11 @@ changes anything on GitHub.
   app.
 
 **Widgets and Quick Settings tile**
-- The per-repository widget is set up from the live catalog and shows that
+- The Repository widget is set up from the live catalog and shows that
   repository's saved counts with their age: `last good` when stale, never a
   made-up zero (#12, #21). The compact layout merges counts and has a 140 dp
   minimum width (#41).
-- The stack widget lists every pinned repository, most recent push first
+- The Pinned repos widget lists every pinned repository, most recent push first
   (#23). Tapping a widget opens that repository or the catalog in
   RepoGlance.
 - Pinned repositories refresh about every 30 minutes while a network is
@@ -43,13 +44,17 @@ changes anything on GitHub.
   off the main thread (#24, #26). Their look now matches the app (#39), and
   the widget picker describes only what the widget shows (#40).
 - A Quick Settings tile shows the latest push and opens the catalog (#19).
+- **Widgets** in the app's menu adds the Repository or Pinned repos widget
+  through the launcher's own *Add to home screen* sheet, lists the widgets
+  already placed, and opens a repository widget's setup to change it. The
+  launcher's widget picker uses the same names (#53).
 
 **Sample mode**
 - **Explore with sample data** on the sign-in screen opens the real catalog,
   repository view and navigator on seven made-up repositories. It is marked
   `SAMPLE` on every screen, needs no GitHub account and makes no network
   call (#43).
-- In sample mode, the repo and stack widgets are set up from the sample
+- In sample mode, the Repository and Pinned repos widgets are set up from the sample
   repositories and show `sample` where the time would be. The Quick Settings
   tile reads `Sample · <repo> · <age>`. Their taps open RepoGlance, and
   sample mode never refreshes in the background. Signing in clears the

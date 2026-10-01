@@ -408,3 +408,9 @@
 {"action": "decision_implemented", "at": "2026-10-01T00:51:51+00:00", "data": {"decision_id": "theme-choice-046"}, "event_id": "59667c64-20a3-4e74-a136-9b56dfc93b3e"}
 {"action": "decision_verified", "at": "2026-10-01T00:51:51+00:00", "data": {"decision_id": "theme-choice-046"}, "event_id": "aed4c319-fd20-4ddd-aa4d-8ca6b8ab3d2d"}
 {"action": "decision_reviewed", "at": "2026-10-01T01:08:08+00:00", "data": {"classifications": ["human_gate"], "decision_id": "theme-choice-046", "ref": "file:.grilltrack/proof/theme-choice-046-verify-20260930.md#review", "result": "findings", "reviewed_at": "2026-10-01T01:08:08+00:00", "source_identity": "git:b6fc370cbe21839f0090ac49b526a9c680e4e84d"}, "event_id": "08f255d8-99a2-4e84-91ae-26315b26d6c6"}
+{"action": "decision_implemented", "at": "2026-10-01T01:22:19+00:00", "data": {"decision_id": "settings-044"}, "event_id": "f173e31e-f792-4108-bb3d-3437855e80df"}
+{"action": "decision_verified", "at": "2026-10-01T01:22:20+00:00", "data": {"decision_id": "settings-044"}, "event_id": "dde524e6-ed0f-4475-915d-11adfe298086"}
+{"action": "decision_implemented", "at": "2026-10-01T01:22:20+00:00", "data": {"decision_id": "widgets-entry-045"}, "event_id": "279bf8fe-28ac-46d9-89b6-06b62c7e7096"}
+{"action": "decision_verified", "at": "2026-10-01T01:22:20+00:00", "data": {"decision_id": "widgets-entry-045"}, "event_id": "6f098f92-10b5-481d-b9a7-966a0146002b"}
+{"action": "decision_implemented", "at": "2026-10-01T01:22:20+00:00", "data": {"decision_id": "widgets-look-047"}, "event_id": "686367d5-5fb0-4009-8b10-ddd59535f9e1"}
+{"action": "decision_verified", "at": "2026-10-01T01:22:20+00:00", "data": {"decision_id": "widgets-look-047"}, "event_id": "30007afc-bf83-4b3e-ab65-9c53e3a8aac4"}

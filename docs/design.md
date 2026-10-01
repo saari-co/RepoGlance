@@ -1,6 +1,8 @@
 # Design contract: RepoGlance
 
-- **Version:** 8 (2026-09-30): in-app theme choice [theme-choice-046].
+- **Version:** 9 (2026-09-30): Settings and the Widgets screen
+  [settings-044, widgets-entry-045, widgets-look-047]. Version 8
+  (2026-09-30): in-app theme choice [theme-choice-046].
   Version 7 (2026-09-30): sample marker, tonal banner
   [sample-marker-040]. Version 6 (2026-09-30): sample widgets and the
   unconfigured widget [sample-widgets-039]. Version 5 (2026-09-29): compact widget crowding
@@ -82,6 +84,30 @@
     the phone); a Compose-only override (start window and system bars would
     not follow); widgets following the app; inline segmented buttons.
   - **Proof:** `.grilltrack/proof/theme-choice-046-verify-20260930.md`.
+- **Settings [settings-044]:** the three-dot menu (`More options`) holds
+  exactly `Widgets` and `Settings` on the live and sample catalogs, and
+  `Settings` alone on the Connect screen. Settings is an M3 small top app bar
+  with a back arrow over plain list rows (leading outlined icon, headline,
+  supporting line; a trailing open-in-new icon for links), on the background
+  colour. Section heads are the SECTION mono label in `primary`, sentence
+  case: `Appearance`, `GitHub`, `About`. The Widgets row comes first and is
+  hidden signed out; GitHub (Manage GitHub access, Disconnect GitHub) shows
+  only with a session.
+- **Widgets screen [widgets-entry-045, widgets-look-047, "C preview
+  tiles"]:** the user-facing names are `Repository widget` and `Pinned repos
+  widget` (launcher labels `Repository` and `Pinned repos`); "stack" is never
+  shown. Two tonal tiles sit side by side (24 dp, `surfaceContainer`). Each
+  has a sketch of the widget's shape (rounded `surfaceContainerHighest` frame,
+  a `primary` name bar, `outlineVariant` lines; 2x1 for Repository, 4x3 for
+  Pinned repos), the name, one sentence and a full-width tonal `Add`
+  capsule. `On your home screen` follows as list rows with icons; repository
+  rows carry a chevron and open their setup. The removal hint, sample note
+  and how-to are `bodySmall` in `onSurfaceVariant`.
+  - **Rejected (round 1, do not reintroduce without a new grill):** A add
+    cards above plain rows; B a settings list with + buttons; D placed widgets
+    first with one Add button and a chooser dialog; E a card per widget kind
+    holding its placed widgets.
+  - **Proof:** `.grilltrack/proof/widgets-look-047-verify-20260930.md`.
 - **Typography, body:** M3 default type scale on the system font for
   titles, row text and reading text.
 - **Typography, labels [label-typography-030, "mono labels"]:** every label
@@ -248,6 +274,8 @@
   text buttons and list rows kept M3 in round 3. Not grilled.
 - **Motion signatures:** press spring, ring pulse beyond the checking mark.
   Not grilled.
+- **Settings and Widgets on large screens:** on the Fold's inner display
+  both screens span the full width, rows and tiles included. Not grilled.
 - **Static brand fallback scheme** for devices without dynamic colour. Not
   grilled.
 

@@ -10,12 +10,12 @@ A user connects RepoGlance to GitHub through GitHub's device flow: the app shows
 - `signin-return` brings RepoGlance back over the Custom Tab by itself once the authorization is saved, with no tap on the tab, then lands on the live catalog with the `LIVE` chip.
 - `signin-finishing` shows the RepoGlance mark with its pulsing rings and `Finishing sign-in…`, then `Loading your repositories…`, with no spinner, between authorization and the catalog. The rings keep running across the message change. Refreshing the catalog later still shows the plain spinner.
 - `signin-persist` survives a force-stop and cold start without reconnecting.
-- `signin-disconnect` (`Disconnect GitHub` in the account menu) clears the session.
+- `signin-disconnect` (`Disconnect GitHub` in Settings, after a confirm) clears the session.
 
 ## How to get to it (user POV)
 
 - Open RepoGlance with no session: the sign-in screen is the first screen.
-- From the live catalog, the account menu (`Account and access settings`) offers `Manage GitHub access` and `Disconnect GitHub`.
+- From the live catalog, the three-dot menu → `Settings` → `GitHub` offers `Manage GitHub access` and `Disconnect GitHub` (see [Settings and Widgets](./settings-widgets.md)).
 
 ## Driving it with verify-repoglance
 
