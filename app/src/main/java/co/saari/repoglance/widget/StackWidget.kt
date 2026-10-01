@@ -83,6 +83,9 @@ class StackWidget : GlanceAppWidget() {
             }
         }
     }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) =
+        provideWidgetPreview(context, WidgetPreviewKind.PINNED_REPOS)
 }
 
 internal data class StackWidgetData(

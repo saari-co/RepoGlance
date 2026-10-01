@@ -4,6 +4,20 @@ All notable changes to RepoGlance. Each `## X.Y.Z` section here is the exact
 release-notes body used for that tag's GitHub Release — see
 [RELEASING.md](RELEASING.md).
 
+## Unreleased
+
+Merged after the `v0.4.0-beta.1` tag; not in a release yet. This heading is
+not a version, so the release workflow does not read it.
+
+**Widgets**
+- The launcher's *Add to home screen* sheet and its widget picker show a
+  preview of each widget instead of the app icon: the sample Repository and
+  Pinned repos widgets, marked `sample`, with no clock time. On Android 15+
+  the picker uses a preview generated from the widgets themselves, with a
+  static copy as the fallback (seen on Android 14 and 16; Android 12–13 not
+  yet run). Both follow dynamic colour and light/dark.
+- Built on Glance 1.2.0 (from 1.1.1).
+
 ## 0.4.0-beta.1
 
 First Google Play candidate (closed testing). Everything merged since

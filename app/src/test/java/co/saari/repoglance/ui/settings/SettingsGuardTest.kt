@@ -55,10 +55,10 @@ class SettingsGuardTest {
 
     @Test
     fun pinRequestsGoThroughOneGuardedHelper() {
-        val request = section(pinning, "fun request(context: Context, kind: WidgetKind): Boolean {", "\n    fun setupIntent(")
+        val request = section(pinning, "suspend fun request(context: Context, kind: WidgetKind): Boolean {", "\n    fun setupIntent(")
         val guard = request.indexOf("if (!manager.isRequestPinAppWidgetSupported) return false")
         assertTrue(guard >= 0)
-        assertTrue(guard < request.indexOf("requestPinAppWidget("))
+        assertTrue(guard < request.indexOf("requestPinGlanceAppWidget("))
         assertTrue(
             "the repository widget opens its setup after the launcher adds it",
             request.contains("Intent(context, RepoWidgetConfigActivity::class.java)") && request.contains("FLAG_MUTABLE"),
@@ -66,7 +66,10 @@ class SettingsGuardTest {
         val main = Paths.get("app/src/main/java")
         val callers = Files.walk(repositoryRoot().resolve(main)).use { paths ->
             paths.filter { it.toString().endsWith(".kt") }
-                .filter { Files.readAllBytes(it).toString(Charsets.UTF_8).contains(".requestPinAppWidget(") }
+                .filter { path ->
+                    val text = Files.readAllBytes(path).toString(Charsets.UTF_8)
+                    text.contains(".requestPinAppWidget(") || text.contains(".requestPinGlanceAppWidget(")
+                }
                 .map { it.fileName.toString() }
                 .toList()
         }

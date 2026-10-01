@@ -3,7 +3,7 @@
 # Approved test phones (.claude/skills/verify-repoglance/devices.tsv) over adb only; never drives any other device.
 #
 #   bin/verify-repoglance doctor                 # is this device/build worth driving?
-#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|status-picker|type-picker|shape-picker|widget-look-picker|compact-picker|sample-marker-picker|checking
+#   bin/verify-repoglance launch <scenario> <screen> [repo] [mode] [candidate]   # screen: live|navigator|picker|navigator-picker|splash-picker|status-picker|type-picker|shape-picker|widget-look-picker|compact-picker|sample-marker-picker|widget-preview-picker|checking
 #   bin/verify-repoglance dump [label]           # uiautomator tree -> runs/verify-repoglance-runs/<run>/<label>.xml (+ .txt)
 #   bin/verify-repoglance capture <label>        # inner-display PNG + manifest via phone_proof
 #   bin/verify-repoglance tap <resource-id>      # tap the centre of a node by resource-id (from the last dump)
@@ -150,6 +150,7 @@ launch() {
     widget-look-picker) expect="devpicker.WidgetLookVariantPickerActivity"; marker="family-look" ;;
     compact-picker) expect="devpicker.CompactVariantPickerActivity"; marker="family-look" ;;
     sample-marker-picker) expect="devpicker.SampleMarkerPickerActivity"; marker="sample-marker-040" ;;
+    widget-preview-picker) expect="devpicker.WidgetPreviewPickerActivity"; marker="widget-preview-look-049" ;;
     checking) expect="devlaunch.CheckingPreviewActivity"; marker="repoglance:checking-mark" ;;
     signin-finishing) expect="devlaunch.SignInFinishingPreviewActivity"; marker="repoglance:signin-mark" ;;
     navigator) expect="co.saari.repoglance/.MainActivity"; marker="repoglance:fixture-home" ;;

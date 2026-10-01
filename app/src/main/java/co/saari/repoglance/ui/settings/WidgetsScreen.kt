@@ -76,7 +76,7 @@ fun WidgetsScreen(sampleMode: Boolean, onBack: () -> Unit, modifier: Modifier = 
     WidgetsContent(
         state = state,
         onBack = onBack,
-        onAdd = { kind -> WidgetPinning.request(context, kind) },
+        onAdd = { kind -> scope.launch { WidgetPinning.request(context, kind) } },
         onOpenSetup = { id -> context.startActivity(WidgetPinning.setupIntent(context, id)) },
         modifier = modifier,
     )

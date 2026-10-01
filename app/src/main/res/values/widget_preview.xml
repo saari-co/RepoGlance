@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_preview_background">@android:color/system_neutral1_10</color>
+    <color name="widget_preview_on_background">@android:color/system_neutral1_900</color>
+    <color name="widget_preview_on_surface">@android:color/system_neutral1_900</color>
+    <color name="widget_preview_on_surface_variant">@android:color/system_neutral2_700</color>
+    <color name="widget_preview_tertiary_container">@android:color/system_accent3_100</color>
+    <color name="widget_preview_on_tertiary_container">@android:color/system_accent3_900</color>
+    <string name="widget_preview_repo_name" translatable="false">rocket</string>
+    <string name="widget_preview_sample" translatable="false">sample</string>
+    <string name="widget_preview_issues" translatable="false">issues</string>
+    <string name="widget_preview_prs" translatable="false">PRs</string>
+    <string name="widget_preview_repo_issues" translatable="false">5</string>
+    <string name="widget_preview_repo_prs" translatable="false">3</string>
+    <string name="widget_preview_pinned_header" translatable="false">Pinned · 3</string>
+    <string name="widget_preview_pin_1" translatable="false">saari-co/rocket</string>
+    <string name="widget_preview_pin_1_counts" translatable="false">issues 5 · PRs 3 · review 0</string>
+    <string name="widget_preview_pin_2" translatable="false">saari-co/api-server</string>
+    <string name="widget_preview_pin_2_counts" translatable="false">issues 3 · PRs 2 · review 0</string>
+    <string name="widget_preview_pin_3" translatable="false">dinkuskit/infra</string>
+    <string name="widget_preview_pin_3_counts" translatable="false">issues 2 · PRs 1 · review 0</string>
+</resources>

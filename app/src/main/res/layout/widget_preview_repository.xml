@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launcher's widget picker draws this layout when no generated preview
+     is published (Android 12-14, or before the first publish). It mirrors the
+     compact sample widget, so it keeps that widget's 8-10 sp mono labels
+     (compact-crowding-034). Overdraw is ignored because the launcher, not an
+     activity theme, paints behind it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/widget_preview_background"
+    android:orientation="vertical"
+    tools:ignore="Overdraw,SmallSp"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:text="@string/widget_preview_repo_name"
+            android:textColor="@color/widget_preview_on_surface_variant"
+            android:textSize="10sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/widget_preview_capsule"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:paddingHorizontal="4dp"
+            android:text="@string/widget_preview_sample"
+            android:textColor="@color/widget_preview_on_tertiary_container"
+            android:textSize="8sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:text="@string/widget_preview_issues"
+            android:textColor="@color/widget_preview_on_surface_variant"
+            android:textSize="8sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/widget_preview_repo_issues"
+            android:textColor="@color/widget_preview_on_background"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:text="@string/widget_preview_prs"
+            android:textColor="@color/widget_preview_on_surface_variant"
+            android:textSize="8sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/widget_preview_repo_prs"
+            android:textColor="@color/widget_preview_on_background"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>
