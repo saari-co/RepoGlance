@@ -81,7 +81,10 @@ First test build. Sign in with GitHub's device flow, pin the repositories you sh
 
 Nothing here is committed as an image (AGENTS.md). The Play-ready files and
 their SHA-256s are in the private asset release
-[`repoglance-play-listing-20260930`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930).
+[`repoglance-play-listing-20260930-040`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930-040).
+It holds the retake after `sample-marker-040` (#49). The earlier release
+`repoglance-play-listing-20260930` is kept unchanged as evidence, and the
+first two proof sections hash its files.
 Capture proof is in
 [proof/play-listing-20260930/PROOF.md](../proof/play-listing-20260930/PROOF.md).
 
@@ -100,11 +103,10 @@ Capture proof is in
 - **All screenshots are sample mode.** Every one comes from **Explore with
   sample data**, so none shows a real account's repositories. The repository
   names sit under the maintainer's own accounts (`saari-co`, `dinkuskit`,
-  `saariuslystoned`), and each screenshot carries the `SAMPLE` bar.
-- **The marker is provisional.** The screenshots show today's `SAMPLE`
-  marker, whose look is still provisional (`sample-marker-040`). If that
-  round changes it, retake the screenshots before `play-app-access-041` is
-  closed.
+  `saariuslystoned`), and each app screenshot carries the `SAMPLE` banner.
+- **The marker is locked.** The screenshots show the `sample-marker-040`
+  look (#49): the tonal banner in the app, and tertiary `sample` bands on the
+  widgets.
 - **Icon.** The icon is the ringed commit-eye, rendered from the adaptive
   launcher icon's background and foreground vectors over the full 108 dp
   canvas. This is what Android Studio's Play Store icon export does.
@@ -115,11 +117,11 @@ Capture proof is in
   render showed only one catalog row under the header, so it was not used
   (see the proof).
 - **Widgets and tile.** Screenshots 6 and 7 come from sample mode on `main`
-  after #45.
+  after #49.
   - Screenshot 6 shows the stack widget with two sample pins, and the repo
     widget resized tall, on the launcher's second page.
   - Screenshot 7 shows the Quick Settings panel with the tile widened to
-    show its `Sample · saari-co/rocket · 25m` subtitle; the system cuts it
+    show its `Sample data · saari-co/rocket · 25m` subtitle; the system cuts it
     off at the edge.
   - Every widget's time slot reads `sample`.
 
