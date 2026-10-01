@@ -82,7 +82,8 @@ First test build. Sign in with GitHub's device flow, pin the repositories you sh
 Nothing here is committed as an image (AGENTS.md). The Play-ready files and
 their SHA-256s are in the private asset release
 [`repoglance-play-listing-20260930-040`](https://github.com/saari-co/swarm-pr-assets/releases/tag/repoglance-play-listing-20260930-040).
-It holds the retake after `sample-marker-040` (#49). The earlier release
+It holds the retake after `sample-marker-040` (#49), and those files are
+live in Console since 2026-09-30. The earlier release
 `repoglance-play-listing-20260930` is kept unchanged as evidence, and the
 first two proof sections hash its files.
 Capture proof is in
@@ -103,7 +104,12 @@ Capture proof is in
 - **All screenshots are sample mode.** Every one comes from **Explore with
   sample data**, so none shows a real account's repositories. The repository
   names sit under the maintainer's own accounts (`saari-co`, `dinkuskit`,
-  `saariuslystoned`), and each app screenshot carries the `SAMPLE` banner.
+  `saariuslystoned`).
+  - Screenshots 1–4 and the fold references carry the `SAMPLE` banner.
+  - Screenshot 5 is the signed-out Connect screen, showing the **Explore
+    with sample data** entry. It has no banner because sample mode is not
+    on yet.
+  - Screenshots 6 and 7 show the sample widgets and the tile.
 - **The marker is locked.** The screenshots show the `sample-marker-040`
   look (#49): the tonal banner in the app, and tertiary `sample` bands on the
   widgets.
