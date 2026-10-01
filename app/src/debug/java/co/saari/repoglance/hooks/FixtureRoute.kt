@@ -15,6 +15,10 @@ import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.NavigatorScopeCodec
+import co.saari.repoglance.state.rememberPinnedRepos
+import co.saari.repoglance.state.rememberScenario
+import co.saari.repoglance.state.setSelectedScenario
+import co.saari.repoglance.state.togglePin
 import co.saari.repoglance.ui.HomeScreen
 import co.saari.repoglance.ui.NavigatorScreen
 import co.saari.repoglance.widget.WidgetRefresh

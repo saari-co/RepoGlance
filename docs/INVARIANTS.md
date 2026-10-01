@@ -81,7 +81,7 @@ Seeded from the accepted review findings on RepoGlance pull requests #2, #4,
 | Repository metadata is requested only when it can complete an exact count | ClawSweeper P2 on PR #12 | `LiveSnapshotFactoryTest` (`needsRepositoryMetadata` cases) | 2 |
 | Interactive elements carry a content description | Play tracker #7 | Android Lint `ContentDescription` at error for View/XML; **unguarded for Compose** until the Grill C emulator tier runs `enableAccessibilityChecks()` | 2 (partial) |
 | Release builds contain no debug tooling | `AGENTS.md`; PR #12 picker | debug source set only (`app/src/debug`); no lint guard yet | 3 |
-| Release builds carry no fixture route: the fixture home (`HomeScreen`), the fixture navigator (`NavigatorScreen`) and `FixtureRoot` live in `app/src/debug`, `MainActivity` reaches them only through `hooks.FixtureRoute`, and the release `FixtureRoute` is a no-op, so an intent with `repo_full` opens the live entry. `repo_full` and `navigator_mode` are debug-only extras | Maintainer decision 2026-10-01 (follow-up to #55): the fixture home is a test screen, not a user surface | `FixtureRouteGuardTest` (no fixture extra or screen named in `app/src/main` or `app/src/release`; the release hook reads no intent), `FixtureRouteReleaseTest` (the release unit-test classpath has no `HomeScreenKt`, `NavigatorScreenKt` or `FixtureRouteKt`), `FixtureRouteDebugTest` (the debug classpath has all three, so the names stay true) | 2 |
+| Release builds carry no fixture route: the fixture home (`HomeScreen`), the fixture navigator (`NavigatorScreen`) and `FixtureRoot` live in `app/src/debug`, `MainActivity` reaches them only through `hooks.FixtureRoute`, and the release `FixtureRoute` is a no-op, so an intent with `repo_full` opens the live entry. `repo_full` and `navigator_mode` are debug-only extras. The helpers only the route uses live in `app/src/debug` too: `state/NavigatorScopeCodec`, `render/CiSemanticRole` (`CiColorRole` stays in main for the widgets and `StatusColors`), `ui/theme/StatusPill`, and the fixture prefs (`selectedScenario`, `setSelectedScenario`, `pinnedRepos`, `togglePin`, `rememberScenario`, `rememberPinnedRepos`, keys `selected_scenario` and `pinned_repos`) as `AppPrefs` extensions in `state/FixturePrefs.kt` | Maintainer decision 2026-10-01 (follow-up to #55): the fixture home is a test screen, not a user surface; helpers follow-up to #56 | `FixtureRouteGuardTest` (no fixture extra, screen, helper or fixture prefs key named in `app/src/main` or `app/src/release`; the helper files exist in `app/src/debug`; the release hook reads no intent), `FixtureRouteReleaseTest` (the release unit-test classpath has none of `HomeScreenKt`, `NavigatorScreenKt`, `FixtureRouteKt`, `NavigatorScopeCodec`, `FixturePrefsKt`, `CiSemanticRole` or `StatusPillKt`, and neither `AppPrefs` nor `ControlShapeKt` declares a moved member), `FixtureRouteDebugTest` (the debug classpath has all seven classes and `FixturePrefsKt`/`StatusPillKt` declare the moved members, so the names stay true) | 2 |
 | Screen-level composables expose a `modifier` parameter | Compose rules `ModifierMissing` | six existing screens are frozen in `app/detekt-baseline-debug.xml`; any new emitting composable without a modifier fails detekt | 2 (ratchet) |
 | Cover-display app shell must not overlap the status bar | Fold proof run 2026-08-11 | unguarded until the device verifier tier (Grill C) captures the `CLOSED` posture | 4 |
 | Sample mode never reaches GitHub, the session, or the live and widget stores (it may only redraw widgets); sample rows never open GitHub, in the app or on a widget; sample repositories are a fixed list under the maintainer's own accounts (saari-co, dinkuskit, saariuslystoned) and never reuse a real repository name; every sample author and assignee is the maintainer's own handle; a repository outside the sample set renders as unavailable, never as empty; sample pins and sample widget setups stay apart from live pins and widget setups and clear when sample mode ends; widgets read sample data only while sample mode is on and show `sample` where a live widget shows its clock time; sample mode never schedules or feeds background refresh; sample-mode prefs load off the main thread, except in `RepoWidgetReceiver.onDeleted`, which reads the sample and live widget setups and pins on the main thread (debt recorded 2026-09-30, `sample-widgets-039` review) | GrillTrack `sample-app-038`, `sample-mode-042`, `sample-people-043`, `sample-widgets-039` (reviewer access, #7) | `SampleModeGuardTest`, `SampleAccountTest` (pins the exact list and a denylist of real repositories), `SampleWidgetsGuardTest`, `SampleWidgetsTest`, `TileTextTest`. That the listed names do not exist on GitHub is an API observation (404 on 2026-09-29, `.grilltrack/proof/sample-app-038-verify-20260929.md`), not a guard: changing the list needs a fresh check. | 2 |
@@ -368,6 +368,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 ### `co/saari/repoglance/render/CiSemanticRole.kt`
 
+Split on 2026-10-01: the `CiSemanticRole` mapping moved to `app/src/debug`
+with the rest of the fixture route (only the fixture home used it).
+`CiColorRole` stays in `app/src/main` as `render/CiColorRole.kt` because the
+widgets, `StatusColors` and `SnapshotRendering.rateLimitRole` use it.
+
 - Semantic color role for a [CiState], decoupled from any concrete Color —
   the Compose and Glance layers each map a role to their own theme color
   (`MaterialTheme.colorScheme.*` / `GlanceTheme.colors.*`); no hardcoded hex
@@ -388,6 +393,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/state/AppPrefs.kt`
+
+The fixture-scenario and fixture-pin members (and their keys) moved to
+`app/src/debug/.../state/FixturePrefs.kt` as `AppPrefs` extensions on
+2026-10-01 with the rest of the fixture route. Release `AppPrefs` keeps the
+live pins, the catalog sort and `preload`.
 
 - Thin SharedPreferences wrapper for Slice 2's on-device state: the
   fixture-scenario switcher and the pinned-repo set (repos stored as
@@ -418,6 +428,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/state/NavigatorScopeCodec.kt`
+
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
 
 - Encodes/decodes [NavigatorScope] to a (kind, value) pair of primitive
   `String`s. A sealed interface holding a [RepoRef] is not directly

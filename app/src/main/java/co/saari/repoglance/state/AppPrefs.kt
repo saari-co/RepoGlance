@@ -9,38 +9,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.core.content.edit
 import co.saari.repoglance.data.CatalogSort
-import co.saari.repoglance.fixtures.FixtureScenario
 
 object AppPrefs {
     private const val PREFS_NAME = "repoglance"
-    private const val KEY_SCENARIO = "selected_scenario"
-    private const val KEY_PINNED = "pinned_repos"
     private const val KEY_CATALOG_SORT = "catalog_sort"
     private const val KEY_LIVE_PINS = "live_pinned_repos"
 
-    private fun prefs(context: Context): SharedPreferences =
+    internal fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun preload(context: Context) {
         prefs(context).all
-    }
-
-    fun selectedScenario(context: Context): FixtureScenario {
-        val stored = prefs(context).getString(KEY_SCENARIO, null) ?: return FixtureScenario.MIXED
-        return runCatching { FixtureScenario.valueOf(stored) }.getOrDefault(FixtureScenario.MIXED)
-    }
-
-    fun setSelectedScenario(context: Context, scenario: FixtureScenario) {
-        prefs(context).edit { putString(KEY_SCENARIO, scenario.name) }
-    }
-
-    fun pinnedRepos(context: Context): Set<String> =
-        prefs(context).getStringSet(KEY_PINNED, emptySet()).orEmpty().toSet()
-
-    fun togglePin(context: Context, repoFull: String) {
-        val current = pinnedRepos(context)
-        val next = if (repoFull in current) current - repoFull else current + repoFull
-        prefs(context).edit { putStringSet(KEY_PINNED, next) }
     }
 
     fun livePins(context: Context): Set<String> =
@@ -83,15 +62,7 @@ object AppPrefs {
         rememberPrefsState(context, KEY_CATALOG_SORT) { catalogSort(context) }
 
     @Composable
-    fun rememberScenario(context: Context): State<FixtureScenario> =
-        rememberPrefsState(context, KEY_SCENARIO) { selectedScenario(context) }
-
-    @Composable
-    fun rememberPinnedRepos(context: Context): State<Set<String>> =
-        rememberPrefsState(context, KEY_PINNED) { pinnedRepos(context) }
-
-    @Composable
-    private fun <T> rememberPrefsState(context: Context, key: String, read: () -> T): State<T> {
+    internal fun <T> rememberPrefsState(context: Context, key: String, read: () -> T): State<T> {
         val state = remember { mutableStateOf(read()) }
         DisposableEffect(context, key, read) {
             val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->

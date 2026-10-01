@@ -91,7 +91,7 @@ val LocalControlShape = staticCompositionLocalOf { ControlShape.Default }
 private const val STATE_EDGE_ALPHA = 0.65f
 
 @Composable
-private fun edgeStroke(edge: Edge, state: Color, width: Dp): BorderStroke? = when (edge) {
+internal fun edgeStroke(edge: Edge, state: Color, width: Dp): BorderStroke? = when (edge) {
     Edge.NONE -> null
     Edge.HAIRLINE -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     Edge.STATE -> BorderStroke(width, state.copy(alpha = STATE_EDGE_ALPHA))
@@ -111,19 +111,6 @@ fun ControlChip(label: @Composable () -> Unit, modifier: Modifier = Modifier) {
         } else {
             AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         },
-    )
-}
-
-@Composable
-fun StatusPill(tone: StatusTone, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val shape = LocalControlShape.current
-    Surface(
-        color = if (shape.pillFill == Fill.OUTLINED) Color.Transparent else tone.container,
-        contentColor = tone.onContainer,
-        shape = shape.pill,
-        border = edgeStroke(shape.pillEdge, tone.ink, shape.stateEdgeWidth),
-        modifier = modifier,
-        content = content,
     )
 }
 
