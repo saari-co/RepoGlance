@@ -45,13 +45,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import co.saari.repoglance.hooks.EXTRA_NAVIGATOR_MODE
+import co.saari.repoglance.hooks.EXTRA_REPO_FULL
 import co.saari.repoglance.model.NavigatorMode
 import co.saari.repoglance.model.NavigatorScope
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.NavigatorScopeCodec
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
-import co.saari.repoglance.widget.EXTRA_NAVIGATOR_MODE
-import co.saari.repoglance.widget.EXTRA_REPO_FULL
 import co.saari.repoglance.widget.navigatorModeFromExtra
 
 /**

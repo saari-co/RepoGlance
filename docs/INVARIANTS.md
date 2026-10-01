@@ -81,6 +81,7 @@ Seeded from the accepted review findings on RepoGlance pull requests #2, #4,
 | Repository metadata is requested only when it can complete an exact count | ClawSweeper P2 on PR #12 | `LiveSnapshotFactoryTest` (`needsRepositoryMetadata` cases) | 2 |
 | Interactive elements carry a content description | Play tracker #7 | Android Lint `ContentDescription` at error for View/XML; **unguarded for Compose** until the Grill C emulator tier runs `enableAccessibilityChecks()` | 2 (partial) |
 | Release builds contain no debug tooling | `AGENTS.md`; PR #12 picker | debug source set only (`app/src/debug`); no lint guard yet | 3 |
+| Release builds carry no fixture route: the fixture home (`HomeScreen`), the fixture navigator (`NavigatorScreen`) and `FixtureRoot` live in `app/src/debug`, `MainActivity` reaches them only through `hooks.FixtureRoute`, and the release `FixtureRoute` is a no-op, so an intent with `repo_full` opens the live entry. `repo_full` and `navigator_mode` are debug-only extras | Maintainer decision 2026-10-01 (follow-up to #55): the fixture home is a test screen, not a user surface | `FixtureRouteGuardTest` (no fixture extra or screen named in `app/src/main` or `app/src/release`; the release hook reads no intent), `FixtureRouteReleaseTest` (the release unit-test classpath has no `HomeScreenKt`, `NavigatorScreenKt` or `FixtureRouteKt`), `FixtureRouteDebugTest` (the debug classpath has all three, so the names stay true) | 2 |
 | Screen-level composables expose a `modifier` parameter | Compose rules `ModifierMissing` | six existing screens are frozen in `app/detekt-baseline-debug.xml`; any new emitting composable without a modifier fails detekt | 2 (ratchet) |
 | Cover-display app shell must not overlap the status bar | Fold proof run 2026-08-11 | unguarded until the device verifier tier (Grill C) captures the `CLOSED` posture | 4 |
 | Sample mode never reaches GitHub, the session, or the live and widget stores (it may only redraw widgets); sample rows never open GitHub, in the app or on a widget; sample repositories are a fixed list under the maintainer's own accounts (saari-co, dinkuskit, saariuslystoned) and never reuse a real repository name; every sample author and assignee is the maintainer's own handle; a repository outside the sample set renders as unavailable, never as empty; sample pins and sample widget setups stay apart from live pins and widget setups and clear when sample mode ends; widgets read sample data only while sample mode is on and show `sample` where a live widget shows its clock time; sample mode never schedules or feeds background refresh; sample-mode prefs load off the main thread, except in `RepoWidgetReceiver.onDeleted`, which reads the sample and live widget setups and pins on the main thread (debt recorded 2026-09-30, `sample-widgets-039` review) | GrillTrack `sample-app-038`, `sample-mode-042`, `sample-people-043`, `sample-widgets-039` (reviewer access, #7) | `SampleModeGuardTest`, `SampleAccountTest` (pins the exact list and a denylist of real repositories), `SampleWidgetsGuardTest`, `SampleWidgetsTest`, `TileTextTest`. That the listed names do not exist on GitHub is an API observation (404 on 2026-09-29, `.grilltrack/proof/sample-app-038-verify-20260929.md`), not a guard: changing the list needs a fresh check. | 2 |
@@ -476,6 +477,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 ### `co/saari/repoglance/ui/HomeScreen.kt`
 
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
+
 - Home screen (fixture mode): scenario switcher, pin-aware repo list, and
   the widget-pinning debug/user affordance. All display strings read
   through [SnapshotRendering] / [Ages] — nothing here re-derives a rule.
@@ -497,6 +501,9 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/ui/NavigatorScreen.kt`
+
+Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
+release builds no longer contain it.
 
 - Navigator screen with a compact app-owned control block that scrolls away
   as part of the real result list. The mode selector is the only sticky app
@@ -600,6 +607,11 @@ still load-bearing should be promoted into the guard table or a test.
 
 
 ### `co/saari/repoglance/widget/WidgetActions.kt`
+
+Superseded: the widgets open the live repository through
+`EXTRA_LIVE_REPO_FULL` (`WidgetPinsTest`). `EXTRA_REPO_FULL` and
+`EXTRA_NAVIGATOR_MODE` moved to the debug `hooks/FixtureRoute.kt` on
+2026-10-01; the rationale below is kept as history.
 
 - Shared repo Intent-extra contract between the widgets' tap actions and
   [co.saari.repoglance.MainActivity], which reads this extra to pre-scope
