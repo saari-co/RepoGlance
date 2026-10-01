@@ -164,6 +164,24 @@ The head release dex has no class whose name contains `StatusPill`,
 `isMinifyEnabled = false`, so before this change all of them shipped in
 the release APK.
 
+## After merging main (#54)
+
+`origin/main` moved to `54f296e` (#54, widget previews) while this branch
+was open. It merged cleanly as `755de02`, and #54 adds no line naming a
+moved symbol. On the merged tree,
+`./gradlew --no-daemon assembleDebug check assembleRelease` exited 0:
+
+```text
+testDebugUnitTest: 362 tests, 0 failures, 0 errors; FixtureRoute failures: []
+testReleaseUnitTest: 347 tests, 0 failures, 0 errors; FixtureRoute failures: []
+merged-app-release-unsigned.apk sha256=f6440aee4274dc9f51c315f413b07feb31cea9ac7d8887260badee78a67451b2
+  NavigatorScopeCodec* 0, FixturePrefsKt* 0, CiSemanticRole* 0, StatusPillKt* 0, CiColorRole* 1
+  AppPrefs fixture-only methods: []   ControlShapeKt fixture-only methods: []
+  dex strings: selected_scenario=0 pinned_repos=0
+```
+
+#54 adds 12 tests to each variant: 350 + 12 = 362 and 335 + 12 = 347.
+
 ## Not covered and left for later
 
 - No device run. The fixture home, fixture navigator and debug pickers
@@ -194,3 +212,7 @@ the release APK.
 | `base-app-release-unsigned.apk` | `9452ee9ed3b4d90a5e1b7b72e89a36a54d62aeca4c4635125ba8f1cd1ca99e7b` |
 | `head-app-release-unsigned.apk` | `b06ec064cf9412baf44f12cd586f7edffee8c2f26f23af977fa4e36bd69e9b42` |
 | `head-app-debug.apk` | `0363768bd834ea4f41556fbb93127073288fa834273b0e723ad2eeedd5719781` |
+| `gradle-check-merged.log` | `ba9c64f442b58a46c7a2ea814bd5f947226ae328c53598110aeffa38f366c028` |
+| `unit-tests-merged.txt` | `bf33d2ad02125eb00ab8630c92470ba872777a1d95ceb3b949dc8edac7f8fc5f` |
+| `apk-dex-scan-merged.txt` | `da098e788d60da7e8cb1f82bc4435db7e76ba81b40faf64504b977a29357f9b5` |
+| `merged-app-release-unsigned.apk` | `f6440aee4274dc9f51c315f413b07feb31cea9ac7d8887260badee78a67451b2` |
