@@ -30,10 +30,16 @@ object WidgetPinning {
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {
-            runCatching { manager.requestPinAppWidget(provider(context, kind), null, callback(context, kind)) }
-                .getOrDefault(false)
+            withoutPreview(manager, context, kind)
         }
     }
+
+    private fun withoutPreview(manager: AppWidgetManager, context: Context, kind: WidgetKind): Boolean =
+        try {
+            manager.requestPinAppWidget(provider(context, kind), null, callback(context, kind))
+        } catch (_: Exception) {
+            false
+        }
 
     private suspend fun pin(context: Context, glance: GlanceAppWidgetManager, kind: WidgetKind): Boolean =
         when (kind) {

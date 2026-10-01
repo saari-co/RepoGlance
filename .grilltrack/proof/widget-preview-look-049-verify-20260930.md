@@ -235,6 +235,45 @@ group (`runtime`, `runtime-android`, `runtime-saveable`,
 `runtime-saveable-android`) 1.7.3 → 1.7.8. Nothing else moves;
 `core-remoteviews` 1.1.0 was already on the classpath.
 
+## Re-verification after review round 2 (`d3f6a76`)
+
+Review: `.grilltrack/proof/widget-previews-review-20260930.md#round-2`.
+`./gradlew assembleDebug check`: BUILD SUCCESSFUL, 355 unit tests, lint no
+new issues, detekt clean. APK
+`b0e90876cf99d76e9381ce6685c1fb909e36e59f155f86f7100ac7127c593165`. Run
+`widget-preview-reverify2-emu` (emulator, signed out, light, 2026-10-01 00:12).
+
+- The fixture home's `Pin repo widget` and `Pin stack widget` call the same
+  `WidgetPinning.request`; both opened `AddItemActivity` with the sample
+  preview (`sheet-Pin-repo-widget`
+  `577d276a03a7b078758cad3eb8e0e93b790c04957753b36ed2ecfbf704ca55fd`,
+  `sheet-Pin-stack-widget2`
+  `671d1d4c98c5a72ee7dd31bad15b5988a425aa3e69f57f817d7bc206fe6cd0df`).
+  Nothing was added; `dumpsys appwidget` still lists 5, 4, 2.
+  (`sheet-Pin-stack-widget` `8108f86c…` and `sheet-Pin-stack-widget2`'s first
+  attempt `a2349f4e…` caught the navigator after the sheet had closed and
+  are discarded.)
+- The start-up publish was still refused at 00:12:30 (`rate-limited` for
+  both receivers) with the stamp at `1.1` and no crash.
+- Which path opened these sheets cannot be told from the device: the plain
+  `requestPinAppWidget` fallback (after a failed Glance request) also returns
+  true, and with the generated previews removed it would show the static
+  copy, which is built to look the same. No failure was expected on this
+  path; the fallback is guarded by
+  `WidgetPreviewGuardTest.everyAddHandsTheSheetThePreview` only.
+- `bin/verify-repoglance cleanup` afterwards.
+
+## Final head check (review round 3 fixes)
+
+`./gradlew assembleDebug check`: BUILD SUCCESSFUL, 355 unit tests, lint no
+new issues, detekt clean. APK
+`7d721885ceaa4c962368a898695e7507866a831c65b891c65cc0c3b3332fc645` on the
+emulator (run `widget-preview-final-emu`): the fixture home's `Pin repo
+widget` (`WidgetPinning.request`) opened `AddItemActivity` with the sample
+preview, capture
+`56ec6e25d36ea472d354c9ea8baf950f844a598c55c4d4bbc3386d25d99f5b6c`; nothing
+added (`dumpsys appwidget`: 5, 4, 2); `cleanup` afterwards.
+
 ## Not proven
 
 - Android 12–14 (the `previewLayout` path there) — no such device was run.

@@ -113,11 +113,15 @@ class WidgetPreviewGuardTest {
         assertTrue("the sheet preview is composed off the main thread", pinning.contains("withContext(Dispatchers.Default) { pin(context, glance, kind) }"))
         val request = pinning.substringAfter("suspend fun request(").substringBefore("private suspend fun pin(")
         assertTrue(
-            "a failed sheet request retries without a preview, and that retry cannot throw",
-            request.contains(
-                "} catch (_: Exception) {\n" +
-                    "            runCatching { manager.requestPinAppWidget(provider(context, kind), null, callback(context, kind)) }\n" +
-                    "                .getOrDefault(false)",
+            "a failed sheet request retries without a preview",
+            request.contains("} catch (_: Exception) {\n            withoutPreview(manager, context, kind)\n        }"),
+        )
+        val retry = pinning.substringAfter("private fun withoutPreview(").substringBefore("\n\n")
+        assertTrue(
+            "the retry passes no preview, keeps the setup callback and cannot throw",
+            retry.contains(
+                "manager.requestPinAppWidget(provider(context, kind), null, callback(context, kind))\n" +
+                    "        } catch (_: Exception) {\n            false",
             ),
         )
         assertTrue(request.contains("} catch (cancelled: CancellationException) {\n            throw cancelled"))

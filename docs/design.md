@@ -124,7 +124,7 @@
 
   | surface | source |
   | --- | --- |
-  | in-app `Add` sheet | `WidgetPinning.request` → `requestPinGlanceAppWidget` with `WidgetSheetPreview` |
+  | in-app `Add` sheet | `WidgetPinning.request` → `requestPinGlanceAppWidget` with `WidgetSheetPreview`; if that request fails, a plain `requestPinAppWidget` without a preview, so the sheet shows the launcher's own preview (the generated or static sample below) |
   | launcher picker, Android 15+ | generated preview: `providePreview` on both widgets, published by `WidgetPreviews.publishIfNeeded` (home-screen category) at app start when missing or when the `versionCode.LOOK_VERSION` stamp changes; a rate-limited call (about two per hour per widget) retries on a later start |
   | launcher picker, Android 12–14 or not yet published | `android:previewLayout` (`widget_preview_repository`, `widget_preview_pinned`): a static copy with the same strings and the same system-palette colours in `values` / `values-night` |
 

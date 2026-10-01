@@ -26,3 +26,38 @@ reflection-based receiver construction in `setWidgetPreviews`,
 `requestPinGlanceAppWidget` internals, `WidgetPinning` support check and
 setup callback, fallback colours equal to Glance 1.2.0's `glance_color*`
 resources.
+
+## Round 2 — `git:8e8cdcb` (round 1 fixes)
+
+Same reviewer, read-only. Nothing new above P3. Round 1: findings 1, 2, 3, 5
+and 7 resolved in `8e8cdcb`; 6 resolved by the re-verification proof; 4
+partially resolved.
+
+| # | finding | severity | class | action |
+| --- | --- | --- | --- | --- |
+| 4b | the store guard misses helpers the preview runs (`TallLook`, `labelFamily`, `freshnessRole`, `sampleMarker`, `StackRows`, `SampleAccount`); the "every system call is caught" check only counts two `attempt {` | P3 | required_fix | scan `WidgetLook.kt`, `SampleWidgetMarks.kt`, `SampleWidgetData.kt`, `sample/SampleAccount.kt` whole, add `object StackRows {`, reword the count check |
+| N1a | a failing sheet preview or lost foreground now makes `Add` silently do nothing | P3 | required_fix | on a non-cancellation failure, retry the plain `requestPinAppWidget` (the launcher then shows the static sample copy), itself caught |
+| N1b | the debug picker reports any failure as "refused: launcher cannot pin" | P3 | defer | debug-only wording; release behaviour unaffected |
+| N2 | `kotlinx.coroutines.CancellationException` vs the repo's `kotlin.coroutines.cancellation.CancellationException` | nit | required_fix | use the repo's import |
+
+Checked clean by the reviewer: catch ordering (cancellation before
+`Exception`), foreground-loss `IllegalStateException` caught, `attempt {}`
+inside inline `filter`/`forEach`, `setAppWidgetSize` semantics in
+glance-appwidget-testing 1.2.0 (the `to review` assertion is not vacuous),
+string-anchored extraction fails loudly on a missing anchor, pin-support
+check first, setup callback flags, single pin caller, home-screen-only
+stamped publish.
+
+## Round 3 — `git:d3f6a76` (round 2 fixes)
+
+Same reviewer, read-only. "Round 3 clean": nothing new above P3. 4b, N1a and
+N2 resolved; N1b deferred as stated. The fallback cannot open a second
+sheet (Glance's system pin call is its last step; a throw there means no
+sheet), foreground loss is caught twice without a crash, the setup
+`PendingIntent` is the same on both paths, and the guards are not vacuous.
+
+| # | finding | severity | class | action |
+| --- | --- | --- | --- | --- |
+| R3-1 | design.md and INVARIANTS describe only the Glance sheet path, not the preview-less fallback | P3 | required_fix | name the fallback (launcher's own preview, same sample) |
+| R3-2 | the proof says the fallback "was not triggered on a device", which `request` cannot show (both paths return true and look alike) | P3 | required_fix | reword: not distinguishable on the device |
+| R3-3 | the fallback's `runCatching` also swallows `Error`s | nit | required_fix | `try { … } catch (_: Exception) { false }` |
