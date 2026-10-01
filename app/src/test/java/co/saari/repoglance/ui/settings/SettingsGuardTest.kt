@@ -115,6 +115,20 @@ class SettingsGuardTest {
         val userFacing = Regex("<string name=\"widget_[a-z_]+\">([^<]+)</string>").findAll(strings).map { it.groupValues[1] }.toList()
         assertTrue(userFacing.size >= 4)
         userFacing.forEach { assertFalse("no user-facing 'stack': $it", it.contains("stack", ignoreCase = true)) }
+        val kotlin = Files.walk(repositoryRoot().resolve("app/src/main/java")).use { paths ->
+            paths.filter { it.toString().endsWith(".kt") }.toList()
+        }.flatMap { file ->
+            Regex("\"((?:[^\"\\\\\\n]|\\\\.)*)\"").findAll(Files.readAllBytes(file).toString(Charsets.UTF_8))
+                .map { file.fileName.toString() to it.groupValues[1] }
+                .toList()
+        }
+        assertTrue("the scan reads the Widgets screen names", kotlin.contains("PlacedWidgets.kt" to "Pinned repos widget"))
+        val tag = Regex("[a-z0-9]+(?:[-_:][a-z0-9]+)*")
+        assertEquals(
+            "no user-facing 'stack' in Kotlin strings; tags and keys may keep it",
+            emptyList<Pair<String, String>>(),
+            kotlin.filter { (_, text) -> text.contains("stack", ignoreCase = true) && !tag.matches(text) },
+        )
     }
 
     @Test
