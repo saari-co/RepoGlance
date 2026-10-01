@@ -22,10 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import co.saari.repoglance.state.ThemeChoice
 import co.saari.repoglance.state.ThemePrefs
@@ -65,6 +68,7 @@ fun ThemeSettingItem(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ThemeDialog(selected: ThemeChoice, onChoose: (ThemeChoice) -> Unit, onDismiss: () -> Unit) {
     var pending by rememberSaveable(selected) { mutableStateOf(selected) }
@@ -108,6 +112,8 @@ private fun ThemeDialog(selected: ThemeChoice, onChoose: (ThemeChoice) -> Unit, 
                 modifier = Modifier.testTag("repoglance:theme-cancel"),
             ) { LabelText("Cancel", LabelRole.BUTTON) }
         },
-        modifier = Modifier.testTag("repoglance:theme-dialog"),
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag("repoglance:theme-dialog"),
     )
 }

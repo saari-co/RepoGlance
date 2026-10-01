@@ -108,6 +108,10 @@ class ThemeChoiceGuardTest {
         assertTrue(setting.contains("Text(\"Theme\")"))
         assertTrue(setting.contains("Text(\"Choose theme\")"))
         assertTrue(setting.contains("role = Role.RadioButton"))
+        assertTrue(
+            "a dialog is its own window, so it publishes its tags as resource ids itself",
+            setting.contains(".semantics { testTagsAsResourceId = true }"),
+        )
         assertTrue("a radio tap only marks the choice", setting.contains("onClick = { pending = option }"))
         assertTrue("OK applies it", setting.contains("onClick = { onChoose(pending) }"))
     }
