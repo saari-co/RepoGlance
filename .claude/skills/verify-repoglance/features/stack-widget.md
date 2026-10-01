@@ -1,6 +1,6 @@
-# Stack widget
+# Pinned repos widget
 
-The large RepoGlance stack widget lists every pinned repository from the live catalog, most recent push first, each with its open issues, open PRs, PRs awaiting the user's review, and the clock time its numbers were observed.
+The large RepoGlance Pinned repos widget (`Pinned repos` in the launcher's widget picker; the stack widget in code) lists every pinned repository from the live catalog, most recent push first, each with its open issues, open PRs, PRs awaiting the user's review, and the clock time its numbers were observed.
 
 ## Sub-features
 
@@ -12,7 +12,8 @@ The large RepoGlance stack widget lists every pinned repository from the live ca
 
 ## How to get to it (user POV)
 
-- Long-press the home screen, Widgets, RepoGlance, drag the stack widget out. It needs no setup.
+- In RepoGlance, three-dot menu → `Widgets` → `Pinned repos widget` → `Add`, then `Add to home screen` (see [Settings and Widgets](./settings-widgets.md)). It needs no setup.
+- Or long-press the home screen, Widgets, RepoGlance, and drag `Pinned repos` out.
 - Pin repositories with the thumbtack in the live catalog; they appear in the stack.
 
 ## Driving it with verify-repoglance

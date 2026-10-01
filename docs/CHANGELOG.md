@@ -7,7 +7,7 @@ release-notes body used for that tag's GitHub Release — see
 ## 0.4.0-beta.1
 
 First Google Play candidate (closed testing). Everything merged since
-`v0.3.0-beta.1`, #6 through #49. RepoGlance stays read-only: it never
+`v0.3.0-beta.1`, #6 through #53. RepoGlance stays read-only: it never
 changes anything on GitHub.
 
 **Sign-in**
@@ -17,7 +17,8 @@ changes anything on GitHub.
   loads. This was proven on a Pixel Fold running Android 17; elsewhere the
   code screen tells you to close the tab (#31).
 - Session start-up and token storage run off the main thread (#16, #28).
-- **Manage GitHub access** is in the header menu (#6).
+- **Manage GitHub access** and **Disconnect GitHub** are in Settings, from
+  the app's menu (#6, #53).
 
 **Catalog and repositories**
 - The live catalog can be filtered by account or organization and searched
@@ -29,11 +30,11 @@ changes anything on GitHub.
   app.
 
 **Widgets and Quick Settings tile**
-- The per-repository widget is set up from the live catalog and shows that
+- The Repository widget is set up from the live catalog and shows that
   repository's saved counts with their age: `last good` when stale, never a
   made-up zero (#12, #21). The compact layout merges counts and has a 140 dp
   minimum width (#41).
-- The stack widget lists every pinned repository, most recent push first
+- The Pinned repos widget lists every pinned repository, most recent push first
   (#23). Tapping a widget opens that repository or the catalog in
   RepoGlance.
 - Pinned repositories refresh about every 30 minutes while a network is
@@ -45,13 +46,17 @@ changes anything on GitHub.
   off the main thread (#24, #26). Their look now matches the app (#39), and
   the widget picker describes only what the widget shows (#40).
 - A Quick Settings tile shows the latest push and opens the catalog (#19).
+- **Widgets** in the app's menu adds the Repository or Pinned repos widget
+  through the launcher's own *Add to home screen* sheet, lists the widgets
+  already placed, and opens a repository widget's setup to change it. The
+  launcher's widget picker uses the same names (#53).
 
 **Sample mode**
 - **Explore with sample data** on the sign-in screen opens the real catalog,
   repository view and navigator on seven made-up repositories. It is marked
   `SAMPLE` on every screen, needs no GitHub account and makes no network
   call (#43).
-- In sample mode, the repo and stack widgets are set up from the sample
+- In sample mode, the Repository and Pinned repos widgets are set up from the sample
   repositories and show `sample` where the time would be. The Quick Settings
   tile reads `Sample data · <repo> · <age>`. Their taps open RepoGlance, and
   sample mode never refreshes in the background. Signing in clears the
@@ -68,6 +73,9 @@ changes anything on GitHub.
   checks for a saved session (#18).
 - Tonal status pills, mono label type, and Google-style shapes and controls
   (#36, #37, #38).
+- **Settings → Theme** chooses `Light`, `Dark` or `System default` (the
+  default) for RepoGlance alone, start window and status bar included.
+  Widgets and the Quick Settings tile keep the phone's theme (#50).
 
 **Platform and build**
 - Targets and compiles against Android 16 (API 36) on AGP 8.10.1. The
@@ -86,9 +94,6 @@ changes anything on GitHub.
 - The return over the GitHub tab can need a manual switch back after a slow
   authorization (#32).
 - The start-window colour on Android 12 and 13 is approximate and unverified.
-- There is no in-app light/dark choice (the app follows the system theme)
-  and no Settings screen with a Widgets entry yet. Both are planned before
-  production.
 
 ## 0.3.0
 

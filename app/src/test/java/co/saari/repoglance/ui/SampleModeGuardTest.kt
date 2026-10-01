@@ -149,7 +149,7 @@ class SampleModeGuardTest {
 
     @Test
     fun sampleScreensCarryTheSampleMarkerAndHideLiveOnlyControls() {
-        val home = section(screen, "private fun LiveRepositoryHome(", "private fun DisconnectDialog(")
+        val home = section(screen, "private fun LiveRepositoryHome(", "private fun CatalogTitleRow(")
         assertTrue(home.contains("if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)"))
         assertTrue(home.contains("SampleModeStore.togglePin(context, repository.ref.full)"))
         val toggle = section(home, "onTogglePin = {", "},\n")
@@ -166,10 +166,18 @@ class SampleModeGuardTest {
         val liveChip = title.indexOf("LabelText(\"LIVE\"")
         assertTrue(liveChip >= 0)
         assertTrue("the LIVE chip is only for a real session", title.lastIndexOf("if (!sampleMode) {", liveChip) >= 0)
-        val menu = title.indexOf("Text(\"Manage GitHub access\")")
-        assertTrue(menu >= 0)
-        val menuGuard = title.lastIndexOf("if (!sampleMode) {", menu)
-        assertTrue("Manage GitHub access and Disconnect are hidden in sample mode", menuGuard > liveChip)
+        assertTrue(
+            "the sample catalog keeps the menu so Widgets and Settings stay reachable",
+            title.contains("AppMenu(onOpenWidgets = onOpenWidgets, onOpenSettings = onOpenSettings)"),
+        )
+        val settings = source("app/src/main/java/co/saari/repoglance/ui/settings/SettingsScreen.kt")
+        val github = settings.indexOf("headline = \"Manage GitHub access\"")
+        assertTrue(github >= 0)
+        assertTrue(
+            "Manage GitHub access and Disconnect are only for a real session",
+            settings.lastIndexOf("if (account == SettingsAccount.LIVE) {", github) >= 0,
+        )
+        assertTrue(settings.contains("sampleMode -> SettingsAccount.SAMPLE"))
 
         val navigator = section(screen, "private fun LiveNavigator(", "private fun androidx.compose")
         assertTrue(navigator.contains("if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)"))

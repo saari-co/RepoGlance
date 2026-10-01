@@ -13,7 +13,9 @@ Adding the compact/tall RepoGlance widget opens a setup screen listing the repos
 
 ## How to get to it (user POV)
 
-- Long-press the home screen, Widgets, RepoGlance, drag the compact widget out; the setup screen opens.
+- In RepoGlance, three-dot menu → `Widgets` → `Repository widget` → `Add`, then `Add to home screen`; the setup screen opens (see [Settings and Widgets](./settings-widgets.md)).
+- Or long-press the home screen, Widgets, RepoGlance, and drag `Repository` out; the setup screen opens.
+- To change a placed widget's repository or feed, tap its row under `On your home screen` on the Widgets screen.
 - Tap a placed widget's header to open that repository's live view in the app (issues and PRs with the `LIVE` chip); tap a row to open it on GitHub.
 
 ## Driving it with verify-repoglance
@@ -21,7 +23,7 @@ Adding the compact/tall RepoGlance widget opens a setup screen listing the repos
 Preconditions:
 
 - `bin/verify-repoglance doctor` passes and the maintainer's live session exists (the list comes from the last catalog load).
-- **Placement.** An agent may place a widget itself: long-press the home screen, Widgets, search RepoGlance, then drag the size you need out. Prefer an empty home page and report where it landed. The maintainer can also drag it out. Leave a widget the maintainer already placed as it is.
+- **Placement.** An agent may place a widget itself: the in-app Widgets screen's `Add` (the real `requestPinAppWidget` path), or long-press the home screen, Widgets, search RepoGlance, then drag the size you need out. Prefer an empty home page and report where it landed. The maintainer can also drag it out. Leave a widget the maintainer already placed as it is.
 
 - **Setup list.** Open the setup screen for a new widget, then `dump widget-setup`. The `Repository` field shows the first pinned repository, and the note reads `Saving pins this repository in RepoGlance`.
 - **Pin on save.** Save the widget for `saari-co/RepoGlance`, then `bin/verify-repoglance launch MIXED live`, filter to `saari-co/RepoGlance`, `dump after-widget`: the row control reads `Unpin saari-co/RepoGlance`.

@@ -61,7 +61,7 @@ camera, microphone, or notification permission.
 Your access token and any cached repository data live only on your device.
 To remove them:
 
-- Choose **Disconnect GitHub** in the app's menu, which deletes the saved
+- Choose **Disconnect GitHub** in the app's Settings (from its menu), which deletes the saved
   session and the cached GitHub data, or
 - Uninstall the app.
 

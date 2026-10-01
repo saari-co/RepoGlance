@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -86,6 +85,7 @@ import co.saari.repoglance.sample.SampleAccount
 import co.saari.repoglance.state.AppPrefs
 import co.saari.repoglance.state.SampleModeStore
 import co.saari.repoglance.ui.brand.CheckingMark
+import co.saari.repoglance.ui.settings.popupResourceIds
 import co.saari.repoglance.ui.theme.ControlCard
 import co.saari.repoglance.ui.theme.ControlChip
 import co.saari.repoglance.ui.theme.FamilyStatus
@@ -117,7 +117,8 @@ fun LiveRepoGlanceScreen(
     onBackToRepositories: () -> Unit,
     onRefreshRepository: () -> Unit,
     onManageGitHubAccess: () -> Unit,
-    onSignOut: () -> Unit,
+    onOpenWidgets: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     var selectedOwner by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(state) {
@@ -132,7 +133,12 @@ fun LiveRepoGlanceScreen(
 
     when (state) {
         LiveUiState.Checking -> CheckingScreen()
-        LiveUiState.SignedOut -> ConnectGitHubScreen(connectionReady, onConnectGitHub, onExploreSampleData)
+        LiveUiState.SignedOut -> ConnectGitHubScreen(
+            connectionReady = connectionReady,
+            onConnectGitHub = onConnectGitHub,
+            onExploreSampleData = onExploreSampleData,
+            onOpenSettings = onOpenSettings,
+        )
         LiveUiState.RequestingDeviceCode -> CenteredStatus("Starting GitHub sign-in…", showProgress = true)
         is LiveUiState.AwaitingDeviceAuthorization -> AwaitingGitHubScreen(
             userCode = state.userCode,
@@ -166,10 +172,8 @@ fun LiveRepoGlanceScreen(
                     onSelectRepository = onSelectRepository,
                     onRefresh = onRetry,
                     onManageGitHubAccess = onManageGitHubAccess,
-                    onSignOut = {
-                        selectedOwner = null
-                        onSignOut()
-                    },
+                    onOpenWidgets = onOpenWidgets,
+                    onOpenSettings = onOpenSettings,
                 )
             } else {
                 LiveNavigator(
@@ -240,6 +244,7 @@ private fun ConnectGitHubScreen(
     connectionReady: Boolean,
     onConnectGitHub: () -> Unit,
     onExploreSampleData: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -249,6 +254,11 @@ private fun ConnectGitHubScreen(
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
+        AppMenu(
+            onOpenWidgets = null,
+            onOpenSettings = onOpenSettings,
+            modifier = Modifier.align(Alignment.TopEnd),
+        )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("RepoGlance", style = MaterialTheme.typography.headlineLarge)
             Spacer(Modifier.height(12.dp))
@@ -399,6 +409,9 @@ internal const val SIGNIN_MESSAGE_TEST_TAG = "repoglance:signin-message"
 internal const val RETURN_INSTRUCTION_TEST_TAG = "repoglance:signin-return-instruction"
 
 internal const val OWNER_FILTER_TEST_TAG = "repoglance:owner-filter"
+internal const val APP_MENU_TEST_TAG = "repoglance:menu"
+internal const val MENU_WIDGETS_TEST_TAG = "repoglance:menu-widgets"
+internal const val MENU_SETTINGS_TEST_TAG = "repoglance:menu-settings"
 internal const val CATALOG_SORT_RECENT_TEST_TAG = "repoglance:catalog-sort-recent"
 internal const val CATALOG_SORT_ALPHA_TEST_TAG = "repoglance:catalog-sort-alpha"
 
@@ -414,10 +427,10 @@ private fun LiveRepositoryHome(
     onSelectRepository: (LiveRepository) -> Unit,
     onRefresh: () -> Unit,
     onManageGitHubAccess: () -> Unit,
-    onSignOut: () -> Unit,
+    onOpenWidgets: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
-    var confirmSignOut by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val widgetScope = rememberCoroutineScope()
     val sort by AppPrefs.rememberCatalogSort(context)
@@ -428,16 +441,6 @@ private fun LiveRepositoryHome(
         visibleRepositories(catalog.repositories, selectedOwner, query, sort, pins)
     }
     val now = rememberFreshnessNow()
-
-    if (confirmSignOut) {
-        DisconnectDialog(
-            onDismiss = { confirmSignOut = false },
-            onConfirm = {
-                confirmSignOut = false
-                onSignOut()
-            },
-        )
-    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         LazyColumn(
@@ -457,8 +460,8 @@ private fun LiveRepositoryHome(
                             now = now,
                             sampleMode = sampleMode,
                             onRefresh = onRefresh,
-                            onManageGitHubAccess = onManageGitHubAccess,
-                            onRequestSignOut = { confirmSignOut = true },
+                            onOpenWidgets = onOpenWidgets,
+                            onOpenSettings = onOpenSettings,
                         )
                         if (sampleMode) SampleModeBar(onSignIn = onLeaveSampleData)
                         CatalogRateLimitLine(rateLimit, now)
@@ -533,31 +536,15 @@ private fun LiveRepositoryHome(
 }
 
 @Composable
-private fun DisconnectDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Disconnect RepoGlance?") },
-        text = { Text("This removes the GitHub session from this phone. You can connect again anytime.") },
-        confirmButton = {
-            TextButton(onClick = onConfirm) { LabelText("Disconnect GitHub", LabelRole.BUTTON) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { LabelText("Cancel", LabelRole.BUTTON) }
-        },
-    )
-}
-
-@Composable
 private fun CatalogTitleRow(
     catalog: LiveRepositoryCatalog,
     observedAt: Instant,
     now: Instant,
     sampleMode: Boolean,
     onRefresh: () -> Unit,
-    onManageGitHubAccess: () -> Unit,
-    onRequestSignOut: () -> Unit,
+    onOpenWidgets: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
-    var accountMenuExpanded by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.weight(1f)) {
             Text("RepoGlance", style = MaterialTheme.typography.headlineSmall)
@@ -579,34 +566,40 @@ private fun CatalogTitleRow(
         ) {
             Icon(Icons.Default.Refresh, contentDescription = "Refresh repositories")
         }
-        if (!sampleMode) {
-            Box {
-                IconButton(onClick = { accountMenuExpanded = true }) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = "Account and access settings",
-                    )
-                }
-                DropdownMenu(
-                    expanded = accountMenuExpanded,
-                    onDismissRequest = { accountMenuExpanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Manage GitHub access") },
-                        onClick = {
-                            accountMenuExpanded = false
-                            onManageGitHubAccess()
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Disconnect GitHub") },
-                        onClick = {
-                            accountMenuExpanded = false
-                            onRequestSignOut()
-                        },
-                    )
-                }
+        AppMenu(onOpenWidgets = onOpenWidgets, onOpenSettings = onOpenSettings)
+    }
+}
+
+@Composable
+private fun AppMenu(onOpenWidgets: (() -> Unit)?, onOpenSettings: () -> Unit, modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        IconButton(onClick = { expanded = true }, modifier = Modifier.testTag(APP_MENU_TEST_TAG)) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.popupResourceIds(),
+        ) {
+            if (onOpenWidgets != null) {
+                DropdownMenuItem(
+                    text = { Text("Widgets") },
+                    onClick = {
+                        expanded = false
+                        onOpenWidgets()
+                    },
+                    modifier = Modifier.testTag(MENU_WIDGETS_TEST_TAG),
+                )
             }
+            DropdownMenuItem(
+                text = { Text("Settings") },
+                onClick = {
+                    expanded = false
+                    onOpenSettings()
+                },
+                modifier = Modifier.testTag(MENU_SETTINGS_TEST_TAG),
+            )
         }
     }
 }

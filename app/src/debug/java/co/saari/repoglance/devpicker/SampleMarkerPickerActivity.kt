@@ -343,7 +343,8 @@ private fun AppCanvas(marker: SampleMarker, repoView: Boolean) {
                 onBackToRepositories = {},
                 onRefreshRepository = {},
                 onManageGitHubAccess = {},
-                onSignOut = {},
+                onOpenWidgets = {},
+                onOpenSettings = {},
             )
         }
     }

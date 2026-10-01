@@ -10,6 +10,14 @@ Everything below is ready to paste. Sample mode covers the widgets and the
 Quick Settings tile since `sample-widgets-039` (#45), so a reviewer can reach
 every advertised surface without credentials.
 
+**Changed in #53 (Settings and Widgets), not yet in Console.** The Full
+description and What's new below now use the widget names `Repository` and
+`Pinned repos` (also their names in the launcher's widget picker), point to
+**Widgets** in the app's menu, and say that Manage GitHub access and
+Disconnect GitHub are in Settings. Console still holds the earlier text,
+which stays true of this build. Pasting the new text is a maintainer step
+(#7).
+
 Sources: [PRIVACY.md](PRIVACY.md) (published at
 <https://saari-co.github.io/RepoGlance/privacy/>),
 [AUTH_ARCHITECTURE.md](AUTH_ARCHITECTURE.md), `app/src/main/AndroidManifest.xml`
@@ -36,7 +44,7 @@ Read-only GitHub widgets, pinned repos, and open issues and PRs at a glance.
 
 ## Full description
 
-(4,000 characters max; 2,304 used)
+(4,000 characters max; 2,450 used)
 
 ```
 RepoGlance keeps an eye on your GitHub repositories from your Android home screen. It is read-only: it never comments, closes, merges or changes anything on GitHub.
@@ -48,19 +56,20 @@ OPEN ISSUES AND PULL REQUESTS
 Open a repository to see its open issues and pull requests, or just one kind, and search the loaded rows. Tap an item to open the full thread in the GitHub app.
 
 WIDGETS AND A QUICK SETTINGS TILE
-• A per-repository widget with open issue and pull request counts, and the latest items at the taller size.
-• A stack widget that lists your pinned repositories, most recent push first.
+• A Repository widget with open issue and pull request counts, and the latest items at the taller size.
+• A Pinned repos widget that lists your pinned repositories, most recent push first.
 • A Quick Settings tile with your latest push.
+Add a widget from Widgets in the app's menu, which also lists the widgets on your home screen, or from your home screen's widget picker.
 Every value shows how old it is. When GitHub can't be reached, RepoGlance shows the last good value with its age, or "no data". It never shows a made-up zero. Pinned repositories refresh about every 30 minutes on a network connection, within GitHub's rate limits.
 
 TRY IT WITHOUT AN ACCOUNT
 Tap "Explore with sample data" on the first screen to try the catalog, the repository views, the widgets and the Quick Settings tile with made-up repositories, clearly marked sample. Sample mode makes no network requests.
 
 SIGN IN WITH GITHUB'S OWN FLOW
-RepoGlance uses GitHub's device sign-in: you enter a short code on GitHub's own page, so RepoGlance never sees your password. You choose which repositories RepoGlance can read when you install its GitHub App, and you can change that anytime from the app's menu.
+RepoGlance uses GitHub's device sign-in: you enter a short code on GitHub's own page, so RepoGlance never sees your password. You choose which repositories RepoGlance can read when you install its GitHub App, and you can change that anytime from Settings in the app's menu.
 
 NO SERVER, NO TRACKING
-There is no RepoGlance server. The app talks only to GitHub, directly from your phone. Your GitHub token is encrypted with Android Keystore and is used only to reach GitHub. There are no ads, no analytics and no trackers. Disconnect GitHub in the app's menu to delete your session and cached data from the phone.
+There is no RepoGlance server. The app talks only to GitHub, directly from your phone. Your GitHub token is encrypted with Android Keystore and is used only to reach GitHub. There are no ads, no analytics and no trackers. Disconnect GitHub in Settings to delete your session and cached data from the phone.
 
 Made for Pixel phones and foldables, with Material You dynamic color and light and dark themes.
 
@@ -71,10 +80,10 @@ RepoGlance is an independent app. It is not affiliated with or endorsed by GitHu
 
 ## What's new (0.4.0-beta.1)
 
-(500 characters max; 385 used)
+(500 characters max; 409 used)
 
 ```
-First test build. Sign in with GitHub's device flow, pin the repositories you share with RepoGlance, open their issues and pull requests, and add per-repository and stack widgets plus a Quick Settings tile. No account? Tap "Explore with sample data" on the first screen to try all of it with made-up repositories. RepoGlance is read-only and talks only to GitHub. Not yet: a CI column.
+First test build. Sign in with GitHub's device flow, pin the repositories you share with RepoGlance, open their issues and pull requests, and add Repository and Pinned repos widgets from the app's menu, plus a Quick Settings tile. No account? Tap "Explore with sample data" on the first screen to try all of it with made-up repositories. RepoGlance is read-only and talks only to GitHub. Not yet: a CI column.
 ```
 
 ## Graphics

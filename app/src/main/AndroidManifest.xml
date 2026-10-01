@@ -42,7 +42,8 @@
              no write). -->
         <receiver
             android:name=".widget.RepoWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_repo_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -67,7 +68,8 @@
 
         <receiver
             android:name=".widget.StackWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_stack_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

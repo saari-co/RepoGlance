@@ -44,33 +44,40 @@ class GitHubAccessUiSourceWiringTest {
     }
 
     @Test
-    fun loadedRepositoryHomeHeaderMenuExposesManageAndDisconnectLabels() {
+    fun headerMenuOpensWidgetsAndSettingsAndSettingsHoldsGitHubAccess() {
         val root = repositoryRoot()
         val screenSource = readText(
             root.resolve("app/src/main/java/co/saari/repoglance/ui/LiveRepoGlanceScreen.kt"),
         )
-        val loadedHomeSource = screenSource
-            .substringAfter("private fun LiveRepositoryHome(")
-            .substringBefore(
-                "@Composable\nprivate fun LiveNavigator(",
-            )
-
-        assertTrue(
-            "Header menu must expose GitHub access management",
-            loadedHomeSource.contains("Text(\"Manage GitHub access\")"),
-        )
-        assertTrue(
-            "Header menu must expose disconnect action",
-            loadedHomeSource.contains("Text(\"Disconnect GitHub\")"),
+        val menuSource = screenSource
+            .substringAfter("private fun AppMenu(")
+            .substringBefore("@Composable\nprivate fun CatalogRateLimitLine(")
+        assertEquals(
+            "The header menu holds exactly Widgets and Settings (settings-044)",
+            listOf("Widgets", "Settings"),
+            Regex("""text = \{ Text\("([^"]+)"\) \}""").findAll(menuSource).map { it.groupValues[1] }.toList(),
         )
         assertFalse(
-            "Legacy disconnect dialog label must migrate to new header action label",
-            loadedHomeSource.contains("Text(\"Disconnect GitHub?\")"),
+            "Manage GitHub access moved from the header menu into Settings",
+            screenSource.contains("Text(\"Manage GitHub access\")"),
         )
+        assertFalse(
+            "Disconnect moved from the header menu into Settings",
+            screenSource.contains("Text(\"Disconnect GitHub\")"),
+        )
+
+        val settingsSource = readText(
+            root.resolve("app/src/main/java/co/saari/repoglance/ui/settings/SettingsScreen.kt"),
+        )
+        assertTrue(settingsSource.contains("headline = \"Manage GitHub access\""))
+        assertTrue(settingsSource.contains("headline = \"Disconnect GitHub\""))
         assertTrue(
-            "Expected overflow menu entry structure should be present in loaded home",
-            loadedHomeSource.contains("DropdownMenuItem"),
+            "Disconnect still asks before it removes the session",
+            settingsSource.contains("onClick = { confirmDisconnect = true }") &&
+                settingsSource.contains("private fun DisconnectDialog("),
         )
+        val activitySource = readText(root.resolve("app/src/main/java/co/saari/repoglance/MainActivity.kt"))
+        assertTrue(activitySource.contains("onManageGitHubAccess = ::openInstallationSettings,"))
     }
 
     @Test
