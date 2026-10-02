@@ -190,7 +190,7 @@ fun LiveRepoGlanceScreen(
 }
 
 @Composable
-private fun AwaitingGitHubScreen(
+internal fun AwaitingGitHubScreen(
     userCode: String,
     verificationUri: String,
     expiresAt: Instant,
@@ -304,6 +304,7 @@ private fun SampleModeBar(onSignIn: () -> Unit, modifier: Modifier = Modifier) {
     when (LocalSampleMarker.current) {
         SampleMarker.CHIP_ROW -> SampleChipRow(onSignIn, modifier)
         SampleMarker.BANNER -> SampleBanner(onSignIn, modifier)
+        SampleMarker.NONE -> Unit
     }
 }
 

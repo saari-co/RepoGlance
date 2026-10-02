@@ -121,11 +121,18 @@ internal fun readRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetD
 internal fun readSampleRepoWidgetData(context: Context, appWidgetId: Int): RepoWidgetData {
     val config = SampleModeStore.widgetConfig(context, appWidgetId)
     val now = Instant.now()
+    val persona = SampleModeStore.persona(context)
     return RepoWidgetData(
         config = config,
-        snapshot = config?.let { SampleWidgetData.snapshot(it.repo, now) },
-        rows = config?.let { rowsForMode(SampleWidgetData.rows(it.repo, now), it.mode) }.orEmpty(),
-        freshness = WidgetFreshness(now = now, clock = widgetClock(context), rateLimitedUntil = null, sample = true),
+        snapshot = config?.let { SampleWidgetData.snapshot(it.repo, now, persona) },
+        rows = config?.let { rowsForMode(SampleWidgetData.rows(it.repo, now, persona), it.mode) }.orEmpty(),
+        freshness = WidgetFreshness(
+            now = now,
+            clock = widgetClock(context),
+            rateLimitedUntil = null,
+            sample = true,
+            sampleMarker = SampleModeStore.marker(context),
+        ),
     )
 }
 
@@ -172,7 +179,10 @@ internal data class WidgetFreshness(
     val clock: ClockLabel,
     val rateLimitedUntil: Instant?,
     val sample: Boolean = false,
-)
+    val sampleMarker: SampleMarker? = null,
+) {
+    val showsSampleLabel: Boolean get() = sample && sampleMarker != SampleMarker.NONE
+}
 
 internal fun widgetClock(context: Context): ClockLabel = ClockLabel(
     zone = ZoneId.systemDefault(),
@@ -228,7 +238,7 @@ internal fun compactFreshnessLabel(
 ): String {
     val observedAt = snapshot?.observedAt
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) return "no data"
-    if (freshness.sample) return SAMPLE_TIME_LABEL
+    if (freshness.showsSampleLabel) return SAMPLE_TIME_LABEL
     val clock = freshness.clock.format(observedAt, freshness.now)
     return when {
         freshness.rateLimitedUntil != null -> (if (short) "limited · " else "rate limited · ") + clock
@@ -476,7 +486,7 @@ internal fun tallHeaderLabel(snapshot: RepoSnapshot?, mode: NavigatorMode, fresh
     if (snapshot == null || observedAt == null || snapshot.valueBasis == ValueBasis.UNKNOWN) {
         return "no data · open RepoGlance to load"
     }
-    if (freshness.sample) return widgetCountSummary(snapshot, mode) + " · " + SAMPLE_TIME_LABEL
+    if (freshness.showsSampleLabel) return widgetCountSummary(snapshot, mode) + " · " + SAMPLE_TIME_LABEL
     val limited = freshness.rateLimitedUntil
         ?.let { "rate limited · resets " + freshness.clock.time(it) + " · " }
         .orEmpty()

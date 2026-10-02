@@ -61,6 +61,17 @@ class TileTextTest {
     }
 
     @Test
+    fun theShowcaseReadsExactlyLikeALiveTile() {
+        val latest = LatestPushRecord("saltmarsh-io/rocket", now.minus(Duration.ofMinutes(25)), now)
+        val marker = co.saari.repoglance.ui.theme.SampleMarker.NONE
+        assertEquals(TileTexts.of(latest, now), TileTexts.sample(latest, now, marker = marker))
+        assertEquals("saltmarsh-io/rocket · 25m", TileTexts.sample(latest, now, marker = marker).subtitle)
+        assertFalse(TileTexts.sample(latest, now, marker = marker).contentDescription.contains("sample"))
+        assertEquals(TileTexts.of(latest, now, locked = true), TileTexts.sample(latest, now, locked = true, marker = marker))
+        assertEquals(TileTexts.of(null, now), TileTexts.sample(null, now, marker = marker))
+    }
+
+    @Test
     fun sampleModeKeepsTheLockedShadeUnchanged() {
         val latest = LatestPushRecord("saari-co/rocket", now.minus(Duration.ofMinutes(25)), now)
         val text = TileTexts.sample(latest, now, locked = true)

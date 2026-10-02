@@ -230,7 +230,8 @@
     the clock time of its data, a sample widget shows the word `sample`:
     the compact freshness slot, the tall header in place of `as of`, and
     each stack row. Sample data was never fetched and never refreshes, so
-    no clock is shown. Its look is the sample marker below.
+    no clock is shown (the debug-only showcase below is the one exception).
+    Its look is the sample marker below.
   - **Unconfigured repo widget [sample-widgets-039]:** `RepoGlance` over
     `Tap to choose a repository`; a tap opens that widget's setup. It
     replaced the stale `FIXTURE PREVIEW` label.
@@ -255,6 +256,18 @@
     row (the provisional look, kept only as the seam's pre-lock value);
     C full-bleed top strip; D header badge; E persistent bottom bar.
   - **Proof:** `.grilltrack/proof/sample-marker-040-verify-20260930.md`.
+  - **Showcase [showcase-048, debug-only]:** `SampleMarker.NONE` is the
+    third seam value: no banner, no capsule, no band, and the tile and
+    every time slot read like a live widget (`as of 9:30`, `25m`). It is
+    reachable only through the debug launcher (`screen=showcase`), which is
+    the only writer of `SampleModeStore.KEY_SHOWCASE`; a release build has
+    no writer, and leaving sample mode clears it. The showcase renders the
+    same seven repositories, rows and counts under the fictional
+    `SamplePersona.SHOWCASE` (`saltmarsh-io`, `ferrywood`,
+    `elin-tidewater`, all 404 on GitHub on 2026-10-01) so a marker-free
+    screen never attributes made-up numbers to a real account. Its purpose
+    is the imagery of repoglance.com; the shipped sample mode and its
+    banner are unchanged.
 - **Status colour [status-colour-029, "family tonal"]:** four meanings, one
   hue each, shared with Swarm Intercom and harmonised with dynamic colour.
   `render/CiSemanticRole.kt` maps CI to POSITIVE / NEGATIVE / IN_PROGRESS /

@@ -392,6 +392,20 @@ widgets, `StatusColors` and `SnapshotRendering.rateLimitRole` use it.
 - Non-null exactly when the snapshot's basis is LAST_GOOD.
 
 
+### `co/saari/repoglance/sample/SampleAccount.kt`
+
+- `SamplePersona` says whose repositories sample mode shows. `SAMPLE` is the
+  shipped sample mode: made-up repositories under the maintainer's own
+  accounts, marked SAMPLE on every screen (sample-mode-042). `SHOWCASE` is
+  the debug-only showcase for website imagery (showcase-048): the same
+  repositories, rows and counts under fictional owners (`saltmarsh-io`,
+  `ferrywood`, `elin-tidewater`) that resolved 404 on GitHub on 2026-10-01,
+  so a marker-free screen never attributes made-up numbers to a real
+  account. `SamplePersona.of(owner)` maps an owner back to its persona;
+  unknown owners read as `SAMPLE`. Guard: `SampleAccountTest` pins both
+  name lists (layer 2).
+
+
 ### `co/saari/repoglance/state/AppPrefs.kt`
 
 The fixture-scenario and fixture-pin members (and their keys) moved to
@@ -443,6 +457,17 @@ release builds no longer contain it.
    invalid/unparseable repo [value] — never throws.
 
 
+### `co/saari/repoglance/state/SampleModeStore.kt`
+
+- `KEY_SHOWCASE` marks the debug-only showcase (showcase-048): sample mode
+  under the `SHOWCASE` persona with `SampleMarker.NONE`. Only the debug
+  source set's `ShowcaseLaunch` writes it, so a release build has no
+  writer, and `leave()` clears it with the rest of sample mode. `marker()`
+  and `persona()` are the single reads the app, widgets and tile share.
+  Guard: `SampleMarkerTest.theShowcaseIsWrittenOnlyFromTheDebugSourceSet`
+  scans `app/src/main` for a writer (layer 2).
+
+
 ### `co/saari/repoglance/state/SnapshotStore.kt`
 
 - Pure function layer over [Fixtures]: pin-aware sorting, widget-content
@@ -489,6 +514,13 @@ release builds no longer contain it.
    both are non-null for [NavigatorMode.BOTH].
 
 
+### `co/saari/repoglance/tile/TileText.kt`
+
+- `TileTexts.sample(marker = NONE)` returns exactly `TileTexts.of(...)`: in
+  the showcase the tile reads like a live tile, with no "Sample" prefix.
+  Guard: `TileTextTest.theShowcaseReadsExactlyLikeALiveTile` (layer 2).
+
+
 ### `co/saari/repoglance/ui/HomeScreen.kt`
 
 Moved to `app/src/debug` on 2026-10-01 with the rest of the fixture route;
@@ -508,6 +540,14 @@ release builds no longer contain it.
 
 
 ### `co/saari/repoglance/ui/LiveRepoGlanceScreen.kt`
+
+- `AwaitingGitHubScreen` is `internal` so the debug-only
+  `SignInCodePreviewActivity` can hold the real device-code screen open
+  with a made-up code for repoglance.com's imagery (showcase-048). The
+  production path still reaches it only through
+  `LiveUiState.AwaitingDeviceAuthorization`. Guard:
+  `SignInCodePreviewTest` pins the fixture and the absence of any device
+  flow call in the preview (layer 2).
 
 - Accessibility resource id for the repository search field on the loaded home.
 
@@ -542,6 +582,15 @@ release builds no longer contain it.
 - opaque copy over the list once the controls item has left the viewport
 
 - so the sole persistent app control remains available in every posture.
+
+
+### `co/saari/repoglance/ui/theme/SampleMarker.kt`
+
+- `SampleMarker.NONE` is the third seam value: no banner, no capsule, no
+  band, live-looking time slots. It exists for the debug-only showcase
+  (showcase-048) and is never the default and never user-selectable; the
+  locked production marker stays `BANNER` (sample-marker-040). Guard:
+  `SampleMarkerTest.theLockedTonalBannerIsTheProductionMarker` (layer 2).
 
 
 ### `co/saari/repoglance/ui/theme/Theme.kt`
@@ -594,6 +643,12 @@ release builds no longer contain it.
 
 - there is height for it.
 
+- `WidgetFreshness.sampleMarker` carries the persisted sample marker into a
+  sample widget; `null` falls back to `LocalSampleMarker` so the debug
+  pickers keep previewing candidates. `showsSampleLabel` is true for every
+  marker but the showcase's `NONE`, which renders the clock like a live
+  widget (showcase-048). Guard: `SampleMarkerTest.showcaseLabelsCarryNoSampleWord`
+  (layer 2).
 
 ### `co/saari/repoglance/widget/RepoWidgetConfigActivity.kt`
 

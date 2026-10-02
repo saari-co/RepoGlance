@@ -68,6 +68,45 @@ class SampleAccountTest {
         }
     }
 
+    private val showcaseRepositories = listOf(
+        "saltmarsh-io/rocket",
+        "saltmarsh-io/api-server",
+        "saltmarsh-io/mobile-app",
+        "ferrywood/infra",
+        "ferrywood/design-system",
+        "elin-tidewater/dotfiles",
+        "saltmarsh-io/legacy-site",
+    )
+
+    @Test
+    fun theShowcasePersonaIsTheSameCatalogUnderFictionalOwners() {
+        val sample = SampleAccount.catalog(now)
+        val showcase = SampleAccount.catalog(now, SamplePersona.SHOWCASE)
+        assertEquals(
+            "the showcase owners resolved 404 on GitHub on 2026-10-01 (showcase-048); changing them needs a fresh check",
+            showcaseRepositories,
+            showcase.repositories.map { it.ref.full },
+        )
+        assertEquals("elin-tidewater", showcase.viewer.login)
+        assertTrue(showcase.repositories.none { it.ref.owner in setOf("saari-co", "dinkuskit", "saariuslystoned") })
+        assertEquals(sample.repositories.map { it.ref.name }, showcase.repositories.map { it.ref.name })
+        assertEquals(sample.repositories.map { it.id }, showcase.repositories.map { it.id })
+        assertEquals(sample.repositories.map { it.pushedAt }, showcase.repositories.map { it.pushedAt })
+        assertEquals(sample.repositories.map { it.isPrivate to it.isArchived }, showcase.repositories.map { it.isPrivate to it.isArchived })
+        for ((real, fictional) in sample.repositories.zip(showcase.repositories)) {
+            val realContent = SampleAccount.content(real, now)
+            val content = SampleAccount.content(fictional, now)
+            assertEquals(issues(realContent).map { it.number to it.title }, issues(content).map { it.number to it.title })
+            assertEquals(pullRequests(realContent).map { it.number to it.title }, pullRequests(content).map { it.number to it.title })
+            (issues(content).map { it.author } + pullRequests(content).map { it.author }).forEach { assertEquals("elin-tidewater", it) }
+            issues(content).forEach { assertTrue(it.assignee == null || it.assignee == "elin-tidewater") }
+        }
+        assertEquals(SamplePersona.SHOWCASE, SamplePersona.of("saltmarsh-io"))
+        assertEquals(SamplePersona.SHOWCASE, SamplePersona.of("Ferrywood"))
+        assertEquals(SamplePersona.SAMPLE, SamplePersona.of("saari-co"))
+        assertEquals(SamplePersona.SAMPLE, SamplePersona.of("someone-else"))
+    }
+
     @Test
     fun catalogHasSeveralOwnersAndVisibilities() {
         val repositories = SampleAccount.catalog(now).repositories

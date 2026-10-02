@@ -2,13 +2,13 @@
   "closeout": null,
   "created_at": "2026-07-28T16:10:40+00:00",
   "current_focus": {
-    "cadence": "frontier-batch",
+    "cadence": "sequential",
     "confirmed": true,
-    "confirmed_at": "2026-10-01T13:44:09+00:00",
-    "domain": "repoglance.com website: where the site source lives, the page set, and the look (EmDash on Cloudflare; introduces the app and links to the closed-test signup)",
-    "started_at": "2026-10-01T13:44:09+00:00",
+    "confirmed_at": "2026-10-01T13:38:43+00:00",
+    "domain": "showcase-048: a debug-only showcase mode for website imagery, requested by the maintainer on 2026-10-01 for repoglance.com ('use other mock data; sample data should just be for testers; use an emulator'): sample mode rendered without the SAMPLE marker and under fictional owners, reachable only through the debug scenario launcher, captured on the approved emulator; the production sample marker (sample-marker-040) stays locked",
+    "started_at": "2026-10-01T13:31:41+00:00",
     "status": "inspected",
-    "summary": "Maintainer 2026-10-01 took all three recommendations in frontier batch 1: (048) create public MIT saari-co/repoglance-site laid out like dinkuskit; (049) two pages, / and /testers, privacy stays a link to the GitHub Pages policy Play points at; (050) the signup link is https://groups.google.com/g/repoglance-testers, with the Play opt-in link added when Console shows it. Bounded implementation: the site foundation in saari-co/repoglance-site; the look and hosting followed in that repository's ledger. Delivery separate: PRs; merges, Cloudflare, DNS, Access and deploys only with the maintainer's OK."
+    "summary": "Implement the showcase in claude/showcase-mode (worktree RepoGlance-worktrees/RepoGlance-showcase-mode): SampleMarker.NONE, SamplePersona, SampleModeStore showcase flag, persona-aware widgets and tile, ShowcaseLaunch in the debug source set, launcher screen=showcase, bin/verify-repoglance, unit tests, design.md, the sample-mode feature map; verify with ./gradlew check and emulator captures through verify-repoglance; review the exact commit; then a PR. No merge, no release."
   },
   "decisions": [
     {
@@ -6018,6 +6018,141 @@
       "superseded_by": null,
       "updated_at": "2026-10-01T13:44:10+00:00",
       "verification_ref": "github:saari-co/repoglance-site proof/cms-access-20261001/PROOF.md (Group link on /testers; no Play URL; opt-in link stated as not published)"
+    },
+    {
+      "baseline_ref": "git:eb1fa12 (main)",
+      "candidate_refs": [],
+      "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+      "context_ref": "ledger:saari-co/repoglance-site#site-imagery-007",
+      "created_at": "2026-10-01T13:38:42+00:00",
+      "deferred_reason": null,
+      "delivery_ref": null,
+      "dependencies": [
+        "sample-marker-040",
+        "sample-mode-042"
+      ],
+      "domain": "showcase-048: a debug-only showcase mode for website imagery, requested by the maintainer on 2026-10-01 for repoglance.com ('use other mock data; sample data should just be for testers; use an emulator'): sample mode rendered without the SAMPLE marker and under fictional owners, reachable only through the debug scenario launcher, captured on the approved emulator; the production sample marker (sample-marker-040) stays locked",
+      "history": [
+        {
+          "at": "2026-10-01T13:38:42+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "proposed",
+          "implementation_ref": null,
+          "note": "user accepted the scoped decision",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "locked",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T13:54:19+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "locked",
+          "implementation_ref": null,
+          "note": "bounded implementation recorded",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "implemented",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T14:52:07+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "implemented",
+          "implementation_ref": "git:bbce61a (SampleMarker.NONE, SamplePersona.SHOWCASE, SampleModeStore showcase flag, persona-aware widgets and tile, ShowcaseLaunch + launcher screen=showcase, bin/verify-repoglance, unit tests, design.md, INVARIANTS.md, sample-mode feature map); ./gradlew check green",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": null
+        },
+        {
+          "at": "2026-10-01T15:54:30+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "verified",
+          "implementation_ref": "git:bbce61a (SampleMarker.NONE, SamplePersona.SHOWCASE, SampleModeStore showcase flag, persona-aware widgets and tile, ShowcaseLaunch + launcher screen=showcase, bin/verify-repoglance, unit tests, design.md, INVARIANTS.md, sample-mode feature map); ./gradlew check green",
+          "note": "adjudicated review requires a fix",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "needs_reverification",
+          "verification_ref": "file:.grilltrack/proof/showcase-048-verify-20261001.md (./gradlew check green on bbce61a; emulator walk through the debug launcher with dumps and 13 captures in the private release repoglance-showcase-048-20261001)"
+        },
+        {
+          "at": "2026-10-01T15:54:30+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "needs_reverification",
+          "implementation_ref": "git:bbce61a (SampleMarker.NONE, SamplePersona.SHOWCASE, SampleModeStore showcase flag, persona-aware widgets and tile, ShowcaseLaunch + launcher screen=showcase, bin/verify-repoglance, unit tests, design.md, INVARIANTS.md, sample-mode feature map); ./gradlew check green",
+          "note": "bounded implementation recorded",
+          "repair_required": true,
+          "review_classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "review_ref": ".grilltrack/proof/showcase-048-verify-20261001.md#review-round-1",
+          "review_result": "findings",
+          "review_source_identity": "git:bbce61a880335a2629b00b4ac860cee90e97d9db",
+          "to": "implemented",
+          "verification_ref": "file:.grilltrack/proof/showcase-048-verify-20261001.md (./gradlew check green on bbce61a; emulator walk through the debug launcher with dumps and 13 captures in the private release repoglance-showcase-048-20261001)"
+        },
+        {
+          "at": "2026-10-01T15:54:30+00:00",
+          "choice": "A debug-only showcase: SampleMarker.NONE at the four marker seams (catalog bar, widget capsule and bands, tile subtitle, time slots read like live), the same seven repositories and rows under the fictional SamplePersona.SHOWCASE (saltmarsh-io, ferrywood, elin-tidewater; all 404 on GitHub on 2026-10-01), persisted as SampleModeStore.KEY_SHOWCASE and written only by the debug launcher's screen=showcase; release builds have no writer; the shipped sample mode and its banner (sample-marker-040) are unchanged; captured on the approved emulator for repoglance.com.",
+          "from": "implemented",
+          "implementation_ref": "git:f19ca5b (review round 1 fixes in a05590c: ShowcaseLaunch prunes stale sample state, stronger writer scan, accurate feature map and design.md; f19ca5b: debug-only SignInCodePreviewActivity with the fixture code HK7N-4R2D for the website's sign-in imagery)",
+          "note": "verification recorded in cumulative context",
+          "repair_required": false,
+          "review_classifications": [],
+          "review_ref": null,
+          "review_result": null,
+          "review_source_identity": null,
+          "to": "verified",
+          "verification_ref": "file:.grilltrack/proof/showcase-048-verify-20261001.md (./gradlew check green on bbce61a; emulator walk through the debug launcher with dumps and 13 captures in the private release repoglance-showcase-048-20261001)"
+        }
+      ],
+      "id": "showcase-048",
+      "implementation_ref": "git:f19ca5b (review round 1 fixes in a05590c: ShowcaseLaunch prunes stale sample state, stronger writer scan, accurate feature map and design.md; f19ca5b: debug-only SignInCodePreviewActivity with the fixture code HK7N-4R2D for the website's sign-in imagery)",
+      "question": "How does the website get real screenshots of RepoGlance without the SAMPLE marker and without a real account's data?",
+      "rationale": "Explicit maintainer direction on 2026-10-01 ('3, use an emulator') after three honest options were laid out; the fictional owners are the agent's call so a marker-free screen never points at a real account.",
+      "repair_required": false,
+      "review_classifications": [],
+      "review_history": [
+        {
+          "classifications": [
+            "required_fix",
+            "defer"
+          ],
+          "ref": ".grilltrack/proof/showcase-048-verify-20261001.md#review-round-1",
+          "result": "findings",
+          "reviewed_at": "2026-10-01T15:54:30+00:00",
+          "source_identity": "git:bbce61a880335a2629b00b4ac860cee90e97d9db"
+        },
+        {
+          "classifications": [],
+          "ref": ".grilltrack/proof/showcase-048-verify-20261001.md#sign-in-code-preview-maintainer-request-after-imagery-round-1",
+          "result": "clean",
+          "reviewed_at": "2026-10-01T15:55:25+00:00",
+          "source_identity": "git:f19ca5ba6da54b7eea1e593dd9e2f565d318fbf9"
+        }
+      ],
+      "review_ref": ".grilltrack/proof/showcase-048-verify-20261001.md#sign-in-code-preview-maintainer-request-after-imagery-round-1",
+      "review_result": "clean",
+      "review_source_identity": "git:f19ca5ba6da54b7eea1e593dd9e2f565d318fbf9",
+      "status": "verified",
+      "superseded_by": null,
+      "updated_at": "2026-10-01T15:55:25+00:00",
+      "verification_ref": "file:.grilltrack/proof/showcase-048-verify-20261001.md (./gradlew check green on f19ca5b; the showcase captures from bbce61a stand; the sign-in code preview captured on the emulator in both themes)"
     }
   ],
   "last_activation": {
@@ -6038,15 +6173,15 @@
   "pause": null,
   "recommendation": {
     "alternatives": [
-      "Point the Play listing's website field and the README at https://repoglance.com (a Play Console change is maintainer-only)."
+      "widget-previews follow-up: the launcher's Add sheet and widget picker still preview the maintainer-owner sample set; a showcase-aware preview is possible but has no user-facing purpose."
     ],
-    "reason": "The website decisions 048-050 are implemented, verified and live from their own repository; app-side slots are unchanged by them.",
-    "recommended": "Return to the app: the unresolved RepoGlance slots (compact 12-hour capsule fit, static brand fallback scheme, shape on the remaining M3 controls) and the widget-preview decisions' follow-ups.",
-    "recorded_at": "2026-10-01T13:44:10+00:00"
+    "reason": "The showcase exists only for the website; nothing else in the app waits on it.",
+    "recommended": "Keep the showcase in step with the website: when repoglance.com's imagery is locked, record the asset release and the slugs it uses here, and re-capture only when a captured surface changes.",
+    "recorded_at": "2026-10-01T15:55:26+00:00"
   },
   "schema_version": "grilltrack/v0.1",
   "status": "active",
   "title": "RepoGlance product identity and bootstrap contract",
   "track_id": "gt-20260728163459-227573",
-  "updated_at": "2026-10-01T13:44:10+00:00"
+  "updated_at": "2026-10-01T15:55:26+00:00"
 }

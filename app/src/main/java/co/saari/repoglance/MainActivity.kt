@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import co.saari.repoglance.ui.settings.SettingsScreen
 import co.saari.repoglance.ui.settings.ThemeSettingItem
 import co.saari.repoglance.ui.settings.WidgetsScreen
 import co.saari.repoglance.ui.settings.settingsAccount
+import co.saari.repoglance.ui.theme.LocalSampleMarker
 import co.saari.repoglance.ui.theme.RepoGlanceTheme
 import co.saari.repoglance.widget.EXTRA_LIVE_CATALOG
 import co.saari.repoglance.widget.EXTRA_LIVE_REPO_FULL
@@ -81,7 +83,9 @@ class MainActivity : ComponentActivity() {
                         .semantics { testTagsAsResourceId = true },
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    if (fixtureRoute.isOpen) fixtureRoute.Content() else LiveRoot()
+                    CompositionLocalProvider(LocalSampleMarker provides liveModel.sampleMarker.value) {
+                        if (fixtureRoute.isOpen) fixtureRoute.Content() else LiveRoot()
+                    }
                 }
             }
         }

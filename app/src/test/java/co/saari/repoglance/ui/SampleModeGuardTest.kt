@@ -44,7 +44,10 @@ class SampleModeGuardTest {
             Regex(Regex.escape("WidgetRefresh.")).findAll(setSampleMode).count(),
         )
         val enter = section(setSampleMode, "if (active) {", "} else {")
-        assertTrue(enter.contains("SampleAccount.catalog(now)"))
+        assertTrue(
+            "the sample catalog comes from SampleAccount under the phone's persona (showcase-048)",
+            enter.contains("SampleAccount.catalog(now, SampleModeStore.persona(context))"),
+        )
         assertTrue(enter.contains("rateLimit = SampleAccount.RATE_LIMIT"))
         assertTrue(
             "the sample flag write and its redraw survive the screen closing",

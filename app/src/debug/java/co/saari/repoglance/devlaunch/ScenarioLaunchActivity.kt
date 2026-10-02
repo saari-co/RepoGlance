@@ -43,6 +43,10 @@ import kotlinx.coroutines.withContext
 //         | type-picker (extra candidate A..E)
 //         | checking (the production Checking screen held open)
 //         | signin-finishing (the production post-token sign-in screens held open)
+//         | signin-code (the production device-code screen held open with a
+//           made-up code, for website imagery; never a GitHub-issued code)
+//         | showcase (sample mode under the fictional showcase persona with no
+//           marker, for website imagery; showcase-048)
 //         | none (apply the extras below and stay on the current screen)
 // probeCommitDelaySeconds (long, optional): arms hooks.RefreshProbe once.
 // rateFault (LOW | EXHAUSTED | OFF, optional) with rateFaultResetSeconds (long,
@@ -84,6 +88,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
                     TransportFault.arm(applicationContext, kind, rateFaultResetSeconds)
                 }
                 if (refreshNow) BackgroundRefresh.refreshNow(applicationContext)
+                if (screen == SCREEN_SHOWCASE) ShowcaseLaunch.enter(applicationContext)
             }
             if (next != null) startActivity(next)
             finish()
@@ -148,6 +153,8 @@ class ScenarioLaunchActivity : ComponentActivity() {
         const val SCREEN_WIDGET_PREVIEW_PICKER = "widget-preview-picker"
         const val SCREEN_CHECKING = "checking"
         const val SCREEN_SIGNIN_FINISHING = "signin-finishing"
+        const val SCREEN_SIGNIN_CODE = "signin-code"
+        const val SCREEN_SHOWCASE = "showcase"
         const val SCREEN_NONE = "none"
         const val EXTRA_SLOT = "slot"
         const val EXTRA_CANDIDATE = "candidate"
@@ -159,6 +166,7 @@ class ScenarioLaunchActivity : ComponentActivity() {
             SCREEN_PICKER to WidgetVariantPickerActivity::class.java,
             SCREEN_CHECKING to CheckingPreviewActivity::class.java,
             SCREEN_SIGNIN_FINISHING to SignInFinishingPreviewActivity::class.java,
+            SCREEN_SIGNIN_CODE to SignInCodePreviewActivity::class.java,
         )
         val FAMILY_PICKERS: Map<String, Class<out Activity>> = mapOf(
             SCREEN_STATUS_PICKER to StatusColourVariantPickerActivity::class.java,

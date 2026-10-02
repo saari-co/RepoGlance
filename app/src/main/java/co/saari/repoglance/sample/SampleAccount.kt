@@ -15,6 +15,27 @@ import co.saari.repoglance.model.RepoRef
 import java.time.Duration
 import java.time.Instant
 
+enum class SamplePersona(val viewer: String, val org: String, val secondOrg: String) {
+    SAMPLE(viewer = SampleAccount.VIEWER_LOGIN, org = "saari-co", secondOrg = "dinkuskit"),
+    SHOWCASE(viewer = "elin-tidewater", org = "saltmarsh-io", secondOrg = "ferrywood"),
+    ;
+
+    val owners: Set<String> get() = setOf(viewer, org, secondOrg)
+
+    internal fun owner(slot: OwnerSlot): String = when (slot) {
+        OwnerSlot.ORG -> org
+        OwnerSlot.SECOND_ORG -> secondOrg
+        OwnerSlot.VIEWER -> viewer
+    }
+
+    companion object {
+        fun of(owner: String): SamplePersona =
+            entries.firstOrNull { persona -> persona.owners.any { it.equals(owner, ignoreCase = true) } } ?: SAMPLE
+    }
+}
+
+internal enum class OwnerSlot { ORG, SECOND_ORG, VIEWER }
+
 object SampleAccount {
     const val VIEWER_LOGIN = "saariuslystoned"
     const val ITEM_NOTE = "Sample item — not on GitHub"
@@ -26,33 +47,38 @@ object SampleAccount {
 
     private data class SampleRepo(
         val id: Long,
-        val ref: RepoRef,
+        val slot: OwnerSlot,
+        val name: String,
         val isPrivate: Boolean,
         val isArchived: Boolean,
         val pushedAgo: Duration?,
         val issueCount: Int,
         val pullRequestCount: Int,
         val firstNumber: Int,
-    )
+    ) {
+        fun ref(persona: SamplePersona): RepoRef = RepoRef(persona.owner(slot), name)
+    }
 
     private val REPOS = listOf(
-        SampleRepo(1L, RepoRef("saari-co", "rocket"), false, false, Duration.ofMinutes(25), 5, 3, 412),
-        SampleRepo(2L, RepoRef("saari-co", "api-server"), true, false, Duration.ofHours(2), 3, 2, 218),
-        SampleRepo(3L, RepoRef("saari-co", "mobile-app"), false, false, Duration.ofHours(6), 4, 2, 87),
-        SampleRepo(4L, RepoRef("dinkuskit", "infra"), true, false, Duration.ofDays(1), 2, 1, 1_203),
-        SampleRepo(5L, RepoRef("dinkuskit", "design-system"), false, false, Duration.ofDays(3), 1, 0, 36),
-        SampleRepo(6L, RepoRef(VIEWER_LOGIN, "dotfiles"), false, false, Duration.ofDays(9), 0, 1, 14),
-        SampleRepo(7L, RepoRef("saari-co", "legacy-site"), false, true, null, 0, 0, 1),
+        SampleRepo(1L, OwnerSlot.ORG, "rocket", false, false, Duration.ofMinutes(25), 5, 3, 412),
+        SampleRepo(2L, OwnerSlot.ORG, "api-server", true, false, Duration.ofHours(2), 3, 2, 218),
+        SampleRepo(3L, OwnerSlot.ORG, "mobile-app", false, false, Duration.ofHours(6), 4, 2, 87),
+        SampleRepo(4L, OwnerSlot.SECOND_ORG, "infra", true, false, Duration.ofDays(1), 2, 1, 1_203),
+        SampleRepo(5L, OwnerSlot.SECOND_ORG, "design-system", false, false, Duration.ofDays(3), 1, 0, 36),
+        SampleRepo(6L, OwnerSlot.VIEWER, "dotfiles", false, false, Duration.ofDays(9), 0, 1, 14),
+        SampleRepo(7L, OwnerSlot.ORG, "legacy-site", false, true, null, 0, 0, 1),
     )
 
-    fun catalog(now: Instant): LiveRepositoryCatalog = LiveRepositoryCatalog(
-        viewer = GitHubViewer(login = VIEWER_LOGIN, avatarUrl = null),
-        installations = emptyList(),
-        repositories = REPOS.map { it.toLive(now) },
-    )
+    fun catalog(now: Instant, persona: SamplePersona = SamplePersona.SAMPLE): LiveRepositoryCatalog =
+        LiveRepositoryCatalog(
+            viewer = GitHubViewer(login = persona.viewer, avatarUrl = null),
+            installations = emptyList(),
+            repositories = REPOS.map { it.toLive(now, persona) },
+        )
 
     fun content(repository: LiveRepository, now: Instant): LiveRepositoryContent {
-        val index = REPOS.indexOfFirst { it.ref.full.equals(repository.ref.full, ignoreCase = true) }
+        val persona = SamplePersona.of(repository.ref.owner)
+        val index = REPOS.indexOfFirst { it.ref(persona).full.equals(repository.ref.full, ignoreCase = true) }
         val sample = REPOS.getOrNull(index) ?: return LiveRepositoryContent(
             repository = repository,
             issues = GitHubApiResult.Failure(OUTSIDE_SAMPLE, statusCode = null, rateLimit = UNKNOWN_RATE),
@@ -61,34 +87,34 @@ object SampleAccount {
         return LiveRepositoryContent(
             repository = repository,
             issues = GitHubApiResult.Success(
-                LivePage(issueRows(sample, index, now), hasMorePages = false),
+                LivePage(issueRows(sample, index, now, persona), hasMorePages = false),
                 now,
                 RATE_LIMIT,
             ),
             pullRequests = GitHubApiResult.Success(
-                LivePage(pullRequestRows(sample, index, now), hasMorePages = false),
+                LivePage(pullRequestRows(sample, index, now, persona), hasMorePages = false),
                 now,
                 RATE_LIMIT,
             ),
         )
     }
 
-    private fun SampleRepo.toLive(now: Instant) = LiveRepository(
+    private fun SampleRepo.toLive(now: Instant, persona: SamplePersona) = LiveRepository(
         id = id,
-        ref = ref,
+        ref = ref(persona),
         isPrivate = isPrivate,
         isArchived = isArchived,
         pushedAt = pushedAgo?.let { now.minus(it) },
     )
 
-    private fun issueRows(repo: SampleRepo, repoIndex: Int, now: Instant): List<LiveIssue> =
+    private fun issueRows(repo: SampleRepo, repoIndex: Int, now: Instant, persona: SamplePersona): List<LiveIssue> =
         (0 until repo.issueCount).map { i ->
             val seed = repoIndex * 3 + i
             LiveIssue(
                 number = repo.firstNumber + repo.pullRequestCount + i,
                 title = pick(Fixtures.TITLE_POOL, seed),
-                author = VIEWER_LOGIN,
-                assignee = if (i % 2 == 0) VIEWER_LOGIN else null,
+                author = persona.viewer,
+                assignee = if (i % 2 == 0) persona.viewer else null,
                 labels = labels(seed, count = 1 + i % 2),
                 commentCount = (seed * 3) % 7,
                 updatedAt = rowUpdatedAt(repo, i, now),
@@ -96,13 +122,18 @@ object SampleAccount {
             )
         }
 
-    private fun pullRequestRows(repo: SampleRepo, repoIndex: Int, now: Instant): List<LivePullRequest> =
+    private fun pullRequestRows(
+        repo: SampleRepo,
+        repoIndex: Int,
+        now: Instant,
+        persona: SamplePersona,
+    ): List<LivePullRequest> =
         (0 until repo.pullRequestCount).map { j ->
             val seed = repoIndex * 5 + j + Fixtures.TITLE_POOL.size / 2
             LivePullRequest(
                 number = repo.firstNumber + j,
                 title = pick(Fixtures.TITLE_POOL, seed),
-                author = VIEWER_LOGIN,
+                author = persona.viewer,
                 assignee = null,
                 labels = labels(seed, count = j % 2),
                 isDraft = j == 1,

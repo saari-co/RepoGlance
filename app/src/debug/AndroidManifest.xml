@@ -61,6 +61,10 @@
             android:exported="true"
             android:label="verify-repoglance sign-in finishing preview" />
         <activity
+            android:name="co.saari.repoglance.devlaunch.SignInCodePreviewActivity"
+            android:exported="true"
+            android:label="verify-repoglance sign-in code preview (fixture code)" />
+        <activity
             android:name="co.saari.repoglance.devlaunch.ScenarioLaunchActivity"
             android:exported="true"
             android:label="verify-repoglance scenario launcher"
