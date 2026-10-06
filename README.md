@@ -22,6 +22,10 @@ tags build signed APKs and AABs on
 [GitHub Releases](https://github.com/saari-co/RepoGlance/releases)
 ([docs/RELEASING.md](docs/RELEASING.md)).
 
+The website, [repoglance.com](https://repoglance.com), introduces the app
+and explains how to join the closed test; its source is
+[saari-co/repoglance-site](https://github.com/saari-co/repoglance-site).
+
 Available on `main`, with device proof in [`proof/`](proof/) and
 [`.grilltrack/proof/`](.grilltrack/proof/):
 
