@@ -1,0 +1,72 @@
+name: ClawSweeper native comment request
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  relay:
+    if: >-
+      vars.CLAWSWEEPER_NATIVE_INTAKE_ENABLED == 'true' &&
+      github.event.issue.pull_request != null && github.event.comment.user.type == 'User'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Bind the supported command to the current PR
+        id: request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -I - <<'PY' > "$RUNNER_TEMP/clawsweeper-request.json"
+          import json, os, re, subprocess
+          with open(os.environ['GITHUB_EVENT_PATH']) as source:
+              event = json.load(source)
+          comment = event['comment']
+          commands = [m[1].lower() for line in comment.get('body', '').splitlines()
+                      if (m := re.fullmatch(r'\s*@clawsweeper\s+(review|re-review|re-run)\s*', line, re.I))]
+          if len(commands) != 1:
+              raise SystemExit(0)
+          repo = os.environ['GITHUB_REPOSITORY']
+          if not repo.startswith(('saari-co/', 'dinkuskit/')):
+              raise SystemExit(0)
+          number = event['issue']['number']
+          def get(path):
+              return json.loads(subprocess.check_output(['gh', 'api', path], text=True))
+          pull = get(f'repos/{repo}/pulls/{number}')
+          metadata = get('repos/' + repo)
+          if pull['state'] != 'open' or pull['draft'] or pull['base']['ref'] != metadata['default_branch']:
+              raise SystemExit(0)
+          trusted = comment.get('author_association') in {'OWNER', 'MEMBER', 'COLLABORATOR'}
+          author_rerun = commands[0] != 'review' and comment['user']['login'] == pull['user']['login']
+          if not trusted and not author_rerun:
+              raise SystemExit(0)
+          payload = dict(target_repo=repo, repository_id=str(metadata['id']), pr=str(number),
+              requested_base=pull['base']['sha'], requested_head=pull['head']['sha'],
+              origin_repository=repo, origin_run_id=os.environ['GITHUB_RUN_ID'],
+              origin_run_attempt=os.environ['GITHUB_RUN_ATTEMPT'], comment_id=str(comment['id']),
+              publish=trusted)
+          print(json.dumps(dict(event_type='clawsweeper_native_pr', client_payload=payload)))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('requested=true\n')
+          PY
+      - name: Preserve exact source request
+        if: steps.request.outputs.requested == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: clawsweeper-request-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/clawsweeper-request.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Relay for full admission
+        if: steps.request.outputs.requested == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.CLAWSWEEPER_DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          [ -n "$GH_TOKEN" ] || { echo 'Native dispatch credential is not configured.' >&2; exit 1; }
+          gh api --method POST repos/saari-co/spark-dgx/dispatches --input "$RUNNER_TEMP/clawsweeper-request.json"
+          echo 'Request delivered for validation; this does not claim acceptance or review clearance.'
