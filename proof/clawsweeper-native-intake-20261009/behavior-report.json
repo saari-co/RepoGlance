@@ -1,0 +1,234 @@
+{
+  "overall_behavior": "satisfies_contract",
+  "overall_confidence": 1.0,
+  "target": {
+    "type": "CLI",
+    "access": "real extracted workflow payload builder, controlled gh API"
+  },
+  "contract": {
+    "path": "behavior-contract.md",
+    "version": "2026-10-09"
+  },
+  "checks": [
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-re-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-re-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-re-run-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance OWNER-re-run-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-re-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-re-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-re-run-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance MEMBER-re-run-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=true",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-re-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-re-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=false",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-re-run-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance COLLABORATOR-re-run-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=false",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-re-review-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-re-review-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=false",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-re-run-author=False",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance NONE-re-run-author=True",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; bound request emitted with publish=false",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance empty",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance prose",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance multiple",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance draft",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance closed",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    },
+    {
+      "contract_clause": "saari-co/RepoGlance wrong-base",
+      "status": "pass",
+      "severity": null,
+      "evidence": "Actual extracted workflow program exit 0; no request emitted",
+      "confidence": 1.0
+    }
+  ],
+  "anti_cheat_probes": [
+    {
+      "probe": "Change repository ID, head SHA, comment ID per case",
+      "result": "All emitted identities match changed live fixture inputs"
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Controlled event/API execution, not a live GitHub Actions comment run. Outer workflow User-only gate and artifact/dispatch are checked separately; model execution/publication not exercised."
+  ]
+}
