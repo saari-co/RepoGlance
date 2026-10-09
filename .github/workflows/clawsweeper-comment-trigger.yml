@@ -40,7 +40,7 @@ jobs:
           metadata = get('repos/' + repo)
           if pull['state'] != 'open' or pull['draft'] or pull['base']['ref'] != metadata['default_branch']:
               raise SystemExit(0)
-          trusted = comment.get('author_association') in {'OWNER', 'MEMBER', 'COLLABORATOR'}
+          trusted = comment.get('author_association') in {'OWNER', 'MEMBER'}
           author_rerun = commands[0] != 'review' and comment['user']['login'] == pull['user']['login']
           if not trusted and not author_rerun:
               raise SystemExit(0)
